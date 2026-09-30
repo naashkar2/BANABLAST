@@ -1,448 +1,1253 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Banablast Accounts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
+  <title>BANABLAST - Business Ledger</title>
   <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #0f172a;
+      --accent-green: #16a34a;
+      --accent-red: #dc2626;
+      --accent-blue: #0284c7;
+      --accent-purple: #7c3aed;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 90px; }
-    
+    body { background-color: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+
     /* Header */
-    .app-header { background: #1e3a8a; color: white; padding: 14px 16px; text-align: center; }
-    .app-header h1 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
-    .date-row { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 6px; }
-    .date-input { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 8px; border-radius: 6px; font-size: 13px; outline: none; }
-    .btn-leave { background: #f59e0b; color: #78350f; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    header { background: var(--primary); color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; }
+    .date-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 8px; }
+    .date-picker { background: transparent; border: none; color: white; font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
+    .holiday-btn { background: #eab308; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .holiday-btn.active { background: var(--accent-red); color: white; }
 
-    /* Nav Tabs */
-    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; }
-    .tab-btn { flex: 1; padding: 11px 4px; border: none; background: transparent; font-weight: 700; font-size: 13px; color: #64748b; cursor: pointer; text-align: center; }
-    .tab-btn.active { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; }
+    /* Holiday Banner */
+    .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 8px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
 
-    .container { padding: 12px; }
+    /* Navigation Tabs */
+    .nav-tabs { display: flex; background: white; border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+    .tab-btn { flex: 1; min-width: 80px; padding: 12px 6px; text-align: center; background: none; border: none; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    /* Top Summary Card */
-    .summary-card { background: #1e293b; color: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; font-size: 13px; }
-    .summary-card span { font-weight: bold; }
-    .txt-green { color: #4ade80; }
-    .txt-red { color: #f87171; }
-    .txt-blue { color: #38bdf8; }
+    .content-area { padding: 14px; max-width: 600px; margin: 0 auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    /* 2 Columns: Cash vs GPay (Notebook Style) */
-    .columns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .col-box { background: white; border-radius: 8px; border: 1px solid #cbd5e1; overflow: hidden; display: flex; flex-direction: column; min-height: 250px; }
-    .col-header { padding: 8px; text-align: center; color: white; font-weight: bold; font-size: 13px; }
-    .col-header.cash { background: #15803d; }
-    .col-header.gpay { background: #0369a1; }
-    
-    .entry-list { padding: 8px; flex: 1; overflow-y: auto; max-height: 220px; }
-    .entry-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px dashed #f1f5f9; }
-    .entry-row span.name { color: #334155; }
-    .entry-row span.amt { font-weight: bold; color: #dc2626; }
-    
-    .col-footer { padding: 8px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; }
-    .footer-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+    /* Daily Summary Card */
+    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 16px; }
+    .sum-box h4 { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
+    .sum-box p { font-size: 1.15rem; font-weight: 800; }
+    .color-green { color: #4ade80 !important; }
+    .color-red { color: #f87171 !important; }
+    .color-blue { color: #38bdf8 !important; }
+    .color-purple { color: #c084fc !important; }
 
-    /* Cumulative Balances Box */
-    .balance-card { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
-    .balance-card h3 { font-size: 12px; color: #1e40af; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .bal-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
-    .bal-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: #1e3a8a; border-top: 1px solid #93c5fd; padding-top: 6px; margin-top: 4px; }
+    /* Section Action Buttons (Placed right above the white space) */
+    .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .btn-sale-top { background: var(--accent-green); }
+    .btn-exp-top { background: var(--accent-red); margin-top: 16px; }
 
-    /* Bottom Khatabook Actions */
-    .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; gap: 10px; padding: 10px 14px; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 50; }
-    .btn { flex: 1; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; text-align: center; }
-    .btn-green { background: #16a34a; }
-    .btn-red { background: #dc2626; }
+    /* Section White Card Container */
+    .section-card { background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 16px; overflow: hidden; }
+    .section-subbar { background: #f1f5f9; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
+
+    /* Entry Items */
+    .entry-list { padding: 4px 8px; min-height: 80px; max-height: 350px; overflow-y: auto; }
+    .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-info { flex: 1; cursor: pointer; padding-right: 8px; }
+    .entry-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+    .entry-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .mode-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+    .badge-cash { background: #dcfce7; color: #15803d; }
+    .badge-gpay { background: #e0f2fe; color: #0369a1; }
+    .entry-right { display: flex; align-items: center; gap: 8px; }
+    .entry-amt { font-size: 1rem; font-weight: 800; }
+    .entry-actions { display: flex; gap: 4px; }
+    .btn-icon { background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 4px; opacity: 0.7; }
+    .btn-icon:hover { opacity: 1; }
+
+    /* Running Balance Box */
+    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 14px; margin-top: 20px; }
+    .running-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .running-title { font-size: 0.9rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+    .btn-link { background: none; border: none; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
+    .bal-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: #334155; }
+    .bal-row.total { border-top: 2px solid #cbd5e1; padding-top: 8px; font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
+
+    /* Stock Items */
+    .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .stock-name { font-weight: 700; font-size: 0.95rem; text-transform: capitalize; }
+    .stock-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .stock-amt { font-size: 1rem; font-weight: 800; color: var(--accent-red); }
+
+    /* Reports & Partner Split */
+    .report-filter { display: flex; gap: 8px; margin-bottom: 14px; }
+    .filter-btn { flex: 1; padding: 8px; background: white; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .cat-box { background: white; border-radius: 10px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+    .cat-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .list-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
+
+    /* Partner Split Cards */
+    .partner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .partner-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center; }
+    .partner-card h5 { font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .partner-card .p-val { font-size: 0.85rem; font-weight: 800; margin: 4px 0; }
+    .partner-card .p-sub { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* Investment & Withdrawal Cards */
+    .inv-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+    .inv-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem; }
+    .inv-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-verified { background: #dcfce7; color: #15803d; }
+    .verify-box { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #e2e8f0; font-size: 0.75rem; }
+    .verify-buttons { display: flex; gap: 6px; margin-top: 6px; }
+    .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
+    .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
 
     /* Modals */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 100; }
-    .modal-content { background: white; width: 100%; border-radius: 16px 16px 0 0; padding: 18px; max-height: 90vh; overflow-y: auto; }
-    .form-group { margin-bottom: 11px; }
-    .form-group label { display: block; font-size: 12px; color: #475569; font-weight: bold; margin-bottom: 4px; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; outline: none; }
-    .btn-save { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; margin-top: 8px; }
-    .mode-chips { display: flex; gap: 8px; }
-    .mode-chip { flex: 1; padding: 9px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
-    .mode-chip.active-cash { background: #dcfce7; border-color: #16a34a; color: #15803d; }
-    .mode-chip.active-gpay { background: #fee2e2; border-color: #dc2626; color: #b91c1c; }
-  </style>
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: flex-end; }
+    .modal-box { background: white; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0; padding: 18px; animation: slideUp 0.2s ease-out; max-height: 85vh; overflow-y: auto; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-box h3 { margin-bottom: 12px; font-size: 1.1rem; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
+    .btn-submit { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; margin-top: 8px; }
+    .btn-cancel { width: 100%; padding: 10px; background: none; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; }
 
-  <!-- Google Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    /* Sheet History Modal Table */
+    .sheet-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+    .sheet-table th, .sheet-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .sheet-table th { background: #f8fafc; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; }
+    .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
+  </style>
 </head>
 <body>
 
-  <!-- App Header -->
-  <div class="app-header">
-    <h1>BANABLAST</h1>
-    <div class="date-row">
-      <input type="date" id="selectedDate" class="date-input" onchange="loadDateData()">
-      <button class="btn-leave" id="leaveBtn" onclick="toggleShopHoliday()">Shop Holiday</button>
+  <header>
+    <div class="header-top">
+      <div class="brand-title">BANABLAST</div>
+      <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
     </div>
-  </div>
+    <div class="date-control">
+      <input type="date" id="selectedDate" class="date-picker" onchange="loadDateData()">
+    </div>
+  </header>
 
-  <!-- Tabs Navigation -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('daily', event)">Daily Accounts</button>
-    <button class="tab-btn" onclick="switchTab('stock', event)">Stock Items</button>
-    <button class="tab-btn" onclick="switchTab('reports', event)">Rent & Reports</button>
-  </div>
+  <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <div class="container" id="tabContent">
-    <!-- 1. DAILY ACCOUNT TAB -->
-    <div id="dailyView">
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('daily')">Daily Accounts</button>
+    <button class="tab-btn" onclick="switchTab('stock')">Stock Items</button>
+    <button class="tab-btn" onclick="switchTab('reports')">Reports</button>
+    <button class="tab-btn" onclick="switchTab('invest')">💼 Investments</button>
+  </nav>
+
+  <div class="content-area">
+
+    <!-- TAB 1: DAILY ACCOUNTS (VERTICAL FLOW) -->
+    <div id="tab-daily" class="tab-content active">
+      
+      <!-- Top Summary -->
       <div class="summary-card">
-        <div>Sales: <span class="txt-green" id="topSales">&#8377;0</span></div>
-        <div>Expense: <span class="txt-red" id="topExpense">&#8377;0</span></div>
-        <div>Profit: <span class="txt-blue" id="topNet">&#8377;0</span></div>
-      </div>
-
-      <!-- 2 Columns: Cash & GPay -->
-      <div class="columns-grid">
-        <!-- Cash Column -->
-        <div class="col-box">
-          <div class="col-header cash" id="cashInHeader">CASH IN: &#8377;0</div>
-          <div class="entry-list" id="cashList"></div>
-          <div class="col-footer">
-            <div class="footer-row"><span>Cash Exp:</span> <span class="txt-red" id="cashExpTotal">&#8377;0</span></div>
-            <div class="footer-row" style="font-weight:bold;"><span>Cash Bal:</span> <span class="txt-green" id="cashBal">&#8377;0</span></div>
-          </div>
+        <div class="sum-box">
+          <h4>Sales</h4>
+          <p id="sumDailySales" class="color-green">₹0</p>
         </div>
-
-        <!-- GPay Column -->
-        <div class="col-box">
-          <div class="col-header gpay" id="gpayInHeader">GPAY IN: &#8377;0</div>
-          <div class="entry-list" id="gpayList"></div>
-          <div class="col-footer">
-            <div class="footer-row"><span>GPay Exp:</span> <span class="txt-red" id="gpayExpTotal">&#8377;0</span></div>
-            <div class="footer-row" style="font-weight:bold;"><span>GPay Bal:</span> <span class="txt-blue" id="gpayBal">&#8377;0</span></div>
-          </div>
+        <div class="sum-box">
+          <h4>Expense</h4>
+          <p id="sumDailyExp" class="color-red">₹0</p>
+        </div>
+        <div class="sum-box">
+          <h4>Profit</h4>
+          <p id="sumDailyProfit" class="color-blue">₹0</p>
         </div>
       </div>
 
-      <!-- Cumulative Rolling Balance -->
-      <div class="balance-card">
-        <h3>RUNNING BALANCES <span style="cursor:pointer; text-decoration:underline; font-size:11px;" onclick="editOpeningBalance()">Edit Opening</span></h3>
+      <!-- 1. SALES SECTION -->
+      <button class="section-header-btn btn-sale-top" onclick="openEntryModal('sale')">
+        + ADD SALE IN (വരവ് ചേർക്കുക)
+      </button>
+      <div class="section-card">
+        <div class="section-subbar">
+          <span>SALES LIST (ക്ലിക്ക് ചെയ്താൽ ഹിസ്റ്ററി കാണാം)</span>
+          <span>Cash: <b id="subSaleCash">₹0</b> | GPay: <b id="subSaleGPay">₹0</b></span>
+        </div>
+        <div class="entry-list" id="salesEntriesList"></div>
+      </div>
+
+      <!-- 2. EXPENSES SECTION -->
+      <button class="section-header-btn btn-exp-top" onclick="openEntryModal('expense')">
+        - ADD EXPENSE (ചിലവ് ചേർക്കുക)
+      </button>
+      <div class="section-card">
+        <div class="section-subbar">
+          <span>EXPENSES LIST (ക്ലിക്ക് ചെയ്താൽ ഹിസ്റ്ററി കാണാം)</span>
+          <span>Cash: <b id="subExpCash">₹0</b> | GPay: <b id="subExpGPay">₹0</b></span>
+        </div>
+        <div class="entry-list" id="expenseEntriesList"></div>
+      </div>
+
+      <!-- 3. RUNNING BALANCES (AT THE BOTTOM) -->
+      <div class="running-card">
+        <div class="running-header">
+          <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
+          <button class="btn-link" onclick="openOpeningModal()">EDIT OPENING</button>
+        </div>
         <div class="bal-row">
-          <span>Bank Account (Acco):</span>
-          <span id="accoDisplay">&#8377;0 + 0 = &#8377;0</span>
+          <span>Bank Account (GPay/UPI):</span>
+          <span id="runBankBal" style="font-weight:700;">₹0</span>
         </div>
         <div class="bal-row">
           <span>Counter Cash Box:</span>
-          <span id="boxDisplay">&#8377;0 + 0 = &#8377;0</span>
+          <span id="runCashBal" style="font-weight:700;">₹0</span>
         </div>
-        <div class="bal-total">
+        <div class="bal-row total">
           <span>TOTAL BALANCE:</span>
-          <span id="totalRollingDisplay">&#8377;0</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. STOCK ITEMS VIEW -->
-    <div id="stockView" style="display:none;">
-      <h3 style="font-size:14px; margin-bottom:8px; color:#1e293b;">Item-wise Stock Purchases</h3>
-      <div id="stockItemList" style="background:white; border-radius:8px; padding:10px; border:1px solid #cbd5e1; font-size:13px;">
-        <p style="color:#64748b; text-align:center;">No stock purchases added yet.</p>
-      </div>
-    </div>
-
-    <!-- 3. RENT & REPORTS VIEW -->
-    <div id="reportsView" style="display:none;">
-      <div class="balance-card" style="background:#fef3c7; border-color:#fcd34d;">
-        <h3 style="color:#92400e;">RENT TRACKER</h3>
-        <div style="font-size:16px; font-weight:bold; color:#78350f;" id="rentPaidTotal">Total Rent Paid: &#8377;0</div>
-        <small id="rentDaysCount" style="color:#b45309;">0 Days Recorded</small>
-      </div>
-      <div id="rentHistoryList" style="background:white; border-radius:8px; padding:10px; border:1px solid #cbd5e1; font-size:13px;">
-        <p style="color:#64748b; text-align:center;">No rent entries recorded.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Actions -->
-  <div class="footer-actions">
-    <button class="btn btn-green" onclick="openEntryModal('Income')">+ SALE IN</button>
-    <button class="btn btn-red" onclick="openEntryModal('Expense')">- EXPENSE</button>
-  </div>
-
-  <!-- Entry Modal -->
-  <div class="modal" id="entryModal">
-    <div class="modal-content">
-      <h2 id="modalTitle" style="font-size:16px; margin-bottom:12px;">Add Transaction</h2>
-      <div class="form-group">
-        <label>Amount (തുക)</label>
-        <input type="number" id="inpAmount" placeholder="₹0" inputmode="numeric">
-      </div>
-      <div class="form-group">
-        <label>Payment Mode</label>
-        <div class="mode-chips">
-          <div class="mode-chip active-cash" id="modeCashChip" onclick="setMode('Cash')">CASH</div>
-          <div class="mode-chip" id="modeGpayChip" onclick="setMode('GPay')">GPAY / UPI</div>
+          <span id="runTotalBal">₹0</span>
         </div>
       </div>
 
-      <!-- Specific for Expense -->
-      <div id="expenseFields" style="display:none;">
-        <div class="form-group">
-          <label>Expense Category</label>
-          <select id="inpCategory" onchange="onCategoryChange()">
-            <option value="Stock">Stock / Raw Materials</option>
-            <option value="Rent">Shop Rent</option>
-            <option value="Salary">Staff Salary</option>
-            <option value="KSEB">Electricity / KSEB</option>
-            <option value="Refreshment">Tea / Refreshments</option>
-            <option value="Others">Others</option>
-          </select>
-        </div>
+    </div>
 
-        <!-- Dynamic Stock Items Selector -->
-        <div class="form-group" id="stockItemField">
-          <label>Select Item (or Add New)</label>
-          <div style="display:flex; gap:6px;">
-            <select id="inpSavedItem" style="flex:1;"></select>
-            <button type="button" onclick="addNewItemPrompt()" style="padding:0 12px; background:#1e3a8a; color:white; border:none; border-radius:6px; font-weight:bold;">+ New</button>
+    <!-- TAB 2: STOCK ITEMS -->
+    <div id="tab-stock" class="tab-content">
+      <h3 style="font-size:1rem; margin-bottom:12px;">Item-wise Stock Purchases</h3>
+      <div id="stockListContainer"></div>
+    </div>
+
+    <!-- TAB 3: REPORTS (ALL EXPENSES & PARTNER PROFIT SHARE) -->
+    <div id="tab-reports" class="tab-content">
+      <div class="report-filter">
+        <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
+        <button class="filter-btn" id="btnFiltWeek" onclick="filterReport('week')">This Week</button>
+        <button class="filter-btn" id="btnFiltAll" onclick="filterReport('all')">All Time</button>
+      </div>
+
+      <div class="summary-card">
+        <div class="sum-box"><h4>Sales</h4><p id="repSales" class="color-green">₹0</p></div>
+        <div class="sum-box"><h4>Expense</h4><p id="repExp" class="color-red">₹0</p></div>
+        <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
+      </div>
+
+      <!-- 3 PARTNERS PROFIT SPLIT (1/3 EACH) -->
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>🤝 Partners Profit Split (1/3 Each)</span>
+          <span id="repEachShare" class="color-blue">₹0 / partner</span>
+        </div>
+        <div class="partner-grid">
+          <div class="partner-card">
+            <h5>ASHIF</h5>
+            <div class="p-sub">Drawn: <span id="drawAshif" class="color-red">₹0</span></div>
+            <div class="p-val" id="netAshif">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>SABITH</h5>
+            <div class="p-sub">Drawn: <span id="drawSabith" class="color-red">₹0</span></div>
+            <div class="p-val" id="netSabith">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>ASHKAR ALI</h5>
+            <div class="p-sub">Drawn: <span id="drawAshkar" class="color-red">₹0</span></div>
+            <div class="p-val" id="netAshkar">₹0</div>
           </div>
         </div>
+      </div>
 
-        <!-- Employee Name if Salary -->
-        <div class="form-group" id="employeeField" style="display:none;">
-          <label>Employee Name</label>
-          <input type="text" id="inpEmployee" placeholder="e.g. Asif">
+      <!-- Expense Categories Breakdown -->
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>🏠 Rent Payments</span>
+          <span id="repTotalRent" class="color-red">₹0</span>
+        </div>
+        <div id="repRentList"></div>
+      </div>
+
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>👥 Staff Salaries</span>
+          <span id="repTotalSalary" class="color-red">₹0</span>
+        </div>
+        <div id="repStaffList"></div>
+      </div>
+
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>📦 Stock & Other Expenses</span>
+          <span id="repTotalOther" class="color-red">₹0</span>
+        </div>
+        <div class="list-row"><span>Stock Purchases Total:</span><strong id="repStockSum">₹0</strong></div>
+        <div class="list-row"><span>Daily Miscellaneous:</span><strong id="repMiscSum">₹0</strong></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFIED) -->
+    <div id="tab-invest" class="tab-content">
+      <div style="display:flex; gap:10px; margin-bottom:14px;">
+        <button class="section-header-btn" style="background:var(--accent-purple); border-radius:8px;" onclick="openInvestModal()">+ ADD INVESTMENT</button>
+        <button class="section-header-btn" style="background:#b91c1c; border-radius:8px;" onclick="openWithdrawModal()">- WITHDRAW MONEY</button>
+      </div>
+
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>💼 Capital Invested by Partners</span>
+          <span id="invTotalVerified" class="color-purple">₹0</span>
+        </div>
+        <div class="partner-grid">
+          <div class="partner-card">
+            <h5>ASHIF</h5>
+            <div class="p-val color-purple" id="invCapAshif">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>SABITH</h5>
+            <div class="p-val color-purple" id="invCapSabith">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>ASHKAR ALI</h5>
+            <div class="p-val color-purple" id="invCapAshkar">₹0</div>
+          </div>
         </div>
       </div>
 
+      <div id="pendingAlertBox" style="display:none; background:#fef3c7; color:#92400e; padding:10px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:14px; border:1px solid #fde68a;">
+        ⚠️ സ്ഥിരീകരിക്കാത്ത (Pending) എൻട്രികൾ താഴെയുണ്ട്. 3 പേരും വെരിഫൈ ചെയ്താൽ മാത്രമേ തുക ബാലൻസിൽ കൂട്ടുകയോ കുറയ്ക്കുകയോ ചെയ്യൂ.
+      </div>
+
+      <h3 style="font-size:0.95rem; margin:14px 0 8px; color:var(--text-dark);">Investments Log (നിക്ഷേപങ്ങൾ)</h3>
+      <div id="investListContainer"></div>
+
+      <h3 style="font-size:0.95rem; margin:20px 0 8px; color:var(--text-dark);">Withdrawals Log (പിൻവലിച്ച തുകകൾ)</h3>
+      <div id="withdrawListContainer"></div>
+    </div>
+
+  </div>
+
+  <!-- Entry Modal (Daily Sale / Expense) -->
+  <div class="modal" id="entryModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">Add Entry</h3>
+      <input type="hidden" id="editEntryId">
+      <input type="hidden" id="entryType">
+
       <div class="form-group">
-        <label>Note / Remark</label>
-        <input type="text" id="inpNote" placeholder="e.g. Counter Sales, Milk, Sugar">
+        <label>Amount (തുക ₹)</label>
+        <input type="number" id="entryAmount" class="form-control" placeholder="0.00" required>
       </div>
 
       <div class="form-group">
-        <label>Partner</label>
-        <select id="inpPartner">
-          <option value="Partner 1">Partner 1</option>
-          <option value="Partner 2">Partner 2</option>
-          <option value="Partner 3">Partner 3</option>
+        <label>Payment Mode (പണം എങ്ങന നൽകി/ലഭിച്ചു?)</label>
+        <select id="entryMode" class="form-control">
+          <option value="cash">Counter Cash</option>
+          <option value="gpay">GPay / Bank</option>
         </select>
       </div>
 
-      <button class="btn-save" id="saveSubmitBtn" onclick="saveTransaction()">SAVE ENTRY</button>
-      <button style="width:100%; background:transparent; border:none; color:#64748b; padding:10px; cursor:pointer;" onclick="closeModal()">Cancel</button>
+      <!-- Category selection for Expense -->
+      <div class="form-group" id="expCategoryGroup" style="display:none;">
+        <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
+        <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
+          <option value="tea">Tea / Refreshment</option>
+          <option value="stock">Stock Item (Milk, Banana, Sugar, etc.)</option>
+          <option value="salary">Staff Salary</option>
+          <option value="rent">Shop Rent</option>
+          <option value="other">Daily Expense / Miscellaneous</option>
+        </select>
+      </div>
+
+      <!-- Item Name / Remark (Never blank!) -->
+      <div class="form-group">
+        <label id="itemNameLabel">Item / Description / Remark</label>
+        <input type="text" id="entryTitle" class="form-control" placeholder="e.g. Sales, Tea, Milk, Shop Rent..." required>
+      </div>
+
+      <div class="form-group">
+        <label>Additional Note (ഓപ്ഷണൽ)</label>
+        <input type="text" id="entryNote" class="form-control" placeholder="Extra details if any">
+      </div>
+
+      <button class="btn-submit" id="modalSubmitBtn" onclick="saveEntry()">Save Entry</button>
+      <button class="btn-cancel" onclick="closeModal('entryModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Universal Item History Sheet Modal (Milk, Tea, Rent, Sugar, Sales etc.) -->
+  <div class="modal" id="itemSheetModal">
+    <div class="modal-box" style="max-height: 90vh;">
+      <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Item Purchase History</h3>
+      
+      <!-- History Date Filters -->
+      <div class="report-filter" style="margin-top:8px;">
+        <button class="filter-btn active" id="sheetFiltMonth" onclick="filterItemSheet('month')">This Month</button>
+        <button class="filter-btn" id="sheetFiltWeek" onclick="filterItemSheet('week')">This Week</button>
+        <button class="filter-btn" id="sheetFiltAll" onclick="filterItemSheet('all')">All Time</button>
+        <button class="filter-btn" id="sheetFiltCustom" onclick="filterItemSheet('custom')">Custom</button>
+      </div>
+
+      <!-- Custom Date Pickers -->
+      <div id="customDateRow" style="display:none; gap:6px; margin-bottom:10px;">
+        <input type="date" id="sheetFromDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <input type="date" id="sheetToDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <button class="filter-btn active" style="flex:0 0 60px;" onclick="applyCustomSheetDate()">Apply</button>
+      </div>
+
+      <!-- Table Sheet View -->
+      <div style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+        <table class="sheet-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Details</th>
+              <th>Mode</th>
+              <th style="text-align:right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="sheetTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Total Sum Banner -->
+      <div class="sheet-total-box">
+        <span>TOTAL AMOUNT:</span>
+        <span id="sheetTotalSum" class="color-red">₹0</span>
+      </div>
+
+      <button class="btn-cancel" style="margin-top:8px;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
+    </div>
+  </div>
+
+  <!-- Add Investment Modal -->
+  <div class="modal" id="investModal">
+    <div class="modal-box">
+      <h3>Add Capital Investment</h3>
+      <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ ഇത് പ്രാബല്യത്തിൽ വരൂ.</p>
+
+      <div class="form-group">
+        <label>Investing Partner (നിക്ഷേപിച്ച പാർട്ണർ)</label>
+        <select id="invPartner" class="form-control">
+          <option value="ASHIF">ASHIF</option>
+          <option value="SABITH">SABITH</option>
+          <option value="ASHKAR ALI">ASHKAR ALI</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" id="invAmount" class="form-control" placeholder="0.00" required>
+      </div>
+
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="invMode" class="form-control">
+          <option value="bank">Bank Transfer / UPI</option>
+          <option value="cash">Direct Cash</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="invDate" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Description / Note</label>
+        <input type="text" id="invNote" class="form-control" placeholder="e.g. Advance, Equipment">
+      </div>
+
+      <button class="btn-submit" style="background:var(--accent-purple);" onclick="saveInvestment()">Submit for Verification</button>
+      <button class="btn-cancel" onclick="closeModal('investModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Add Withdrawal Modal (with 3-partner verification) -->
+  <div class="modal" id="withdrawModal">
+    <div class="modal-box">
+      <h3>Request Profit/Money Withdrawal</h3>
+      <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയുകയുള്ളൂ.</p>
+
+      <div class="form-group">
+        <label>Withdrawing Partner (പിൻവലിക്കുന്ന പാർട്ണർ)</label>
+        <select id="withPartner" class="form-control">
+          <option value="ASHIF">ASHIF</option>
+          <option value="SABITH">SABITH</option>
+          <option value="ASHKAR ALI">ASHKAR ALI</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" id="withAmount" class="form-control" placeholder="0.00" required>
+      </div>
+
+      <div class="form-group">
+        <label>Payment Source (എവിടെ നിന്ന് എടുത്തു?)</label>
+        <select id="withMode" class="form-control">
+          <option value="cash">Counter Cash Box</option>
+          <option value="gpay">Bank Account / GPay</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="withDate" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Note / Reason</label>
+        <input type="text" id="withNote" class="form-control" placeholder="e.g. Profit withdrawal">
+      </div>
+
+      <button class="btn-submit" style="background:var(--accent-red);" onclick="saveWithdrawal()">Submit for Verification</button>
+      <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Opening Balance Modal -->
+  <div class="modal" id="openingModal">
+    <div class="modal-box">
+      <h3>Set Initial Opening Balance</h3>
+      <div class="form-group">
+        <label>Counter Cash Box Opening (₹)</label>
+        <input type="number" id="openCash" class="form-control" value="0">
+      </div>
+      <div class="form-group">
+        <label>Bank Account / GPay Opening (₹)</label>
+        <input type="number" id="openBank" class="form-control" value="0">
+      </div>
+      <button class="btn-submit" style="background:var(--primary);" onclick="saveOpeningBalance()">Save Opening</button>
+      <button class="btn-cancel" onclick="closeModal('openingModal')">Cancel</button>
     </div>
   </div>
 
   <script>
-    // State Variables
-    let currentDate = new Date().toISOString().split('T')[0];
-    document.getElementById('selectedDate').value = currentDate;
-    let selectedMode = 'Cash';
-    let currentType = 'Income';
+    const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
-    // Stock Items Memory
-    let savedItems = JSON.parse(localStorage.getItem('banablast_items')) || ["Raw Banana", "Sugar", "Milk", "BBC", "Pappai", "Skel", "Oil", "Packing Pouches"];
+    // Data Stores
+    let transactions = JSON.parse(localStorage.getItem('bb_trans')) || [];
+    let withdrawals = JSON.parse(localStorage.getItem('bb_withdrawals')) || [];
+    let investments = JSON.parse(localStorage.getItem('bb_investments')) || [];
+    let holidays = JSON.parse(localStorage.getItem('bb_holidays')) || [];
+    let opening = JSON.parse(localStorage.getItem('bb_opening')) || { cash: 0, bank: 0 };
+    let currentReportFilter = 'month';
 
-    function updateItemDropdown() {
-      const select = document.getElementById('inpSavedItem');
-      select.innerHTML = '';
-      savedItems.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item;
-        opt.innerText = item;
-        select.appendChild(opt);
-      });
-    }
-    updateItemDropdown();
+    // Sheet Modal State
+    let activeSheetKey = '';
+    let currentSheetFilter = 'month';
 
-    function addNewItemPrompt() {
-      const name = prompt("Enter New Item Name:");
-      if (name && !savedItems.includes(name.trim())) {
-        savedItems.push(name.trim());
-        localStorage.setItem('banablast_items', JSON.stringify(savedItems));
-        updateItemDropdown();
-        document.getElementById('inpSavedItem').value = name.trim();
-      }
-    }
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('selectedDate').value = today;
+    document.getElementById('invDate').value = today;
+    document.getElementById('withDate').value = today;
+    document.getElementById('sheetFromDate').value = today;
+    document.getElementById('sheetToDate').value = today;
 
-    function setMode(mode) {
-      selectedMode = mode;
-      document.getElementById('modeCashChip').className = 'mode-chip' + (mode === 'Cash' ? ' active-cash' : '');
-      document.getElementById('modeGpayChip').className = 'mode-chip' + (mode === 'GPay' ? ' active-gpay' : '');
-    }
+    window.onload = function() {
+      loadDateData();
+    };
 
-    function openEntryModal(type) {
-      currentType = type;
-      document.getElementById('modalTitle').innerText = (type === 'Income') ? '+ SALE IN (വരവ്)' : '- EXPENSE (ചിലവ്)';
-      document.getElementById('saveSubmitBtn').style.backgroundColor = (type === 'Income') ? '#16a34a' : '#dc2626';
-      document.getElementById('expenseFields').style.display = (type === 'Expense') ? 'block' : 'none';
-      document.getElementById('entryModal').style.display = 'flex';
-      onCategoryChange();
-    }
-
-    function closeModal() { document.getElementById('entryModal').style.display = 'none'; }
-
-    function onCategoryChange() {
-      const cat = document.getElementById('inpCategory').value;
-      document.getElementById('stockItemField').style.display = (cat === 'Stock') ? 'block' : 'none';
-      document.getElementById('employeeField').style.display = (cat === 'Salary') ? 'block' : 'none';
-    }
-
-    function switchTab(tab, event) {
+    function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       event.target.classList.add('active');
-      document.getElementById('dailyView').style.display = (tab === 'daily') ? 'block' : 'none';
-      document.getElementById('stockView').style.display = (tab === 'stock') ? 'block' : 'none';
-      document.getElementById('reportsView').style.display = (tab === 'reports') ? 'block' : 'none';
-      if (tab === 'stock') renderStockReport();
-      if (tab === 'reports') renderRentReport();
+      document.getElementById('tab-' + tabId).classList.add('active');
+
+      if (tabId === 'stock') renderStockTab();
+      if (tabId === 'reports') renderReportsTab();
+      if (tabId === 'invest') renderInvestTab();
     }
 
-    function saveTransaction() {
-      const amount = parseFloat(document.getElementById('inpAmount').value);
-      if (!amount || amount <= 0) return alert("Enter valid amount!");
+    /* Date & Holiday Control */
+    function loadDateData() {
+      const curDate = document.getElementById('selectedDate').value;
+      const isHoliday = holidays.includes(curDate);
+      const hBtn = document.getElementById('holidayToggleBtn');
+      const hBanner = document.getElementById('holidayBanner');
 
-      const partner = document.getElementById('inpPartner').value;
-      let note = document.getElementById('inpNote').value.trim();
-      let category = (currentType === 'Expense') ? document.getElementById('inpCategory').value : 'Sale';
-
-      if (currentType === 'Expense') {
-        if (category === 'Stock') note = document.getElementById('inpSavedItem').value + (note ? ' (' + note + ')' : '');
-        if (category === 'Salary') note = (document.getElementById('inpEmployee').value || 'Staff') + ' Salary' + (note ? ' (' + note + ')' : '');
+      if (isHoliday) {
+        hBtn.classList.add('active');
+        hBtn.innerText = 'Holiday: Active';
+        hBanner.style.display = 'block';
       } else {
-        note = note || 'Counter Sales';
+        hBtn.classList.remove('active');
+        hBtn.innerText = 'Shop Holiday';
+        hBanner.style.display = 'none';
       }
 
-      const entry = {
-        type: currentType,
-        amount: amount,
-        mode: selectedMode,
-        category: category,
-        note: note,
-        partner: partner,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      let local = JSON.parse(localStorage.getItem('banablast_' + currentDate) || '[]');
-      local.push(entry);
-      localStorage.setItem('banablast_' + currentDate, JSON.stringify(local));
-
-      // Global store for reports
-      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
-      allEntries.push({ ...entry, date: currentDate });
-      localStorage.setItem('banablast_all_entries', JSON.stringify(allEntries));
-
-      closeModal();
-      document.getElementById('inpAmount').value = '';
-      document.getElementById('inpNote').value = '';
-      renderDateData(local);
+      renderDailyAccounts();
     }
 
-    function loadDateData() {
-      currentDate = document.getElementById('selectedDate').value;
-      let local = JSON.parse(localStorage.getItem('banablast_' + currentDate) || '[]');
-      renderDateData(local);
+    function toggleHoliday() {
+      const curDate = document.getElementById('selectedDate').value;
+      const idx = holidays.indexOf(curDate);
+      if (idx > -1) holidays.splice(idx, 1);
+      else holidays.push(curDate);
+      localStorage.setItem('bb_holidays', JSON.stringify(holidays));
+      loadDateData();
     }
 
-    function renderDateData(entries) {
-      let cashIn = 0, gpayIn = 0, cashExp = 0, gpayExp = 0;
-      const cashList = document.getElementById('cashList');
-      const gpayList = document.getElementById('gpayList');
-      cashList.innerHTML = ''; gpayList.innerHTML = '';
+    /* Modal Controls */
+    function openEntryModal(type, editId = null) {
+      document.getElementById('editEntryId').value = editId || '';
+      document.getElementById('entryType').value = type;
+      const isExp = type === 'expense';
+      document.getElementById('expCategoryGroup').style.display = isExp ? 'block' : 'none';
+      document.getElementById('modalSubmitBtn').style.background = isExp ? 'var(--accent-red)' : 'var(--accent-green)';
+      document.getElementById('modalTitle').innerText = editId ? (isExp ? 'Edit Expense' : 'Edit Sale') : (isExp ? 'Add Expense (ചിലവ്)' : 'Add Sale In (വരവ്)');
 
-      entries.forEach(e => {
-        if (e.type === 'Income') {
-          if (e.mode === 'Cash') cashIn += e.amount;
-          if (e.mode === 'GPay') gpayIn += e.amount;
+      if (editId) {
+        const item = transactions.find(t => t.id === editId);
+        if (item) {
+          document.getElementById('entryAmount').value = item.amount;
+          document.getElementById('entryMode').value = item.mode;
+          document.getElementById('entryTitle').value = item.title || item.extra || (item.type === 'sale' ? 'Sale' : 'Expense');
+          document.getElementById('entryNote').value = item.note || '';
+          if (isExp) document.getElementById('entryCategory').value = item.category || 'other';
+        }
+      } else {
+        document.getElementById('entryAmount').value = '';
+        document.getElementById('entryNote').value = '';
+        if (isExp) {
+          document.getElementById('entryCategory').value = 'tea';
+          document.getElementById('entryTitle').value = 'Tea';
         } else {
-          if (e.mode === 'Cash') {
-            cashExp += e.amount;
-            cashList.innerHTML += `<div class="entry-row"><span class="name">${e.note}</span><span class="amt">${e.amount}</span></div>`;
+          document.getElementById('entryTitle').value = 'Sales';
+        }
+      }
+      handleCategoryChange();
+      document.getElementById('entryModal').style.display = 'flex';
+    }
+
+    function handleCategoryChange() {
+      const type = document.getElementById('entryType').value;
+      if (type !== 'expense') return;
+      const cat = document.getElementById('entryCategory').value;
+      const titleInput = document.getElementById('entryTitle');
+      const editId = document.getElementById('editEntryId').value;
+      if (!editId) {
+        if (cat === 'tea') titleInput.value = 'Tea';
+        else if (cat === 'rent') titleInput.value = 'Shop Rent';
+        else if (cat === 'salary') titleInput.value = '';
+        else if (cat === 'stock') titleInput.value = 'Milk';
+        else titleInput.value = '';
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    /* Save Transaction (Daily) */
+    function saveEntry() {
+      const curDate = document.getElementById('selectedDate').value;
+      const editId = document.getElementById('editEntryId').value;
+      const type = document.getElementById('entryType').value;
+      const amount = parseFloat(document.getElementById('entryAmount').value);
+      const mode = document.getElementById('entryMode').value;
+      let title = document.getElementById('entryTitle').value.trim();
+      const note = document.getElementById('entryNote').value.trim();
+
+      if (!amount || amount <= 0) {
+        alert('സാധുവായ തുക നൽകുക');
+        return;
+      }
+
+      if (!title) {
+        title = type === 'sale' ? 'Sales' : 'Expense';
+      }
+
+      let category = 'sale';
+      if (type === 'expense') {
+        category = document.getElementById('entryCategory').value;
+      }
+
+      if (editId) {
+        const item = transactions.find(t => t.id === editId);
+        if (item) {
+          item.amount = amount;
+          item.mode = mode;
+          item.category = category;
+          item.title = title;
+          item.extra = title;
+          item.note = note;
+        }
+      } else {
+        transactions.push({
+          id: 'TX_' + Date.now(),
+          date: curDate,
+          type,
+          category,
+          title,
+          extra: title,
+          amount,
+          mode,
+          note
+        });
+      }
+
+      localStorage.setItem('bb_trans', JSON.stringify(transactions));
+      closeModal('entryModal');
+      renderDailyAccounts();
+    }
+
+    function deleteEntry(id) {
+      if (confirm('ഈ കണക്ക് ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?')) {
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('bb_trans', JSON.stringify(transactions));
+        renderDailyAccounts();
+      }
+    }
+
+    /* Render Daily Accounts (VERTICAL SINGLE COLUMN FLOW) */
+    function renderDailyAccounts() {
+      const curDate = document.getElementById('selectedDate').value;
+      const todayTrans = transactions.filter(t => t.date === curDate);
+
+      let totalSales = 0, totalExp = 0;
+      let saleCash = 0, saleGPay = 0;
+      let expCash = 0, expGPay = 0;
+
+      let salesHTML = '', expHTML = '';
+
+      todayTrans.forEach(t => {
+        const isSale = t.type === 'sale';
+        const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
+        const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
+        const badgeText = t.mode.toUpperCase();
+
+        const rowHTML = `
+          <div class="entry-row">
+            <div class="entry-info" onclick="openItemHistorySheet('${displayTitle}', '${t.category}')">
+              <div class="entry-title">
+                <span>${displayTitle}</span>
+                <span class="mode-badge ${badgeClass}">${badgeText}</span>
+              </div>
+              <div class="entry-sub">
+                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ ഹിസ്റ്ററി കാണാം 🔍
+              </div>
+            </div>
+            <div class="entry-right">
+              <span class="entry-amt ${isSale ? 'color-green' : 'color-red'}">
+                ${isSale ? '+' : '-'}₹${t.amount}
+              </span>
+              <div class="entry-actions">
+                <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️</button>
+                <button class="btn-icon" onclick="deleteEntry('${t.id}')">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        if (isSale) {
+          totalSales += t.amount;
+          if (t.mode === 'cash') saleCash += t.amount; else saleGPay += t.amount;
+          salesHTML += rowHTML;
+        } else {
+          totalExp += t.amount;
+          if (t.mode === 'cash') expCash += t.amount; else expGPay += t.amount;
+          expHTML += rowHTML;
+        }
+      });
+
+      document.getElementById('salesEntriesList').innerHTML = salesHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">വരവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
+      document.getElementById('expenseEntriesList').innerHTML = expHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">ചിലവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
+
+      document.getElementById('sumDailySales').innerText = '₹' + totalSales;
+      document.getElementById('sumDailyExp').innerText = '₹' + totalExp;
+      document.getElementById('sumDailyProfit').innerText = '₹' + (totalSales - totalExp);
+
+      document.getElementById('subSaleCash').innerText = '₹' + saleCash;
+      document.getElementById('subSaleGPay').innerText = '₹' + saleGPay;
+      document.getElementById('subExpCash').innerText = '₹' + expCash;
+      document.getElementById('subExpGPay').innerText = '₹' + expGPay;
+
+      // Cumulative Running Balances (Opening + Net Daily - Verified Withdrawals)
+      let cumCash = opening.cash || 0;
+      let cumBank = opening.bank || 0;
+
+      transactions.forEach(t => {
+        if (t.date <= curDate) {
+          if (t.mode === 'cash') {
+            cumCash += (t.type === 'sale' ? t.amount : -t.amount);
           } else {
-            gpayExp += e.amount;
-            gpayList.innerHTML += `<div class="entry-row"><span class="name">${e.note}</span><span class="amt">${e.amount}</span></div>`;
+            cumBank += (t.type === 'sale' ? t.amount : -t.amount);
           }
         }
       });
 
-      const cashBal = cashIn - cashExp;
-      const gpayBal = gpayIn - gpayExp;
-      const totalSales = cashIn + gpayIn;
-      const totalExp = cashExp + gpayExp;
-
-      document.getElementById('cashInHeader').innerText = `CASH IN: ₹${cashIn}`;
-      document.getElementById('gpayInHeader').innerText = `GPAY IN: ₹${gpayIn}`;
-      document.getElementById('cashExpTotal').innerText = `- ₹${cashExp}`;
-      document.getElementById('gpayExpTotal').innerText = `- ₹${gpayExp}`;
-      document.getElementById('cashBal').innerText = `+ ₹${cashBal}`;
-      document.getElementById('gpayBal').innerText = `+ ₹${gpayBal}`;
-
-      document.getElementById('topSales').innerText = `₹${totalSales}`;
-      document.getElementById('topExpense').innerText = `₹${totalExp}`;
-      document.getElementById('topNet').innerText = `₹${totalSales - totalExp}`;
-
-      let prevAcco = parseFloat(localStorage.getItem('prev_acco') || '6310');
-      let prevBox = parseFloat(localStorage.getItem('prev_box') || '4510');
-      let finalAcco = prevAcco + gpayBal;
-      let finalBox = prevBox + cashBal;
-
-      document.getElementById('accoDisplay').innerText = `₹${prevAcco} + ${gpayBal} = ₹${finalAcco}`;
-      document.getElementById('boxDisplay').innerText = `₹${prevBox} + ${cashBal} = ₹${finalBox}`;
-      document.getElementById('totalRollingDisplay').innerText = `₹${finalAcco + finalBox}`;
-    }
-
-    function editOpeningBalance() {
-      let a = prompt("Opening Bank Balance (Acco):", localStorage.getItem('prev_acco') || '6310');
-      let b = prompt("Opening Cash in Hand (Cash Box):", localStorage.getItem('prev_box') || '4510');
-      if (a) localStorage.setItem('prev_acco', a);
-      if (b) localStorage.setItem('prev_box', b);
-      loadDateData();
-    }
-
-    function renderStockReport() {
-      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
-      let stockListEl = document.getElementById('stockItemList');
-      let map = {};
-      allEntries.filter(e => e.category === 'Stock').forEach(e => {
-        let name = e.note.split(' (')[0];
-        map[name] = (map[name] || 0) + e.amount;
+      // Deduct ONLY 3-partner verified withdrawals
+      withdrawals.forEach(w => {
+        if (w.status === 'verified' && w.date <= curDate) {
+          if (w.mode === 'cash') cumCash -= w.amount; else cumBank -= w.amount;
+        }
       });
 
-      let keys = Object.keys(map);
-      if (!keys.length) {
-        stockListEl.innerHTML = '<p style="color:#64748b; text-align:center;">No stock purchases added yet.</p>';
+      document.getElementById('runCashBal').innerText = '₹' + cumCash;
+      document.getElementById('runBankBal').innerText = '₹' + cumBank;
+      document.getElementById('runTotalBal').innerText = '₹' + (cumCash + cumBank);
+    }
+
+    /* Universal History Sheet Modal (Milk, Tea, Rent, Sugar, Sales etc.) */
+    function openItemHistorySheet(itemName, category) {
+      activeSheetKey = itemName.trim().toLowerCase();
+      document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
+      currentSheetFilter = 'month';
+      document.getElementById('customDateRow').style.display = 'none';
+
+      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('sheetFiltMonth').classList.add('active');
+
+      renderItemSheetContent();
+      document.getElementById('itemSheetModal').style.display = 'flex';
+    }
+
+    function filterItemSheet(period) {
+      currentSheetFilter = period;
+      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
+      if (period === 'month') document.getElementById('sheetFiltMonth').classList.add('active');
+      if (period === 'week') document.getElementById('sheetFiltWeek').classList.add('active');
+      if (period === 'all') document.getElementById('sheetFiltAll').classList.add('active');
+      if (period === 'custom') {
+        document.getElementById('sheetFiltCustom').classList.add('active');
+        document.getElementById('customDateRow').style.display = 'flex';
+        return;
+      } else {
+        document.getElementById('customDateRow').style.display = 'none';
+      }
+      renderItemSheetContent();
+    }
+
+    function applyCustomSheetDate() {
+      renderItemSheetContent();
+    }
+
+    function renderItemSheetContent() {
+      const curDate = document.getElementById('selectedDate').value;
+      const refDate = new Date(curDate);
+      const fromDate = document.getElementById('sheetFromDate').value;
+      const toDate = document.getElementById('sheetToDate').value;
+
+      let matched = transactions.filter(t => {
+        const itemTitle = (t.title || t.extra || (t.type === 'sale' ? 'sales' : '')).toLowerCase();
+        return itemTitle === activeSheetKey;
+      });
+
+      // Filter by period
+      let filtered = matched.filter(t => {
+        if (currentSheetFilter === 'all') return true;
+        const tDate = new Date(t.date);
+        if (currentSheetFilter === 'month') {
+          return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
+        }
+        if (currentSheetFilter === 'week') {
+          const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        if (currentSheetFilter === 'custom') {
+          return t.date >= fromDate && t.date <= toDate;
+        }
+        return true;
+      });
+
+      filtered.sort((a,b) => b.date.localeCompare(a.date));
+
+      let totalSum = 0;
+      let rowsHTML = '';
+
+      filtered.forEach(t => {
+        totalSum += t.amount;
+        const isSale = t.type === 'sale';
+        rowsHTML += `
+          <tr>
+            <td><strong>${t.date}</strong></td>
+            <td>${t.note ? t.note : (isSale ? 'Sale' : t.category)}</td>
+            <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
+            <td style="text-align:right; font-weight:800;" class="${isSale ? 'color-green' : 'color-red'}">
+              ₹${t.amount}
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
+      document.getElementById('sheetTotalSum').innerText = '₹' + totalSum;
+      document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
+    }
+
+    /* Opening Balance */
+    function openOpeningModal() {
+      document.getElementById('openCash').value = opening.cash || 0;
+      document.getElementById('openBank').value = opening.bank || 0;
+      document.getElementById('openingModal').style.display = 'flex';
+    }
+
+    function saveOpeningBalance() {
+      opening.cash = parseFloat(document.getElementById('openCash').value) || 0;
+      opening.bank = parseFloat(document.getElementById('openBank').value) || 0;
+      localStorage.setItem('bb_opening', JSON.stringify(opening));
+      closeModal('openingModal');
+      renderDailyAccounts();
+    }
+
+    /* TAB 2: Stock Items & Purchase History */
+    function renderStockTab() {
+      const stockTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
+      const container = document.getElementById('stockListContainer');
+
+      if (stockTrans.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സ്റ്റോക്ക് വാങ്ങിയ വിവരങ്ങൾ ഇല്ല</p>';
         return;
       }
-      stockListEl.innerHTML = '';
-      keys.forEach(k => {
-        stockListEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;"><strong>${k}</strong><span style="color:#dc2626; font-weight:bold;">₹${map[k]}</span></div>`;
+
+      const grouped = {};
+      stockTrans.forEach(t => {
+        const name = (t.title || t.extra || 'Unknown').toLowerCase();
+        if (!grouped[name]) grouped[name] = { total: 0, count: 0, lastDate: t.date };
+        grouped[name].total += t.amount;
+        grouped[name].count += 1;
+        if (t.date > grouped[name].lastDate) grouped[name].lastDate = t.date;
       });
+
+      let html = '';
+      Object.keys(grouped).forEach(name => {
+        const item = grouped[name];
+        html += `
+          <div class="stock-card" onclick="openItemHistorySheet('${name}', 'stock')">
+            <div>
+              <div class="stock-name">${name}</div>
+              <div class="stock-meta">വാങ്ങിയത്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
+            </div>
+            <div class="stock-amt">₹${item.total}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
-    function renderRentReport() {
-      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
-      let rentList = allEntries.filter(e => e.category === 'Rent');
-      let total = rentList.reduce((acc, curr) => acc + curr.amount, 0);
-      document.getElementById('rentPaidTotal').innerText = `Total Rent Paid: ₹${total}`;
-      document.getElementById('rentDaysCount').innerText = `${rentList.length} Payments Recorded`;
+    /* TAB 3: Reports (All Expenses & 3 Partners Profit Split) */
+    function filterReport(period) {
+      currentReportFilter = period;
+      document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      if (period === 'month') document.getElementById('btnFiltMonth').classList.add('active');
+      if (period === 'week') document.getElementById('btnFiltWeek').classList.add('active');
+      if (period === 'all') document.getElementById('btnFiltAll').classList.add('active');
+      renderReportsTab();
+    }
 
-      let el = document.getElementById('rentHistoryList');
-      if (!rentList.length) {
-        el.innerHTML = '<p style="color:#64748b; text-align:center;">No rent entries recorded.</p>';
+    function renderReportsTab() {
+      const curDate = document.getElementById('selectedDate').value;
+      const refDate = new Date(curDate);
+
+      let filteredTrans = transactions.filter(t => {
+        if (currentReportFilter === 'all') return true;
+        const tDate = new Date(t.date);
+        if (currentReportFilter === 'month') {
+          return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
+        }
+        if (currentReportFilter === 'week') {
+          const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        return true;
+      });
+
+      let sales = 0, exp = 0, rent = 0, salary = 0, stock = 0, misc = 0;
+      let rentListHTML = '';
+      let staffGroup = {};
+
+      filteredTrans.forEach(t => {
+        if (t.type === 'sale') {
+          sales += t.amount;
+        } else {
+          exp += t.amount;
+          if (t.category === 'rent') {
+            rent += t.amount;
+            rentListHTML += `<div class="list-row"><span>${t.date} (${t.mode.toUpperCase()})</span><strong>₹${t.amount}</strong></div>`;
+          } else if (t.category === 'salary') {
+            salary += t.amount;
+            const staff = t.title || t.extra || 'Unknown';
+            staffGroup[staff] = (staffGroup[staff] || 0) + t.amount;
+          } else if (t.category === 'stock') {
+            stock += t.amount;
+          } else {
+            misc += t.amount;
+          }
+        }
+      });
+
+      const netProfit = sales - exp;
+      document.getElementById('repSales').innerText = '₹' + sales;
+      document.getElementById('repExp').innerText = '₹' + exp;
+      document.getElementById('repProfit').innerText = '₹' + netProfit;
+
+      const eachShare = Math.round(netProfit / 3);
+      document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
+
+      // Verified Withdrawn amount for 3 partners
+      const drawnMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
+      withdrawals.forEach(w => {
+        if (w.status === 'verified') {
+          if (drawnMap[w.partner] !== undefined) drawnMap[w.partner] += w.amount;
+        }
+      });
+
+      PARTNERS.forEach(p => {
+        const drawn = drawnMap[p] || 0;
+        const balanceShare = eachShare - drawn;
+        let prefix = p === 'ASHIF' ? 'Ashif' : (p === 'SABITH' ? 'Sabith' : 'Ashkar');
+
+        document.getElementById('draw' + prefix).innerText = '₹' + drawn;
+        const valElem = document.getElementById('net' + prefix);
+        valElem.innerText = (balanceShare >= 0 ? '+' : '') + '₹' + balanceShare;
+        valElem.className = 'p-val ' + (balanceShare >= 0 ? 'color-green' : 'color-red');
+      });
+
+      document.getElementById('repTotalRent').innerText = '₹' + rent;
+      document.getElementById('repRentList').innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
+
+      document.getElementById('repTotalSalary').innerText = '₹' + salary;
+      let staffHTML = '';
+      Object.keys(staffGroup).forEach(staff => {
+        staffHTML += `<div class="list-row"><span>👤 ${staff}</span><strong class="color-red">₹${staffGroup[staff]}</strong></div>`;
+      });
+      document.getElementById('repStaffList').innerHTML = staffHTML || '<p style="font-size:0.8rem; color:#94a3b8;">സാലറി വിവരങ്ങൾ ഇല്ല</p>';
+
+      document.getElementById('repStockSum').innerText = '₹' + stock;
+      document.getElementById('repMiscSum').innerText = '₹' + misc;
+      document.getElementById('repTotalOther').innerText = '₹' + (stock + misc);
+    }
+
+    /* TAB 4: INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFIED) */
+    function openInvestModal() {
+      document.getElementById('invAmount').value = '';
+      document.getElementById('invNote').value = '';
+      document.getElementById('investModal').style.display = 'flex';
+    }
+
+    function saveInvestment() {
+      const partner = document.getElementById('invPartner').value;
+      const amount = parseFloat(document.getElementById('invAmount').value);
+      const mode = document.getElementById('invMode').value;
+      const date = document.getElementById('invDate').value;
+      const note = document.getElementById('invNote').value.trim();
+
+      if (!amount || amount <= 0) {
+        alert('സാധുവായ തുക നൽകുക');
         return;
       }
-      el.innerHTML = '';
-      rentList.forEach(r => {
-        el.innerHTML += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9;"><span>${r.date} • ${r.mode}</span><strong style="color:#dc2626;">₹${r.amount}</strong></div>`;
+
+      investments.push({
+        id: 'INV_' + Date.now(),
+        partner,
+        amount,
+        mode,
+        date,
+        note,
+        approvals: [partner],
+        status: 'pending'
       });
+
+      localStorage.setItem('bb_investments', JSON.stringify(investments));
+      closeModal('investModal');
+      alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
+      renderInvestTab();
     }
 
-    function toggleShopHoliday() {
-      alert("Shop holiday status updated for this date!");
+    function verifyInvestment(invId, partnerName) {
+      const inv = investments.find(i => i.id === invId);
+      if (!inv) return;
+
+      if (!inv.approvals.includes(partnerName)) {
+        inv.approvals.push(partnerName);
+      }
+
+      if (PARTNERS.every(p => inv.approvals.includes(p))) {
+        inv.status = 'verified';
+      }
+
+      localStorage.setItem('bb_investments', JSON.stringify(investments));
+      renderInvestTab();
     }
 
-    loadDateData();
+    function deleteInvestment(id) {
+      if (confirm('ഈ ഇൻവെസ്റ്റ്മെന്റ് റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
+        investments = investments.filter(i => i.id !== id);
+        localStorage.setItem('bb_investments', JSON.stringify(investments));
+        renderInvestTab();
+      }
+    }
+
+    /* Withdrawal Handling (with 3-Partner Verification) */
+    function openWithdrawModal() {
+      document.getElementById('withAmount').value = '';
+      document.getElementById('withNote').value = '';
+      document.getElementById('withdrawModal').style.display = 'flex';
+    }
+
+    function saveWithdrawal() {
+      const partner = document.getElementById('withPartner').value;
+      const amount = parseFloat(document.getElementById('withAmount').value);
+      const mode = document.getElementById('withMode').value;
+      const date = document.getElementById('withDate').value;
+      const note = document.getElementById('withNote').value.trim();
+
+      if (!amount || amount <= 0) {
+        alert('സാധുവായ തുക നൽകുക');
+        return;
+      }
+
+      withdrawals.push({
+        id: 'WTH_' + Date.now(),
+        partner,
+        amount,
+        mode,
+        date,
+        note,
+        approvals: [partner],
+        status: 'pending'
+      });
+
+      localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
+      closeModal('withdrawModal');
+      alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
+      renderInvestTab();
+    }
+
+    function verifyWithdrawal(wthId, partnerName) {
+      const w = withdrawals.find(i => i.id === wthId);
+      if (!w) return;
+
+      if (!w.approvals.includes(partnerName)) {
+        w.approvals.push(partnerName);
+      }
+
+      if (PARTNERS.every(p => w.approvals.includes(p))) {
+        w.status = 'verified';
+      }
+
+      localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
+      renderInvestTab();
+      renderDailyAccounts();
+      renderReportsTab();
+    }
+
+    function deleteWithdrawal(id) {
+      if (confirm('ഈ Withdrawal റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
+        withdrawals = withdrawals.filter(w => w.id !== id);
+        localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
+        renderInvestTab();
+        renderDailyAccounts();
+        renderReportsTab();
+      }
+    }
+
+    /* Render Investments & Withdrawals Tab */
+    function renderInvestTab() {
+      let capMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
+      let totVerInvest = 0;
+      let hasPending = false;
+
+      let invHTML = '';
+      investments.slice().reverse().forEach(inv => {
+        const isVer = inv.status === 'verified';
+        if (isVer) {
+          totVerInvest += inv.amount;
+          capMap[inv.partner] = (capMap[inv.partner] || 0) + inv.amount;
+        } else {
+          hasPending = true;
+        }
+
+        let verifyButtonsHTML = '';
+        PARTNERS.forEach(p => {
+          const hasApproved = inv.approvals.includes(p);
+          verifyButtonsHTML += `
+            <button class="btn-verify ${hasApproved ? 'done' : ''}" onclick="verifyInvestment('${inv.id}', '${p}')">
+              ${hasApproved ? '✓ ' + p : 'Verify: ' + p}
+            </button>
+          `;
+        });
+
+        invHTML += `
+          <div class="inv-card">
+            <div class="inv-header">
+              <span>👤 ${inv.partner}</span>
+              <span class="color-purple">+₹${inv.amount}</span>
+            </div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
+              📅 ${inv.date} | Mode: ${inv.mode.toUpperCase()} ${inv.note ? '| ' + inv.note : ''}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+              <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
+                ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${inv.approvals.length}/3 Verified)`}
+              </span>
+              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️</button>
+            </div>
+            <div class="verify-box">
+              <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
+              <div class="verify-buttons">${verifyButtonsHTML}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('invTotalVerified').innerText = '₹' + totVerInvest;
+      document.getElementById('invCapAshif').innerText = '₹' + (capMap['ASHIF'] || 0);
+      document.getElementById('invCapSabith').innerText = '₹' + (capMap['SABITH'] || 0);
+      document.getElementById('invCapAshkar').innerText = '₹' + (capMap['ASHKAR ALI'] || 0);
+      document.getElementById('investListContainer').innerHTML = invHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">ഇൻവെസ്റ്റ്മെന്റുകൾ ഇല്ല</p>';
+
+      let withHTML = '';
+      withdrawals.slice().reverse().forEach(w => {
+        const isVer = w.status === 'verified';
+        if (!isVer) hasPending = true;
+
+        let verifyButtonsHTML = '';
+        PARTNERS.forEach(p => {
+          const hasApproved = w.approvals.includes(p);
+          verifyButtonsHTML += `
+            <button class="btn-verify ${hasApproved ? 'done' : ''}" onclick="verifyWithdrawal('${w.id}', '${p}')">
+              ${hasApproved ? '✓ ' + p : 'Verify: ' + p}
+            </button>
+          `;
+        });
+
+        withHTML += `
+          <div class="inv-card">
+            <div class="inv-header">
+              <span>👤 ${w.partner}</span>
+              <span class="color-red">-₹${w.amount}</span>
+            </div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
+              📅 ${w.date} | Mode: ${w.mode.toUpperCase()} ${w.note ? '| ' + w.note : ''}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+              <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
+                ${isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${w.approvals.length}/3 Verified)`}
+              </span>
+              <button class="btn-icon" onclick="deleteWithdrawal('${w.id}')">🗑️</button>
+            </div>
+            <div class="verify-box">
+              <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
+              <div class="verify-buttons">${verifyButtonsHTML}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('withdrawListContainer').innerHTML = withHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">പിൻവലിക്കലുകൾ ഒന്നും ഇല്ല</p>';
+      document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
+    }
   </script>
 </body>
 </html>
