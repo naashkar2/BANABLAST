@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Banablast Accounts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 90px; }
+    
+    /* Header */
+    .app-header { background: #1e3a8a; color: white; padding: 14px 16px; text-align: center; }
+    .app-header h1 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+    .date-row { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 6px; }
+    .date-input { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 8px; border-radius: 6px; font-size: 13px; outline: none; }
+    .btn-leave { background: #f59e0b; color: #78350f; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+    /* Nav Tabs */
+    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; }
+    .tab-btn { flex: 1; padding: 11px 4px; border: none; background: transparent; font-weight: 700; font-size: 13px; color: #64748b; cursor: pointer; text-align: center; }
+    .tab-btn.active { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; }
+
+    .container { padding: 12px; }
+
+    /* Top Summary Card */
+    .summary-card { background: #1e293b; color: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; font-size: 13px; }
+    .summary-card span { font-weight: bold; }
+    .txt-green { color: #4ade80; }
+    .txt-red { color: #f87171; }
+    .txt-blue { color: #38bdf8; }
+
+    /* 2 Columns: Cash vs GPay (Notebook Style) */
+    .columns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .col-box { background: white; border-radius: 8px; border: 1px solid #cbd5e1; overflow: hidden; display: flex; flex-direction: column; min-height: 250px; }
+    .col-header { padding: 8px; text-align: center; color: white; font-weight: bold; font-size: 13px; }
+    .col-header.cash { background: #15803d; }
+    .col-header.gpay { background: #0369a1; }
+    
+    .entry-list { padding: 8px; flex: 1; overflow-y: auto; max-height: 220px; }
+    .entry-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px dashed #f1f5f9; }
+    .entry-row span.name { color: #334155; }
+    .entry-row span.amt { font-weight: bold; color: #dc2626; }
+    
+    .col-footer { padding: 8px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; }
+    .footer-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+
+    /* Cumulative Balances Box */
+    .balance-card { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+    .balance-card h3 { font-size: 12px; color: #1e40af; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .bal-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
+    .bal-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: #1e3a8a; border-top: 1px solid #93c5fd; padding-top: 6px; margin-top: 4px; }
+
+    /* Bottom Khatabook Actions */
+    .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; gap: 10px; padding: 10px 14px; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 50; }
+    .btn { flex: 1; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; text-align: center; }
+    .btn-green { background: #16a34a; }
+    .btn-red { background: #dc2626; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 100; }
+    .modal-content { background: white; width: 100%; border-radius: 16px 16px 0 0; padding: 18px; max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 11px; }
+    .form-group label { display: block; font-size: 12px; color: #475569; font-weight: bold; margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; outline: none; }
+    .btn-save { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; margin-top: 8px; }
+    .mode-chips { display: flex; gap: 8px; }
+    .mode-chip { flex: 1; padding: 9px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+    .mode-chip.active-cash { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+    .mode-chip.active-gpay { background: #fee2e2; border-color: #dc2626; color: #b91c1c; }
+  </style>
+
+  <!-- Google Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <div class="app-header">
+    <h1>BANABLAST</h1>
+    <div class="date-row">
+      <input type="date" id="selectedDate" class="date-input" onchange="loadDateData()">
+      <button class="btn-leave" id="leaveBtn" onclick="toggleShopHoliday()">Shop Holiday</button>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('daily', event)">Daily Accounts</button>
+    <button class="tab-btn" onclick="switchTab('stock', event)">Stock Items</button>
+    <button class="tab-btn" onclick="switchTab('reports', event)">Rent & Reports</button>
+  </div>
+
+  <div class="container" id="tabContent">
+    <!-- 1. DAILY ACCOUNT TAB -->
+    <div id="dailyView">
+      <div class="summary-card">
+        <div>Sales: <span class="txt-green" id="topSales">&#8377;0</span></div>
+        <div>Expense: <span class="txt-red" id="topExpense">&#8377;0</span></div>
+        <div>Profit: <span class="txt-blue" id="topNet">&#8377;0</span></div>
+      </div>
+
+      <!-- 2 Columns: Cash & GPay -->
+      <div class="columns-grid">
+        <!-- Cash Column -->
+        <div class="col-box">
+          <div class="col-header cash" id="cashInHeader">CASH IN: &#8377;0</div>
+          <div class="entry-list" id="cashList"></div>
+          <div class="col-footer">
+            <div class="footer-row"><span>Cash Exp:</span> <span class="txt-red" id="cashExpTotal">&#8377;0</span></div>
+            <div class="footer-row" style="font-weight:bold;"><span>Cash Bal:</span> <span class="txt-green" id="cashBal">&#8377;0</span></div>
+          </div>
+        </div>
+
+        <!-- GPay Column -->
+        <div class="col-box">
+          <div class="col-header gpay" id="gpayInHeader">GPAY IN: &#8377;0</div>
+          <div class="entry-list" id="gpayList"></div>
+          <div class="col-footer">
+            <div class="footer-row"><span>GPay Exp:</span> <span class="txt-red" id="gpayExpTotal">&#8377;0</span></div>
+            <div class="footer-row" style="font-weight:bold;"><span>GPay Bal:</span> <span class="txt-blue" id="gpayBal">&#8377;0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cumulative Rolling Balance -->
+      <div class="balance-card">
+        <h3>RUNNING BALANCES <span style="cursor:pointer; text-decoration:underline; font-size:11px;" onclick="editOpeningBalance()">Edit Opening</span></h3>
+        <div class="bal-row">
+          <span>Bank Account (Acco):</span>
+          <span id="accoDisplay">&#8377;0 + 0 = &#8377;0</span>
+        </div>
+        <div class="bal-row">
+          <span>Counter Cash Box:</span>
+          <span id="boxDisplay">&#8377;0 + 0 = &#8377;0</span>
+        </div>
+        <div class="bal-total">
+          <span>TOTAL BALANCE:</span>
+          <span id="totalRollingDisplay">&#8377;0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. STOCK ITEMS VIEW -->
+    <div id="stockView" style="display:none;">
+      <h3 style="font-size:14px; margin-bottom:8px; color:#1e293b;">Item-wise Stock Purchases</h3>
+      <div id="stockItemList" style="background:white; border-radius:8px; padding:10px; border:1px solid #cbd5e1; font-size:13px;">
+        <p style="color:#64748b; text-align:center;">No stock purchases added yet.</p>
+      </div>
+    </div>
+
+    <!-- 3. RENT & REPORTS VIEW -->
+    <div id="reportsView" style="display:none;">
+      <div class="balance-card" style="background:#fef3c7; border-color:#fcd34d;">
+        <h3 style="color:#92400e;">RENT TRACKER</h3>
+        <div style="font-size:16px; font-weight:bold; color:#78350f;" id="rentPaidTotal">Total Rent Paid: &#8377;0</div>
+        <small id="rentDaysCount" style="color:#b45309;">0 Days Recorded</small>
+      </div>
+      <div id="rentHistoryList" style="background:white; border-radius:8px; padding:10px; border:1px solid #cbd5e1; font-size:13px;">
+        <p style="color:#64748b; text-align:center;">No rent entries recorded.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Actions -->
+  <div class="footer-actions">
+    <button class="btn btn-green" onclick="openEntryModal('Income')">+ SALE IN</button>
+    <button class="btn btn-red" onclick="openEntryModal('Expense')">- EXPENSE</button>
+  </div>
+
+  <!-- Entry Modal -->
+  <div class="modal" id="entryModal">
+    <div class="modal-content">
+      <h2 id="modalTitle" style="font-size:16px; margin-bottom:12px;">Add Transaction</h2>
+      <div class="form-group">
+        <label>Amount (തുക)</label>
+        <input type="number" id="inpAmount" placeholder="₹0" inputmode="numeric">
+      </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <div class="mode-chips">
+          <div class="mode-chip active-cash" id="modeCashChip" onclick="setMode('Cash')">CASH</div>
+          <div class="mode-chip" id="modeGpayChip" onclick="setMode('GPay')">GPAY / UPI</div>
+        </div>
+      </div>
+
+      <!-- Specific for Expense -->
+      <div id="expenseFields" style="display:none;">
+        <div class="form-group">
+          <label>Expense Category</label>
+          <select id="inpCategory" onchange="onCategoryChange()">
+            <option value="Stock">Stock / Raw Materials</option>
+            <option value="Rent">Shop Rent</option>
+            <option value="Salary">Staff Salary</option>
+            <option value="KSEB">Electricity / KSEB</option>
+            <option value="Refreshment">Tea / Refreshments</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Stock Items Selector -->
+        <div class="form-group" id="stockItemField">
+          <label>Select Item (or Add New)</label>
+          <div style="display:flex; gap:6px;">
+            <select id="inpSavedItem" style="flex:1;"></select>
+            <button type="button" onclick="addNewItemPrompt()" style="padding:0 12px; background:#1e3a8a; color:white; border:none; border-radius:6px; font-weight:bold;">+ New</button>
+          </div>
+        </div>
+
+        <!-- Employee Name if Salary -->
+        <div class="form-group" id="employeeField" style="display:none;">
+          <label>Employee Name</label>
+          <input type="text" id="inpEmployee" placeholder="e.g. Asif">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Note / Remark</label>
+        <input type="text" id="inpNote" placeholder="e.g. Counter Sales, Milk, Sugar">
+      </div>
+
+      <div class="form-group">
+        <label>Partner</label>
+        <select id="inpPartner">
+          <option value="Partner 1">Partner 1</option>
+          <option value="Partner 2">Partner 2</option>
+          <option value="Partner 3">Partner 3</option>
+        </select>
+      </div>
+
+      <button class="btn-save" id="saveSubmitBtn" onclick="saveTransaction()">SAVE ENTRY</button>
+      <button style="width:100%; background:transparent; border:none; color:#64748b; padding:10px; cursor:pointer;" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // State Variables
+    let currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('selectedDate').value = currentDate;
+    let selectedMode = 'Cash';
+    let currentType = 'Income';
+
+    // Stock Items Memory
+    let savedItems = JSON.parse(localStorage.getItem('banablast_items')) || ["Raw Banana", "Sugar", "Milk", "BBC", "Pappai", "Skel", "Oil", "Packing Pouches"];
+
+    function updateItemDropdown() {
+      const select = document.getElementById('inpSavedItem');
+      select.innerHTML = '';
+      savedItems.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.innerText = item;
+        select.appendChild(opt);
+      });
+    }
+    updateItemDropdown();
+
+    function addNewItemPrompt() {
+      const name = prompt("Enter New Item Name:");
+      if (name && !savedItems.includes(name.trim())) {
+        savedItems.push(name.trim());
+        localStorage.setItem('banablast_items', JSON.stringify(savedItems));
+        updateItemDropdown();
+        document.getElementById('inpSavedItem').value = name.trim();
+      }
+    }
+
+    function setMode(mode) {
+      selectedMode = mode;
+      document.getElementById('modeCashChip').className = 'mode-chip' + (mode === 'Cash' ? ' active-cash' : '');
+      document.getElementById('modeGpayChip').className = 'mode-chip' + (mode === 'GPay' ? ' active-gpay' : '');
+    }
+
+    function openEntryModal(type) {
+      currentType = type;
+      document.getElementById('modalTitle').innerText = (type === 'Income') ? '+ SALE IN (വരവ്)' : '- EXPENSE (ചിലവ്)';
+      document.getElementById('saveSubmitBtn').style.backgroundColor = (type === 'Income') ? '#16a34a' : '#dc2626';
+      document.getElementById('expenseFields').style.display = (type === 'Expense') ? 'block' : 'none';
+      document.getElementById('entryModal').style.display = 'flex';
+      onCategoryChange();
+    }
+
+    function closeModal() { document.getElementById('entryModal').style.display = 'none'; }
+
+    function onCategoryChange() {
+      const cat = document.getElementById('inpCategory').value;
+      document.getElementById('stockItemField').style.display = (cat === 'Stock') ? 'block' : 'none';
+      document.getElementById('employeeField').style.display = (cat === 'Salary') ? 'block' : 'none';
+    }
+
+    function switchTab(tab, event) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('dailyView').style.display = (tab === 'daily') ? 'block' : 'none';
+      document.getElementById('stockView').style.display = (tab === 'stock') ? 'block' : 'none';
+      document.getElementById('reportsView').style.display = (tab === 'reports') ? 'block' : 'none';
+      if (tab === 'stock') renderStockReport();
+      if (tab === 'reports') renderRentReport();
+    }
+
+    function saveTransaction() {
+      const amount = parseFloat(document.getElementById('inpAmount').value);
+      if (!amount || amount <= 0) return alert("Enter valid amount!");
+
+      const partner = document.getElementById('inpPartner').value;
+      let note = document.getElementById('inpNote').value.trim();
+      let category = (currentType === 'Expense') ? document.getElementById('inpCategory').value : 'Sale';
+
+      if (currentType === 'Expense') {
+        if (category === 'Stock') note = document.getElementById('inpSavedItem').value + (note ? ' (' + note + ')' : '');
+        if (category === 'Salary') note = (document.getElementById('inpEmployee').value || 'Staff') + ' Salary' + (note ? ' (' + note + ')' : '');
+      } else {
+        note = note || 'Counter Sales';
+      }
+
+      const entry = {
+        type: currentType,
+        amount: amount,
+        mode: selectedMode,
+        category: category,
+        note: note,
+        partner: partner,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      let local = JSON.parse(localStorage.getItem('banablast_' + currentDate) || '[]');
+      local.push(entry);
+      localStorage.setItem('banablast_' + currentDate, JSON.stringify(local));
+
+      // Global store for reports
+      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
+      allEntries.push({ ...entry, date: currentDate });
+      localStorage.setItem('banablast_all_entries', JSON.stringify(allEntries));
+
+      closeModal();
+      document.getElementById('inpAmount').value = '';
+      document.getElementById('inpNote').value = '';
+      renderDateData(local);
+    }
+
+    function loadDateData() {
+      currentDate = document.getElementById('selectedDate').value;
+      let local = JSON.parse(localStorage.getItem('banablast_' + currentDate) || '[]');
+      renderDateData(local);
+    }
+
+    function renderDateData(entries) {
+      let cashIn = 0, gpayIn = 0, cashExp = 0, gpayExp = 0;
+      const cashList = document.getElementById('cashList');
+      const gpayList = document.getElementById('gpayList');
+      cashList.innerHTML = ''; gpayList.innerHTML = '';
+
+      entries.forEach(e => {
+        if (e.type === 'Income') {
+          if (e.mode === 'Cash') cashIn += e.amount;
+          if (e.mode === 'GPay') gpayIn += e.amount;
+        } else {
+          if (e.mode === 'Cash') {
+            cashExp += e.amount;
+            cashList.innerHTML += `<div class="entry-row"><span class="name">${e.note}</span><span class="amt">${e.amount}</span></div>`;
+          } else {
+            gpayExp += e.amount;
+            gpayList.innerHTML += `<div class="entry-row"><span class="name">${e.note}</span><span class="amt">${e.amount}</span></div>`;
+          }
+        }
+      });
+
+      const cashBal = cashIn - cashExp;
+      const gpayBal = gpayIn - gpayExp;
+      const totalSales = cashIn + gpayIn;
+      const totalExp = cashExp + gpayExp;
+
+      document.getElementById('cashInHeader').innerText = `CASH IN: ₹${cashIn}`;
+      document.getElementById('gpayInHeader').innerText = `GPAY IN: ₹${gpayIn}`;
+      document.getElementById('cashExpTotal').innerText = `- ₹${cashExp}`;
+      document.getElementById('gpayExpTotal').innerText = `- ₹${gpayExp}`;
+      document.getElementById('cashBal').innerText = `+ ₹${cashBal}`;
+      document.getElementById('gpayBal').innerText = `+ ₹${gpayBal}`;
+
+      document.getElementById('topSales').innerText = `₹${totalSales}`;
+      document.getElementById('topExpense').innerText = `₹${totalExp}`;
+      document.getElementById('topNet').innerText = `₹${totalSales - totalExp}`;
+
+      let prevAcco = parseFloat(localStorage.getItem('prev_acco') || '6310');
+      let prevBox = parseFloat(localStorage.getItem('prev_box') || '4510');
+      let finalAcco = prevAcco + gpayBal;
+      let finalBox = prevBox + cashBal;
+
+      document.getElementById('accoDisplay').innerText = `₹${prevAcco} + ${gpayBal} = ₹${finalAcco}`;
+      document.getElementById('boxDisplay').innerText = `₹${prevBox} + ${cashBal} = ₹${finalBox}`;
+      document.getElementById('totalRollingDisplay').innerText = `₹${finalAcco + finalBox}`;
+    }
+
+    function editOpeningBalance() {
+      let a = prompt("Opening Bank Balance (Acco):", localStorage.getItem('prev_acco') || '6310');
+      let b = prompt("Opening Cash in Hand (Cash Box):", localStorage.getItem('prev_box') || '4510');
+      if (a) localStorage.setItem('prev_acco', a);
+      if (b) localStorage.setItem('prev_box', b);
+      loadDateData();
+    }
+
+    function renderStockReport() {
+      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
+      let stockListEl = document.getElementById('stockItemList');
+      let map = {};
+      allEntries.filter(e => e.category === 'Stock').forEach(e => {
+        let name = e.note.split(' (')[0];
+        map[name] = (map[name] || 0) + e.amount;
+      });
+
+      let keys = Object.keys(map);
+      if (!keys.length) {
+        stockListEl.innerHTML = '<p style="color:#64748b; text-align:center;">No stock purchases added yet.</p>';
+        return;
+      }
+      stockListEl.innerHTML = '';
+      keys.forEach(k => {
+        stockListEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;"><strong>${k}</strong><span style="color:#dc2626; font-weight:bold;">₹${map[k]}</span></div>`;
+      });
+    }
+
+    function renderRentReport() {
+      let allEntries = JSON.parse(localStorage.getItem('banablast_all_entries') || '[]');
+      let rentList = allEntries.filter(e => e.category === 'Rent');
+      let total = rentList.reduce((acc, curr) => acc + curr.amount, 0);
+      document.getElementById('rentPaidTotal').innerText = `Total Rent Paid: ₹${total}`;
+      document.getElementById('rentDaysCount').innerText = `${rentList.length} Payments Recorded`;
+
+      let el = document.getElementById('rentHistoryList');
+      if (!rentList.length) {
+        el.innerHTML = '<p style="color:#64748b; text-align:center;">No rent entries recorded.</p>';
+        return;
+      }
+      el.innerHTML = '';
+      rentList.forEach(r => {
+        el.innerHTML += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9;"><span>${r.date} • ${r.mode}</span><strong style="color:#dc2626;">₹${r.amount}</strong></div>`;
+      });
+    }
+
+    function toggleShopHoliday() {
+      alert("Shop holiday status updated for this date!");
+    }
+
+    loadDateData();
+  </script>
+</body>
+</html>
