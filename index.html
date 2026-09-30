@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
   <title>BANABLAST - Business Ledger</title>
+  
+  <!-- App Icon / Favicon -->
+  <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
+
+  <!-- Google Firebase SDKs (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --primary: #1e3a8a;
@@ -21,10 +29,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
 
-    /* Header */
-    header { background: var(--primary); color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    /* Header & Brand Logo */
+    header { background: var(--primary); color: white; padding: 10px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; }
+    .brand-container { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: white; border: 2px solid #facc15; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; display: flex; flex-direction: column; line-height: 1.1; }
+    .sync-status { font-size: 0.65rem; color: #86efac; font-weight: 600; margin-top: 2px; }
+    
     .date-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 8px; }
     .date-picker { background: transparent; border: none; color: white; font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
     .holiday-btn { background: #eab308; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -51,7 +63,7 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* Section Action Buttons (Placed right above the white space) */
+    /* Section Action Buttons */
     .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .btn-sale-top { background: var(--accent-green); }
     .btn-exp-top { background: var(--accent-red); margin-top: 16px; }
@@ -138,11 +150,18 @@
 
   <header>
     <div class="header-top">
-      <div class="brand-title">BANABLAST</div>
+      <div class="brand-container">
+        <!-- Logo Image with exact uploaded name & fallbacks -->
+        <img src="Bana%20blast%20logo.png" alt="Bana Blast" class="brand-logo" onerror="this.onerror=null; this.src='logo.png';">
+        <div class="brand-title">
+          <span>BANABLAST</span>
+          <span class="sync-status">🟢 Live Cloud Sync</span>
+        </div>
+      </div>
       <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
     </div>
     <div class="date-control">
-      <input type="date" id="selectedDate" class="date-picker" onchange="loadDateData()">
+      <input type="date" id="selectedDate" class="date-picker" onchange="renderAll()">
     </div>
   </header>
 
@@ -355,7 +374,6 @@
         </select>
       </div>
 
-      <!-- Category selection for Expense -->
       <div class="form-group" id="expCategoryGroup" style="display:none;">
         <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
@@ -367,7 +385,6 @@
         </select>
       </div>
 
-      <!-- Item Name / Remark (Never blank!) -->
       <div class="form-group">
         <label id="itemNameLabel">Item / Description / Remark</label>
         <input type="text" id="entryTitle" class="form-control" placeholder="e.g. Sales, Tea, Milk, Shop Rent..." required>
@@ -383,12 +400,11 @@
     </div>
   </div>
 
-  <!-- Universal Item History Sheet Modal (Milk, Tea, Rent, Sugar, Sales etc.) -->
+  <!-- Universal Item History Sheet Modal -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box" style="max-height: 90vh;">
       <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Item Purchase History</h3>
       
-      <!-- History Date Filters -->
       <div class="report-filter" style="margin-top:8px;">
         <button class="filter-btn active" id="sheetFiltMonth" onclick="filterItemSheet('month')">This Month</button>
         <button class="filter-btn" id="sheetFiltWeek" onclick="filterItemSheet('week')">This Week</button>
@@ -396,14 +412,12 @@
         <button class="filter-btn" id="sheetFiltCustom" onclick="filterItemSheet('custom')">Custom</button>
       </div>
 
-      <!-- Custom Date Pickers -->
       <div id="customDateRow" style="display:none; gap:6px; margin-bottom:10px;">
         <input type="date" id="sheetFromDate" class="form-control" style="font-size:0.8rem; padding:6px;">
         <input type="date" id="sheetToDate" class="form-control" style="font-size:0.8rem; padding:6px;">
         <button class="filter-btn active" style="flex:0 0 60px;" onclick="applyCustomSheetDate()">Apply</button>
       </div>
 
-      <!-- Table Sheet View -->
       <div style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
         <table class="sheet-table">
           <thead>
@@ -418,7 +432,6 @@
         </table>
       </div>
 
-      <!-- Total Sum Banner -->
       <div class="sheet-total-box">
         <span>TOTAL AMOUNT:</span>
         <span id="sheetTotalSum" class="color-red">₹0</span>
@@ -471,7 +484,7 @@
     </div>
   </div>
 
-  <!-- Add Withdrawal Modal (with 3-partner verification) -->
+  <!-- Add Withdrawal Modal -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Profit/Money Withdrawal</h3>
@@ -534,15 +547,27 @@
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
-    // Data Stores
-    let transactions = JSON.parse(localStorage.getItem('bb_trans')) || [];
-    let withdrawals = JSON.parse(localStorage.getItem('bb_withdrawals')) || [];
-    let investments = JSON.parse(localStorage.getItem('bb_investments')) || [];
-    let holidays = JSON.parse(localStorage.getItem('bb_holidays')) || [];
-    let opening = JSON.parse(localStorage.getItem('bb_opening')) || { cash: 0, bank: 0 };
+    // 1. Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
+      authDomain: "banablast-64513.firebaseapp.com",
+      projectId: "banablast-64513",
+      storageBucket: "banablast-64513.firebasestorage.app",
+      messagingSenderId: "236930066397",
+      appId: "1:236930066397:web:e8062c9d77080837e3f834"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Data in Memory
+    let transactions = [];
+    let withdrawals = [];
+    let investments = [];
+    let holidays = [];
+    let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
-    // Sheet Modal State
     let activeSheetKey = '';
     let currentSheetFilter = 'month';
 
@@ -553,19 +578,53 @@
     document.getElementById('sheetFromDate').value = today;
     document.getElementById('sheetToDate').value = today;
 
+    // 2. Real-time Listeners (Syncs across devices)
     window.onload = function() {
-      loadDateData();
+      // Transactions Sync
+      db.collection('transactions').onSnapshot(snap => {
+        transactions = [];
+        snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
+        renderAll();
+      }, err => console.error("Trans sync err:", err));
+
+      // Withdrawals Sync
+      db.collection('withdrawals').onSnapshot(snap => {
+        withdrawals = [];
+        snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
+        renderAll();
+      }, err => console.error("Withdraw sync err:", err));
+
+      // Investments Sync
+      db.collection('investments').onSnapshot(snap => {
+        investments = [];
+        snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
+        renderAll();
+      }, err => console.error("Invest sync err:", err));
+
+      // Settings (Opening Balance & Holidays) Sync
+      db.collection('settings').doc('general').onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.opening) opening = data.opening;
+          if (data.holidays) holidays = data.holidays;
+          renderAll();
+        }
+      }, err => console.error("Settings sync err:", err));
     };
+
+    function renderAll() {
+      loadDateData();
+      renderDailyAccounts();
+      renderStockTab();
+      renderReportsTab();
+      renderInvestTab();
+    }
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       event.target.classList.add('active');
       document.getElementById('tab-' + tabId).classList.add('active');
-
-      if (tabId === 'stock') renderStockTab();
-      if (tabId === 'reports') renderReportsTab();
-      if (tabId === 'invest') renderInvestTab();
     }
 
     /* Date & Holiday Control */
@@ -584,8 +643,6 @@
         hBtn.innerText = 'Shop Holiday';
         hBanner.style.display = 'none';
       }
-
-      renderDailyAccounts();
     }
 
     function toggleHoliday() {
@@ -593,8 +650,11 @@
       const idx = holidays.indexOf(curDate);
       if (idx > -1) holidays.splice(idx, 1);
       else holidays.push(curDate);
-      localStorage.setItem('bb_holidays', JSON.stringify(holidays));
-      loadDateData();
+
+      db.collection('settings').doc('general').set({
+        opening,
+        holidays
+      }, { merge: true });
     }
 
     /* Modal Controls */
@@ -648,7 +708,7 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    /* Save Transaction (Daily) */
+    /* Save Transaction (Firebase) */
     function saveEntry() {
       const curDate = document.getElementById('selectedDate').value;
       const editId = document.getElementById('editEntryId').value;
@@ -672,44 +732,34 @@
         category = document.getElementById('entryCategory').value;
       }
 
+      const entryData = {
+        date: curDate,
+        type,
+        category,
+        title,
+        extra: title,
+        amount,
+        mode,
+        note,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
       if (editId) {
-        const item = transactions.find(t => t.id === editId);
-        if (item) {
-          item.amount = amount;
-          item.mode = mode;
-          item.category = category;
-          item.title = title;
-          item.extra = title;
-          item.note = note;
-        }
+        db.collection('transactions').doc(editId).update(entryData);
       } else {
-        transactions.push({
-          id: 'TX_' + Date.now(),
-          date: curDate,
-          type,
-          category,
-          title,
-          extra: title,
-          amount,
-          mode,
-          note
-        });
+        db.collection('transactions').add(entryData);
       }
 
-      localStorage.setItem('bb_trans', JSON.stringify(transactions));
       closeModal('entryModal');
-      renderDailyAccounts();
     }
 
     function deleteEntry(id) {
       if (confirm('ഈ കണക്ക് ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?')) {
-        transactions = transactions.filter(t => t.id !== id);
-        localStorage.setItem('bb_trans', JSON.stringify(transactions));
-        renderDailyAccounts();
+        db.collection('transactions').doc(id).delete();
       }
     }
 
-    /* Render Daily Accounts (VERTICAL SINGLE COLUMN FLOW) */
+    /* Render Daily Accounts */
     function renderDailyAccounts() {
       const curDate = document.getElementById('selectedDate').value;
       const todayTrans = transactions.filter(t => t.date === curDate);
@@ -742,7 +792,7 @@
                 ${isSale ? '+' : '-'}₹${t.amount}
               </span>
               <div class="entry-actions">
-                <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️</button>
+                <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️️</button>
                 <button class="btn-icon" onclick="deleteEntry('${t.id}')">🗑️</button>
               </div>
             </div>
@@ -772,7 +822,7 @@
       document.getElementById('subExpCash').innerText = '₹' + expCash;
       document.getElementById('subExpGPay').innerText = '₹' + expGPay;
 
-      // Cumulative Running Balances (Opening + Net Daily - Verified Withdrawals)
+      // Cumulative Running Balances
       let cumCash = opening.cash || 0;
       let cumBank = opening.bank || 0;
 
@@ -786,7 +836,6 @@
         }
       });
 
-      // Deduct ONLY 3-partner verified withdrawals
       withdrawals.forEach(w => {
         if (w.status === 'verified' && w.date <= curDate) {
           if (w.mode === 'cash') cumCash -= w.amount; else cumBank -= w.amount;
@@ -798,7 +847,7 @@
       document.getElementById('runTotalBal').innerText = '₹' + (cumCash + cumBank);
     }
 
-    /* Universal History Sheet Modal (Milk, Tea, Rent, Sugar, Sales etc.) */
+    /* Universal History Sheet Modal */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
       document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
@@ -843,7 +892,6 @@
         return itemTitle === activeSheetKey;
       });
 
-      // Filter by period
       let filtered = matched.filter(t => {
         if (currentSheetFilter === 'all') return true;
         const tDate = new Date(t.date);
@@ -895,12 +943,16 @@
     function saveOpeningBalance() {
       opening.cash = parseFloat(document.getElementById('openCash').value) || 0;
       opening.bank = parseFloat(document.getElementById('openBank').value) || 0;
-      localStorage.setItem('bb_opening', JSON.stringify(opening));
+
+      db.collection('settings').doc('general').set({
+        opening,
+        holidays
+      }, { merge: true });
+
       closeModal('openingModal');
-      renderDailyAccounts();
     }
 
-    /* TAB 2: Stock Items & Purchase History */
+    /* TAB 2: Stock Items */
     function renderStockTab() {
       const stockTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
       const container = document.getElementById('stockListContainer');
@@ -935,7 +987,7 @@
       container.innerHTML = html;
     }
 
-    /* TAB 3: Reports (All Expenses & 3 Partners Profit Split) */
+    /* TAB 3: Reports */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -994,7 +1046,6 @@
       const eachShare = Math.round(netProfit / 3);
       document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
 
-      // Verified Withdrawn amount for 3 partners
       const drawnMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
       withdrawals.forEach(w => {
         if (w.status === 'verified') {
@@ -1028,7 +1079,7 @@
       document.getElementById('repTotalOther').innerText = '₹' + (stock + misc);
     }
 
-    /* TAB 4: INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFIED) */
+    /* TAB 4: INVESTMENTS & WITHDRAWALS */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -1047,48 +1098,45 @@
         return;
       }
 
-      investments.push({
-        id: 'INV_' + Date.now(),
+      db.collection('investments').add({
         partner,
         amount,
         mode,
         date,
         note,
         approvals: [partner],
-        status: 'pending'
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      localStorage.setItem('bb_investments', JSON.stringify(investments));
       closeModal('investModal');
       alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
-      renderInvestTab();
     }
 
     function verifyInvestment(invId, partnerName) {
       const inv = investments.find(i => i.id === invId);
       if (!inv) return;
 
-      if (!inv.approvals.includes(partnerName)) {
-        inv.approvals.push(partnerName);
+      let currentApprovals = inv.approvals || [];
+      if (!currentApprovals.includes(partnerName)) {
+        currentApprovals.push(partnerName);
       }
 
-      if (PARTNERS.every(p => inv.approvals.includes(p))) {
-        inv.status = 'verified';
-      }
+      const isVerified = PARTNERS.every(p => currentApprovals.includes(p));
 
-      localStorage.setItem('bb_investments', JSON.stringify(investments));
-      renderInvestTab();
+      db.collection('investments').doc(invId).update({
+        approvals: currentApprovals,
+        status: isVerified ? 'verified' : 'pending'
+      });
     }
 
     function deleteInvestment(id) {
       if (confirm('ഈ ഇൻവെസ്റ്റ്മെന്റ് റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
-        investments = investments.filter(i => i.id !== id);
-        localStorage.setItem('bb_investments', JSON.stringify(investments));
-        renderInvestTab();
+        db.collection('investments').doc(id).delete();
       }
     }
 
-    /* Withdrawal Handling (with 3-Partner Verification) */
+    /* Withdrawal Handling */
     function openWithdrawModal() {
       document.getElementById('withAmount').value = '';
       document.getElementById('withNote').value = '';
@@ -1107,52 +1155,44 @@
         return;
       }
 
-      withdrawals.push({
-        id: 'WTH_' + Date.now(),
+      db.collection('withdrawals').add({
         partner,
         amount,
         mode,
         date,
         note,
         approvals: [partner],
-        status: 'pending'
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
       closeModal('withdrawModal');
       alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
-      renderInvestTab();
     }
 
     function verifyWithdrawal(wthId, partnerName) {
       const w = withdrawals.find(i => i.id === wthId);
       if (!w) return;
 
-      if (!w.approvals.includes(partnerName)) {
-        w.approvals.push(partnerName);
+      let currentApprovals = w.approvals || [];
+      if (!currentApprovals.includes(partnerName)) {
+        currentApprovals.push(partnerName);
       }
 
-      if (PARTNERS.every(p => w.approvals.includes(p))) {
-        w.status = 'verified';
-      }
+      const isVerified = PARTNERS.every(p => currentApprovals.includes(p));
 
-      localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
-      renderInvestTab();
-      renderDailyAccounts();
-      renderReportsTab();
+      db.collection('withdrawals').doc(wthId).update({
+        approvals: currentApprovals,
+        status: isVerified ? 'verified' : 'pending'
+      });
     }
 
     function deleteWithdrawal(id) {
       if (confirm('ഈ Withdrawal റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
-        withdrawals = withdrawals.filter(w => w.id !== id);
-        localStorage.setItem('bb_withdrawals', JSON.stringify(withdrawals));
-        renderInvestTab();
-        renderDailyAccounts();
-        renderReportsTab();
+        db.collection('withdrawals').doc(id).delete();
       }
     }
 
-    /* Render Investments & Withdrawals Tab */
     function renderInvestTab() {
       let capMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
       let totVerInvest = 0;
@@ -1170,7 +1210,7 @@
 
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
-          const hasApproved = inv.approvals.includes(p);
+          const hasApproved = (inv.approvals || []).includes(p);
           verifyButtonsHTML += `
             <button class="btn-verify ${hasApproved ? 'done' : ''}" onclick="verifyInvestment('${inv.id}', '${p}')">
               ${hasApproved ? '✓ ' + p : 'Verify: ' + p}
@@ -1189,7 +1229,7 @@
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
-                ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${inv.approvals.length}/3 Verified)`}
+                ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`}
               </span>
               <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️</button>
             </div>
@@ -1214,7 +1254,7 @@
 
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
-          const hasApproved = w.approvals.includes(p);
+          const hasApproved = (w.approvals || []).includes(p);
           verifyButtonsHTML += `
             <button class="btn-verify ${hasApproved ? 'done' : ''}" onclick="verifyWithdrawal('${w.id}', '${p}')">
               ${hasApproved ? '✓ ' + p : 'Verify: ' + p}
@@ -1233,7 +1273,7 @@
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
-                ${isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${w.approvals.length}/3 Verified)`}
+                ${isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`}
               </span>
               <button class="btn-icon" onclick="deleteWithdrawal('${w.id}')">🗑️</button>
             </div>
