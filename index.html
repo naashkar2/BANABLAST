@@ -2,10 +2,10 @@
 <html lang="ml">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>BANABLAST - Business Ledger</title>
   
-  <!-- App Icon / Favicon -->
+  <!-- App Favicon -->
   <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
 
   <!-- Google Firebase SDKs (Compat Version) -->
@@ -27,35 +27,104 @@
       --border-color: #cbd5e1;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+    
+    /* Extra Bottom Space to prevent bottom banner / nav buttons overlapping */
+    body { 
+      background-color: var(--bg); 
+      color: var(--text-dark); 
+      padding-bottom: 120px; 
+    }
 
-    /* Header & Brand Logo */
-    header { background: var(--primary); color: white; padding: 10px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    /* Header with Safe Area for Mobile Status Bar */
+    header { 
+      background: var(--primary); 
+      color: white; 
+      padding-top: max(34px, env(safe-area-inset-top)); /* Space for Phone Clock & Battery */
+      padding-left: 14px;
+      padding-right: 14px;
+      padding-bottom: 12px;
+      position: sticky; 
+      top: 0; 
+      z-index: 50; 
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15); 
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .brand-container { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: white; border: 2px solid #facc15; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; display: flex; flex-direction: column; line-height: 1.1; }
+    
+    .brand-logo-frame {
+      width: 40px; 
+      height: 40px; 
+      border-radius: 50%; 
+      background: #facc15; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .brand-logo { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    .brand-logo-fallback {
+      font-size: 1.3rem;
+      display: none;
+    }
+
+    .brand-title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
+    .brand-title { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; }
     .sync-status { font-size: 0.65rem; color: #86efac; font-weight: 600; margin-top: 2px; }
     
-    .date-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 8px; }
-    .date-picker { background: transparent; border: none; color: white; font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
-    .holiday-btn { background: #eab308; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .holiday-btn { background: #eab308; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .holiday-btn.active { background: var(--accent-red); color: white; }
+
+    .date-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: rgba(255,255,255,0.18); padding: 7px 12px; border-radius: 8px; }
+    .date-picker { background: transparent; border: none; color: white; font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
 
     /* Holiday Banner */
     .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 8px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
 
-    /* Navigation Tabs */
-    .nav-tabs { display: flex; background: white; border-bottom: 1px solid var(--border-color); overflow-x: auto; }
-    .tab-btn { flex: 1; min-width: 80px; padding: 12px 6px; text-align: center; background: none; border: none; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    /* Clean Horizontal Scrolling Nav Tabs */
+    .nav-tabs { 
+      display: flex; 
+      background: white; 
+      border-bottom: 1px solid var(--border-color); 
+      overflow-x: auto; 
+      white-space: nowrap; 
+      padding: 8px 12px; 
+      gap: 8px; 
+      -webkit-overflow-scrolling: touch; 
+      scrollbar-width: none; 
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { 
+      flex: 0 0 auto; 
+      padding: 8px 14px; 
+      border-radius: 20px; 
+      border: 1px solid #e2e8f0; 
+      background: #f1f5f9; 
+      font-size: 0.8rem; 
+      font-weight: 700; 
+      color: var(--text-muted); 
+      cursor: pointer; 
+      transition: all 0.2s;
+    }
+    .tab-btn.active { 
+      background: var(--primary); 
+      color: white; 
+      border-color: var(--primary); 
+      box-shadow: 0 2px 4px rgba(30,58,138,0.25);
+    }
 
     .content-area { padding: 14px; max-width: 600px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
     /* Daily Summary Card */
-    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 16px; }
+    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
     .sum-box h4 { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
     .sum-box p { font-size: 1.15rem; font-weight: 800; }
     .color-green { color: #4ade80 !important; }
@@ -66,11 +135,11 @@
     /* Section Action Buttons */
     .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .btn-sale-top { background: var(--accent-green); }
-    .btn-exp-top { background: var(--accent-red); margin-top: 16px; }
+    .btn-exp-top { background: var(--accent-red); margin-top: 18px; }
 
     /* Section White Card Container */
-    .section-card { background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 16px; overflow: hidden; }
-    .section-subbar { background: #f1f5f9; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
+    .section-card { background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    .section-subbar { background: #f8fafc; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
 
     /* Entry Items */
     .entry-list { padding: 4px 8px; min-height: 80px; max-height: 350px; overflow-y: auto; }
@@ -89,7 +158,7 @@
     .btn-icon:hover { opacity: 1; }
 
     /* Running Balance Box */
-    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 14px; margin-top: 20px; }
+    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 14px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
     .running-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .running-title { font-size: 0.9rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
     .btn-link { background: none; border: none; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
@@ -128,16 +197,35 @@
     .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
     .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
 
-    /* Modals */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: flex-end; }
-    .modal-box { background: white; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0; padding: 18px; animation: slideUp 0.2s ease-out; max-height: 85vh; overflow-y: auto; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    /* Modals with Proper Screen Margin and Bottom Clearance */
+    .modal { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.6); 
+      z-index: 100; 
+      justify-content: center; 
+      align-items: center; /* Centered for optimal visibility */
+      padding: 16px;
+    }
+    .modal-box { 
+      background: white; 
+      width: 100%; 
+      max-width: 480px; 
+      border-radius: 16px; 
+      padding: 20px; 
+      animation: popIn 0.2s ease-out; 
+      max-height: 80vh; 
+      overflow-y: auto; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .modal-box h3 { margin-bottom: 12px; font-size: 1.1rem; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
     .btn-submit { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; margin-top: 8px; }
-    .btn-cancel { width: 100%; padding: 10px; background: none; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; }
+    .btn-cancel { width: 100%; padding: 11px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: var(--text-dark); font-weight: 700; cursor: pointer; margin-top: 6px; }
 
     /* Sheet History Modal Table */
     .sheet-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
@@ -151,10 +239,13 @@
   <header>
     <div class="header-top">
       <div class="brand-container">
-        <!-- Logo Image with exact uploaded name & fallbacks -->
-        <img src="Bana%20blast%20logo.png" alt="Bana Blast" class="brand-logo" onerror="this.onerror=null; this.src='logo.png';">
-        <div class="brand-title">
-          <span>BANABLAST</span>
+        <!-- Resilient Logo Frame with Bulletproof Fallbacks -->
+        <div class="brand-logo-frame">
+          <img id="mainAppLogo" src="Bana blast logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
+          <span id="logoFallbackText" class="brand-logo-fallback">🍌</span>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-title">BANABLAST</span>
           <span class="sync-status">🟢 Live Cloud Sync</span>
         </div>
       </div>
@@ -219,7 +310,7 @@
         <div class="entry-list" id="expenseEntriesList"></div>
       </div>
 
-      <!-- 3. RUNNING BALANCES (AT THE BOTTOM) -->
+      <!-- 3. RUNNING BALANCES (AT THE BOTTOM WITH FULL CLEARANCE) -->
       <div class="running-card">
         <div class="running-header">
           <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
@@ -247,7 +338,7 @@
       <div id="stockListContainer"></div>
     </div>
 
-    <!-- TAB 3: REPORTS (ALL EXPENSES & PARTNER PROFIT SHARE) -->
+    <!-- TAB 3: REPORTS -->
     <div id="tab-reports" class="tab-content">
       <div class="report-filter">
         <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
@@ -313,7 +404,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFIED) -->
+    <!-- TAB 4: INVESTMENTS & WITHDRAWALS -->
     <div id="tab-invest" class="tab-content">
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="section-header-btn" style="background:var(--accent-purple); border-radius:8px;" onclick="openInvestModal()">+ ADD INVESTMENT</button>
@@ -354,7 +445,7 @@
 
   </div>
 
-  <!-- Entry Modal (Daily Sale / Expense) -->
+  <!-- Entry Modal -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -367,7 +458,7 @@
       </div>
 
       <div class="form-group">
-        <label>Payment Mode (പണം എങ്ങന നൽകി/ലഭിച്ചു?)</label>
+        <label>Payment Mode</label>
         <select id="entryMode" class="form-control">
           <option value="cash">Counter Cash</option>
           <option value="gpay">GPay / Bank</option>
@@ -402,7 +493,7 @@
 
   <!-- Universal Item History Sheet Modal -->
   <div class="modal" id="itemSheetModal">
-    <div class="modal-box" style="max-height: 90vh;">
+    <div class="modal-box">
       <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Item Purchase History</h3>
       
       <div class="report-filter" style="margin-top:8px;">
@@ -418,7 +509,7 @@
         <button class="filter-btn active" style="flex:0 0 60px;" onclick="applyCustomSheetDate()">Apply</button>
       </div>
 
-      <div style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+      <div style="max-height:260px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
         <table class="sheet-table">
           <thead>
             <tr>
@@ -437,7 +528,7 @@
         <span id="sheetTotalSum" class="color-red">₹0</span>
       </div>
 
-      <button class="btn-cancel" style="margin-top:8px;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
+      <button class="btn-cancel" style="margin-top:12px;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
     </div>
   </div>
 
@@ -448,7 +539,7 @@
       <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ ഇത് പ്രാബല്യത്തിൽ വരൂ.</p>
 
       <div class="form-group">
-        <label>Investing Partner (നിക്ഷേപിച്ച പാർട്ണർ)</label>
+        <label>Investing Partner</label>
         <select id="invPartner" class="form-control">
           <option value="ASHIF">ASHIF</option>
           <option value="SABITH">SABITH</option>
@@ -491,7 +582,7 @@
       <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയുകയുള്ളൂ.</p>
 
       <div class="form-group">
-        <label>Withdrawing Partner (പിൻവലിക്കുന്ന പാർട്ണർ)</label>
+        <label>Withdrawing Partner</label>
         <select id="withPartner" class="form-control">
           <option value="ASHIF">ASHIF</option>
           <option value="SABITH">SABITH</option>
@@ -505,7 +596,7 @@
       </div>
 
       <div class="form-group">
-        <label>Payment Source (എവിടെ നിന്ന് എടുത്തു?)</label>
+        <label>Payment Source</label>
         <select id="withMode" class="form-control">
           <option value="cash">Counter Cash Box</option>
           <option value="gpay">Bank Account / GPay</option>
@@ -547,6 +638,20 @@
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
+    // Logo image error recovery
+    function handleLogoLoadError(img) {
+      if (!img.dataset.retryEncoded) {
+        img.dataset.retryEncoded = "1";
+        img.src = "Bana%20blast%20logo.png";
+      } else if (!img.dataset.retrySimple) {
+        img.dataset.retrySimple = "1";
+        img.src = "logo.png";
+      } else {
+        img.style.display = "none";
+        document.getElementById('logoFallbackText').style.display = "block";
+      }
+    }
+
     // 1. Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
@@ -578,30 +683,26 @@
     document.getElementById('sheetFromDate').value = today;
     document.getElementById('sheetToDate').value = today;
 
-    // 2. Real-time Listeners (Syncs across devices)
+    // 2. Real-time Listeners
     window.onload = function() {
-      // Transactions Sync
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
         renderAll();
       }, err => console.error("Trans sync err:", err));
 
-      // Withdrawals Sync
       db.collection('withdrawals').onSnapshot(snap => {
         withdrawals = [];
         snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
         renderAll();
       }, err => console.error("Withdraw sync err:", err));
 
-      // Investments Sync
       db.collection('investments').onSnapshot(snap => {
         investments = [];
         snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
         renderAll();
       }, err => console.error("Invest sync err:", err));
 
-      // Settings (Opening Balance & Holidays) Sync
       db.collection('settings').doc('general').onSnapshot(doc => {
         if (doc.exists) {
           const data = doc.data();
@@ -708,7 +809,7 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    /* Save Transaction (Firebase) */
+    /* Save Transaction */
     function saveEntry() {
       const curDate = document.getElementById('selectedDate').value;
       const editId = document.getElementById('editEntryId').value;
@@ -792,7 +893,7 @@
                 ${isSale ? '+' : '-'}₹${t.amount}
               </span>
               <div class="entry-actions">
-                <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️️</button>
+                <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️</button>
                 <button class="btn-icon" onclick="deleteEntry('${t.id}')">🗑️</button>
               </div>
             </div>
@@ -822,7 +923,7 @@
       document.getElementById('subExpCash').innerText = '₹' + expCash;
       document.getElementById('subExpGPay').innerText = '₹' + expGPay;
 
-      // Cumulative Running Balances
+      // Cumulative Balances
       let cumCash = opening.cash || 0;
       let cumBank = opening.bank || 0;
 
