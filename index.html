@@ -8,6 +8,12 @@
   <!-- App Favicon -->
   <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
 
+  <!-- Google Fonts, Flatpickr Calendar & html2pdf Library -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <!-- Google Firebase SDKs (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -26,23 +32,36 @@
       --text-muted: #64748b;
       --border-color: #cbd5e1;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Malayalam', -apple-system, sans-serif; }
     
-    /* Extra Bottom Space to prevent bottom banner / nav buttons overlapping */
     body { 
       background-color: var(--bg); 
       color: var(--text-dark); 
       padding-bottom: 120px; 
     }
 
-    /* Header with Safe Area for Mobile Status Bar */
-    header { 
-      background: var(--primary); 
-      color: white; 
-      padding-top: max(34px, env(safe-area-inset-top)); /* Space for Phone Clock & Battery */
-      padding-left: 14px;
-      padding-right: 14px;
+    /* 1. മനോഹരമായ സെന്റർ ഹെഡർ */
+    .app-top-bar {
+      background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
+      padding-top: max(16px, env(safe-area-inset-top));
       padding-bottom: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .app-main-heading {
+      color: #ffffff;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    /* സബ് ഹെഡർ: ലോഗോയും ക്ലൗഡ് സ്റ്റാറ്റസും */
+    header { 
+      background: #1e3a8a; 
+      color: white; 
+      padding: 10px 14px 14px;
       position: sticky; 
       top: 0; 
       z-index: 50; 
@@ -51,16 +70,17 @@
     .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .brand-container { display: flex; align-items: center; gap: 10px; }
     
+    /* യഥാർത്ഥ ലോഗോ ഡിസൈൻ */
     .brand-logo-frame {
-      width: 40px; 
-      height: 40px; 
+      width: 44px; 
+      height: 44px; 
       border-radius: 50%; 
-      background: #facc15; 
+      background: #ffffff; 
       display: flex; 
       align-items: center; 
       justify-content: center;
       border: 2px solid #ffffff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       overflow: hidden;
       flex-shrink: 0;
     }
@@ -70,24 +90,64 @@
       object-fit: cover; 
     }
     .brand-logo-fallback {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       display: none;
     }
 
     .brand-title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
-    .brand-title { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; }
-    .sync-status { font-size: 0.65rem; color: #86efac; font-weight: 600; margin-top: 2px; }
+    .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
+    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
     
-    .holiday-btn { background: #eab308; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .holiday-btn { background: #eab308; color: #000; border: none; padding: 7px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
     .holiday-btn.active { background: var(--accent-red); color: white; }
 
-    .date-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: rgba(255,255,255,0.18); padding: 7px 12px; border-radius: 8px; }
-    .date-picker { background: transparent; border: none; color: white; font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
+    /* ഡേറ്റ് പിക്കർ ബാർ */
+    .date-control { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      margin-top: 10px; 
+      background: rgba(255,255,255,0.2); 
+      padding: 8px 12px; 
+      border-radius: 10px; 
+      cursor: pointer;
+    }
+    .date-picker { 
+      background: transparent; 
+      border: none; 
+      color: white; 
+      font-size: 0.95rem; 
+      font-weight: 700; 
+      outline: none; 
+      width: 100%; 
+      cursor: pointer; 
+    }
 
-    /* Holiday Banner */
-    .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 8px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
+    /* കലണ്ടർ കസ്റ്റം കളർ ക്രമീകരണങ്ങൾ */
+    .flatpickr-calendar { border-radius: 16px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; border: none !important; }
+    .flatpickr-day.today {
+      background: #2563eb !important;
+      border-color: #2563eb !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.6) !important;
+    }
+    .flatpickr-day.shop-holiday-day {
+      background: #ef4444 !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border-radius: 50% !important;
+    }
+    .flatpickr-day.shop-holiday-day.today {
+      background: linear-gradient(135deg, #2563eb 50%, #ef4444 50%) !important;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6) !important;
+    }
 
-    /* Clean Horizontal Scrolling Nav Tabs */
+    .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 10px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
+
+    /* Nav Tabs */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -123,8 +183,8 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Daily Summary Card */
-    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+    /* Daily Summary */
+    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
     .sum-box h4 { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
     .sum-box p { font-size: 1.15rem; font-weight: 800; }
     .color-green { color: #4ade80 !important; }
@@ -132,17 +192,21 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* Section Action Buttons */
+    /* ക്വിക്ക് ഷെയർ ബാർ */
+    .quick-share-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .btn-share { flex: 1; padding: 8px 12px; border: none; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .btn-share-pdf { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .btn-share-wa { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+    /* Buttons */
     .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .btn-sale-top { background: var(--accent-green); }
     .btn-exp-top { background: var(--accent-red); margin-top: 18px; }
 
-    /* Section White Card Container */
     .section-card { background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
     .section-subbar { background: #f8fafc; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
 
-    /* Entry Items */
-    .entry-list { padding: 4px 8px; min-height: 80px; max-height: 350px; overflow-y: auto; }
+    .entry-list { padding: 4px 8px; min-height: 60px; max-height: 350px; overflow-y: auto; }
     .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
     .entry-row:last-child { border-bottom: none; }
     .entry-info { flex: 1; cursor: pointer; padding-right: 8px; }
@@ -157,13 +221,34 @@
     .btn-icon { background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 4px; opacity: 0.7; }
     .btn-icon:hover { opacity: 1; }
 
-    /* Running Balance Box */
-    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 14px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-    .running-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    /* ക്ലിക്കബിൾ റണ്ണിംഗ് ബാലൻസ് കാർഡ് */
+    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-top: 20px; box-shadow: 0 3px 8px rgba(37,99,235,0.08); }
+    .running-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .running-title { font-size: 0.9rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
     .btn-link { background: none; border: none; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
-    .bal-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: #334155; }
-    .bal-row.total { border-top: 2px solid #cbd5e1; padding-top: 8px; font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
+    
+    .clickable-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      background: #ffffff;
+      margin-bottom: 8px;
+      cursor: pointer;
+      border: 1px solid #dbeafe;
+      transition: all 0.15s ease;
+    }
+    .clickable-row:active { transform: scale(0.98); background: #e0e7ff; }
+    .clickable-row.total {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      border: none;
+      padding: 12px 10px;
+      margin-top: 4px;
+    }
+    .clickable-row.total span { color: #ffffff !important; }
+    .clickable-row.total strong { color: #ffffff !important; font-size: 1.15rem; }
 
     /* Stock Items */
     .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -171,7 +256,7 @@
     .stock-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     .stock-amt { font-size: 1rem; font-weight: 800; color: var(--accent-red); }
 
-    /* Reports & Partner Split */
+    /* Reports */
     .report-filter { display: flex; gap: 8px; margin-bottom: 14px; }
     .filter-btn { flex: 1; padding: 8px; background: white; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
     .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -179,14 +264,14 @@
     .cat-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .list-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
 
-    /* Partner Split Cards */
+    /* Partner Split */
     .partner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .partner-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center; }
     .partner-card h5 { font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
     .partner-card .p-val { font-size: 0.85rem; font-weight: 800; margin: 4px 0; }
     .partner-card .p-sub { font-size: 0.7rem; color: var(--text-muted); }
 
-    /* Investment & Withdrawal Cards */
+    /* Investments */
     .inv-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
     .inv-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem; }
     .inv-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
@@ -197,51 +282,55 @@
     .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
     .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
 
-    /* Modals with Proper Screen Margin and Bottom Clearance */
+    /* Modals */
     .modal { 
       display: none; 
       position: fixed; 
       inset: 0; 
-      background: rgba(0,0,0,0.6); 
-      z-index: 100; 
+      background: rgba(0,0,0,0.65); 
+      z-index: 1000; 
       justify-content: center; 
-      align-items: center; /* Centered for optimal visibility */
+      align-items: center; 
       padding: 16px;
     }
     .modal-box { 
       background: white; 
       width: 100%; 
-      max-width: 480px; 
+      max-width: 500px; 
       border-radius: 16px; 
       padding: 20px; 
       animation: popIn 0.2s ease-out; 
-      max-height: 80vh; 
+      max-height: 85vh; 
       overflow-y: auto; 
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
     @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .modal-box h3 { margin-bottom: 12px; font-size: 1.1rem; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
     .btn-submit { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; margin-top: 8px; }
     .btn-cancel { width: 100%; padding: 11px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: var(--text-dark); font-weight: 700; cursor: pointer; margin-top: 6px; }
 
-    /* Sheet History Modal Table */
+    /* Tables */
     .sheet-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-    .sheet-table th, .sheet-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .sheet-table th, .sheet-table td { padding: 9px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
     .sheet-table th { background: #f8fafc; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; }
     .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
   </style>
 </head>
 <body>
 
+  <!-- 1. പുതിയ സെന്റർ ഹെഡർ (കറുത്ത ബാർ മാറ്റി) -->
+  <div class="app-top-bar">
+    <h1 class="app-main-heading">BANABLAST</h1>
+  </div>
+
   <header>
     <div class="header-top">
       <div class="brand-container">
-        <!-- Resilient Logo Frame with Bulletproof Fallbacks -->
+        <!-- ഒറിജിനൽ ലോഗോ -->
         <div class="brand-logo-frame">
-          <img id="mainAppLogo" src="Bana blast logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
+          <img id="mainAppLogo" src="Bana%20blast%20logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
           <span id="logoFallbackText" class="brand-logo-fallback">🍌</span>
         </div>
         <div class="brand-title-wrap">
@@ -251,8 +340,11 @@
       </div>
       <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
     </div>
+
+    <!-- ഇൻ-ആപ്പ് കലണ്ടർ ഇൻപുട്ട് -->
     <div class="date-control">
-      <input type="date" id="selectedDate" class="date-picker" onchange="renderAll()">
+      <span style="font-size:1.1rem;">📅</span>
+      <input type="text" id="selectedDate" class="date-picker" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
     </div>
   </header>
 
@@ -265,9 +357,9 @@
     <button class="tab-btn" onclick="switchTab('invest')">💼 Investments</button>
   </nav>
 
-  <div class="content-area">
+  <div class="content-area" id="exportContentArea">
 
-    <!-- TAB 1: DAILY ACCOUNTS (VERTICAL FLOW) -->
+    <!-- TAB 1: DAILY ACCOUNTS -->
     <div id="tab-daily" class="tab-content active">
       
       <!-- Top Summary -->
@@ -284,6 +376,12 @@
           <h4>Profit</h4>
           <p id="sumDailyProfit" class="color-blue">₹0</p>
         </div>
+      </div>
+
+      <!-- Quick Share Buttons -->
+      <div class="quick-share-bar">
+        <button class="btn-share btn-share-pdf" onclick="exportDailyPDF()">📄 PDF ഡൗൺലോഡ്</button>
+        <button class="btn-share btn-share-wa" onclick="shareDailyWhatsApp()">💬 WhatsApp ഷെയർ</button>
       </div>
 
       <!-- 1. SALES SECTION -->
@@ -310,23 +408,29 @@
         <div class="entry-list" id="expenseEntriesList"></div>
       </div>
 
-      <!-- 3. RUNNING BALANCES (AT THE BOTTOM WITH FULL CLEARANCE) -->
+      <!-- 3. RUNNING BALANCES (ക്ലിക്കബിൾ ആക്കിയത്) -->
       <div class="running-card">
         <div class="running-header">
           <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
           <button class="btn-link" onclick="openOpeningModal()">EDIT OPENING</button>
         </div>
-        <div class="bal-row">
-          <span>Bank Account (GPay/UPI):</span>
-          <span id="runBankBal" style="font-weight:700;">₹0</span>
+
+        <!-- Bank Row -->
+        <div class="clickable-row" onclick="openRunningBreakdown('bank')">
+          <span style="font-weight:600; color:#334155;">Bank Account (GPay/UPI) 🔍</span>
+          <strong id="runBankBal" style="font-weight:800; color:#0369a1;">₹0</strong>
         </div>
-        <div class="bal-row">
-          <span>Counter Cash Box:</span>
-          <span id="runCashBal" style="font-weight:700;">₹0</span>
+
+        <!-- Cash Row -->
+        <div class="clickable-row" onclick="openRunningBreakdown('cash')">
+          <span style="font-weight:600; color:#334155;">Counter Cash Box 🔍</span>
+          <strong id="runCashBal" style="font-weight:800; color:#15803d;">₹0</strong>
         </div>
-        <div class="bal-row total">
-          <span>TOTAL BALANCE:</span>
-          <span id="runTotalBal">₹0</span>
+
+        <!-- Total Row -->
+        <div class="clickable-row total" onclick="openRunningBreakdown('total')">
+          <span style="font-weight:800;">TOTAL BALANCE (ക്ലിക്ക് ചെയ്യുക) 📊</span>
+          <strong id="runTotalBal">₹0</strong>
         </div>
       </div>
 
@@ -350,6 +454,11 @@
         <div class="sum-box"><h4>Sales</h4><p id="repSales" class="color-green">₹0</p></div>
         <div class="sum-box"><h4>Expense</h4><p id="repExp" class="color-red">₹0</p></div>
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
+      </div>
+
+      <!-- Quick Report Share -->
+      <div class="quick-share-bar">
+        <button class="btn-share btn-share-pdf" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
       </div>
 
       <!-- 3 PARTNERS PROFIT SPLIT (1/3 EACH) -->
@@ -377,7 +486,6 @@
         </div>
       </div>
 
-      <!-- Expense Categories Breakdown -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🏠 Rent Payments</span>
@@ -532,6 +640,32 @@
     </div>
   </div>
 
+  <!-- 4. റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ മോഡൽ (പുതിയത്) -->
+  <div class="modal" id="runningBreakdownModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+        <h3 id="breakdownTitle" style="color:var(--primary); font-size:1.1rem; margin:0;">Account Breakdown</h3>
+        <button onclick="closeModal('runningBreakdownModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
+      </div>
+
+      <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകളുടെ സ്റ്റേറ്റ്‌മെന്റ്:</p>
+
+      <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;">
+        <!-- ഡാറ്റ ഇവിടെ ലോഡ് ആകും -->
+      </div>
+
+      <div class="sheet-total-box" style="margin-top:12px;">
+        <span>CUMULATIVE BALANCE:</span>
+        <span id="breakdownTotalSum" class="color-blue">₹0</span>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn-submit" style="background:#2563eb; margin-top:0;" onclick="exportBreakdownPDF()">📄 PDF ആക്കി മാറ്റുക</button>
+        <button class="btn-cancel" style="margin-top:0;" onclick="closeModal('runningBreakdownModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Investment Modal -->
   <div class="modal" id="investModal">
     <div class="modal-box">
@@ -638,7 +772,6 @@
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
-    // Logo image error recovery
     function handleLogoLoadError(img) {
       if (!img.dataset.retryEncoded) {
         img.dataset.retryEncoded = "1";
@@ -675,16 +808,41 @@
 
     let activeSheetKey = '';
     let currentSheetFilter = 'month';
+    let currentBreakdownMode = 'total';
+    let flatpickrCalendar = null;
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('selectedDate').value = today;
-    document.getElementById('invDate').value = today;
-    document.getElementById('withDate').value = today;
-    document.getElementById('sheetFromDate').value = today;
-    document.getElementById('sheetToDate').value = today;
 
-    // 2. Real-time Listeners
+    // Flatpickr കലണ്ടർ സജ്ജീകരിക്കുന്നു
+    function initFlatpickrCalendar() {
+      flatpickrCalendar = flatpickr("#selectedDate", {
+        dateFormat: "Y-m-d",
+        defaultDate: today,
+        altInput: true,
+        altFormat: "d/m/Y (D)",
+        disableMobile: true, // ഫോണിലെ നേറ്റീവ് പിക്കർ ഒഴിവാക്കി കസ്റ്റം ലുക്ക് ഉറപ്പാക്കുന്നു
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+          const dateStr = fp.formatDate(dayElem.dateObj, "Y-m-d");
+          if (holidays.includes(dateStr)) {
+            dayElem.classList.add("shop-holiday-day");
+          }
+        },
+        onChange: function(selectedDates, dateStr) {
+          document.getElementById('selectedDate').value = dateStr;
+          renderAll();
+        }
+      });
+      document.getElementById('selectedDate').value = today;
+    }
+
     window.onload = function() {
+      initFlatpickrCalendar();
+
+      document.getElementById('invDate').value = today;
+      document.getElementById('withDate').value = today;
+      document.getElementById('sheetFromDate').value = today;
+      document.getElementById('sheetToDate').value = today;
+
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
@@ -708,6 +866,7 @@
           const data = doc.data();
           if (data.opening) opening = data.opening;
           if (data.holidays) holidays = data.holidays;
+          if (flatpickrCalendar) flatpickrCalendar.redraw();
           renderAll();
         }
       }, err => console.error("Settings sync err:", err));
@@ -728,9 +887,8 @@
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    /* Date & Holiday Control */
     function loadDateData() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const isHoliday = holidays.includes(curDate);
       const hBtn = document.getElementById('holidayToggleBtn');
       const hBanner = document.getElementById('holidayBanner');
@@ -747,7 +905,7 @@
     }
 
     function toggleHoliday() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const idx = holidays.indexOf(curDate);
       if (idx > -1) holidays.splice(idx, 1);
       else holidays.push(curDate);
@@ -758,7 +916,6 @@
       }, { merge: true });
     }
 
-    /* Modal Controls */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -809,9 +966,8 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    /* Save Transaction */
     function saveEntry() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
       const type = document.getElementById('entryType').value;
       const amount = parseFloat(document.getElementById('entryAmount').value);
@@ -860,9 +1016,8 @@
       }
     }
 
-    /* Render Daily Accounts */
     function renderDailyAccounts() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const todayTrans = transactions.filter(t => t.date === curDate);
 
       let totalSales = 0, totalExp = 0;
@@ -923,7 +1078,6 @@
       document.getElementById('subExpCash').innerText = '₹' + expCash;
       document.getElementById('subExpGPay').innerText = '₹' + expGPay;
 
-      // Cumulative Balances
       let cumCash = opening.cash || 0;
       let cumBank = opening.bank || 0;
 
@@ -946,6 +1100,148 @@
       document.getElementById('runCashBal').innerText = '₹' + cumCash;
       document.getElementById('runBankBal').innerText = '₹' + cumBank;
       document.getElementById('runTotalBal').innerText = '₹' + (cumCash + cumBank);
+    }
+
+    /* -------------------------------------------------------------
+       5. റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ ഷീറ്റ് (CUMULATIVE STATEMENT)
+       ------------------------------------------------------------- */
+    function openRunningBreakdown(mode) {
+      currentBreakdownMode = mode;
+      const modal = document.getElementById('runningBreakdownModal');
+      const titleElem = document.getElementById('breakdownTitle');
+      const tableContainer = document.getElementById('breakdownTableContainer');
+      const curDate = document.getElementById('selectedDate').value || today;
+
+      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
+      titleElem.innerText = `${modeTitle} - Date-wise Breakdown`;
+
+      let relevantDates = new Set();
+      transactions.forEach(t => { if (t.date <= curDate) relevantDates.add(t.date); });
+      withdrawals.forEach(w => { if (w.status === 'verified' && w.date <= curDate) relevantDates.add(w.date); });
+
+      const sortedDates = Array.from(relevantDates).sort();
+
+      let currentBal = 0;
+      if (mode === 'cash') currentBal = opening.cash || 0;
+      else if (mode === 'bank') currentBal = opening.bank || 0;
+      else currentBal = (opening.cash || 0) + (opening.bank || 0);
+
+      let tableHTML = `
+        <table class="sheet-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>In (+)</th>
+              <th>Out (-)</th>
+              <th style="text-align:right;">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#f1f5f9; font-weight:700;">
+              <td>OPENING</td>
+              <td colspan="2" style="color:#64748b; font-size:0.75rem;">Initial Opening Balance</td>
+              <td style="text-align:right; color:#1e3a8a;">₹${currentBal}</td>
+            </tr>
+      `;
+
+      sortedDates.forEach(d => {
+        let dayIn = 0;
+        let dayOut = 0;
+
+        transactions.filter(t => t.date === d).forEach(t => {
+          const matchMode = (mode === 'total') || (t.mode === mode);
+          if (matchMode) {
+            if (t.type === 'sale') dayIn += t.amount;
+            else dayOut += t.amount;
+          }
+        });
+
+        withdrawals.filter(w => w.status === 'verified' && w.date === d).forEach(w => {
+          const matchMode = (mode === 'total') || (w.mode === mode);
+          if (matchMode) {
+            dayOut += w.amount;
+          }
+        });
+
+        currentBal += (dayIn - dayOut);
+
+        if (dayIn > 0 || dayOut > 0) {
+          tableHTML += `
+            <tr>
+              <td><strong>${d}</strong></td>
+              <td class="color-green">+₹${dayIn}</td>
+              <td class="color-red">-₹${dayOut}</td>
+              <td style="text-align:right; font-weight:800; color:${currentBal >= 0 ? '#15803d' : '#dc2626'};">
+                ₹${currentBal}
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      tableHTML += `</tbody></table>`;
+      tableContainer.innerHTML = tableHTML;
+      document.getElementById('breakdownTotalSum').innerText = '₹' + currentBal;
+      document.getElementById('breakdownTotalSum').className = currentBal >= 0 ? 'color-blue' : 'color-red';
+
+      modal.style.display = 'flex';
+    }
+
+    /* -------------------------------------------------------------
+       6. PDF & WHATSAPP ഷെയറിംഗ് ഫംഗ്ഷനുകൾ
+       ------------------------------------------------------------- */
+    function exportDailyPDF() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const element = document.getElementById('tab-daily');
+      
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Daily_${curDate}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function exportReportsPDF() {
+      const element = document.getElementById('tab-reports');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Report_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function exportBreakdownPDF() {
+      const element = document.getElementById('breakdownTableContainer');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function shareDailyWhatsApp() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const sales = document.getElementById('sumDailySales').innerText;
+      const exp = document.getElementById('sumDailyExp').innerText;
+      const profit = document.getElementById('sumDailyProfit').innerText;
+      const cashBal = document.getElementById('runCashBal').innerText;
+      const bankBal = document.getElementById('runBankBal').innerText;
+      const totBal = document.getElementById('runTotalBal').innerText;
+
+      const message = `🍌 *BANABLAST - DAILY ACCOUNT* 🍌\n📅 Date: ${curDate}\n----------------------------\n💰 Total Sales: ${sales}\n💸 Total Expense: ${exp}\n📈 Net Profit: ${profit}\n----------------------------\n📦 *RUNNING BALANCES:*\n💵 Counter Cash: ${cashBal}\n💳 Bank/GPay: ${bankBal}\n📊 *TOTAL BALANCE: ${totBal}*\n----------------------------\n_Generated via BANABLAST Business Ledger_`;
+
+      const waURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+      window.open(waURL, '_blank');
     }
 
     /* Universal History Sheet Modal */
@@ -983,7 +1279,7 @@
     }
 
     function renderItemSheetContent() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
       const fromDate = document.getElementById('sheetFromDate').value;
       const toDate = document.getElementById('sheetToDate').value;
@@ -1034,7 +1330,6 @@
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
     }
 
-    /* Opening Balance */
     function openOpeningModal() {
       document.getElementById('openCash').value = opening.cash || 0;
       document.getElementById('openBank').value = opening.bank || 0;
@@ -1053,7 +1348,6 @@
       closeModal('openingModal');
     }
 
-    /* TAB 2: Stock Items */
     function renderStockTab() {
       const stockTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
       const container = document.getElementById('stockListContainer');
@@ -1088,7 +1382,6 @@
       container.innerHTML = html;
     }
 
-    /* TAB 3: Reports */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -1099,7 +1392,7 @@
     }
 
     function renderReportsTab() {
-      const curDate = document.getElementById('selectedDate').value;
+      const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
 
       let filteredTrans = transactions.filter(t => {
@@ -1180,7 +1473,6 @@
       document.getElementById('repTotalOther').innerText = '₹' + (stock + misc);
     }
 
-    /* TAB 4: INVESTMENTS & WITHDRAWALS */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -1237,7 +1529,6 @@
       }
     }
 
-    /* Withdrawal Handling */
     function openWithdrawModal() {
       document.getElementById('withAmount').value = '';
       document.getElementById('withNote').value = '';
