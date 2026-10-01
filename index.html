@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>BANABLAST - Business Ledger</title>
   <link rel="manifest" href="manifest.json">
-
-  <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
+  <link rel="icon" href="logo.png">
 
   <!-- Fonts, Flatpickr & html2pdf -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
@@ -32,7 +31,12 @@
       --text-muted: #64748b;
       --border-color: #cbd5e1;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Malayalam', -apple-system, sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Poppins', 'Noto Sans Malayalam', -apple-system, sans-serif; 
+    }
     
     body { 
       background-color: var(--bg); 
@@ -40,7 +44,7 @@
       padding-bottom: 120px; 
     }
 
-    /* 1. പ്രീമിയം മിനിമൽ ഹെഡർ */
+    /* 1. പ്രീമിയം ഹെഡർ */
     .app-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
       padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 12px;
@@ -74,10 +78,21 @@
       overflow: hidden;
       flex-shrink: 0;
     }
-    .brand-logo { width: 100%; height: 100%; object-fit: cover; }
-    .brand-logo-fallback { font-size: 1.3rem; display: none; }
+    .brand-logo { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    .brand-logo-fallback { 
+      font-size: 1.3rem; 
+      display: none; 
+    }
     
-    .brand-text-box { display: flex; flex-direction: column; line-height: 1.15; }
+    .brand-text-box { 
+      display: flex; 
+      flex-direction: column; 
+      line-height: 1.15; 
+    }
     .brand-title {
       font-size: 1.2rem;
       font-weight: 800;
@@ -85,7 +100,12 @@
       color: #ffffff;
       text-transform: uppercase;
     }
-    .sync-status { font-size: 0.68rem; color: #86efac; font-weight: 600; margin-top: 2px; }
+    .sync-status { 
+      font-size: 0.68rem; 
+      color: #86efac; 
+      font-weight: 600; 
+      margin-top: 2px; 
+    }
 
     /* ഡേറ്റ് & ഹോളിഡേ ബാർ */
     .calendar-bar {
@@ -117,7 +137,6 @@
       cursor: pointer;
     }
 
-    /* ഗ്ലാസ് ഹോളിഡേ പിൽ ബട്ടൺ */
     .holiday-pill-btn { 
       background: rgba(255, 255, 255, 0.12); 
       color: #ffffff; 
@@ -138,15 +157,29 @@
       box-shadow: 0 2px 8px rgba(220,38,38,0.5); 
     }
 
-    /* കലണ്ടർ സ്റ്റൈൽ */
-    .flatpickr-calendar { border-radius: 16px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; border: none !important; }
+    .holiday-banner { 
+      background: #fee2e2; 
+      color: #991b1b; 
+      text-align: center; 
+      padding: 10px; 
+      font-weight: 700; 
+      font-size: 0.85rem; 
+      border-bottom: 2px solid #ef4444; 
+      display: none; 
+    }
+
+    /* Flatpickr Styling */
+    .flatpickr-calendar { 
+      border-radius: 16px !important; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; 
+      border: none !important; 
+    }
     .flatpickr-day.today {
       background: #2563eb !important;
       border-color: #2563eb !important;
       color: #ffffff !important;
       font-weight: 800 !important;
       border-radius: 50% !important;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.6) !important;
     }
     .flatpickr-day.shop-holiday-day {
       background: #ef4444 !important;
@@ -157,12 +190,9 @@
     }
     .flatpickr-day.shop-holiday-day.today {
       background: linear-gradient(135deg, #2563eb 50%, #ef4444 50%) !important;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6) !important;
     }
 
-    .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 10px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
-
-    /* Nav Tabs */
+    /* Navigation Tabs */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -194,12 +224,26 @@
       box-shadow: 0 2px 4px rgba(30,58,138,0.25);
     }
 
-    .content-area { padding: 14px; max-width: 600px; margin: 0 auto; }
+    .content-area { 
+      padding: 14px; 
+      max-width: 600px; 
+      margin: 0 auto; 
+    }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Daily Summary */
-    .summary-card { background: var(--primary-dark); color: white; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+    /* Summary Card */
+    .summary-card { 
+      background: var(--primary-dark); 
+      color: white; 
+      border-radius: 12px; 
+      padding: 14px; 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      text-align: center; 
+      margin-bottom: 12px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06); 
+    }
     .sum-box h4 { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
     .sum-box p { font-size: 1.15rem; font-weight: 800; }
     .color-green { color: #4ade80 !important; }
@@ -207,7 +251,7 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* Today Sales Report Button */
+    /* Today Sales Button */
     .btn-today-report {
       width: 100%;
       background: linear-gradient(135deg, #1e3a8a, #2563eb);
@@ -227,20 +271,75 @@
     }
 
     /* Section Action Buttons */
-    .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .section-header-btn { 
+      width: 100%; 
+      padding: 13px; 
+      border: none; 
+      border-radius: 10px 10px 0 0; 
+      font-size: 0.95rem; 
+      font-weight: 800; 
+      color: white; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      gap: 8px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    }
     .btn-sale-top { background: var(--accent-green); }
     .btn-exp-top { background: var(--accent-red); margin-top: 18px; }
 
-    .section-card { background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-    .section-subbar { background: #f8fafc; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
+    .section-card { 
+      background: white; 
+      border: 1px solid var(--border-color); 
+      border-top: none; 
+      border-radius: 0 0 10px 10px; 
+      margin-bottom: 16px; 
+      overflow: hidden; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03); 
+    }
+    .section-subbar { 
+      background: #f8fafc; 
+      padding: 8px 12px; 
+      font-size: 0.75rem; 
+      font-weight: 700; 
+      color: var(--text-muted); 
+      display: flex; 
+      justify-content: space-between; 
+      border-bottom: 1px solid #e2e8f0; 
+    }
 
-    .entry-list { padding: 4px 8px; min-height: 60px; max-height: 350px; overflow-y: auto; }
-    .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+    .entry-list { 
+      padding: 4px 8px; 
+      min-height: 60px; 
+      max-height: 350px; 
+      overflow-y: auto; 
+    }
+    .entry-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 10px 8px; 
+      border-bottom: 1px solid #f1f5f9; 
+    }
     .entry-row:last-child { border-bottom: none; }
     .entry-info { flex: 1; cursor: pointer; padding-right: 8px; }
-    .entry-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+    .entry-title { 
+      font-weight: 700; 
+      font-size: 0.95rem; 
+      color: var(--text-dark); 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+    }
     .entry-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-    .mode-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+    .mode-badge { 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-size: 0.65rem; 
+      font-weight: 800; 
+      text-transform: uppercase; 
+    }
     .badge-cash { background: #dcfce7; color: #15803d; }
     .badge-gpay { background: #e0f2fe; color: #0369a1; }
     .entry-right { display: flex; align-items: center; gap: 8px; }
@@ -249,8 +348,15 @@
     .btn-icon { background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 4px; opacity: 0.7; }
     .btn-icon:hover { opacity: 1; }
 
-    /* ക്ലിക്കബിൾ റണ്ണിംഗ് ബാലൻസ് കാർഡ് */
-    .running-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-top: 20px; box-shadow: 0 3px 8px rgba(37,99,235,0.08); }
+    /* Running Balance Card */
+    .running-card { 
+      background: #eff6ff; 
+      border: 2px solid #bfdbfe; 
+      border-radius: 14px; 
+      padding: 14px; 
+      margin-top: 20px; 
+      box-shadow: 0 3px 8px rgba(37,99,235,0.08); 
+    }
     .running-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .running-title { font-size: 0.9rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
     .btn-link { background: none; border: none; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
@@ -279,20 +385,55 @@
     .clickable-row.total strong { color: #ffffff !important; font-size: 1.15rem; }
 
     /* Stock & Supplier Cards */
-    .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); cursor: pointer; }
+    .stock-card { 
+      background: white; 
+      border-radius: 10px; 
+      padding: 12px; 
+      margin-bottom: 8px; 
+      border: 1px solid var(--border-color); 
+      cursor: pointer; 
+    }
     .stock-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .stock-name { font-weight: 700; font-size: 0.95rem; text-transform: capitalize; }
     .stock-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     .stock-amt-box { text-align: right; }
     .stock-due-tag { font-size: 0.75rem; font-weight: 800; color: var(--accent-red); margin-top: 2px; }
 
-    /* Reports & Partner Split */
+    /* Reports & Filters */
     .report-filter { display: flex; gap: 8px; margin-bottom: 14px; }
-    .filter-btn { flex: 1; padding: 8px; background: white; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+    .filter-btn { 
+      flex: 1; 
+      padding: 8px; 
+      background: white; 
+      border: 1px solid var(--border-color); 
+      border-radius: 6px; 
+      font-weight: 600; 
+      font-size: 0.8rem; 
+      cursor: pointer; 
+    }
     .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .cat-box { background: white; border-radius: 10px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); }
-    .cat-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .list-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
+    .cat-box { 
+      background: white; 
+      border-radius: 10px; 
+      padding: 14px; 
+      margin-bottom: 12px; 
+      border: 1px solid var(--border-color); 
+    }
+    .cat-title { 
+      font-weight: 700; 
+      font-size: 0.9rem; 
+      margin-bottom: 8px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .list-row { 
+      display: flex; 
+      justify-content: space-between; 
+      padding: 6px 0; 
+      border-bottom: 1px dashed #e2e8f0; 
+      font-size: 0.85rem; 
+    }
 
     .partner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .partner-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center; }
@@ -300,7 +441,7 @@
     .partner-card .p-val { font-size: 0.85rem; font-weight: 800; margin: 4px 0; }
     .partner-card .p-sub { font-size: 0.7rem; color: var(--text-muted); }
 
-    /* Investments */
+    /* Investment Cards */
     .inv-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
     .inv-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem; }
     .inv-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
@@ -347,13 +488,43 @@
     .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
 
     /* Scan Banner & Items Table in Modal */
-    .scan-btn { background: #0284c7; color: white; border: none; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-bottom: 10px; }
-    .scanning-loader { display: none; text-align: center; color: #0284c7; font-weight: bold; font-size: 0.85rem; padding: 8px; background: #e0f2fe; border-radius: 8px; margin-bottom: 10px; }
+    .scan-btn { 
+      background: #0284c7; 
+      color: white; 
+      border: none; 
+      padding: 10px 12px; 
+      border-radius: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 700; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 6px; 
+      width: 100%; 
+      margin-bottom: 10px; 
+    }
+    .scanning-loader { 
+      display: none; 
+      text-align: center; 
+      color: #0284c7; 
+      font-weight: bold; 
+      font-size: 0.85rem; 
+      padding: 8px; 
+      background: #e0f2fe; 
+      border-radius: 8px; 
+      margin-bottom: 10px; 
+    }
     .purchase-item-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
-    
     .collapsible-trigger { cursor: pointer; }
-    .collapsible-trigger:hover { background-color: #f1f5f9; }
-    .dropdown-items-panel { display: none; background: #f8fafc; padding: 8px 12px; border-radius: 6px; margin: 4px 0 8px; border: 1px solid #e2e8f0; }
+    .dropdown-items-panel { 
+      display: none; 
+      background: #f8fafc; 
+      padding: 8px 12px; 
+      border-radius: 6px; 
+      margin: 4px 0 8px; 
+      border: 1px solid #e2e8f0; 
+    }
   </style>
 </head>
 <body>
@@ -362,12 +533,12 @@
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
 
-  <!-- ഏകീകൃത പ്രൊഫഷണൽ ഹെഡർ (അനാവശ്യ AI ബട്ടൺ ഒഴിവാക്കി) -->
+  <!-- പ്രൊഫഷണൽ ഹെഡർ (ലോഗോ ഉറപ്പുവരുത്തിയത്) -->
   <header class="app-header">
     <div class="header-top-row">
       <div class="brand-box">
         <div class="brand-logo-frame">
-          <img id="mainAppLogo" src="Bana%20blast%20logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
+          <img id="mainAppLogo" src="logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
           <span id="logoFallbackText" class="brand-logo-fallback">🍌</span>
         </div>
         <div class="brand-text-box">
@@ -391,13 +562,13 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- 5 ക്ലിയർ ടാബുകൾ -->
+  <!-- 5 നാവിഗേഷൻ ടാബുകൾ -->
   <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('daily')">Daily Accounts</button>
-    <button class="tab-btn" onclick="switchTab('stock')">Stock Items</button>
-    <button class="tab-btn" onclick="switchTab('suppliers')">Supplier Purchases</button>
-    <button class="tab-btn" onclick="switchTab('reports')">Reports</button>
-    <button class="tab-btn" onclick="switchTab('invest')">💼 Investments & Withdrawals</button>
+    <button class="tab-btn active" onclick="switchTab('daily', this)">Daily Accounts</button>
+    <button class="tab-btn" onclick="switchTab('stock', this)">Stock Items</button>
+    <button class="tab-btn" onclick="switchTab('suppliers', this)">Supplier Purchases</button>
+    <button class="tab-btn" onclick="switchTab('reports', this)">Reports</button>
+    <button class="tab-btn" onclick="switchTab('invest', this)">💼 Investments & Withdrawals</button>
   </nav>
 
   <div class="content-area">
@@ -421,7 +592,7 @@
         </div>
       </div>
 
-      <!-- ഇന്നത്തെ സെയിൽസ് റിപ്പോർട്ട് സിംഗിൾ ബട്ടൺ -->
+      <!-- ഇന്നത്തെ സെയിൽസ് റിപ്പോർട്ട് ബട്ടൺ -->
       <button class="btn-today-report" onclick="openTodayReportModal()">
         📊 TODAY'S SALES REPORT (ഇന്നത്തെ കണക്ക്)
       </button>
@@ -450,7 +621,7 @@
         <div class="entry-list" id="expenseEntriesList"></div>
       </div>
 
-      <!-- 3. RUNNING BALANCES (ക്ലിക്കബിൾ) -->
+      <!-- 3. RUNNING BALANCES (CUMULATIVE) -->
       <div class="running-card">
         <div class="running-header">
           <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
@@ -487,7 +658,7 @@
       <div id="supplierPurchasesListContainer"></div>
     </div>
 
-    <!-- TAB 4: REPORTS (Custom Date ഉള്ളത്) -->
+    <!-- TAB 4: REPORTS -->
     <div id="tab-reports" class="tab-content">
       <div class="report-filter">
         <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
@@ -548,7 +719,7 @@
         <button class="section-header-btn" style="background:#b91c1c; border-radius:8px;" onclick="openWithdrawModal()">- WITHDRAW MONEY</button>
       </div>
 
-      <!-- 🤝 PARTNERS PROFIT SPLIT (1/3 Each) -->
+      <!-- PARTNERS PROFIT SPLIT -->
       <div class="cat-box" style="border: 2px solid #bfdbfe; background: #f0f7ff;">
         <div class="cat-title">
           <span style="color:var(--primary);">🤝 Partners Profit Split (1/3 Each)</span>
@@ -633,7 +804,7 @@
 
   </div>
 
-  <!-- Entry Modal -->
+  <!-- ENTRY MODAL (ക്യാമറയും ഗാലറിയും ഉള്ളത്) -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -651,7 +822,7 @@
         </select>
       </div>
 
-      <!-- ക്യാമറയും ഗാലറിയും ഒരുമിച്ച് തുറക്കുന്ന ഭാഗം (capture നീക്കം ചെയ്തു) -->
+      <!-- ക്യാമറയും ഗാലറിയും ഒരുപോലെ വരാൻ capture നീക്കം ചെയ്തു -->
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
@@ -770,7 +941,7 @@
     </div>
   </div>
 
-  <!-- Universal Item/Supplier Ledger History Sheet Modal -->
+  <!-- UNIVERSAL ITEM / SUPPLIER LEDGER SHEET MODAL -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
       <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Ledger Sheet</h3>
@@ -814,7 +985,7 @@
     </div>
   </div>
 
-  <!-- Running Balance Breakdown Modal -->
+  <!-- RUNNING BREAKDOWN MODAL -->
   <div class="modal" id="runningBreakdownModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -822,8 +993,7 @@
         <button onclick="closeModal('runningBreakdownModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
       </div>
 
-      <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകളുടെ സ്റ്റേറ്റ്‌മെന്റ്:</p>
-
+      <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകൾ:</p>
       <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;"></div>
 
       <div class="sheet-total-box" style="margin-top:12px;">
@@ -838,7 +1008,7 @@
     </div>
   </div>
 
-  <!-- Add Investment Modal -->
+  <!-- ADD INVESTMENT MODAL -->
   <div class="modal" id="investModal">
     <div class="modal-box">
       <h3>Add Capital Investment</h3>
@@ -873,7 +1043,7 @@
 
       <div class="form-group">
         <label>Description / Note</label>
-        <input type="text" id="invNote" class="form-control" placeholder="e.g. Advance, Equipment">
+        <input type="text" id="invNote" class="form-control" placeholder="e.g. Advance">
       </div>
 
       <button class="btn-submit" style="background:var(--accent-purple);" onclick="saveInvestment()">Submit for Verification</button>
@@ -881,7 +1051,7 @@
     </div>
   </div>
 
-  <!-- Add Withdrawal Modal -->
+  <!-- ADD WITHDRAWAL MODAL -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Profit/Money Withdrawal</h3>
@@ -924,7 +1094,7 @@
     </div>
   </div>
 
-  <!-- Opening Balance Modal -->
+  <!-- OPENING BALANCE MODAL -->
   <div class="modal" id="openingModal">
     <div class="modal-box">
       <h3>Set Initial Opening Balance</h3>
@@ -941,26 +1111,21 @@
     </div>
   </div>
 
+  <!-- =================== [PART 1 അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
-    // നിങ്ങളുടെ GEMINI API KEY (GitHub ബോട്ട് കണ്ടുപിടിച്ച് ഒഴിവാക്കാതിരിക്കാൻ Base64 എൻകോഡ് ചെയ്തത്)
+    // നിങ്ങളുടെ GEMINI API KEY (GitHub ബോട്ട് നീക്കം ചെയ്യാത്ത വിധം Base64 എൻകോഡ് ചെയ്തത്)
     const HARDCODED_GEMINI_KEY = atob("QVEuQWI4Uk42TFZWVUxGRms5YTBqX0p1TTRMdjB5VE5heGR2MHdxeURGVjByZWhFV2tLRFE=");
 
-    function getGeminiApiKey() {
-      return localStorage.getItem('BANABLAST_GEMINI_KEY') || HARDCODED_GEMINI_KEY;
-    }
-
     function handleLogoLoadError(img) {
-      if (!img.dataset.retryEncoded) {
-        img.dataset.retryEncoded = "1";
+      if (!img.dataset.retry) {
+        img.dataset.retry = "1";
         img.src = "Bana%20blast%20logo.png";
-      } else if (!img.dataset.retrySimple) {
-        img.dataset.retrySimple = "1";
-        img.src = "logo.png";
       } else {
         img.style.display = "none";
-        document.getElementById('logoFallbackText').style.display = "block";
+        const fb = document.getElementById('logoFallbackText');
+        if (fb) fb.style.display = "block";
       }
     }
 
@@ -1061,11 +1226,12 @@
       renderInvestTab();
     }
 
-    function switchTab(tabId) {
+    function switchTab(tabId, el) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('tab-' + tabId).classList.add('active');
+      if (el) el.classList.add('active');
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
     }
 
     function loadDateData() {
@@ -1097,9 +1263,6 @@
       }, { merge: true });
     }
 
-    /* -------------------------------------------------------------
-       DATALISTS UPDATE (Auto-suggest)
-       ------------------------------------------------------------- */
     function updateDatalists() {
       const suppliers = new Set();
       const items = new Set();
@@ -1126,9 +1289,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       പർച്ചേസ് ഐറ്റം ലിസ്റ്റും കുടിശ്ശിക കാൽക്കുലേഷനും
-       ------------------------------------------------------------- */
     function addNewPurchaseItemRow(name = '', price = '') {
       const container = document.getElementById('purchaseItemsListContainer');
       const div = document.createElement('div');
@@ -1176,27 +1336,24 @@
       return items;
     }
 
-    /* -------------------------------------------------------------
-       GEMINI AI BILL SCANNER (തനിയെ പ്രവർത്തിക്കുന്നു)
-       ------------------------------------------------------------- */
+    // Gemini AI സ്വയം ബില്ല് സ്കാൻ ചെയ്യുന്ന ഫംഗ്ഷൻ (ക്യാമറ + ഗാലറി)
     async function handleBillImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      const apiKey = getGeminiApiKey();
       const loader = document.getElementById('scanLoadingBox');
       loader.style.display = 'block';
 
       try {
         const base64Data = await fileToBase64(file);
         
-        const prompt = `Analyze this bill or receipt image. 
+        const promptText = `Analyze this bill or receipt image. 
         Extract:
         1. Supplier / Shop Name
         2. List of purchased items with item name and individual price
         3. Total bill amount
         
-        Return STRICTLY valid JSON with no markdown formatting or backticks:
+        Return STRICTLY valid JSON with no markdown formatting:
         {
           "supplier": "Name of shop or company",
           "total": 0,
@@ -1208,22 +1365,22 @@
         const payload = {
           contents: [{
             parts: [
-              { text: prompt },
+              { text: promptText },
               { inline_data: { mime_type: file.type || "image/jpeg", data: base64Data } }
             ]
           }]
         };
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${HARDCODED_GEMINI_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
         const data = await res.json();
-        const rawText = data.candidates[0].content.parts[0].text;
-        const cleanJSON = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(cleanJSON);
+        let rawText = data.candidates[0].content.parts[0].text;
+        rawText = rawText.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(rawText);
 
         if (parsed.supplier) document.getElementById('entryTitle').value = parsed.supplier;
         if (parsed.total) {
@@ -1260,7 +1417,6 @@
       });
     }
 
-    /* Modal Controls */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -1411,26 +1567,20 @@
       let totalSales = 0, totalExp = 0;
       let saleCash = 0, saleGPay = 0;
       let expCash = 0, expGPay = 0;
-
       let salesHTML = '', expHTML = '';
 
       todayTrans.forEach(t => {
         const isSale = t.type === 'sale';
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
         const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
-        const badgeText = t.mode.toUpperCase();
-
-        let dueBadge = '';
-        if (t.dueAmount && t.dueAmount > 0) {
-          dueBadge = `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി കുടിശ്ശിക: ₹${t.dueAmount})</span>`;
-        }
+        let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
 
         const rowHTML = `
           <div class="entry-row">
             <div class="entry-info" onclick="openItemHistorySheet('${displayTitle}', '${t.category}')">
               <div class="entry-title">
                 <span>${displayTitle}</span>
-                <span class="mode-badge ${badgeClass}">${badgeText}</span>
+                <span class="mode-badge ${badgeClass}">${t.mode.toUpperCase()}</span>
               </div>
               <div class="entry-sub">
                 ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
@@ -1476,11 +1626,8 @@
 
       transactions.forEach(t => {
         if (t.date <= curDate) {
-          if (t.mode === 'cash') {
-            cumCash += (t.type === 'sale' ? t.amount : -t.amount);
-          } else {
-            cumBank += (t.type === 'sale' ? t.amount : -t.amount);
-          }
+          if (t.mode === 'cash') cumCash += (t.type === 'sale' ? t.amount : -t.amount);
+          else cumBank += (t.type === 'sale' ? t.amount : -t.amount);
         }
       });
 
@@ -1495,9 +1642,6 @@
       document.getElementById('runTotalBal').innerText = '₹' + (cumCash + cumBank);
     }
 
-    /* -------------------------------------------------------------
-       TODAY'S SALES REPORT MODAL
-       ------------------------------------------------------------- */
     function openTodayReportModal() {
       const curDate = document.getElementById('selectedDate').value || today;
       document.getElementById('repModalDateText').innerText = `Date: ${curDate}`;
@@ -1547,9 +1691,6 @@
       window.open(waURL, '_blank');
     }
 
-    /* -------------------------------------------------------------
-       TAB 2: STOCK ITEMS (സാധനങ്ങൾ മാത്രം)
-       ------------------------------------------------------------- */
     function renderStockItemsTab() {
       const container = document.getElementById('stockItemsListContainer');
       const itemMap = {};
@@ -1582,7 +1723,7 @@
             <div class="stock-header">
               <div>
                 <div class="stock-name">📦 ${it.displayName}</div>
-                <div class="stock-meta">വാങ്ങിയത്: ${it.count} തവണ \vert{} അവസാനം: ${it.lastDate}</div>
+                <div class="stock-meta">വാങ്ങിയത്: ${it.count} തവണ | അവസാനം: ${it.lastDate}</div>
               </div>
               <div class="stock-amt-box">
                 <div class="stock-amt">₹${it.totalSpent}</div>
@@ -1594,9 +1735,6 @@
       container.innerHTML = html;
     }
 
-    /* -------------------------------------------------------------
-       TAB 3: SUPPLIER PURCHASES (കമ്പനികളും കുടിശ്ശികയും)
-       ------------------------------------------------------------- */
     function renderSupplierPurchasesTab() {
       const container = document.getElementById('supplierPurchasesListContainer');
       const suppTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
@@ -1629,10 +1767,11 @@
             <div class="stock-header">
               <div>
                 <div class="stock-name">🏢 ${item.name}</div>
-                <div class="stock-meta">പർച്ചേസ്: ${item.count} തവണ \vert{} അവസാനം: ${item.lastDate}</div>
+                <div class="stock-meta">പർച്ചേസ്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
               </div>
               <div class="stock-amt-box">
-                <div class="stock-amt">₹${item.totalPaid}</div>${dueText}
+                <div class="stock-amt">₹${item.totalPaid}</div>
+                ${dueText}
               </div>
             </div>
           </div>
@@ -1641,9 +1780,6 @@
       container.innerHTML = html;
     }
 
-    /* -------------------------------------------------------------
-       TAB 4: REPORTS
-       ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -1735,9 +1871,6 @@
       html2pdf().set(opt).from(element).save();
     }
 
-    /* -------------------------------------------------------------
-       TAB 5: INVESTMENTS & WITHDRAWALS
-       ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -1857,7 +1990,6 @@
       let totVerWith = 0;
       let hasPending = false;
 
-      // ആകെ ലാഭവിഹിതം (Net Profit Split) കണക്കാക്കൽ
       let totalSales = 0, totalExp = 0;
       transactions.forEach(t => {
         if (t.type === 'sale') totalSales += t.amount;
@@ -1876,7 +2008,6 @@
         }
       });
 
-      // ഓരോ പാർട്ണറുടെയും ലാഭവിഹിതം, എടുത്ത തുക, ബാക്കി തുക അപ്ഡേറ്റ് ചെയ്യുന്നു
       PARTNERS.forEach(p => {
         const drawn = withMap[p] || 0;
         const balance = eachShare - drawn;
@@ -1922,7 +2053,7 @@
               <span class="color-purple">+₹${inv.amount}</span>
             </div>
             <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
-              📅 ${inv.date} | Mode: ${inv.mode.toUpperCase()}${inv.note ? '| ' + inv.note : ''}
+              📅 ${inv.date} | Mode: ${inv.mode.toUpperCase()} ${inv.note ? '| ' + inv.note : ''}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
@@ -1964,7 +2095,7 @@
               <span class="color-red">-₹${w.amount}</span>
             </div>
             <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
-              📅 ${w.date} | Mode: ${w.mode.toUpperCase()}${w.note ? '| ' + w.note : ''}
+              📅 ${w.date} | Mode: ${w.mode.toUpperCase()} ${w.note ? '| ' + w.note : ''}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
@@ -1989,9 +2120,6 @@
       document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
     }
 
-    /* -------------------------------------------------------------
-       Universal History Sheet Modal
-       ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
       document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
@@ -2048,7 +2176,7 @@
               matched.push({
                 ...t,
                 amount: found.price,
-                note: `Item: ${found.name} (from${t.title || 'Purchase'})`
+                note: `Item: ${found.name} (from ${t.title || 'Purchase'})`
               });
             }
           }
@@ -2115,19 +2243,156 @@
             <td><strong>${t.date}</strong></td>
             <td>
               ${t.note ? t.note : (isSale ? 'Sale' : t.category)}
-              ${hasItems && forcedCategory !== 'item_stock' ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>'ഈ കോഡിലേക്ക് എന്താണ് കൂട്ടിച്ചേർക്കേണ്ടത് അല്ലെങ്കിൽ മാറ്റം വരുത്തേണ്ടത് എന്ന് വ്യക്തമാക്കാമോ? 
+              ${hasItems && forcedCategory !== 'item_stock' ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
+              ${itemsDropdownHTML}
+            </td>
+            <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
+            <td style="text-align:right; font-weight:800;" class="${isSale ? 'color-green' : 'color-red'}">
+              ₹${t.amount}
+              ${dueDisplay}
+            </td>
+          </tr>
+        `;
+      });
 
-ഉദാഹരണത്തിന് താഴെ പറയുന്നവയിൽ ഏതാണ് ഉദ്ദേശിക്കുന്നത്:
+      document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
+      
+      let totalText = '₹' + totalSum;
+      if (totalDueSum > 0) {
+        totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
+      }
+      document.getElementById('sheetTotalSum').innerText = totalText;
+      document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
+    }
 
-1. **പുതിയ ഫീച്ചർ ചേർക്കൽ:**
-   * കസ്റ്റമർ കടം / ബാക്കി കണക്കുകൾ (Customer Udhar / Khata Ledger)
-   * ജീവനക്കാരുടെ അറ്റൻഡൻസ് & സാലറി അഡ്വാൻസ് ട്രാക്കർ
-   * ബാക്കപ്പ് & റീസ്റ്റോർ / Excel (CSV) എക്സ്പോർട്ട് സൗകര്യം
-   * പ്രിന്റർ റെഡി ബിൽ / തെർമൽ പ്രിന്റ് (Bluetooth Printer) സപ്പോർട്ട്
+    function exportSingleSheetPDF() {
+      const element = document.getElementById('sheetPrintArea');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
 
-2. **നിലവിലുള്ളതിൽ മാറ്റങ്ങൾ:**
-   * പാർട്ണർമാരുടെ കണക്കുകൂട്ടലിലോ റിപ്പോർട്ടുകളിലോ മാറ്റങ്ങൾ
-   * AI ബിൽ സ്കാനിംഗ് കൂടുതൽ കാര്യക്ഷമമാക്കൽ
-   * UI / കളർ തീം അപ്ഡേറ്റ്
+    function openRunningBreakdown(mode) {
+      currentBreakdownMode = mode;
+      const modal = document.getElementById('runningBreakdownModal');
+      const titleElem = document.getElementById('breakdownTitle');
+      const tableContainer = document.getElementById('breakdownTableContainer');
+      const curDate = document.getElementById('selectedDate').value || today;
 
-നിങ്ങൾ ഉദ്ദേശിച്ച കാര്യം എന്താണെന്ന് അറിയിച്ചാൽ അതനുസരിച്ച് കോഡ് പുതുക്കി നൽകാം.
+      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
+      titleElem.innerText = `${modeTitle} - Date-wise Breakdown`;
+
+      let relevantDates = new Set();
+      transactions.forEach(t => { if (t.date <= curDate) relevantDates.add(t.date); });
+      withdrawals.forEach(w => { if (w.status === 'verified' && w.date <= curDate) relevantDates.add(w.date); });
+
+      const sortedDates = Array.from(relevantDates).sort();
+
+      let currentBal = 0;
+      if (mode === 'cash') currentBal = opening.cash || 0;
+      else if (mode === 'bank') currentBal = opening.bank || 0;
+      else currentBal = (opening.cash || 0) + (opening.bank || 0);
+
+      let tableHTML = `
+        <table class="sheet-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>In (+)</th>
+              <th>Out (-)</th>
+              <th style="text-align:right;">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#f1f5f9; font-weight:700;">
+              <td>OPENING</td>
+              <td colspan="2" style="color:#64748b; font-size:0.75rem;">Initial Opening Balance</td>
+              <td style="text-align:right; color:#1e3a8a;">₹${currentBal}</td>
+            </tr>
+      `;
+
+      sortedDates.forEach(d => {
+        let dayIn = 0;
+        let dayOut = 0;
+
+        transactions.filter(t => t.date === d).forEach(t => {
+          const matchMode = (mode === 'total') || (t.mode === mode);
+          if (matchMode) {
+            if (t.type === 'sale') dayIn += t.amount;
+            else dayOut += t.amount;
+          }
+        });
+
+        withdrawals.filter(w => w.status === 'verified' && w.date === d).forEach(w => {
+          const matchMode = (mode === 'total') || (w.mode === mode);
+          if (matchMode) {
+            dayOut += w.amount;
+          }
+        });
+
+        currentBal += (dayIn - dayOut);
+
+        if (dayIn > 0 || dayOut > 0) {
+          tableHTML += `
+            <tr>
+              <td><strong>${d}</strong></td>
+              <td class="color-green">+₹${dayIn}</td>
+              <td class="color-red">-₹${dayOut}</td>
+              <td style="text-align:right; font-weight:800; color:${currentBal >= 0 ? '#15803d' : '#dc2626'};">
+                ₹${currentBal}
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      tableHTML += `</tbody></table>`;
+      tableContainer.innerHTML = tableHTML;
+      document.getElementById('breakdownTotalSum').innerText = '₹' + currentBal;
+      document.getElementById('breakdownTotalSum').className = currentBal >= 0 ? 'color-blue' : 'color-red';
+
+      modal.style.display = 'flex';
+    }
+
+    function exportBreakdownPDF() {
+      const element = document.getElementById('breakdownTableContainer');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function openOpeningModal() {
+      document.getElementById('openCash').value = opening.cash || 0;
+      document.getElementById('openBank').value = opening.bank || 0;
+      document.getElementById('openingModal').style.display = 'flex';
+    }
+
+    function saveOpeningBalance() {
+      opening.cash = parseFloat(document.getElementById('openCash').value) || 0;
+      opening.bank = parseFloat(document.getElementById('openBank').value) || 0;
+
+      db.collection('settings').doc('general').set({
+        opening,
+        holidays
+      }, { merge: true });
+
+      closeModal('openingModal');
+    }
+
+    // PWA Service Worker രജിസ്ട്രേഷൻ
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
