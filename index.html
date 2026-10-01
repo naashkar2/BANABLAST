@@ -508,7 +508,6 @@
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
     
-    /* ബട്ടണുകൾ */
     .btn-submit { 
       width: 100%; 
       padding: 13px; 
@@ -761,30 +760,6 @@
       font-weight: 700;
       font-size: 0.65rem;
       color: #334155;
-    }
-
-    /* പ്രിന്റിംഗ് സിസ്റ്റം (ക്രോം / സഫാരി നേറ്റീവ് PDF) */
-    @media print {
-      body * { visibility: hidden !important; }
-      #a4PreviewModal, #a4PreviewModal * { visibility: visible !important; }
-      #a4PreviewModal {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        background: transparent !important;
-        padding: 0 !important;
-        display: block !important;
-      }
-      .a4-action-bar { display: none !important; }
-      .a4-sheet {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        padding: 10mm !important;
-        min-height: auto !important;
-      }
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
   </style>
 </head>
@@ -1078,21 +1053,21 @@
 
   </div>
 
-  <!-- 🌟 A4 LIVE PREVIEW MODAL (ഇവിടെ നേരിട്ട് A4 ഡിസൈൻ കാണാം) -->
+  <!-- 🌟 A4 LIVE PREVIEW MODAL -->
   <div class="a4-preview-modal" id="a4PreviewModal">
     <div class="a4-preview-container">
       <div class="a4-action-bar">
         <h4 id="a4BarTitle">A4 Statement Preview</h4>
         <div class="a4-btn-group">
-          <button type="button" class="a4-btn a4-btn-print" onclick="printOrSaveCurrentA4()">🖨️ Print / Save PDF</button>
-          <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp</button>
+          <button type="button" class="a4-btn a4-btn-print" onclick="printOrSaveCurrentA4()">💾 Download PDF</button>
+          <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp Share</button>
           <button type="button" class="a4-btn a4-btn-close" onclick="closeA4PreviewModal()">✕</button>
         </div>
       </div>
 
       <!-- റെൻഡർ ചെയ്യപ്പെടുന്ന യഥാർത്ഥ A4 പേജ് -->
       <div class="a4-sheet" id="a4SheetPaper">
-        <!-- ഡൈനാമിക് ആയി ഇവിടെ ഡാറ്റ നിറയും -->
+        <!-- ഡാറ്റ ഇവിടെ തത്സമയം നിറയും -->
       </div>
     </div>
   </div>
@@ -1227,9 +1202,8 @@
       </div>
 
       <div style="margin-top:10px;">
-        <!-- നേരിട്ട് A4 Preview തുറക്കുന്ന ബട്ടൺ -->
         <button class="btn-submit" style="background:#2563eb !important; margin-top:0;" onclick="previewTodayA4()">
-          📄 VIEW & PRINT A4 PDF PREVIEW
+          📄 VIEW & DOWNLOAD A4 PDF PREVIEW
         </button>
       </div>
     </div>
@@ -1505,7 +1479,7 @@
     </div>
   </div>
 
-  <!-- =================== [PART 1 അവസാനിച്ചു] =================== -->
+  <!-- =================== [PART 1 ഇതോടെ അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
@@ -2274,7 +2248,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. 🌟 A4 LIVE PREVIEW & NATIVE PRINT / SHARE ENGINE (ZERO-BLANK)
+       5. 🌟 100% ZERO-BLANK A4 ENGINE & DIRECT PDF DOWNLOAD / SHARE
        ------------------------------------------------------------- */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
@@ -2287,26 +2261,78 @@
       document.getElementById('a4PreviewModal').style.display = 'none';
     }
 
-    // ഫോണിന്റെ നേറ്റീവ് പ്രിന്റർ വഴി 100% ഒറിജിനൽ വെക്ടർ PDF ഉണ്ടാക്കുന്നു (ഒരിക്കലും ബ്ലാങ്ക് ആകില്ല)
-    function printOrSaveCurrentA4() {
-      window.print();
+    // മോഡലിന് പുറത്തുവെച്ച് ക്ലീൻ ആയി റെൻഡർ ചെയ്ത് ഒറിജിനൽ PDF ബ്ലോബ് ഉണ്ടാക്കുന്നു
+    async function createCleanA4PdfBlob(fileName) {
+      const sourceContent = document.getElementById('a4SheetPaper').innerHTML;
+
+      const cleanBox = document.createElement('div');
+      cleanBox.style.cssText = 'position:fixed;top:0;left:0;width:720px;background:#ffffff;color:#0f172a;padding:24px;z-index:999999;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
+      cleanBox.innerHTML = `
+        <div style="background:#ffffff; color:#0f172a;">
+          ${sourceContent}
+        </div>
+      `;
+      document.body.appendChild(cleanBox);
+
+      const prevScroll = window.scrollY;
+      window.scrollTo(0, 0);
+
+      await new Promise(r => setTimeout(r, 300));
+
+      const opt = {
+        margin: [6, 6, 6, 6],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 760 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        const blob = await html2pdf().set(opt).from(cleanBox).output('blob');
+        return blob;
+      } finally {
+        window.scrollTo(0, prevScroll);
+        if (cleanBox.parentNode) cleanBox.parentNode.removeChild(cleanBox);
+      }
     }
 
-    // വാട്സാപ്പിലേക്ക് നേരിട്ട് ഷെയർ ചെയ്യൽ
-    async function shareCurrentA4WhatsApp() {
-      const paper = document.getElementById('a4SheetPaper');
+    // 1. നേരിട്ട് ഫോണിലേക്ക് ഒറിജിനൽ PDF ഡൗൺലോഡ് ചെയ്യുന്നു
+    async function printOrSaveCurrentA4() {
+      const btn = event?.target;
+      const oldText = btn ? btn.innerText : '';
+      if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
+
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        const opt = {
-          margin: [8, 8, 8, 8],
-          filename: fileName,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        const pdfBlob = await createCleanA4PdfBlob(fileName);
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert("✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ആയിട്ടുണ്ട്!");
+      } catch (err) {
+        console.error("Save error:", err);
+        alert("❌ PDF സേവ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
+      } finally {
+        if (btn) btn.innerText = oldText;
+      }
+    }
 
-        const pdfBlob = await html2pdf().set(opt).from(paper).output('blob');
+    // 2. വാട്സാപ്പിലേക്ക് ഒറിജിനൽ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു
+    async function shareCurrentA4WhatsApp() {
+      const btn = event?.target;
+      const oldText = btn ? btn.innerText : '';
+      if (btn) btn.innerText = '⏳ തയ്യാറാക്കുന്നു...';
+
+      const fileName = `${currentA4Title}_${today}.pdf`;
+
+      try {
+        const pdfBlob = await createCleanA4PdfBlob(fileName);
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
@@ -2316,7 +2342,7 @@
             text: `BANABLAST - ${currentA4Title}`
           });
         } else {
-          // ഡൗൺലോഡ് ചെയ്ത ശേഷം വാട്സാപ്പ് ഓപ്പൺ ചെയ്യുന്നു
+          // സിസ്റ്റം ഷെയർ ലഭ്യമല്ലെങ്കിൽ ഫയൽ ആദ്യം ഫോണിലേക്ക് ഡൗൺലോഡ് ചെയ്ത് നൽകുന്നു
           const url = URL.createObjectURL(pdfBlob);
           const a = document.createElement('a');
           a.href = url;
@@ -2326,14 +2352,15 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
 
-          const shareText = encodeURIComponent(`📄 BANABLAST - ${currentA4Title}\nതീയതി: ${document.getElementById('selectedDate').value || today}\nPDF ഫയൽ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്.`);
-          window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
+          alert("✅ PDF ഫയൽ ഫോണിലേക്ക് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!\n\nതുടർന്ന് വാട്സാപ്പ് തുറന്ന് ഈ ഫയൽ അറ്റാച്ച് ചെയ്ത് അയക്കുക.");
         }
       } catch (err) {
-        console.error("WhatsApp share error:", err);
+        console.error("Share error:", err);
         if (err.name !== 'AbortError') {
-          window.print();
+          alert("❌ ഷെയർ ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
         }
+      } finally {
+        if (btn) btn.innerText = oldText;
       }
     }
 
