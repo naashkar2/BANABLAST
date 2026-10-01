@@ -1480,7 +1480,7 @@
   </div>
 
   <!-- =================== [PART 1 ഇതോടെ അവസാനിച്ചു] =================== -->
-    <script>
+      <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
@@ -1530,10 +1530,6 @@
     let currentBreakdownMode = 'total';
     let flatpickrCalendar = null;
     let currentA4Title = "Statement";
-
-    // PDF Caching Variables (ടൈംഔട്ട് ഇല്ലാതെ ഉടൻ ഷെയർ ചെയ്യാനുള്ളത്)
-    let cachedPdfBlob = null;
-    let cachedPdfFile = null;
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -1629,7 +1625,7 @@
       }
 
       if (newPin.length < 4) {
-        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        alert("⚠️️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
         return;
       }
 
@@ -2252,85 +2248,82 @@
     }
 
     /* -------------------------------------------------------------
-       5. 🌟 100% PROVEN A4 ENGINE & BACKGROUND CACHE (ZERO-DELAY)
+       5. 🌟 100% DIRECT SCREEN-TO-PDF ENGINE (ZERO-BLANK GUARANTEED)
        ------------------------------------------------------------- */
-    async function createCleanA4PdfBlob(fileName) {
-      const sourceContent = document.getElementById('a4SheetPaper').innerHTML;
-
-      const cleanBox = document.createElement('div');
-      cleanBox.style.cssText = 'position:fixed;top:0;left:0;width:720px;background:#ffffff;color:#0f172a;padding:24px;z-index:999999;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
-      cleanBox.innerHTML = `
-        <div style="background:#ffffff; color:#0f172a;">
-          ${sourceContent}
-        </div>
-      `;
-      document.body.appendChild(cleanBox);
-
-      const prevScroll = window.scrollY;
-      window.scrollTo(0, 0);
-
-      await new Promise(r => setTimeout(r, 200));
-
-      const opt = {
-        margin: [6, 6, 6, 6],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 760 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      try {
-        const worker = html2pdf().set(opt).from(cleanBox).toPdf().get('pdf');
-        const pdf = await worker;
-        const blob = pdf.output('blob');
-        return blob;
-      } finally {
-        window.scrollTo(0, prevScroll);
-        if (cleanBox.parentNode) cleanBox.parentNode.removeChild(cleanBox);
-      }
-    }
-
-    // പ്രിവ്യൂ തുറക്കുമ്പോൾ തന്നെ ബാക്ക്ഗ്രൗണ്ടിൽ PDF തയ്യാറാക്കി വെക്കുന്നു
-    async function prepareA4PdfInBackground(title) {
-      cachedPdfBlob = null;
-      cachedPdfFile = null;
-      const fileName = `${title}_${today}.pdf`;
-      try {
-        const blob = await createCleanA4PdfBlob(fileName);
-        cachedPdfBlob = blob;
-        cachedPdfFile = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
-      } catch (err) {
-        console.error("Background PDF error:", err);
-      }
-    }
-
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
       document.getElementById('a4SheetPaper').innerHTML = htmlContent;
 
-      // മുകളിൽ View PDF ബട്ടൺ കൂടി ചേർത്ത ആക്ഷൻ ബാർ
       const barGroup = document.querySelector('.a4-btn-group');
       if (barGroup) {
         barGroup.innerHTML = `
           <button type="button" class="a4-btn a4-btn-print" onclick="printOrSaveCurrentA4()">💾 Download PDF</button>
           <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp</button>
-          <button type="button" class="a4-btn" style="background:#0284c7;" onclick="viewPdfInBrowser()">👁️ View</button>
           <button type="button" class="a4-btn a4-btn-close" onclick="closeA4PreviewModal()">✕</button>
         `;
       }
 
       document.getElementById('a4PreviewModal').style.display = 'flex';
-      prepareA4PdfInBackground(currentA4Title);
     }
 
     function closeA4PreviewModal() {
       document.getElementById('a4PreviewModal').style.display = 'none';
-      cachedPdfBlob = null;
-      cachedPdfFile = null;
     }
 
-    // 1. ഡൗൺലോഡ് മാനേജർക്ക് സമയം നൽകി 100% സേവ് ചെയ്യുന്ന ഫംഗ്ഷൻ
+    // സ്ക്രീനിലുള്ള യഥാർത്ഥ A4 ഷീറ്റിൽ നിന്ന് നേരിട്ട് ചിത്രം എടുത്ത് PDF ഉണ്ടാക്കുന്നു
+    async function createCleanA4PdfBlob(fileName) {
+      const element = document.getElementById('a4SheetPaper');
+      const modal = document.getElementById('a4PreviewModal');
+      if (modal) modal.scrollTop = 0;
+
+      // സ്ക്രീനിലുള്ള യഥാർത്ഥ വ്യൂവിന്റെ ചിത്രം പകർത്തുന്നു
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // jsPDF വഴി നേരിട്ട് A4 പേപ്പറിൽ വരയ്ക്കുന്നു
+      const JsPdf = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
+      if (JsPdf) {
+        const pdf = new JsPdf('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const imgWidth = pdfWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pdfHeight - (margin * 2));
+
+        while (heightLeft > 0) {
+          position = position - (pdfHeight - (margin * 2));
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+          heightLeft -= (pdfHeight - (margin * 2));
+        }
+
+        return pdf.output('blob');
+      } else {
+        return await html2pdf().set({
+          margin: [8, 8, 8, 8],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(element).output('blob');
+      }
+    }
+
+    // 1. ഡൗൺലോഡ് ബട്ടൺ (തത്സമയം ഫോണിലേക്ക് സേവ് ആകുന്നു)
     async function printOrSaveCurrentA4() {
       const btn = document.querySelector('.a4-btn-print');
       if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
@@ -2338,13 +2331,7 @@
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        let blob = cachedPdfBlob;
-        if (!blob) {
-          blob = await createCleanA4PdfBlob(fileName);
-          cachedPdfBlob = blob;
-          cachedPdfFile = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
-        }
-
+        const blob = await createCleanA4PdfBlob(fileName);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -2353,7 +2340,6 @@
         document.body.appendChild(a);
         a.click();
 
-        // ബ്ലോബ് ഉടൻ നശിപ്പിക്കാതെ 60 സെക്കൻഡ് സൂക്ഷിക്കുന്നു (ഡൗൺലോഡ് തടസ്സപ്പെടാതിരിക്കാൻ)
         setTimeout(() => {
           if (a.parentNode) document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(url), 60000);
@@ -2361,7 +2347,7 @@
 
         if (btn) {
           btn.innerText = '✅ Saved!';
-          setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2500);
+          setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2000);
         }
       } catch (err) {
         console.error("Save error:", err);
@@ -2370,7 +2356,7 @@
       }
     }
 
-    // 2. വാട്സാപ്പിലേക്ക് നേരിട്ട് ഷെയർ ചെയ്യുന്നു (തത്സമയം)
+    // 2. വാട്സാപ്പ് ബട്ടൺ (നേരിട്ട് യഥാർത്ഥ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു)
     async function shareCurrentA4WhatsApp() {
       const btn = document.querySelector('.a4-btn-wa');
       if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
@@ -2378,30 +2364,18 @@
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        let file = cachedPdfFile;
-        let blob = cachedPdfBlob;
+        const blob = await createCleanA4PdfBlob(fileName);
+        const file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
 
-        if (!file || !blob) {
-          blob = await createCleanA4PdfBlob(fileName);
-          cachedPdfBlob = blob;
-          file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
-          cachedPdfFile = file;
-        }
-
-        // സിസ്റ്റം ഷെയർ വഴി യഥാർത്ഥ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
             title: currentA4Title,
             text: `BANABLAST Statement (${today})`
           });
-        } else if (navigator.share) {
-          await navigator.share({
-            title: currentA4Title,
-            text: `BANABLAST Statement (${today})`
-          });
         } else {
           printOrSaveCurrentA4();
+          alert("✅ PDF ഫയൽ ഫോണിലേക്ക് ഡൗൺലോഡ് ആയിട്ടുണ്ട്. ഇനി വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാം!");
         }
       } catch (err) {
         console.error("Share error:", err);
@@ -2411,20 +2385,6 @@
       } finally {
         if (btn) btn.innerText = '💬 WhatsApp';
       }
-    }
-
-    // 3. ഫോണിന്റെ സ്വന്തം PDF വ്യൂവറിൽ നേരിട്ട് കാണാൻ
-    async function viewPdfInBrowser() {
-      const fileName = `${currentA4Title}_${today}.pdf`;
-      let blob = cachedPdfBlob;
-      if (!blob) {
-        blob = await createCleanA4PdfBlob(fileName);
-        cachedPdfBlob = blob;
-        cachedPdfFile = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
-      }
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
 
     // 1. ഇന്നത്തെ റിപ്പോർട്ട് A4 പ്രിവ്യൂ
