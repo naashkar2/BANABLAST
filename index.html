@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>BANABLAST - Business Ledger</title>
   
-  <!-- App Favicon -->
   <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
 
-  <!-- Google Fonts, Flatpickr & html2pdf -->
+  <!-- Fonts, Flatpickr & html2pdf -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Google Firebase SDKs (Compat) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -40,43 +39,34 @@
       padding-bottom: 120px; 
     }
 
-    /* 1. മനോഹരമായ സെന്റർ ഹെഡർ */
-    .app-top-bar {
+    /* 1. ക്ലീൻ ഏകീകൃത ഹെഡർ (കറുത്ത ബാറോ ആവർത്തനങ്ങളോ ഇല്ല) */
+    .app-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
-      padding-top: max(16px, env(safe-area-inset-top));
-      padding-bottom: 12px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 14px;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.18);
     }
-    .app-main-heading {
-      color: #ffffff;
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    .header-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
-
-    /* സബ് ഹെഡർ: ലോഗോയും ക്ലൗഡ് സ്റ്റാറ്റസും */
-    header { 
-      background: #1e3a8a; 
-      color: white; 
-      padding: 10px 14px 14px;
-      position: sticky; 
-      top: 0; 
-      z-index: 50; 
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15); 
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .brand-container { display: flex; align-items: center; gap: 10px; }
-    
     .brand-logo-frame {
-      width: 44px; 
-      height: 44px; 
-      border-radius: 50%; 
-      background: #ffffff; 
-      display: flex; 
-      align-items: center; 
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
       justify-content: center;
       border: 2px solid #ffffff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.25);
@@ -85,37 +75,68 @@
     }
     .brand-logo { width: 100%; height: 100%; object-fit: cover; }
     .brand-logo-fallback { font-size: 1.4rem; display: none; }
-
-    .brand-title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
-    .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
-    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; }
     
-    .holiday-btn { background: #eab308; color: #000; border: none; padding: 7px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .holiday-btn.active { background: var(--accent-red); color: white; }
+    .brand-text-box { display: flex; flex-direction: column; line-height: 1.15; }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; }
 
-    /* ഡേറ്റ് പിക്കർ ബാർ */
-    .date-control { 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      margin-top: 10px; 
-      background: rgba(255,255,255,0.2); 
-      padding: 8px 12px; 
-      border-radius: 10px; 
+    .header-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-action-btn {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
       cursor: pointer;
     }
-    .date-picker { 
-      background: transparent; 
+    .holiday-btn { 
+      background: #eab308; 
+      color: #000; 
       border: none; 
-      color: white; 
-      font-size: 0.95rem; 
-      font-weight: 700; 
-      outline: none; 
-      width: 100%; 
+      padding: 7px 12px; 
+      border-radius: 8px; 
+      font-size: 0.75rem; 
+      font-weight: 800; 
       cursor: pointer; 
+      white-space: nowrap; 
+    }
+    .holiday-btn.active { background: var(--accent-red); color: white; }
+
+    /* കലണ്ടർ ബാർ */
+    .calendar-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.18);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .date-picker-input {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 700;
+      outline: none;
+      width: 100%;
+      cursor: pointer;
     }
 
-    /* കലണ്ടർ കസ്റ്റം കളർ ക്രമീകരണങ്ങൾ */
+    /* കലണ്ടർ സ്റ്റൈൽ */
     .flatpickr-calendar { border-radius: 16px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; border: none !important; }
     .flatpickr-day.today {
       background: #2563eb !important;
@@ -139,7 +160,7 @@
 
     .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 10px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
 
-    /* Nav Tabs */
+    /* Nav Tabs (5 വ്യത്യസ്ത ടാബുകൾ) */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -184,11 +205,24 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* Quick Share Bar */
-    .quick-share-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-    .btn-share { flex: 1; padding: 8px 12px; border: none; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .btn-share-pdf { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-    .btn-share-wa { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    /* ഇന്നത്തെ റിപ്പോർട്ട് ബട്ടൺ (ഒറ്റ ഫംഗ്ഷൻ) */
+    .btn-today-report {
+      width: 100%;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 8px rgba(37,99,235,0.3);
+    }
 
     /* Section Action Buttons */
     .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -242,7 +276,7 @@
     .clickable-row.total span { color: #ffffff !important; }
     .clickable-row.total strong { color: #ffffff !important; font-size: 1.15rem; }
 
-    /* Supplier & Stock Cards */
+    /* Stock & Supplier Cards */
     .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); cursor: pointer; }
     .stock-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .stock-name { font-weight: 700; font-size: 0.95rem; text-transform: capitalize; }
@@ -315,7 +349,6 @@
     .scanning-loader { display: none; text-align: center; color: #0284c7; font-weight: bold; font-size: 0.85rem; padding: 8px; background: #e0f2fe; border-radius: 8px; margin-bottom: 10px; }
     .purchase-item-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
     
-    /* Collapsible Items in Sheet */
     .collapsible-trigger { cursor: pointer; }
     .collapsible-trigger:hover { background-color: #f1f5f9; }
     .dropdown-items-panel { display: none; background: #f8fafc; padding: 8px 12px; border-radius: 6px; margin: 4px 0 8px; border: 1px solid #e2e8f0; }
@@ -323,43 +356,48 @@
 </head>
 <body>
 
-  <!-- 1. സെന്റർ ഹെഡർ -->
-  <div class="app-top-bar">
-    <h1 class="app-main-heading">BANABLAST</h1>
-  </div>
+  <!-- DATALISTS (കമ്പനികളും സാധനങ്ങളും ആവർത്തിക്കാതെ തനിയെ സെലക്ട് ചെയ്യാൻ) -->
+  <datalist id="suppliersList"></datalist>
+  <datalist id="itemsList"></datalist>
 
-  <header>
-    <div class="header-top">
-      <div class="brand-container">
+  <!-- ഏകീകൃത പ്രൊഫഷണൽ ഹെഡർ -->
+  <header class="app-header">
+    <div class="header-top-row">
+      <div class="brand-box">
         <div class="brand-logo-frame">
           <img id="mainAppLogo" src="Bana%20blast%20logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
           <span id="logoFallbackText" class="brand-logo-fallback">🍌</span>
         </div>
-        <div class="brand-title-wrap">
+        <div class="brand-text-box">
           <span class="brand-title">BANABLAST</span>
           <span class="sync-status">🟢 Live Cloud Sync</span>
         </div>
       </div>
-      <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
+      <div class="header-right-actions">
+        <button class="icon-action-btn" onclick="configureApiKey()" title="AI API Key">⚙️ AI</button>
+        <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
+      </div>
     </div>
 
-    <!-- ഇൻ-ആപ്പ് കലണ്ടർ -->
-    <div class="date-control">
+    <!-- കലണ്ടർ ബാർ -->
+    <div class="calendar-bar">
       <span style="font-size:1.1rem;">📅</span>
-      <input type="text" id="selectedDate" class="date-picker" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
+      <input type="text" id="selectedDate" class="date-picker-input" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
     </div>
   </header>
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
+  <!-- 5 ക്ലിയർ ടാബുകൾ -->
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily')">Daily Accounts</button>
-    <button class="tab-btn" onclick="switchTab('stock')">Stock / Purchases</button>
+    <button class="tab-btn" onclick="switchTab('stock')">Stock Items</button>
+    <button class="tab-btn" onclick="switchTab('suppliers')">Supplier Purchases</button>
     <button class="tab-btn" onclick="switchTab('reports')">Reports</button>
-    <button class="tab-btn" onclick="switchTab('invest')">💼 Investments</button>
+    <button class="tab-btn" onclick="switchTab('invest')">💼 Investments & Withdrawals</button>
   </nav>
 
-  <div class="content-area" id="exportContentArea">
+  <div class="content-area">
 
     <!-- TAB 1: DAILY ACCOUNTS -->
     <div id="tab-daily" class="tab-content active">
@@ -380,11 +418,10 @@
         </div>
       </div>
 
-      <!-- Quick Share Buttons -->
-      <div class="quick-share-bar">
-        <button class="btn-share btn-share-pdf" onclick="exportDailyPDF()">📄 PDF ഡൗൺലോഡ്</button>
-        <button class="btn-share btn-share-wa" onclick="shareDailyWhatsApp()">💬 WhatsApp ഷെയർ</button>
-      </div>
+      <!-- ഇന്നത്തെ സെയിൽസ് റിപ്പോർട്ട് ഒറ്റ ബട്ടൺ -->
+      <button class="btn-today-report" onclick="openTodayReportModal()">
+        📊 TODAY'S SALES REPORT (ഇന്നത്തെ കണക്ക്)
+      </button>
 
       <!-- 1. SALES SECTION -->
       <button class="section-header-btn btn-sale-top" onclick="openEntryModal('sale')">
@@ -417,19 +454,16 @@
           <button class="btn-link" onclick="openOpeningModal()">EDIT OPENING</button>
         </div>
 
-        <!-- Bank Row -->
         <div class="clickable-row" onclick="openRunningBreakdown('bank')">
           <span style="font-weight:600; color:#334155;">Bank Account (GPay/UPI) 🔍</span>
           <strong id="runBankBal" style="font-weight:800; color:#0369a1;">₹0</strong>
         </div>
 
-        <!-- Cash Row -->
         <div class="clickable-row" onclick="openRunningBreakdown('cash')">
           <span style="font-weight:600; color:#334155;">Counter Cash Box 🔍</span>
           <strong id="runCashBal" style="font-weight:800; color:#15803d;">₹0</strong>
         </div>
 
-        <!-- Total Row -->
         <div class="clickable-row total" onclick="openRunningBreakdown('total')">
           <span style="font-weight:800;">TOTAL BALANCE (ക്ലിക്ക് ചെയ്യുക) 📊</span>
           <strong id="runTotalBal">₹0</strong>
@@ -438,18 +472,37 @@
 
     </div>
 
-    <!-- TAB 2: STOCK & PURCHASES (കുടിശ്ശിക ഉൾപ്പെടെ) -->
+    <!-- TAB 2: STOCK ITEMS (സാധനങ്ങളുടെ വിവരങ്ങൾ മാത്രം) -->
     <div id="tab-stock" class="tab-content">
-      <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർ പർച്ചേസുകളും കുടിശ്ശിക കണക്കുകളും</h3>
-      <div id="stockListContainer"></div>
+      <h3 style="font-size:1rem; margin-bottom:12px;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
+      <div id="stockItemsListContainer"></div>
     </div>
 
-    <!-- TAB 3: REPORTS -->
+    <!-- TAB 3: SUPPLIER PURCHASES (കമ്പനികളുടെ വിവരങ്ങളും കുടിശ്ശികയും) -->
+    <div id="tab-suppliers" class="tab-content">
+      <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
+      <div id="supplierPurchasesListContainer"></div>
+    </div>
+
+    <!-- TAB 4: REPORTS (Custom Date ഉള്ളത്) -->
     <div id="tab-reports" class="tab-content">
       <div class="report-filter">
         <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
         <button class="filter-btn" id="btnFiltWeek" onclick="filterReport('week')">This Week</button>
-        <button class="filter-btn" id="btnFiltAll" onclick="filterReport('all')">All Time</button>
+        <button class="filter-btn" id="btnFiltCustom" onclick="filterReport('custom')">Custom Date</button>
+      </div>
+
+      <!-- Custom Date Pickers -->
+      <div id="reportCustomDateBox" style="display:none; gap:6px; margin-bottom:12px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+        <div style="flex:1;">
+          <label style="font-size:0.7rem; font-weight:700;">From:</label>
+          <input type="date" id="repFromDate" class="form-control" style="padding:6px; font-size:0.8rem;">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.7rem; font-weight:700;">To:</label>
+          <input type="date" id="repToDate" class="form-control" style="padding:6px; font-size:0.8rem;">
+        </div>
+        <button class="filter-btn active" style="align-self:flex-end; padding:8px 12px;" onclick="renderReportsTab()">Apply</button>
       </div>
 
       <div class="summary-card">
@@ -458,11 +511,7 @@
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
       </div>
 
-      <div class="quick-share-bar">
-        <button class="btn-share btn-share-pdf" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
-      </div>
-
-      <!-- 3 PARTNERS PROFIT SPLIT (1/3 EACH) -->
+      <!-- Partners Profit Share (1/3 Each) -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🤝 Partners Profit Split (1/3 Each)</span>
@@ -471,18 +520,15 @@
         <div class="partner-grid">
           <div class="partner-card">
             <h5>ASHIF</h5>
-            <div class="p-sub">Drawn: <span id="drawAshif" class="color-red">₹0</span></div>
-            <div class="p-val" id="netAshif">₹0</div>
+            <div class="p-val color-blue" id="shareAshif">₹0</div>
           </div>
           <div class="partner-card">
             <h5>SABITH</h5>
-            <div class="p-sub">Drawn: <span id="drawSabith" class="color-red">₹0</span></div>
-            <div class="p-val" id="netSabith">₹0</div>
+            <div class="p-val color-blue" id="shareSabith">₹0</div>
           </div>
           <div class="partner-card">
             <h5>ASHKAR ALI</h5>
-            <div class="p-sub">Drawn: <span id="drawAshkar" class="color-red">₹0</span></div>
-            <div class="p-val" id="netAshkar">₹0</div>
+            <div class="p-val color-blue" id="shareAshkar">₹0</div>
           </div>
         </div>
       </div>
@@ -511,18 +557,21 @@
         <div class="list-row"><span>Stock Purchases Total:</span><strong id="repStockSum">₹0</strong></div>
         <div class="list-row"><span>Daily Miscellaneous:</span><strong id="repMiscSum">₹0</strong></div>
       </div>
+
+      <button class="btn-submit" style="background:#2563eb;" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
     </div>
 
-    <!-- TAB 4: INVESTMENTS & WITHDRAWALS -->
+    <!-- TAB 5: INVESTMENTS & WITHDRAWALS (എല്ലാ പാർട്ണർ ഇടപാടുകളും ഇവിടെ) -->
     <div id="tab-invest" class="tab-content">
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="section-header-btn" style="background:var(--accent-purple); border-radius:8px;" onclick="openInvestModal()">+ ADD INVESTMENT</button>
         <button class="section-header-btn" style="background:#b91c1c; border-radius:8px;" onclick="openWithdrawModal()">- WITHDRAW MONEY</button>
       </div>
 
+      <!-- Capital Invested -->
       <div class="cat-box">
         <div class="cat-title">
-          <span>💼 Capital Invested by Partners</span>
+          <span>💼 Capital Invested (നിക്ഷേപം)</span>
           <span id="invTotalVerified" class="color-purple">₹0</span>
         </div>
         <div class="partner-grid">
@@ -541,8 +590,30 @@
         </div>
       </div>
 
+      <!-- Total Withdrawn by Partners -->
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>💸 Profit Withdrawn (പിൻവലിച്ച തുക)</span>
+          <span id="withTotalVerified" class="color-red">₹0</span>
+        </div>
+        <div class="partner-grid">
+          <div class="partner-card">
+            <h5>ASHIF</h5>
+            <div class="p-val color-red" id="withCapAshif">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>SABITH</h5>
+            <div class="p-val color-red" id="withCapSabith">₹0</div>
+          </div>
+          <div class="partner-card">
+            <h5>ASHKAR ALI</h5>
+            <div class="p-val color-red" id="withCapAshkar">₹0</div>
+          </div>
+        </div>
+      </div>
+
       <div id="pendingAlertBox" style="display:none; background:#fef3c7; color:#92400e; padding:10px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:14px; border:1px solid #fde68a;">
-        ⚠️ സ്ഥിരീകരിക്കാത്ത (Pending) എൻട്രികൾ താഴെയുണ്ട്. 3 പേരും വെരിഫൈ ചെയ്താൽ മാത്രമേ തുക ബാലൻസിൽ കൂട്ടുകയോ കുറയ്ക്കുകയോ ചെയ്യൂ.
+        ⚠️ സ്ഥിരീകരിക്കാത്ത (Pending) എൻട്രികൾ താഴെയുണ്ട്. 3 പേരും വെരിഫൈ ചെയ്താൽ മാത്രമേ തുക പ്രാബല്യത്തിൽ വരൂ.
       </div>
 
       <h3 style="font-size:0.95rem; margin:14px 0 8px; color:var(--text-dark);">Investments Log (നിക്ഷേപങ്ങൾ)</h3>
@@ -554,7 +625,7 @@
 
   </div>
 
-  <!-- Entry Modal (AI Bill Scanner + Items + Due Balance ഉൾപ്പെടുത്തിയത്) -->
+  <!-- Entry Modal (Auto-suggest + Items + Due Balance) -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -583,7 +654,7 @@
         </div>
       </div>
 
-      <!-- Supplier Purchase Breakdown Section -->
+      <!-- സപ്ലയർ പർച്ചേസ് ഐറ്റംസ് -->
       <div id="supplierItemsBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="font-weight:700; font-size:0.8rem; color:#475569; margin:0;">വാങ്ങിയ സാധനങ്ങളും വിലയും (Items & Price)</label>
@@ -592,12 +663,13 @@
         <div id="purchaseItemsListContainer"></div>
       </div>
 
+      <!-- സപ്ലയർ / കമ്പനി പേര് (Auto-suggest Datalist ലിങ്ക് ചെയ്തിരിക്കുന്നു) -->
       <div class="form-group">
         <label id="itemNameLabel">Supplier / Item / Description</label>
-        <input type="text" id="entryTitle" class="form-control" placeholder="e.g. Milma, Bakery, Tea, Rent" required>
+        <input type="text" id="entryTitle" list="suppliersList" class="form-control" placeholder="പേര് ടൈപ്പ് ചെയ്യുമ്പോൾ സെലക്ട് ചെയ്യാം" required>
       </div>
 
-      <!-- സപ്ലയർ പർച്ചേസിനായുള്ള ബില്ല് തുകയും കൊടുത്ത തുകയും (Due Balance) -->
+      <!-- ബില്ല് തുകയും നൽകിയ തുകയും (Due Balance) -->
       <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
         <div style="display:flex; gap:8px;">
           <div style="flex:1;">
@@ -638,10 +710,66 @@
     </div>
   </div>
 
-  <!-- Universal Item History Sheet Modal (ഡ്രോപ്പ്ഡൗൺ ഐറ്റം വ്യൂ ഉള്ളത്) -->
+  <!-- TODAY'S SALES REPORT MODAL (പുതിയ മോഡൽ) -->
+  <div class="modal" id="todayReportModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+        <h3 style="color:var(--primary); font-size:1.1rem; margin:0;">📊 Today's Sales Report</h3>
+        <button onclick="closeModal('todayReportModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
+      </div>
+
+      <div id="todayReportPrintArea" style="padding:10px 0;">
+        <div style="text-align:center; margin-bottom:12px;">
+          <h4 style="margin:0; font-size:1.2rem; color:var(--primary);">BANABLAST</h4>
+          <p id="repModalDateText" style="font-size:0.8rem; color:#64748b; margin-top:2px;">Date: -</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:0.75rem; color:#15803d; font-weight:bold;">TOTAL SALES</div>
+            <div id="modalRepSales" style="font-size:1.2rem; font-weight:800; color:#15803d;">₹0</div>
+            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">Cash: <span id="modalRepSaleCash">₹0</span> | GPay: <span id="modalRepSaleGpay">₹0</span></div>
+          </div>
+          <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:0.75rem; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
+            <div id="modalRepExp" style="font-size:1.2rem; font-weight:800; color:#b91c1c;">₹0</div>
+            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">Cash: <span id="modalRepExpCash">₹0</span> | GPay: <span id="modalRepExpGpay">₹0</span></div>
+          </div>
+        </div>
+
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:8px; text-align:center; margin-bottom:12px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി</div>
+          <div id="modalRepProfit" style="font-size:1.4rem; font-weight:800; color:#1e3a8a; margin-top:2px;">₹0</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:0.8rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Counter Cash Balance:</span>
+            <strong id="modalRepCashBal">₹0</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Bank / GPay Balance:</span>
+            <strong id="modalRepBankBal">₹0</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:4px; font-weight:bold; color:var(--primary);">
+            <span>Cumulative Total:</span>
+            <span id="modalRepTotalBal">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="btn-submit" style="background:#b91c1c; margin-top:0;" onclick="downloadTodayPDF()">📄 Download PDF</button>
+        <button class="btn-submit" style="background:#15803d; margin-top:0;" onclick="shareTodayWhatsApp()">💬 WhatsApp Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Universal Item/Supplier Ledger History Sheet Modal -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
-      <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Item Purchase History</h3>
+      <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Ledger Sheet</h3>
       
       <div class="report-filter" style="margin-top:8px;">
         <button class="filter-btn active" id="sheetFiltMonth" onclick="filterItemSheet('month')">This Month</button>
@@ -813,9 +941,20 @@
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
     // -------------------------------------------------------------
-    // GEMINI API KEY (നേരിട്ട് ചേർത്തു)
+    // SECURE GEMINI API KEY (GitHub-ൽ പബ്ലിക് ആകാതെ ഫോണിൽ മാത്രം സൂക്ഷിക്കുന്നു)
     // -------------------------------------------------------------
-    const GEMINI_API_KEY = "AQ.Ab8RN6IlUCNPfQzgAKwQwTLnUY_LByYaqdLkMv7IRny6yXP1sg"; 
+    function getGeminiApiKey() {
+      return localStorage.getItem('BANABLAST_GEMINI_KEY') || '';
+    }
+
+    function configureApiKey() {
+      const curKey = getGeminiApiKey();
+      const newKey = prompt("ബില്ലുകൾ സ്കാൻ ചെയ്യാനുള്ള Google Gemini API Key നൽകുക:", curKey);
+      if (newKey !== null) {
+        localStorage.setItem('BANABLAST_GEMINI_KEY', newKey.trim());
+        alert("✓ Gemini API Key ഫോണിൽ സുരക്ഷിതമായി സേവ് ചെയ്തു!");
+      }
+    }
 
     function handleLogoLoadError(img) {
       if (!img.dataset.retryEncoded) {
@@ -830,7 +969,7 @@
       }
     }
 
-    // 1. Firebase Configuration
+    // Firebase Init
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -843,7 +982,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Data in Memory
     let transactions = [];
     let withdrawals = [];
     let investments = [];
@@ -858,7 +996,6 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Flatpickr കലണ്ടർ സജ്ജീകരണം
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
         dateFormat: "Y-m-d",
@@ -887,10 +1024,13 @@
       document.getElementById('withDate').value = today;
       document.getElementById('sheetFromDate').value = today;
       document.getElementById('sheetToDate').value = today;
+      document.getElementById('repFromDate').value = today;
+      document.getElementById('repToDate').value = today;
 
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
+        updateDatalists();
         renderAll();
       }, err => console.error("Trans sync err:", err));
 
@@ -920,7 +1060,8 @@
     function renderAll() {
       loadDateData();
       renderDailyAccounts();
-      renderStockTab();
+      renderStockItemsTab();
+      renderSupplierPurchasesTab();
       renderReportsTab();
       renderInvestTab();
     }
@@ -962,6 +1103,35 @@
     }
 
     /* -------------------------------------------------------------
+       DATALISTS UPDATE (കമ്പനികളും സാധനങ്ങളും ഓട്ടോ സജഷൻ)
+       ------------------------------------------------------------- */
+    function updateDatalists() {
+      const suppliers = new Set();
+      const items = new Set();
+
+      transactions.forEach(t => {
+        if (t.category === 'stock' && t.title) {
+          suppliers.add(t.title.trim());
+        }
+        if (t.items && Array.isArray(t.items)) {
+          t.items.forEach(it => {
+            if (it.name) items.add(it.name.trim());
+          });
+        }
+      });
+
+      const suppDL = document.getElementById('suppliersList');
+      if (suppDL) {
+        suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
+      }
+
+      const itemDL = document.getElementById('itemsList');
+      if (itemDL) {
+        itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
+      }
+    }
+
+    /* -------------------------------------------------------------
        പർച്ചേസ് ഐറ്റം ലിസ്റ്റും കുടിശ്ശിക കാൽക്കുലേഷനും
        ------------------------------------------------------------- */
     function addNewPurchaseItemRow(name = '', price = '') {
@@ -969,7 +1139,7 @@
       const div = document.createElement('div');
       div.className = 'purchase-item-row';
       div.innerHTML = `
-        <input type="text" class="form-control p-name" placeholder="സാധനം (ഉദാ: പാൽ 5L)" value="${name}" style="flex:2;">
+        <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: പാൽ 5L)" value="${name}" style="flex:2;">
         <input type="number" class="form-control p-price" placeholder="വില ₹" value="${price}" style="flex:1;" oninput="recalcTotalBillFromItems()">
         <button type="button" onclick="this.parentElement.remove(); recalcTotalBillFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
       `;
@@ -1012,11 +1182,18 @@
     }
 
     /* -------------------------------------------------------------
-       GEMINI AI BILL SCANNER (ക്യാമറ ബിൽ സ്കാനിംഗ്)
+       GEMINI AI BILL SCANNER
        ------------------------------------------------------------- */
     async function handleBillImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+
+      let apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        configureApiKey();
+        apiKey = getGeminiApiKey();
+        if (!apiKey) return;
+      }
 
       const loader = document.getElementById('scanLoadingBox');
       loader.style.display = 'block';
@@ -1048,7 +1225,7 @@
           }]
         };
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -1078,7 +1255,7 @@
 
       } catch (err) {
         console.error("Scan error:", err);
-        alert("ബില്ല് വായിക്കാൻ സാധിച്ചില്ല. വിവരങ്ങൾ നേരിട്ട് ടൈപ്പ് ചെയ്യാവുന്നതാണ്.");
+        alert("ബില്ല് വായിക്കാൻ സാധിച്ചില്ല അല്ലെങ്കിൽ Key തെറ്റാണ്. വിവരങ്ങൾ നേരിട്ട് നൽകാം.");
       } finally {
         loader.style.display = 'none';
         event.target.value = '';
@@ -1153,7 +1330,7 @@
       document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
       document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
 
-      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര്' : 'Item / Description';
+      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര് (ലിസ്റ്റിൽ നിന്ന് തിരഞ്ഞെടുക്കാം)' : 'Item / Description';
 
       if (!editId && type === 'expense') {
         if (cat === 'tea') titleInput.value = 'Tea';
@@ -1267,7 +1444,7 @@
                 <span class="mode-badge ${badgeClass}">${badgeText}</span>
               </div>
               <div class="entry-sub">
-                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ സാധനങ്ങളും വിവരങ്ങളും കാണാം 🔍 ${dueBadge}
+                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
               </div>
             </div>
             <div class="entry-right">
@@ -1330,113 +1507,35 @@
     }
 
     /* -------------------------------------------------------------
-       റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ ഷീറ്റ്
+       TODAY'S SALES REPORT MODAL (ഒറ്റ ഫംഗ്ഷൻ)
        ------------------------------------------------------------- */
-    function openRunningBreakdown(mode) {
-      currentBreakdownMode = mode;
-      const modal = document.getElementById('runningBreakdownModal');
-      const titleElem = document.getElementById('breakdownTitle');
-      const tableContainer = document.getElementById('breakdownTableContainer');
+    function openTodayReportModal() {
       const curDate = document.getElementById('selectedDate').value || today;
+      document.getElementById('repModalDateText').innerText = `Date: ${curDate}`;
 
-      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
-      titleElem.innerText = `${modeTitle} - Date-wise Breakdown`;
+      document.getElementById('modalRepSales').innerText = document.getElementById('sumDailySales').innerText;
+      document.getElementById('modalRepSaleCash').innerText = document.getElementById('subSaleCash').innerText;
+      document.getElementById('modalRepSaleGpay').innerText = document.getElementById('subSaleGPay').innerText;
 
-      let relevantDates = new Set();
-      transactions.forEach(t => { if (t.date <= curDate) relevantDates.add(t.date); });
-      withdrawals.forEach(w => { if (w.status === 'verified' && w.date <= curDate) relevantDates.add(w.date); });
+      document.getElementById('modalRepExp').innerText = document.getElementById('sumDailyExp').innerText;
+      document.getElementById('modalRepExpCash').innerText = document.getElementById('subExpCash').innerText;
+      document.getElementById('modalRepExpGpay').innerText = document.getElementById('subExpGPay').innerText;
 
-      const sortedDates = Array.from(relevantDates).sort();
+      document.getElementById('modalRepProfit').innerText = document.getElementById('sumDailyProfit').innerText;
 
-      let currentBal = 0;
-      if (mode === 'cash') currentBal = opening.cash || 0;
-      else if (mode === 'bank') currentBal = opening.bank || 0;
-      else currentBal = (opening.cash || 0) + (opening.bank || 0);
+      document.getElementById('modalRepCashBal').innerText = document.getElementById('runCashBal').innerText;
+      document.getElementById('modalRepBankBal').innerText = document.getElementById('runBankBal').innerText;
+      document.getElementById('modalRepTotalBal').innerText = document.getElementById('runTotalBal').innerText;
 
-      let tableHTML = `
-        <table class="sheet-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>In (+)</th>
-              <th>Out (-)</th>
-              <th style="text-align:right;">Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="background:#f1f5f9; font-weight:700;">
-              <td>OPENING</td>
-              <td colspan="2" style="color:#64748b; font-size:0.75rem;">Initial Opening Balance</td>
-              <td style="text-align:right; color:#1e3a8a;">₹${currentBal}</td>
-            </tr>
-      `;
-
-      sortedDates.forEach(d => {
-        let dayIn = 0;
-        let dayOut = 0;
-
-        transactions.filter(t => t.date === d).forEach(t => {
-          const matchMode = (mode === 'total') || (t.mode === mode);
-          if (matchMode) {
-            if (t.type === 'sale') dayIn += t.amount;
-            else dayOut += t.amount;
-          }
-        });
-
-        withdrawals.filter(w => w.status === 'verified' && w.date === d).forEach(w => {
-          const matchMode = (mode === 'total') || (w.mode === mode);
-          if (matchMode) {
-            dayOut += w.amount;
-          }
-        });
-
-        currentBal += (dayIn - dayOut);
-
-        if (dayIn > 0 || dayOut > 0) {
-          tableHTML += `
-            <tr>
-              <td><strong>${d}</strong></td>
-              <td class="color-green">+₹${dayIn}</td>
-              <td class="color-red">-₹${dayOut}</td>
-              <td style="text-align:right; font-weight:800; color:${currentBal >= 0 ? '#15803d' : '#dc2626'};">
-                ₹${currentBal}
-              </td>
-            </tr>
-          `;
-        }
-      });
-
-      tableHTML += `</tbody></table>`;
-      tableContainer.innerHTML = tableHTML;
-      document.getElementById('breakdownTotalSum').innerText = '₹' + currentBal;
-      document.getElementById('breakdownTotalSum').className = currentBal >= 0 ? 'color-blue' : 'color-red';
-
-      modal.style.display = 'flex';
+      document.getElementById('todayReportModal').style.display = 'flex';
     }
 
-    /* -------------------------------------------------------------
-       PDF & WHATSAPP ഷെയറിംഗ് ഫംഗ്ഷനുകൾ
-       ------------------------------------------------------------- */
-    function exportDailyPDF() {
+    function downloadTodayPDF() {
       const curDate = document.getElementById('selectedDate').value || today;
-      const element = document.getElementById('tab-daily');
-      
+      const element = document.getElementById('todayReportPrintArea');
       const opt = {
         margin: 10,
-        filename: `BANABLAST_Daily_${curDate}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save();
-    }
-
-    function exportReportsPDF() {
-      const element = document.getElementById('tab-reports');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Report_${today}.pdf`,
+        filename: `BANABLAST_Report_${curDate}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1444,31 +1543,7 @@
       html2pdf().set(opt).from(element).save();
     }
 
-    function exportBreakdownPDF() {
-      const element = document.getElementById('breakdownTableContainer');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
-    function exportSingleSheetPDF() {
-      const element = document.getElementById('sheetPrintArea');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
-    function shareDailyWhatsApp() {
+    function shareTodayWhatsApp() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('sumDailySales').innerText;
       const exp = document.getElementById('sumDailyExp').innerText;
@@ -1477,201 +1552,95 @@
       const bankBal = document.getElementById('runBankBal').innerText;
       const totBal = document.getElementById('runTotalBal').innerText;
 
-      const message = `🍌 *BANABLAST - DAILY ACCOUNT* 🍌\n📅 Date: ${curDate}\n----------------------------\n💰 Total Sales: ${sales}\n💸 Total Expense: ${exp}\n📈 Net Profit: ${profit}\n----------------------------\n📦 *RUNNING BALANCES:*\n💵 Counter Cash: ${cashBal}\n💳 Bank/GPay: ${bankBal}\n📊 *TOTAL BALANCE: ${totBal}*\n----------------------------\n_Generated via BANABLAST Business Ledger_`;
+      const message = `🍌 *BANABLAST - TODAY'S SALES REPORT* 🍌\n📅 Date: ${curDate}\n----------------------------\n💰 Total Sales: ${sales}\n💸 Total Expense: ${exp}\n📈 Net Daily Profit: ${profit}\n----------------------------\n📦 *RUNNING BALANCES:*\n💵 Cash Box: ${cashBal}\n💳 Bank/GPay: ${bankBal}\n📊 *TOTAL BALANCE: ${totBal}*\n----------------------------\n_Generated via BANABLAST Business Ledger_`;
 
       const waURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
       window.open(waURL, '_blank');
     }
 
     /* -------------------------------------------------------------
-       Universal History Sheet Modal (ഡ്രോപ്പ്ഡൗൺ ഐറ്റം വ്യൂ)
+       TAB 2: STOCK ITEMS (സാധനങ്ങളുടെ കണക്കുകൾ മാത്രം)
        ------------------------------------------------------------- */
-    function openItemHistorySheet(itemName, category) {
-      activeSheetKey = itemName.trim().toLowerCase();
-      document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
-      currentSheetFilter = 'month';
-      document.getElementById('customDateRow').style.display = 'none';
+    function renderStockItemsTab() {
+      const container = document.getElementById('stockItemsListContainer');
+      const itemMap = {};
 
-      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('sheetFiltMonth').classList.add('active');
-
-      renderItemSheetContent();
-      document.getElementById('itemSheetModal').style.display = 'flex';
-    }
-
-    function filterItemSheet(period) {
-      currentSheetFilter = period;
-      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
-      if (period === 'month') document.getElementById('sheetFiltMonth').classList.add('active');
-      if (period === 'week') document.getElementById('sheetFiltWeek').classList.add('active');
-      if (period === 'all') document.getElementById('sheetFiltAll').classList.add('active');
-      if (period === 'custom') {
-        document.getElementById('sheetFiltCustom').classList.add('active');
-        document.getElementById('customDateRow').style.display = 'flex';
-        return;
-      } else {
-        document.getElementById('customDateRow').style.display = 'none';
-      }
-      renderItemSheetContent();
-    }
-
-    function applyCustomSheetDate() {
-      renderItemSheetContent();
-    }
-
-    function toggleItemsDropdown(rowId) {
-      const panel = document.getElementById(rowId);
-      if (panel) {
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-      }
-    }
-
-    function renderItemSheetContent() {
-      const curDate = document.getElementById('selectedDate').value || today;
-      const refDate = new Date(curDate);
-      const fromDate = document.getElementById('sheetFromDate').value;
-      const toDate = document.getElementById('sheetToDate').value;
-
-      let matched = transactions.filter(t => {
-        const itemTitle = (t.title || t.extra || (t.type === 'sale' ? 'sales' : '')).toLowerCase();
-        return itemTitle === activeSheetKey;
-      });
-
-      let filtered = matched.filter(t => {
-        if (currentSheetFilter === 'all') return true;
-        const tDate = new Date(t.date);
-        if (currentSheetFilter === 'month') {
-          return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
-        }
-        if (currentSheetFilter === 'week') {
-          const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
-          return diffDays >= 0 && diffDays <= 7;
-        }
-        if (currentSheetFilter === 'custom') {
-          return t.date >= fromDate && t.date <= toDate;
-        }
-        return true;
-      });
-
-      filtered.sort((a,b) => b.date.localeCompare(a.date));
-
-      let totalSum = 0;
-      let totalDueSum = 0;
-      let rowsHTML = '';
-
-      filtered.forEach((t, idx) => {
-        totalSum += t.amount;
-        if (t.dueAmount) totalDueSum += t.dueAmount;
-        const isSale = t.type === 'sale';
-        const rowId = `dropdown-item-${idx}`;
-
-        let itemsDropdownHTML = '';
-        let hasItems = t.items && t.items.length > 0;
-        if (hasItems) {
-          itemsDropdownHTML = `
-            <div id="${rowId}" class="dropdown-items-panel">
-              <strong style="font-size:0.75rem; color:#1e3a8a;">വാങ്ങിയ സാധനങ്ങളുടെ വിവരങ്ങൾ:</strong>
-              ${t.items.map(it => `
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; padding:2px 0;">
-                  <span>• ${it.name}</span>
-                  <strong>₹${it.price}</strong>
-                </div>
-              `).join('')}
-              ${t.billTotal ? `<div style="border-top:1px dashed #cbd5e1; margin-top:4px; padding-top:2px; display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold;"><span>ആകെ ബില്ല് തുക:</span><span>₹${t.billTotal}</span></div>` : ''}
-            </div>
-          `;
-        }
-
-        let dueDisplay = '';
-        if (t.dueAmount && t.dueAmount > 0) {
-          dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
-        }
-
-        rowsHTML += `
-          <tr class="${hasItems ? 'collapsible-trigger' : ''}" onclick="${hasItems ? `toggleItemsDropdown('${rowId}')` : ''}">
-            <td><strong>${t.date}</strong></td>
-            <td>
-              ${t.note ? t.note : (isSale ? 'Sale' : t.category)}
-              ${hasItems ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
-              ${itemsDropdownHTML}
-            </td>
-            <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
-            <td style="text-align:right; font-weight:800;" class="${isSale ? 'color-green' : 'color-red'}">
-              ₹${t.amount}
-              ${dueDisplay}
-            </td>
-          </tr>
-        `;
-      });
-
-      document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
-      
-      let totalText = '₹' + totalSum;
-      if (totalDueSum > 0) {
-        totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
-      }
-      document.getElementById('sheetTotalSum').innerText = totalText;
-      document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
-    }
-
-    function openOpeningModal() {
-      document.getElementById('openCash').value = opening.cash || 0;
-      document.getElementById('openBank').value = opening.bank || 0;
-      document.getElementById('openingModal').style.display = 'flex';
-    }
-
-    function saveOpeningBalance() {
-      opening.cash = parseFloat(document.getElementById('openCash').value) || 0;
-      opening.bank = parseFloat(document.getElementById('openBank').value) || 0;
-
-      db.collection('settings').doc('general').set({
-        opening,
-        holidays
-      }, { merge: true });
-
-      closeModal('openingModal');
-    }
-
-    /* -------------------------------------------------------------
-       TAB 2: Stock & Supplier Purchases (കുടിശ്ശിക ഉൾപ്പെടുത്തി)
-       ------------------------------------------------------------- */
-    function renderStockTab() {
-      const stockTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
-      const container = document.getElementById('stockListContainer');
-
-      if (stockTrans.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സ്റ്റോക്ക് വാങ്ങിയ വിവരങ്ങൾ ഇല്ല</p>';
-        return;
-      }
-
-      const grouped = {};
-      stockTrans.forEach(t => {
-        const name = (t.title || t.extra || 'Unknown').toLowerCase();
-        if (!grouped[name]) grouped[name] = { totalPaid: 0, totalDue: 0, count: 0, lastDate: t.date, itemsSummary: [] };
-        grouped[name].totalPaid += (t.paidAmount || t.amount);
-        grouped[name].totalDue += (t.dueAmount || 0);
-        grouped[name].count += 1;
-        if (t.date > grouped[name].lastDate) grouped[name].lastDate = t.date;
-        if (t.items && t.items.length) {
+      transactions.forEach(t => {
+        if (t.category === 'stock' && t.items && t.items.length) {
           t.items.forEach(it => {
-            if (!grouped[name].itemsSummary.includes(it.name)) grouped[name].itemsSummary.push(it.name);
+            const key = it.name.trim().toLowerCase();
+            if (!itemMap[key]) {
+              itemMap[key] = { displayName: it.name, totalSpent: 0, count: 0, lastDate: t.date };
+            }
+            itemMap[key].totalSpent += it.price;
+            itemMap[key].count += 1;
+            if (t.date > itemMap[key].lastDate) itemMap[key].lastDate = t.date;
           });
         }
       });
 
+      const keys = Object.keys(itemMap);
+      if (!keys.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സാധനങ്ങൾ വാങ്ങിയ വിവരങ്ങൾ ഒന്നും ലഭ്യമല്ല</p>';
+        return;
+      }
+
       let html = '';
-      Object.keys(grouped).forEach(name => {
-        const item = grouped[name];
-        const subItemsText = item.itemsSummary.length ? `<div style="font-size:0.75rem; color:#0284c7; margin-top:3px;">സാധനങ്ങൾ: ${item.itemsSummary.join(', ')}</div>` : '';
+      keys.forEach(k => {
+        const it = itemMap[k];
+        html += `
+          <div class="stock-card" onclick="openItemHistorySheet('${it.displayName}', 'item_stock')">
+            <div class="stock-header">
+              <div>
+                <div class="stock-name">📦 ${it.displayName}</div>
+                <div class="stock-meta">വാങ്ങിയത്: ${it.count} തവണ | അവസാനം: ${it.lastDate}</div>
+              </div>
+              <div class="stock-amt-box">
+                <div class="stock-amt">₹${it.totalSpent}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    /* -------------------------------------------------------------
+       TAB 3: SUPPLIER PURCHASES (കമ്പനികളും കുടിശ്ശികയും മാത്രം)
+       ------------------------------------------------------------- */
+    function renderSupplierPurchasesTab() {
+      const container = document.getElementById('supplierPurchasesListContainer');
+      const suppTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
+
+      if (!suppTrans.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല</p>';
+        return;
+      }
+
+      const grouped = {};
+      suppTrans.forEach(t => {
+        const name = (t.title || t.extra || 'Unknown').trim();
+        const key = name.toLowerCase();
+        if (!grouped[key]) {
+          grouped[key] = { name, totalPaid: 0, totalDue: 0, count: 0, lastDate: t.date };
+        }
+        grouped[key].totalPaid += (t.paidAmount || t.amount);
+        grouped[key].totalDue += (t.dueAmount || 0);
+        grouped[key].count += 1;
+        if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
+      });
+
+      let html = '';
+      Object.keys(grouped).forEach(k => {
+        const item = grouped[k];
         const dueText = item.totalDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${item.totalDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
 
         html += `
-          <div class="stock-card" onclick="openItemHistorySheet('${name}', 'stock')">
+          <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
             <div class="stock-header">
               <div>
-                <div class="stock-name">${name}</div>
+                <div class="stock-name">🏢 ${item.name}</div>
                 <div class="stock-meta">പർച്ചേസ്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
-                ${subItemsText}
               </div>
               <div class="stock-amt-box">
                 <div class="stock-amt">₹${item.totalPaid}</div>
@@ -1684,21 +1653,30 @@
       container.innerHTML = html;
     }
 
+    /* -------------------------------------------------------------
+       TAB 4: REPORTS (Custom Date Filter ഉള്ളത്)
+       ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('reportCustomDateBox').style.display = (period === 'custom') ? 'flex' : 'none';
+
       if (period === 'month') document.getElementById('btnFiltMonth').classList.add('active');
       if (period === 'week') document.getElementById('btnFiltWeek').classList.add('active');
-      if (period === 'all') document.getElementById('btnFiltAll').classList.add('active');
+      if (period === 'custom') {
+        document.getElementById('btnFiltCustom').classList.add('active');
+        return;
+      }
       renderReportsTab();
     }
 
     function renderReportsTab() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
+      const fromDate = document.getElementById('repFromDate').value;
+      const toDate = document.getElementById('repToDate').value;
 
       let filteredTrans = transactions.filter(t => {
-        if (currentReportFilter === 'all') return true;
         const tDate = new Date(t.date);
         if (currentReportFilter === 'month') {
           return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
@@ -1706,6 +1684,9 @@
         if (currentReportFilter === 'week') {
           const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
           return diffDays >= 0 && diffDays <= 7;
+        }
+        if (currentReportFilter === 'custom') {
+          return t.date >= fromDate && t.date <= toDate;
         }
         return true;
       });
@@ -1742,23 +1723,9 @@
       const eachShare = Math.round(netProfit / 3);
       document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
 
-      const drawnMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
-      withdrawals.forEach(w => {
-        if (w.status === 'verified') {
-          if (drawnMap[w.partner] !== undefined) drawnMap[w.partner] += w.amount;
-        }
-      });
-
-      PARTNERS.forEach(p => {
-        const drawn = drawnMap[p] || 0;
-        const balanceShare = eachShare - drawn;
-        let prefix = p === 'ASHIF' ? 'Ashif' : (p === 'SABITH' ? 'Sabith' : 'Ashkar');
-
-        document.getElementById('draw' + prefix).innerText = '₹' + drawn;
-        const valElem = document.getElementById('net' + prefix);
-        valElem.innerText = (balanceShare >= 0 ? '+' : '') + '₹' + balanceShare;
-        valElem.className = 'p-val ' + (balanceShare >= 0 ? 'color-green' : 'color-red');
-      });
+      document.getElementById('shareAshif').innerText = '₹' + eachShare;
+      document.getElementById('shareSabith').innerText = '₹' + eachShare;
+      document.getElementById('shareAshkar').innerText = '₹' + eachShare;
 
       document.getElementById('repTotalRent').innerText = '₹' + rent;
       document.getElementById('repRentList').innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
@@ -1775,6 +1742,21 @@
       document.getElementById('repTotalOther').innerText = '₹' + (stock + misc);
     }
 
+    function exportReportsPDF() {
+      const element = document.getElementById('tab-reports');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Report_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    /* -------------------------------------------------------------
+       TAB 5: INVESTMENTS & WITHDRAWALS
+       ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -1889,7 +1871,9 @@
 
     function renderInvestTab() {
       let capMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
+      let withMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
       let totVerInvest = 0;
+      let totVerWith = 0;
       let hasPending = false;
 
       let invHTML = '';
@@ -1944,7 +1928,12 @@
       let withHTML = '';
       withdrawals.slice().reverse().forEach(w => {
         const isVer = w.status === 'verified';
-        if (!isVer) hasPending = true;
+        if (isVer) {
+          totVerWith += w.amount;
+          withMap[w.partner] = (withMap[w.partner] || 0) + w.amount;
+        } else {
+          hasPending = true;
+        }
 
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
@@ -1979,8 +1968,288 @@
         `;
       });
 
+      document.getElementById('withTotalVerified').innerText = '₹' + totVerWith;
+      document.getElementById('withCapAshif').innerText = '₹' + (withMap['ASHIF'] || 0);
+      document.getElementById('withCapSabith').innerText = '₹' + (withMap['SABITH'] || 0);
+      document.getElementById('withCapAshkar').innerText = '₹' + (withMap['ASHKAR ALI'] || 0);
       document.getElementById('withdrawListContainer').innerHTML = withHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">പിൻവലിക്കലുകൾ ഒന്നും ഇല്ല</p>';
+      
       document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
+    }
+
+    /* -------------------------------------------------------------
+       Universal History Sheet Modal
+       ------------------------------------------------------------- */
+    function openItemHistorySheet(itemName, category) {
+      activeSheetKey = itemName.trim().toLowerCase();
+      document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
+      currentSheetFilter = 'month';
+      document.getElementById('customDateRow').style.display = 'none';
+
+      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('sheetFiltMonth').classList.add('active');
+
+      renderItemSheetContent(category);
+      document.getElementById('itemSheetModal').style.display = 'flex';
+    }
+
+    function filterItemSheet(period) {
+      currentSheetFilter = period;
+      document.querySelectorAll('#itemSheetModal .filter-btn').forEach(b => b.classList.remove('active'));
+      if (period === 'month') document.getElementById('sheetFiltMonth').classList.add('active');
+      if (period === 'week') document.getElementById('sheetFiltWeek').classList.add('active');
+      if (period === 'all') document.getElementById('sheetFiltAll').classList.add('active');
+      if (period === 'custom') {
+        document.getElementById('sheetFiltCustom').classList.add('active');
+        document.getElementById('customDateRow').style.display = 'flex';
+        return;
+      } else {
+        document.getElementById('customDateRow').style.display = 'none';
+      }
+      renderItemSheetContent();
+    }
+
+    function applyCustomSheetDate() {
+      renderItemSheetContent();
+    }
+
+    function toggleItemsDropdown(rowId) {
+      const panel = document.getElementById(rowId);
+      if (panel) {
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+
+    function renderItemSheetContent(forcedCategory = '') {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+      const fromDate = document.getElementById('sheetFromDate').value;
+      const toDate = document.getElementById('sheetToDate').value;
+
+      let matched = [];
+
+      if (forcedCategory === 'item_stock') {
+        transactions.forEach(t => {
+          if (t.items && t.items.length) {
+            const found = t.items.find(it => it.name.trim().toLowerCase() === activeSheetKey);
+            if (found) {
+              matched.push({
+                ...t,
+                amount: found.price,
+                note: `Item: ${found.name} (from ${t.title || 'Purchase'})`
+              });
+            }
+          }
+        });
+      } else {
+        matched = transactions.filter(t => {
+          const itemTitle = (t.title || t.extra || (t.type === 'sale' ? 'sales' : '')).toLowerCase();
+          return itemTitle === activeSheetKey;
+        });
+      }
+
+      let filtered = matched.filter(t => {
+        if (currentSheetFilter === 'all') return true;
+        const tDate = new Date(t.date);
+        if (currentSheetFilter === 'month') {
+          return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
+        }
+        if (currentSheetFilter === 'week') {
+          const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        if (currentSheetFilter === 'custom') {
+          return t.date >= fromDate && t.date <= toDate;
+        }
+        return true;
+      });
+
+      filtered.sort((a,b) => b.date.localeCompare(a.date));
+
+      let totalSum = 0;
+      let totalDueSum = 0;
+      let rowsHTML = '';
+
+      filtered.forEach((t, idx) => {
+        totalSum += t.amount;
+        if (t.dueAmount) totalDueSum += t.dueAmount;
+        const isSale = t.type === 'sale';
+        const rowId = `dropdown-item-${idx}`;
+
+        let itemsDropdownHTML = '';
+        let hasItems = t.items && t.items.length > 0;
+        if (hasItems && forcedCategory !== 'item_stock') {
+          itemsDropdownHTML = `
+            <div id="${rowId}" class="dropdown-items-panel">
+              <strong style="font-size:0.75rem; color:#1e3a8a;">വാങ്ങിയ സാധനങ്ങളുടെ വിവരങ്ങൾ:</strong>
+              ${t.items.map(it => `
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; padding:2px 0;">
+                  <span>• ${it.name}</span>
+                  <strong>₹${it.price}</strong>
+                </div>
+              `).join('')}
+              ${t.billTotal ? `<div style="border-top:1px dashed #cbd5e1; margin-top:4px; padding-top:2px; display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold;"><span>ആകെ ബില്ല് തുക:</span><span>₹${t.billTotal}</span></div>` : ''}
+            </div>
+          `;
+        }
+
+        let dueDisplay = '';
+        if (t.dueAmount && t.dueAmount > 0) {
+          dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
+        }
+
+        rowsHTML += `
+          <tr class="${hasItems && forcedCategory !== 'item_stock' ? 'collapsible-trigger' : ''}" onclick="${hasItems && forcedCategory !== 'item_stock' ? `toggleItemsDropdown('${rowId}')` : ''}">
+            <td><strong>${t.date}</strong></td>
+            <td>
+              ${t.note ? t.note : (isSale ? 'Sale' : t.category)}
+              ${hasItems && forcedCategory !== 'item_stock' ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
+              ${itemsDropdownHTML}
+            </td>
+            <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
+            <td style="text-align:right; font-weight:800;" class="${isSale ? 'color-green' : 'color-red'}">
+              ₹${t.amount}
+              ${dueDisplay}
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
+      
+      let totalText = '₹' + totalSum;
+      if (totalDueSum > 0) {
+        totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
+      }
+      document.getElementById('sheetTotalSum').innerText = totalText;
+      document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
+    }
+
+    function exportSingleSheetPDF() {
+      const element = document.getElementById('sheetPrintArea');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    /* -------------------------------------------------------------
+       റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ
+       ------------------------------------------------------------- */
+    function openRunningBreakdown(mode) {
+      currentBreakdownMode = mode;
+      const modal = document.getElementById('runningBreakdownModal');
+      const titleElem = document.getElementById('breakdownTitle');
+      const tableContainer = document.getElementById('breakdownTableContainer');
+      const curDate = document.getElementById('selectedDate').value || today;
+
+      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
+      titleElem.innerText = `${modeTitle} - Date-wise Breakdown`;
+
+      let relevantDates = new Set();
+      transactions.forEach(t => { if (t.date <= curDate) relevantDates.add(t.date); });
+      withdrawals.forEach(w => { if (w.status === 'verified' && w.date <= curDate) relevantDates.add(w.date); });
+
+      const sortedDates = Array.from(relevantDates).sort();
+
+      let currentBal = 0;
+      if (mode === 'cash') currentBal = opening.cash || 0;
+      else if (mode === 'bank') currentBal = opening.bank || 0;
+      else currentBal = (opening.cash || 0) + (opening.bank || 0);
+
+      let tableHTML = `
+        <table class="sheet-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>In (+)</th>
+              <th>Out (-)</th>
+              <th style="text-align:right;">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#f1f5f9; font-weight:700;">
+              <td>OPENING</td>
+              <td colspan="2" style="color:#64748b; font-size:0.75rem;">Initial Opening Balance</td>
+              <td style="text-align:right; color:#1e3a8a;">₹${currentBal}</td>
+            </tr>
+      `;
+
+      sortedDates.forEach(d => {
+        let dayIn = 0;
+        let dayOut = 0;
+
+        transactions.filter(t => t.date === d).forEach(t => {
+          const matchMode = (mode === 'total') || (t.mode === mode);
+          if (matchMode) {
+            if (t.type === 'sale') dayIn += t.amount;
+            else dayOut += t.amount;
+          }
+        });
+
+        withdrawals.filter(w => w.status === 'verified' && w.date === d).forEach(w => {
+          const matchMode = (mode === 'total') || (w.mode === mode);
+          if (matchMode) {
+            dayOut += w.amount;
+          }
+        });
+
+        currentBal += (dayIn - dayOut);
+
+        if (dayIn > 0 || dayOut > 0) {
+          tableHTML += `
+            <tr>
+              <td><strong>${d}</strong></td>
+              <td class="color-green">+₹${dayIn}</td>
+              <td class="color-red">-₹${dayOut}</td>
+              <td style="text-align:right; font-weight:800; color:${currentBal >= 0 ? '#15803d' : '#dc2626'};">
+                ₹${currentBal}
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      tableHTML += `</tbody></table>`;
+      tableContainer.innerHTML = tableHTML;
+      document.getElementById('breakdownTotalSum').innerText = '₹' + currentBal;
+      document.getElementById('breakdownTotalSum').className = currentBal >= 0 ? 'color-blue' : 'color-red';
+
+      modal.style.display = 'flex';
+    }
+
+    function exportBreakdownPDF() {
+      const element = document.getElementById('breakdownTableContainer');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function openOpeningModal() {
+      document.getElementById('openCash').value = opening.cash || 0;
+      document.getElementById('openBank').value = opening.bank || 0;
+      document.getElementById('openingModal').style.display = 'flex';
+    }
+
+    function saveOpeningBalance() {
+      opening.cash = parseFloat(document.getElementById('openCash').value) || 0;
+      opening.bank = parseFloat(document.getElementById('openBank').value) || 0;
+
+      db.collection('settings').doc('general').set({
+        opening,
+        holidays
+      }, { merge: true });
+
+      closeModal('openingModal');
     }
   </script>
 </body>
