@@ -8,13 +8,13 @@
   <!-- App Favicon -->
   <link rel="icon" href="Bana%20blast%20logo.png" onerror="this.href='logo.png'">
 
-  <!-- Google Fonts, Flatpickr Calendar & html2pdf Library -->
+  <!-- Google Fonts, Flatpickr & html2pdf -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Google Firebase SDKs (Compat Version) -->
+  <!-- Google Firebase SDKs (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -70,7 +70,6 @@
     .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .brand-container { display: flex; align-items: center; gap: 10px; }
     
-    /* യഥാർത്ഥ ലോഗോ ഡിസൈൻ */
     .brand-logo-frame {
       width: 44px; 
       height: 44px; 
@@ -84,21 +83,14 @@
       overflow: hidden;
       flex-shrink: 0;
     }
-    .brand-logo { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-    }
-    .brand-logo-fallback {
-      font-size: 1.4rem;
-      display: none;
-    }
+    .brand-logo { width: 100%; height: 100%; object-fit: cover; }
+    .brand-logo-fallback { font-size: 1.4rem; display: none; }
 
     .brand-title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
     .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; }
-    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; }
     
-    .holiday-btn { background: #eab308; color: #000; border: none; padding: 7px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+    .holiday-btn { background: #eab308; color: #000; border: none; padding: 7px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .holiday-btn.active { background: var(--accent-red); color: white; }
 
     /* ഡേറ്റ് പിക്കർ ബാർ */
@@ -192,13 +184,13 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* ക്വിക്ക് ഷെയർ ബാർ */
+    /* Quick Share Bar */
     .quick-share-bar { display: flex; gap: 8px; margin-bottom: 16px; }
     .btn-share { flex: 1; padding: 8px 12px; border: none; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .btn-share-pdf { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
     .btn-share-wa { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 
-    /* Buttons */
+    /* Section Action Buttons */
     .section-header-btn { width: 100%; padding: 13px; border: none; border-radius: 10px 10px 0 0; font-size: 0.95rem; font-weight: 800; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .btn-sale-top { background: var(--accent-green); }
     .btn-exp-top { background: var(--accent-red); margin-top: 18px; }
@@ -250,13 +242,15 @@
     .clickable-row.total span { color: #ffffff !important; }
     .clickable-row.total strong { color: #ffffff !important; font-size: 1.15rem; }
 
-    /* Stock Items */
-    .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    /* Supplier & Stock Cards */
+    .stock-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); cursor: pointer; }
+    .stock-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .stock-name { font-weight: 700; font-size: 0.95rem; text-transform: capitalize; }
     .stock-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-    .stock-amt { font-size: 1rem; font-weight: 800; color: var(--accent-red); }
+    .stock-amt-box { text-align: right; }
+    .stock-due-tag { font-size: 0.75rem; font-weight: 800; color: var(--accent-red); margin-top: 2px; }
 
-    /* Reports */
+    /* Reports & Partner Split */
     .report-filter { display: flex; gap: 8px; margin-bottom: 14px; }
     .filter-btn { flex: 1; padding: 8px; background: white; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
     .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -264,7 +258,6 @@
     .cat-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .list-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
 
-    /* Partner Split */
     .partner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .partner-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center; }
     .partner-card h5 { font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
@@ -316,11 +309,21 @@
     .sheet-table th, .sheet-table td { padding: 9px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
     .sheet-table th { background: #f8fafc; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; }
     .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
+
+    /* Scan Banner & Items Table in Modal */
+    .scan-btn { background: #0284c7; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-bottom: 10px; }
+    .scanning-loader { display: none; text-align: center; color: #0284c7; font-weight: bold; font-size: 0.85rem; padding: 8px; background: #e0f2fe; border-radius: 8px; margin-bottom: 10px; }
+    .purchase-item-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+    
+    /* Collapsible Items in Sheet */
+    .collapsible-trigger { cursor: pointer; }
+    .collapsible-trigger:hover { background-color: #f1f5f9; }
+    .dropdown-items-panel { display: none; background: #f8fafc; padding: 8px 12px; border-radius: 6px; margin: 4px 0 8px; border: 1px solid #e2e8f0; }
   </style>
 </head>
 <body>
 
-  <!-- 1. പുതിയ സെന്റർ ഹെഡർ (കറുത്ത ബാർ മാറ്റി) -->
+  <!-- 1. സെന്റർ ഹെഡർ -->
   <div class="app-top-bar">
     <h1 class="app-main-heading">BANABLAST</h1>
   </div>
@@ -328,7 +331,6 @@
   <header>
     <div class="header-top">
       <div class="brand-container">
-        <!-- ഒറിജിനൽ ലോഗോ -->
         <div class="brand-logo-frame">
           <img id="mainAppLogo" src="Bana%20blast%20logo.png" alt="Logo" class="brand-logo" onerror="handleLogoLoadError(this)">
           <span id="logoFallbackText" class="brand-logo-fallback">🍌</span>
@@ -341,7 +343,7 @@
       <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
     </div>
 
-    <!-- ഇൻ-ആപ്പ് കലണ്ടർ ഇൻപുട്ട് -->
+    <!-- ഇൻ-ആപ്പ് കലണ്ടർ -->
     <div class="date-control">
       <span style="font-size:1.1rem;">📅</span>
       <input type="text" id="selectedDate" class="date-picker" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
@@ -352,7 +354,7 @@
 
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily')">Daily Accounts</button>
-    <button class="tab-btn" onclick="switchTab('stock')">Stock Items</button>
+    <button class="tab-btn" onclick="switchTab('stock')">Stock / Purchases</button>
     <button class="tab-btn" onclick="switchTab('reports')">Reports</button>
     <button class="tab-btn" onclick="switchTab('invest')">💼 Investments</button>
   </nav>
@@ -408,7 +410,7 @@
         <div class="entry-list" id="expenseEntriesList"></div>
       </div>
 
-      <!-- 3. RUNNING BALANCES (ക്ലിക്കബിൾ ആക്കിയത്) -->
+      <!-- 3. RUNNING BALANCES (ക്ലിക്കബിൾ) -->
       <div class="running-card">
         <div class="running-header">
           <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
@@ -436,9 +438,9 @@
 
     </div>
 
-    <!-- TAB 2: STOCK ITEMS -->
+    <!-- TAB 2: STOCK & PURCHASES (കുടിശ്ശിക ഉൾപ്പെടെ) -->
     <div id="tab-stock" class="tab-content">
-      <h3 style="font-size:1rem; margin-bottom:12px;">Item-wise Stock Purchases</h3>
+      <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർ പർച്ചേസുകളും കുടിശ്ശിക കണക്കുകളും</h3>
       <div id="stockListContainer"></div>
     </div>
 
@@ -456,7 +458,6 @@
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
       </div>
 
-      <!-- Quick Report Share -->
       <div class="quick-share-bar">
         <button class="btn-share btn-share-pdf" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
       </div>
@@ -553,15 +554,69 @@
 
   </div>
 
-  <!-- Entry Modal -->
+  <!-- Entry Modal (AI Bill Scanner + Items + Due Balance ഉൾപ്പെടുത്തിയത്) -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
       <input type="hidden" id="editEntryId">
       <input type="hidden" id="entryType">
 
+      <div class="form-group" id="expCategoryGroup" style="display:none;">
+        <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
+        <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
+          <option value="tea">Tea / Refreshment</option>
+          <option value="stock">Purchase / സപ്ലയർ പർച്ചേസ്</option>
+          <option value="salary">Staff Salary</option>
+          <option value="rent">Shop Rent</option>
+          <option value="other">Daily Expense / Miscellaneous</option>
+        </select>
+      </div>
+
+      <!-- AI Bill Scan Button -->
+      <div id="aiScanSection" style="display:none; margin-bottom:12px;">
+        <input type="file" id="billCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleBillImageUpload(event)">
+        <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
+          📸 Scan Bill with AI (ഫോട്ടോ എടുക്കുക)
+        </button>
+        <div id="scanLoadingBox" class="scanning-loader">
+          🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക
+        </div>
+      </div>
+
+      <!-- Supplier Purchase Breakdown Section -->
+      <div id="supplierItemsBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="font-weight:700; font-size:0.8rem; color:#475569; margin:0;">വാങ്ങിയ സാധനങ്ങളും വിലയും (Items & Price)</label>
+          <button type="button" onclick="addNewPurchaseItemRow()" style="background:#e0f2fe; color:#0369a1; border:none; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">+ Add Item</button>
+        </div>
+        <div id="purchaseItemsListContainer"></div>
+      </div>
+
       <div class="form-group">
-        <label>Amount (തുക ₹)</label>
+        <label id="itemNameLabel">Supplier / Item / Description</label>
+        <input type="text" id="entryTitle" class="form-control" placeholder="e.g. Milma, Bakery, Tea, Rent" required>
+      </div>
+
+      <!-- സപ്ലയർ പർച്ചേസിനായുള്ള ബില്ല് തുകയും കൊടുത്ത തുകയും (Due Balance) -->
+      <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (ആകെ ബില്ല് ₹)</label>
+            <input type="number" id="suppTotalBill" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (നൽകിയത് ₹)</label>
+            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
+          <span style="color:#b91c1c;">ബാക്കി കുടിശ്ശിക (Due Balance):</span>
+          <span id="suppDueText" style="color:#b91c1c; font-size:0.95rem;">₹0</span>
+        </div>
+      </div>
+
+      <div class="form-group" id="generalAmountGroup">
+        <label id="amountLabel">Amount (തുക ₹)</label>
         <input type="number" id="entryAmount" class="form-control" placeholder="0.00" required>
       </div>
 
@@ -571,22 +626,6 @@
           <option value="cash">Counter Cash</option>
           <option value="gpay">GPay / Bank</option>
         </select>
-      </div>
-
-      <div class="form-group" id="expCategoryGroup" style="display:none;">
-        <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
-        <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
-          <option value="tea">Tea / Refreshment</option>
-          <option value="stock">Stock Item (Milk, Banana, Sugar, etc.)</option>
-          <option value="salary">Staff Salary</option>
-          <option value="rent">Shop Rent</option>
-          <option value="other">Daily Expense / Miscellaneous</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label id="itemNameLabel">Item / Description / Remark</label>
-        <input type="text" id="entryTitle" class="form-control" placeholder="e.g. Sales, Tea, Milk, Shop Rent..." required>
       </div>
 
       <div class="form-group">
@@ -599,7 +638,7 @@
     </div>
   </div>
 
-  <!-- Universal Item History Sheet Modal -->
+  <!-- Universal Item History Sheet Modal (ഡ്രോപ്പ്ഡൗൺ ഐറ്റം വ്യൂ ഉള്ളത്) -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
       <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Item Purchase History</h3>
@@ -617,14 +656,14 @@
         <button class="filter-btn active" style="flex:0 0 60px;" onclick="applyCustomSheetDate()">Apply</button>
       </div>
 
-      <div style="max-height:260px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+      <div id="sheetPrintArea" style="max-height:280px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
         <table class="sheet-table">
           <thead>
             <tr>
               <th>Date</th>
-              <th>Details</th>
+              <th>Details & Items</th>
               <th>Mode</th>
-              <th style="text-align:right;">Amount</th>
+              <th style="text-align:right;">Paid / Due</th>
             </tr>
           </thead>
           <tbody id="sheetTableBody"></tbody>
@@ -636,11 +675,14 @@
         <span id="sheetTotalSum" class="color-red">₹0</span>
       </div>
 
-      <button class="btn-cancel" style="margin-top:12px;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn-submit" style="background:#2563eb; margin-top:0;" onclick="exportSingleSheetPDF()">📄 Print / PDF</button>
+        <button class="btn-cancel" style="margin-top:0;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
+      </div>
     </div>
   </div>
 
-  <!-- 4. റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ മോഡൽ (പുതിയത്) -->
+  <!-- Running Balance Breakdown Modal -->
   <div class="modal" id="runningBreakdownModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -650,9 +692,7 @@
 
       <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകളുടെ സ്റ്റേറ്റ്‌മെന്റ്:</p>
 
-      <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;">
-        <!-- ഡാറ്റ ഇവിടെ ലോഡ് ആകും -->
-      </div>
+      <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;"></div>
 
       <div class="sheet-total-box" style="margin-top:12px;">
         <span>CUMULATIVE BALANCE:</span>
@@ -772,6 +812,11 @@
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
+    // -------------------------------------------------------------
+    // GEMINI API KEY (നിങ്ങൾ എടുത്ത API Key ഇവിടെ നൽകുക)
+    // -------------------------------------------------------------
+    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+
     function handleLogoLoadError(img) {
       if (!img.dataset.retryEncoded) {
         img.dataset.retryEncoded = "1";
@@ -785,7 +830,7 @@
       }
     }
 
-    // 1. Initialize Firebase
+    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -813,14 +858,14 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Flatpickr കലണ്ടർ സജ്ജീകരിക്കുന്നു
+    // Flatpickr കലണ്ടർ സജ്ജീകരണം
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
         dateFormat: "Y-m-d",
         defaultDate: today,
         altInput: true,
         altFormat: "d/m/Y (D)",
-        disableMobile: true, // ഫോണിലെ നേറ്റീവ് പിക്കർ ഒഴിവാക്കി കസ്റ്റം ലുക്ക് ഉറപ്പാക്കുന്നു
+        disableMobile: true,
         onDayCreate: function(dObj, dStr, fp, dayElem) {
           const dateStr = fp.formatDate(dayElem.dateObj, "Y-m-d");
           if (holidays.includes(dateStr)) {
@@ -916,6 +961,145 @@
       }, { merge: true });
     }
 
+    /* -------------------------------------------------------------
+       പർച്ചേസ് ഐറ്റം ലിസ്റ്റും കുടിശ്ശിക കാൽക്കുലേഷനും
+       ------------------------------------------------------------- */
+    function addNewPurchaseItemRow(name = '', price = '') {
+      const container = document.getElementById('purchaseItemsListContainer');
+      const div = document.createElement('div');
+      div.className = 'purchase-item-row';
+      div.innerHTML = `
+        <input type="text" class="form-control p-name" placeholder="സാധനം (ഉദാ: പാൽ 5L)" value="${name}" style="flex:2;">
+        <input type="number" class="form-control p-price" placeholder="വില ₹" value="${price}" style="flex:1;" oninput="recalcTotalBillFromItems()">
+        <button type="button" onclick="this.parentElement.remove(); recalcTotalBillFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function recalcTotalBillFromItems() {
+      let sum = 0;
+      document.querySelectorAll('.p-price').forEach(input => {
+        sum += parseFloat(input.value) || 0;
+      });
+      if (sum > 0) {
+        document.getElementById('suppTotalBill').value = sum;
+        if (!document.getElementById('suppPaidAmount').value) {
+          document.getElementById('suppPaidAmount').value = sum; // ബൈ ഡിഫോൾട്ട് ഫുൾ പെയ്ഡ്
+        }
+      }
+      calcPurchaseDue();
+    }
+
+    function calcPurchaseDue() {
+      const bill = parseFloat(document.getElementById('suppTotalBill').value) || 0;
+      const paid = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+      const due = bill - paid;
+
+      document.getElementById('suppDueText').innerText = '₹' + (due > 0 ? due : 0);
+      document.getElementById('entryAmount').value = paid; // അന്നത്തെ ചിലവായി കൊടുത്ത തുക നൽകുന്നു
+    }
+
+    function getCollectedPurchaseItems() {
+      const items = [];
+      document.querySelectorAll('.purchase-item-row').forEach(row => {
+        const name = row.querySelector('.p-name').value.trim();
+        const price = parseFloat(row.querySelector('.p-price').value) || 0;
+        if (name && price > 0) {
+          items.push({ name, price });
+        }
+      });
+      return items;
+    }
+
+    /* -------------------------------------------------------------
+       GEMINI AI BILL SCANNER (ക്യാമറ ബിൽ സ്കാനിംഗ്)
+       ------------------------------------------------------------- */
+    async function handleBillImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
+        alert("ദയവായി കോഡിൽ നിങ്ങളുടെ Gemini API Key നൽകുക!");
+        return;
+      }
+
+      const loader = document.getElementById('scanLoadingBox');
+      loader.style.display = 'block';
+
+      try {
+        const base64Data = await fileToBase64(file);
+        
+        const prompt = `Analyze this bill or receipt image. 
+        Extract:
+        1. Supplier / Shop Name
+        2. List of purchased items with item name and individual price
+        3. Total bill amount
+        
+        Return STRICTLY valid JSON with no markdown formatting or backticks:
+        {
+          "supplier": "Name of shop or company",
+          "total": 0,
+          "items": [
+            { "name": "item description", "price": 0 }
+          ]
+        }`;
+
+        const payload = {
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: file.type || "image/jpeg", data: base64Data } }
+            ]
+          }]
+        };
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const rawText = data.candidates[0].content.parts[0].text;
+        const cleanJSON = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleanJSON);
+
+        if (parsed.supplier) document.getElementById('entryTitle').value = parsed.supplier;
+        if (parsed.total) {
+          document.getElementById('suppTotalBill').value = parsed.total;
+          document.getElementById('suppPaidAmount').value = parsed.total;
+        }
+
+        const container = document.getElementById('purchaseItemsListContainer');
+        container.innerHTML = '';
+        if (parsed.items && Array.isArray(parsed.items)) {
+          parsed.items.forEach(it => {
+            addNewPurchaseItemRow(it.name, it.price);
+          });
+        }
+        recalcTotalBillFromItems();
+
+        alert("✓ ബില്ലിലെ വിവരങ്ങൾ AI വിജയകരമായി എടുത്തു!");
+
+      } catch (err) {
+        console.error("Scan error:", err);
+        alert("ബില്ല് വായിക്കാൻ സാധിച്ചില്ല. വിവരങ്ങൾ നേരിട്ട് ടൈപ്പ് ചെയ്യാവുന്നതാണ്.");
+      } finally {
+        loader.style.display = 'none';
+        event.target.value = '';
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    /* Modal Controls */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -923,6 +1107,8 @@
       document.getElementById('expCategoryGroup').style.display = isExp ? 'block' : 'none';
       document.getElementById('modalSubmitBtn').style.background = isExp ? 'var(--accent-red)' : 'var(--accent-green)';
       document.getElementById('modalTitle').innerText = editId ? (isExp ? 'Edit Expense' : 'Edit Sale') : (isExp ? 'Add Expense (ചിലവ്)' : 'Add Sale In (വരവ്)');
+      
+      document.getElementById('purchaseItemsListContainer').innerHTML = '';
 
       if (editId) {
         const item = transactions.find(t => t.id === editId);
@@ -932,13 +1118,26 @@
           document.getElementById('entryTitle').value = item.title || item.extra || (item.type === 'sale' ? 'Sale' : 'Expense');
           document.getElementById('entryNote').value = item.note || '';
           if (isExp) document.getElementById('entryCategory').value = item.category || 'other';
+
+          if (item.category === 'stock') {
+            document.getElementById('suppTotalBill').value = item.billTotal || item.amount;
+            document.getElementById('suppPaidAmount').value = item.paidAmount || item.amount;
+            calcPurchaseDue();
+            if (item.items && Array.isArray(item.items)) {
+              item.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
+            }
+          }
         }
       } else {
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
+        document.getElementById('suppTotalBill').value = '';
+        document.getElementById('suppPaidAmount').value = '';
+        document.getElementById('suppDueText').innerText = '₹0';
         if (isExp) {
-          document.getElementById('entryCategory').value = 'tea';
-          document.getElementById('entryTitle').value = 'Tea';
+          document.getElementById('entryCategory').value = 'stock';
+          document.getElementById('entryTitle').value = '';
+          addNewPurchaseItemRow();
         } else {
           document.getElementById('entryTitle').value = 'Sales';
         }
@@ -949,15 +1148,23 @@
 
     function handleCategoryChange() {
       const type = document.getElementById('entryType').value;
-      if (type !== 'expense') return;
       const cat = document.getElementById('entryCategory').value;
+      const isStock = (type === 'expense' && cat === 'stock');
       const titleInput = document.getElementById('entryTitle');
       const editId = document.getElementById('editEntryId').value;
-      if (!editId) {
+
+      document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
+      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
+      document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
+      document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
+
+      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര്' : 'Item / Description';
+
+      if (!editId && type === 'expense') {
         if (cat === 'tea') titleInput.value = 'Tea';
         else if (cat === 'rent') titleInput.value = 'Shop Rent';
         else if (cat === 'salary') titleInput.value = '';
-        else if (cat === 'stock') titleInput.value = 'Milk';
+        else if (cat === 'stock') titleInput.value = '';
         else titleInput.value = '';
       }
     }
@@ -970,23 +1177,39 @@
       const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
       const type = document.getElementById('entryType').value;
-      const amount = parseFloat(document.getElementById('entryAmount').value);
       const mode = document.getElementById('entryMode').value;
       let title = document.getElementById('entryTitle').value.trim();
       const note = document.getElementById('entryNote').value.trim();
 
-      if (!amount || amount <= 0) {
+      let category = 'sale';
+      let items = [];
+      let billTotal = 0;
+      let paidAmount = 0;
+      let dueAmount = 0;
+      let amount = 0;
+
+      if (type === 'expense') {
+        category = document.getElementById('entryCategory').value;
+        if (category === 'stock') {
+          items = getCollectedPurchaseItems();
+          billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
+          paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+          dueAmount = billTotal - paidAmount;
+          amount = paidAmount; // അന്നത്തെ ദിവസച്ചിലവായി നൽകിയ തുക മാത്രം കൂട്ടുന്നു
+        } else {
+          amount = parseFloat(document.getElementById('entryAmount').value) || 0;
+        }
+      } else {
+        amount = parseFloat(document.getElementById('entryAmount').value) || 0;
+      }
+
+      if (amount < 0 || (type === 'sale' && amount <= 0)) {
         alert('സാധുവായ തുക നൽകുക');
         return;
       }
 
       if (!title) {
         title = type === 'sale' ? 'Sales' : 'Expense';
-      }
-
-      let category = 'sale';
-      if (type === 'expense') {
-        category = document.getElementById('entryCategory').value;
       }
 
       const entryData = {
@@ -996,8 +1219,12 @@
         title,
         extra: title,
         amount,
+        billTotal: billTotal || amount,
+        paidAmount: paidAmount || amount,
+        dueAmount: dueAmount > 0 ? dueAmount : 0,
         mode,
         note,
+        items,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -1032,6 +1259,11 @@
         const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
         const badgeText = t.mode.toUpperCase();
 
+        let dueBadge = '';
+        if (t.dueAmount && t.dueAmount > 0) {
+          dueBadge = `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി കുടിശ്ശിക: ₹${t.dueAmount})</span>`;
+        }
+
         const rowHTML = `
           <div class="entry-row">
             <div class="entry-info" onclick="openItemHistorySheet('${displayTitle}', '${t.category}')">
@@ -1040,7 +1272,7 @@
                 <span class="mode-badge ${badgeClass}">${badgeText}</span>
               </div>
               <div class="entry-sub">
-                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ ഹിസ്റ്ററി കാണാം 🔍
+                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ സാധനങ്ങളും വിവരങ്ങളും കാണാം 🔍 ${dueBadge}
               </div>
             </div>
             <div class="entry-right">
@@ -1103,7 +1335,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ ഷീറ്റ് (CUMULATIVE STATEMENT)
+       റണ്ണിംഗ് ബാലൻസ് ബ്രേക്ക്ഡൗൺ ഷീറ്റ്
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
@@ -1188,7 +1420,7 @@
     }
 
     /* -------------------------------------------------------------
-       6. PDF & WHATSAPP ഷെയറിംഗ് ഫംഗ്ഷനുകൾ
+       PDF & WHATSAPP ഷെയറിംഗ് ഫംഗ്ഷനുകൾ
        ------------------------------------------------------------- */
     function exportDailyPDF() {
       const curDate = document.getElementById('selectedDate').value || today;
@@ -1229,6 +1461,18 @@
       html2pdf().set(opt).from(element).save();
     }
 
+    function exportSingleSheetPDF() {
+      const element = document.getElementById('sheetPrintArea');
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
     function shareDailyWhatsApp() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('sumDailySales').innerText;
@@ -1244,7 +1488,9 @@
       window.open(waURL, '_blank');
     }
 
-    /* Universal History Sheet Modal */
+    /* -------------------------------------------------------------
+       Universal History Sheet Modal (ഡ്രോപ്പ്ഡൗൺ ഐറ്റം വ്യൂ)
+       ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
       document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
@@ -1278,6 +1524,13 @@
       renderItemSheetContent();
     }
 
+    function toggleItemsDropdown(rowId) {
+      const panel = document.getElementById(rowId);
+      if (panel) {
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+
     function renderItemSheetContent() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -1308,25 +1561,61 @@
       filtered.sort((a,b) => b.date.localeCompare(a.date));
 
       let totalSum = 0;
+      let totalDueSum = 0;
       let rowsHTML = '';
 
-      filtered.forEach(t => {
+      filtered.forEach((t, idx) => {
         totalSum += t.amount;
+        if (t.dueAmount) totalDueSum += t.dueAmount;
         const isSale = t.type === 'sale';
+        const rowId = `dropdown-item-${idx}`;
+
+        let itemsDropdownHTML = '';
+        let hasItems = t.items && t.items.length > 0;
+        if (hasItems) {
+          itemsDropdownHTML = `
+            <div id="${rowId}" class="dropdown-items-panel">
+              <strong style="font-size:0.75rem; color:#1e3a8a;">വാങ്ങിയ സാധനങ്ങളുടെ വിവരങ്ങൾ:</strong>
+              ${t.items.map(it => `
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; padding:2px 0;">
+                  <span>• ${it.name}</span>
+                  <strong>₹${it.price}</strong>
+                </div>
+              `).join('')}
+              ${t.billTotal ? `<div style="border-top:1px dashed #cbd5e1; margin-top:4px; padding-top:2px; display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold;"><span>ആകെ ബില്ല് തുക:</span><span>₹${t.billTotal}</span></div>` : ''}
+            </div>
+          `;
+        }
+
+        let dueDisplay = '';
+        if (t.dueAmount && t.dueAmount > 0) {
+          dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
+        }
+
         rowsHTML += `
-          <tr>
+          <tr class="${hasItems ? 'collapsible-trigger' : ''}" onclick="${hasItems ? `toggleItemsDropdown('${rowId}')` : ''}">
             <td><strong>${t.date}</strong></td>
-            <td>${t.note ? t.note : (isSale ? 'Sale' : t.category)}</td>
+            <td>
+              ${t.note ? t.note : (isSale ? 'Sale' : t.category)}
+              ${hasItems ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
+              ${itemsDropdownHTML}
+            </td>
             <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
             <td style="text-align:right; font-weight:800;" class="${isSale ? 'color-green' : 'color-red'}">
               ₹${t.amount}
+              ${dueDisplay}
             </td>
           </tr>
         `;
       });
 
       document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
-      document.getElementById('sheetTotalSum').innerText = '₹' + totalSum;
+      
+      let totalText = '₹' + totalSum;
+      if (totalDueSum > 0) {
+        totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
+      }
+      document.getElementById('sheetTotalSum').innerText = totalText;
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
     }
 
@@ -1348,6 +1637,9 @@
       closeModal('openingModal');
     }
 
+    /* -------------------------------------------------------------
+       TAB 2: Stock & Supplier Purchases (കുടിശ്ശിക ഉൾപ്പെടുത്തി)
+       ------------------------------------------------------------- */
     function renderStockTab() {
       const stockTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
       const container = document.getElementById('stockListContainer');
@@ -1360,22 +1652,37 @@
       const grouped = {};
       stockTrans.forEach(t => {
         const name = (t.title || t.extra || 'Unknown').toLowerCase();
-        if (!grouped[name]) grouped[name] = { total: 0, count: 0, lastDate: t.date };
-        grouped[name].total += t.amount;
+        if (!grouped[name]) grouped[name] = { totalPaid: 0, totalDue: 0, count: 0, lastDate: t.date, itemsSummary: [] };
+        grouped[name].totalPaid += (t.paidAmount || t.amount);
+        grouped[name].totalDue += (t.dueAmount || 0);
         grouped[name].count += 1;
         if (t.date > grouped[name].lastDate) grouped[name].lastDate = t.date;
+        if (t.items && t.items.length) {
+          t.items.forEach(it => {
+            if (!grouped[name].itemsSummary.includes(it.name)) grouped[name].itemsSummary.push(it.name);
+          });
+        }
       });
 
       let html = '';
       Object.keys(grouped).forEach(name => {
         const item = grouped[name];
+        const subItemsText = item.itemsSummary.length ? `<div style="font-size:0.75rem; color:#0284c7; margin-top:3px;">സാധനങ്ങൾ: ${item.itemsSummary.join(', ')}</div>` : '';
+        const dueText = item.totalDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${item.totalDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
+
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${name}', 'stock')">
-            <div>
-              <div class="stock-name">${name}</div>
-              <div class="stock-meta">വാങ്ങിയത്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
+            <div class="stock-header">
+              <div>
+                <div class="stock-name">${name}</div>
+                <div class="stock-meta">പർച്ചേസ്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
+                ${subItemsText}
+              </div>
+              <div class="stock-amt-box">
+                <div class="stock-amt">₹${item.totalPaid}</div>
+                ${dueText}
+              </div>
             </div>
-            <div class="stock-amt">₹${item.total}</div>
           </div>
         `;
       });
