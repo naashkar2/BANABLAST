@@ -7,8 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="logo.png">
 
-  <!-- Fonts, Flatpickr & html2pdf -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Flatpickr & html2pdf -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -35,7 +34,7 @@
       box-sizing: border-box; 
       margin: 0; 
       padding: 0; 
-      font-family: 'Poppins', 'Noto Sans Malayalam', -apple-system, sans-serif; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
     }
     
     body { 
@@ -220,9 +219,6 @@
       color: #ffffff !important;
       font-weight: 800 !important;
       border-radius: 50% !important;
-    }
-    .flatpickr-day.shop-holiday-day.today {
-      background: linear-gradient(135deg, #2563eb 50%, #ef4444 50%) !important;
     }
 
     /* Navigation Tabs */
@@ -512,7 +508,7 @@
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
     
-    /* 🌟 തെളിഞ്ഞ ഹൈ-കോൺട്രാസ്റ്റ് ബട്ടണുകൾ 🌟 */
+    /* തെളിഞ്ഞ ബട്ടണുകൾ */
     .btn-submit { 
       width: 100%; 
       padding: 13px; 
@@ -529,10 +525,8 @@
       display: block;
       text-align: center;
     }
-    .btn-submit:active {
-      transform: scale(0.98);
-      opacity: 0.9;
-    }
+    .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+    
     .btn-cancel { 
       width: 100%; 
       padding: 12px; 
@@ -548,9 +542,7 @@
       display: block;
       text-align: center;
     }
-    .btn-cancel:active {
-      background: #e2e8f0;
-    }
+    .btn-cancel:active { background: #e2e8f0; }
 
     /* Tables */
     .sheet-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
@@ -600,7 +592,6 @@
 </head>
 <body>
 
-  <!-- DATALISTS (Auto-suggest) -->
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
 
@@ -908,7 +899,6 @@
         </select>
       </div>
 
-      <!-- ക്യാമറയും ഗാലറിയും ഒരുപോലെ വരാൻ capture നീക്കം ചെയ്തു -->
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
@@ -1285,10 +1275,12 @@
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
       <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ Gemini AI API Key</h3>
-      <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">Google AI Studio-ൽ നിന്നുള്ള നിങ്ങളുടെ API Key ഇവിടെ സേവ് ചെയ്യാം:</p>
+      <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
+        Google AI Studio-ൽ നിന്ന് സൗജന്യമായി എടുത്ത API Key ഇവിടെ നൽകുക:
+      </p>
 
       <div class="form-group">
-        <label>Gemini API Key</label>
+        <label>Gemini API Key (AIzaSy...)</label>
         <input type="text" id="aiKeyInput" class="form-control" placeholder="AIzaSy...">
       </div>
 
@@ -1300,14 +1292,11 @@
   <!-- =================== [PART 1 അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
-    const MASTER_SECURITY_KEY = "9999"; // Master Security Code
+    const MASTER_SECURITY_KEY = "9999";
 
-    // Default Base64 Encoded Gemini API Key
-    const HARDCODED_GEMINI_KEY = atob("QVEuQWI4Uk42TFZWVUxGRms5YTBqX0p1TTRMdjB5VE5heGR2MHdxeURGVjByZWhFV2tLRFE=");
+    // ഡിഫോൾട്ട് കീ അല്ലെങ്കിൽ യൂസർ നൽകുന്ന കീ
+    let dynamicGeminiKey = localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
 
-    let dynamicGeminiKey = localStorage.getItem('BANABLAST_GEMINI_KEY') || HARDCODED_GEMINI_KEY;
-
-    // ഡിഫോൾട്ട് PIN കോഡുകൾ
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
@@ -1425,7 +1414,7 @@
         closeModal('changePinModal');
       }).catch(err => {
         console.error("PIN update error:", err);
-        alert("❌ PIN മാറ്റുന്നതിൽ തടസ്സം നേരിട്ടു. കണക്ഷൻ പരിശോധിക്കുക.");
+        alert("❌ PIN മാറ്റുന്നതിൽ തടസ്സം നേരിട്ടു.");
       });
     }
 
@@ -1441,7 +1430,7 @@
       const newPin = document.getElementById('resetNewPinInput').value.trim();
 
       if (enteredMasterKey !== MASTER_SECURITY_KEY) {
-        alert("❌ തെറ്റായ Master Security Code! മറ്റ് പാർട്ണർമാരോട് ചോദിച്ച് കൃത്യമായ കോഡ് നൽകുക.");
+        alert("❌ തെറ്റായ Master Security Code!");
         return;
       }
 
@@ -1454,11 +1443,11 @@
       db.collection('settings').doc('security').set({
         pins: partnerPins
       }, { merge: true }).then(() => {
-        alert(`✅ ${targetPartner}-ന്റെ PIN വിജയകരമായി റീസെറ്റ് ചെയ്തു! ഇനി പുതിയ PIN ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യാം.`);
+        alert(`✅ ${targetPartner}-ന്റെ PIN വിജയകരമായി റീസെറ്റ് ചെയ്തു!`);
         closeModal('forgotPinModal');
       }).catch(err => {
         console.error("Reset error:", err);
-        alert("❌ തടസ്സം നേരിട്ടു. കണക്ഷൻ പരിശോധിക്കുക.");
+        alert("❌ തടസ്സം നേരിട്ടു.");
       });
     }
 
@@ -1635,7 +1624,7 @@
       const div = document.createElement('div');
       div.className = 'purchase-item-row';
       div.innerHTML = `
-        <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: പാൽ 5L)" value="${name}" style="flex:2;">
+        <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: Cashew)" value="${name}" style="flex:2;">
         <input type="number" step="any" class="form-control p-price" placeholder="വില ₹" value="${price}" style="flex:1;" oninput="recalcTotalBillFromItems()">
         <button type="button" onclick="this.parentElement.remove(); recalcTotalBillFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
       `;
@@ -1679,9 +1668,9 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & GEMINI AI ബിൽ സ്കാനർ (100% WORKING)
+       3. ഇമേജ് കംപ്രഷൻ & GEMINI AI ബിൽ സ്കാനർ
        ------------------------------------------------------------- */
-    function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) {
+    function compressImageFile(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -1708,8 +1697,7 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             const dataUrl = canvas.toDataURL('image/jpeg', quality);
-            const base64 = dataUrl.split(',')[1];
-            resolve(base64);
+            resolve(dataUrl.split(',')[1]);
           };
           img.onerror = err => reject(err);
         };
@@ -1721,20 +1709,21 @@
       const file = event.target.files[0];
       if (!file) return;
 
+      if (!dynamicGeminiKey || dynamicGeminiKey.trim() === '') {
+        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ AI Key' ബട്ടൺ വഴി നിങ്ങളുടെ Gemini API Key നൽകുക.\n(aistudio.google.com-ൽ നിന്ന് സൗജന്യമായി ലഭിക്കും)");
+        openAISettingsModal();
+        event.target.value = '';
+        return;
+      }
+
       const loader = document.getElementById('scanLoadingBox');
       loader.style.display = 'block';
 
       try {
-        // മൊബൈൽ ഫോട്ടോയുടെ ഭാരം കുറച്ച് 200KB ആക്കുന്നു
         const base64Data = await compressImageFile(file);
         
-        const promptText = `Analyze this purchase/shop receipt bill image very carefully.
-        Extract:
-        1. "supplier": Name of the shop / store / supplier (e.g. BBC TRADERS).
-        2. "total": Total bill grand amount as a number (e.g. 1167.50).
-        3. "items": Array of items bought, each having "name" (item description) and "price" (total price or rate for that item as a number).
-        Return ONLY valid strict JSON with NO markdown formatting, NO backticks:
-        {"supplier": "string", "total": 0, "items": [{"name": "string", "price": 0}]}`;
+        const promptText = `Extract items from this purchase receipt bill. Return ONLY valid JSON:
+        {"supplier": "Store Name", "total": 0, "items": [{"name": "item description", "price": 0}]}`;
 
         const payload = {
           contents: [{
@@ -1745,14 +1734,27 @@
           }]
         };
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${dynamicGeminiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+        // പുതിയതും പഴയതുമായ എല്ലാ മോഡൽ ലിങ്കുകളും സപ്പോർട്ട് ചെയ്യുന്നു
+        const endpoints = [
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${dynamicGeminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${dynamicGeminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${dynamicGeminiKey}`
+        ];
 
-        if (!res.ok) {
-          const errData = await res.json();
+        let res = null;
+        for (const url of endpoints) {
+          try {
+            res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) break;
+          } catch(e) {}
+        }
+
+        if (!res || !res.ok) {
+          const errData = res ? await res.json() : {};
           throw new Error(errData.error ? errData.error.message : "API Connection Failed");
         }
 
@@ -1761,9 +1763,7 @@
         rawText = rawText.replace(/```json|```/gi, '').trim();
         const parsed = JSON.parse(rawText);
 
-        if (parsed.supplier) {
-          document.getElementById('entryTitle').value = parsed.supplier;
-        }
+        if (parsed.supplier) document.getElementById('entryTitle').value = parsed.supplier;
         if (parsed.total) {
           document.getElementById('suppTotalBill').value = parsed.total;
           document.getElementById('suppPaidAmount').value = parsed.total;
@@ -1772,9 +1772,7 @@
         const container = document.getElementById('purchaseItemsListContainer');
         container.innerHTML = '';
         if (parsed.items && Array.isArray(parsed.items) && parsed.items.length > 0) {
-          parsed.items.forEach(it => {
-            addNewPurchaseItemRow(it.name, it.price);
-          });
+          parsed.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
         } else {
           addNewPurchaseItemRow();
         }
@@ -1784,7 +1782,7 @@
 
       } catch (err) {
         console.error("Scan error:", err);
-        alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല: " + err.message + "\n(ഫോട്ടോ വ്യക്തമാണെന്ന് ഉറപ്പാക്കുക, അല്ലെങ്കിൽ ഹെഡറിലെ AI Key പരിശോധിക്കുക).");
+        alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല: " + err.message + "\n\n(ഹെഡറിലെ '⚙️ AI Key' ശരിയാണെന്ന് ഉറപ്പാക്കുക).");
       } finally {
         loader.style.display = 'none';
         event.target.value = '';
@@ -1919,7 +1917,7 @@
         mode,
         note,
         items,
-        addedBy: currentLoggedInUser || 'Admin', // ആര് ചേർത്തതാണെന്ന് തനിയെ സേവ് ചെയ്യുന്നു
+        addedBy: currentLoggedInUser || 'Admin',
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -2049,81 +2047,86 @@
     }
 
     /* -------------------------------------------------------------
-       5. 100% BLANK ആകാത്ത പ്രൊഫഷണൽ PDF GENERATOR & WHATSAPP SHARE
+       5. റോക്ക്-സോളിഡ് PDF & WHATSAPP GENERATION ENGINE (100% WORKING)
        ------------------------------------------------------------- */
-    async function renderCleanPdfBlob(htmlBody) {
-      // മോഡൽ വിൻഡോയുടെ സ്ക്രോളിംഗ് പ്രശ്നം ഒഴിവാക്കാൻ പ്രത്യേക പ്രിന്റ് കണ്ടെയ്നർ
-      const wrapper = document.createElement('div');
-      wrapper.style.position = 'fixed';
-      wrapper.style.left = '0';
-      wrapper.style.top = '0';
-      wrapper.style.width = '750px';
-      wrapper.style.background = '#ffffff';
-      wrapper.style.color = '#0f172a';
-      wrapper.style.zIndex = '-99999';
-      wrapper.style.padding = '24px';
-      wrapper.style.boxSizing = 'border-box';
-      wrapper.innerHTML = `
-        <div style="font-family:'Poppins','Noto Sans Malayalam',sans-serif;">
-          <div style="background:linear-gradient(135deg,#091e42 0%,#1e3a8a 60%,#2563eb 100%); color:white; padding:18px; border-radius:12px; text-align:center; margin-bottom:16px;">
-            <h1 style="margin:0; font-size:1.5rem; letter-spacing:1px; font-weight:800;">🍌 BANABLAST</h1>
-            <p style="margin:4px 0 0; font-size:0.85rem; color:#bfdbfe; font-weight:600;">Business Ledger Financial Statement</p>
+    function generatePdfDocument(contentHtml, fileName, isShare = false, shareTitle = 'BANABLAST Statement') {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.75);z-index:999998;display:flex;align-items:center;justify-content:center;color:#ffffff;font-weight:bold;font-size:18px;backdrop-filter:blur(4px);';
+      overlay.innerHTML = '📄 PDF തയ്യാറാക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
+      document.body.appendChild(overlay);
+
+      const printDiv = document.createElement('div');
+      printDiv.style.cssText = 'position:fixed;top:0;left:0;width:750px;background:#ffffff;color:#0f172a;padding:25px;z-index:999999;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
+      printDiv.innerHTML = `
+        <div style="border:2px solid #1e3a8a; border-radius:12px; padding:20px; background:#ffffff;">
+          <div style="text-align:center; margin-bottom:16px; border-bottom:2px solid #1e3a8a; padding-bottom:12px;">
+            <h1 style="margin:0; color:#1e3a8a; font-size:26px; font-weight:800; letter-spacing:1px;">🍌 BANABLAST</h1>
+            <p style="margin:4px 0 0; color:#64748b; font-size:13px; font-weight:700;">BUSINESS LEDGER FINANCIAL STATEMENT</p>
           </div>
-          ${htmlBody}
-          <div style="text-align:center; font-size:0.75rem; color:#94a3b8; border-top:1px dashed #cbd5e1; margin-top:20px; padding-top:10px;">
-            Generated automatically via BANABLAST Web App • Cloud Synced
+          ${contentHtml}
+          <div style="text-align:center; font-size:11px; color:#94a3b8; border-top:1px dashed #cbd5e1; margin-top:24px; padding-top:10px;">
+            BANABLAST Digital Ledger • Automated Cloud System Document
           </div>
         </div>
       `;
-
-      document.body.appendChild(wrapper);
+      document.body.appendChild(printDiv);
 
       const opt = {
-        margin: [8, 8, 8, 8],
-        filename: 'statement.pdf',
+        margin: [10, 10, 10, 10],
+        filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 800 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      try {
-        const pdfBlob = await html2pdf().set(opt).from(wrapper).output('blob');
-        return pdfBlob;
-      } finally {
-        document.body.removeChild(wrapper);
+      const cleanup = () => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        if (printDiv.parentNode) printDiv.parentNode.removeChild(printDiv);
+      };
+
+      if (!isShare) {
+        html2pdf().set(opt).from(printDiv).save().then(() => {
+          cleanup();
+        }).catch(err => {
+          console.error("PDF Save Error:", err);
+          cleanup();
+          alert("❌ PDF ഡൗൺലോഡ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
+        });
+      } else {
+        html2pdf().set(opt).from(printDiv).toPdf().get('pdf').then(pdf => {
+          const blob = pdf.output('blob');
+          const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
+          cleanup();
+
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            navigator.share({
+              files: [pdfFile],
+              title: shareTitle,
+              text: `🍌 BANABLAST - ${shareTitle}`
+            }).catch(err => {
+              if (err.name !== 'AbortError') console.error(err);
+            });
+          } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert("✅ PDF ഫയൽ തയ്യാറായിട്ടുണ്ട്. ഡൗൺലോഡ് ചെയ്ത ഫയൽ വാട്സാപ്പിൽ അയക്കാം!");
+          }
+        }).catch(err => {
+          console.error("PDF Share Error:", err);
+          cleanup();
+          alert("❌ PDF നിർമ്മിക്കുന്നതിൽ തടസ്സം നേരിട്ടു.");
+        });
       }
     }
 
-    async function executeDirectShareOrDownload(pdfBlob, fileName, shareTitle) {
-      const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        try {
-          await navigator.share({
-            files: [pdfFile],
-            title: shareTitle,
-            text: `🍌 BANABLAST - ${shareTitle}`
-          });
-          return;
-        } catch (err) {
-          if (err.name === 'AbortError') return;
-        }
-      }
-
-      // വാട്സാപ്പ് നേരിട്ട് സപ്പോർട്ട് ചെയ്യാത്ത ബ്രൗസറുകളിൽ ഡൗൺലോഡ് ചെയ്യുന്നു
-      const blobUrl = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-      alert("✅ PDF വിജയകരമായി ഡൗൺലോഡ് ആയിട്ടുണ്ട്. ഇനി വാട്സാപ്പിൽ അയക്കാം!");
-    }
-
-    // 1. ഇന്നത്തെ റിപ്പോർട്ട് PDF
-    async function buildTodayReportHtml() {
+    // 1. ഇന്നത്തെ റിപ്പോർട്ട്
+    function getTodayReportHtmlContent() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('modalRepSales').innerText;
       const sCash = document.getElementById('modalRepSaleCash').innerText;
@@ -2140,68 +2143,57 @@
 
       return `
         <div style="text-align:center; margin-bottom:14px;">
-          <h3 style="margin:0; font-size:1.15rem; color:#1e3a8a;">DAILY SALES & PROFIT REPORT</h3>
-          <p style="margin:2px 0 0; color:#64748b; font-size:0.85rem; font-weight:700;">Date: ${curDate}</p>
+          <h3 style="margin:0; font-size:16px; color:#1e3a8a;">DAILY SALES & PROFIT REPORT</h3>
+          <p style="margin:2px 0 0; color:#64748b; font-size:13px; font-weight:700;">Date: ${curDate}</p>
         </div>
 
-        <div style="display:flex; gap:12px; margin-bottom:12px;">
+        <div style="display:flex; gap:12px; margin-bottom:14px;">
           <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; padding:12px; border-radius:10px; text-align:center;">
-            <div style="font-size:0.75rem; color:#15803d; font-weight:800;">TOTAL SALES</div>
-            <div style="font-size:1.4rem; font-weight:800; color:#15803d; margin:4px 0;">${sales}</div>
-            <div style="font-size:0.75rem; color:#64748b;">Cash: ${sCash} | GPay: ${sGpay}</div>
+            <div style="font-size:12px; color:#15803d; font-weight:bold;">TOTAL SALES</div>
+            <div style="font-size:22px; font-weight:800; color:#15803d; margin:4px 0;">${sales}</div>
+            <div style="font-size:11px; color:#64748b;">Cash: ${sCash} | GPay: ${sGpay}</div>
           </div>
           <div style="flex:1; background:#fef2f2; border:1px solid #fecaca; padding:12px; border-radius:10px; text-align:center;">
-            <div style="font-size:0.75rem; color:#b91c1c; font-weight:800;">TOTAL EXPENSE</div>
-            <div style="font-size:1.4rem; font-weight:800; color:#b91c1c; margin:4px 0;">${exp}</div>
-            <div style="font-size:0.75rem; color:#64748b;">Cash: ${eCash} | GPay: ${eGpay}</div>
+            <div style="font-size:12px; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
+            <div style="font-size:22px; font-weight:800; color:#b91c1c; margin:4px 0;">${exp}</div>
+            <div style="font-size:11px; color:#64748b;">Cash: ${eCash} | GPay: ${eGpay}</div>
           </div>
         </div>
 
         <div style="background:#eff6ff; border:2px solid #bfdbfe; padding:14px; border-radius:10px; text-align:center; margin-bottom:14px;">
-          <div style="font-size:0.85rem; font-weight:800; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി ലാഭം</div>
-          <div style="font-size:1.6rem; font-weight:800; color:#1e3a8a; margin-top:2px;">${profit}</div>
+          <div style="font-size:13px; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി ലാഭം</div>
+          <div style="font-size:24px; font-weight:800; color:#1e3a8a; margin-top:2px;">${profit}</div>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:10px; font-size:0.85rem;">
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:10px; font-size:13px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Counter Cash Box Balance:</span><strong>${cashBal}</strong></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Bank / GPay Account Balance:</span><strong>${bankBal}</strong></div>
-          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:8px; font-weight:800; color:#1e3a8a; font-size:0.95rem;">
+          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:8px; font-weight:bold; color:#1e3a8a; font-size:15px;">
             <span>TOTAL CUMULATIVE BALANCE:</span><span>${totBal}</span>
           </div>
         </div>
       `;
     }
 
-    async function downloadTodayPDF() {
+    function downloadTodayPDF() {
       const curDate = document.getElementById('selectedDate').value || today;
-      const html = await buildTodayReportHtml();
-      const blob = await renderCleanPdfBlob(html);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BANABLAST_Report_${curDate}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      generatePdfDocument(getTodayReportHtmlContent(), `BANABLAST_Report_${curDate}.pdf`, false);
     }
 
-    async function shareTodayWhatsAppPDF() {
+    function shareTodayWhatsAppPDF() {
       const curDate = document.getElementById('selectedDate').value || today;
-      const html = await buildTodayReportHtml();
-      const blob = await renderCleanPdfBlob(html);
-      await executeDirectShareOrDownload(blob, `BANABLAST_Report_${curDate}.pdf`, `Today's Sales Report (${curDate})`);
+      generatePdfDocument(getTodayReportHtmlContent(), `BANABLAST_Report_${curDate}.pdf`, true, `Today's Sales Report (${curDate})`);
     }
 
-    // 2. ലെഡ്ജർ ഷീറ്റ് PDF
-    async function buildSingleSheetHtml() {
+    // 2. ലെഡ്ജർ ഷീറ്റ്
+    function getSingleSheetHtmlContent() {
       const title = document.getElementById('sheetItemTitle').innerText;
       const bodyRows = document.getElementById('sheetTableBody').innerHTML;
       const totSum = document.getElementById('sheetTotalSum').innerText;
 
       return `
-        <h3 style="color:#1e3a8a; font-size:1.15rem; margin-bottom:10px;">${title}</h3>
-        <table style="width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:10px;">
+        <h3 style="color:#1e3a8a; font-size:16px; margin-bottom:12px;">${title}</h3>
+        <table style="width:100%; border-collapse:collapse; font-size:12px; margin-top:10px;">
           <thead>
             <tr style="background:#f1f5f9; text-align:left;">
               <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Date</th>
@@ -2212,67 +2204,45 @@
           </thead>
           <tbody>${bodyRows}</tbody>
         </table>
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem;">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
           <span>TOTAL AMOUNT:</span><span style="color:#dc2626;">${totSum}</span>
         </div>
       `;
     }
 
-    async function exportSingleSheetPDF() {
-      const html = await buildSingleSheetHtml();
-      const blob = await renderCleanPdfBlob(html);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    function exportSingleSheetPDF() {
+      generatePdfDocument(getSingleSheetHtmlContent(), `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, false);
     }
 
-    async function shareSingleSheetWhatsAppPDF() {
-      const html = await buildSingleSheetHtml();
-      const blob = await renderCleanPdfBlob(html);
-      await executeDirectShareOrDownload(blob, `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, `${activeSheetKey.toUpperCase()} Ledger Sheet`);
+    function shareSingleSheetWhatsAppPDF() {
+      generatePdfDocument(getSingleSheetHtmlContent(), `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, true, `${activeSheetKey.toUpperCase()} Ledger Sheet`);
     }
 
-    // 3. ബ്രേക്ക്ഡൗൺ PDF
-    async function buildBreakdownHtml() {
+    // 3. ബ്രേക്ക്ഡൗൺ
+    function getBreakdownHtmlContent() {
       const title = document.getElementById('breakdownTitle').innerText;
       const tableContent = document.getElementById('breakdownTableContainer').innerHTML;
       const tot = document.getElementById('breakdownTotalSum').innerText;
 
       return `
-        <h3 style="color:#1e3a8a; font-size:1.15rem; margin-bottom:10px;">${title}</h3>
+        <h3 style="color:#1e3a8a; font-size:16px; margin-bottom:12px;">${title}</h3>
         ${tableContent}
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem;">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
           <span>CUMULATIVE BALANCE:</span><span style="color:#0284c7;">${tot}</span>
         </div>
       `;
     }
 
-    async function exportBreakdownPDF() {
-      const html = await buildBreakdownHtml();
-      const blob = await renderCleanPdfBlob(html);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BANABLAST_Balance_Statement_${today}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    function exportBreakdownPDF() {
+      generatePdfDocument(getBreakdownHtmlContent(), `BANABLAST_Balance_Statement_${today}.pdf`, false);
     }
 
-    async function shareBreakdownWhatsAppPDF() {
-      const html = await buildBreakdownHtml();
-      const blob = await renderCleanPdfBlob(html);
-      await executeDirectShareOrDownload(blob, `BANABLAST_Balance_Statement_${today}.pdf`, `Account Breakdown Statement`);
+    function shareBreakdownWhatsAppPDF() {
+      generatePdfDocument(getBreakdownHtmlContent(), `BANABLAST_Balance_Statement_${today}.pdf`, true, `Account Breakdown Statement`);
     }
 
-    // 4. റിപ്പോർട്ട് ടാബ് PDF
-    async function buildReportsTabHtml() {
+    // 4. റിപ്പോർട്ട് ടാബ്
+    function getReportsTabHtmlContent() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('repSales').innerText;
       const exp = document.getElementById('repExp').innerText;
@@ -2286,22 +2256,22 @@
 
       return `
         <div style="text-align:center; margin-bottom:14px;">
-          <h3 style="margin:0; font-size:1.2rem; color:#1e3a8a;">FINANCIAL REPORT SUMMARY</h3>
-          <p style="margin:2px 0 0; color:#64748b; font-size:0.8rem; font-weight:700;">Filter Period: ${currentReportFilter.toUpperCase()} (Ref Date: ${curDate})</p>
+          <h3 style="margin:0; font-size:16px; color:#1e3a8a;">FINANCIAL REPORT SUMMARY</h3>
+          <p style="margin:2px 0 0; color:#64748b; font-size:12px; font-weight:bold;">Period: ${currentReportFilter.toUpperCase()} (Ref Date: ${curDate})</p>
         </div>
 
         <div style="display:flex; gap:10px; margin-bottom:14px;">
           <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:0.75rem; color:#15803d; font-weight:bold;">TOTAL SALES</div>
-            <div style="font-size:1.3rem; font-weight:800; color:#15803d;">${sales}</div>
+            <div style="font-size:11px; color:#15803d; font-weight:bold;">TOTAL SALES</div>
+            <div style="font-size:18px; font-weight:800; color:#15803d;">${sales}</div>
           </div>
           <div style="flex:1; background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:0.75rem; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
-            <div style="font-size:1.3rem; font-weight:800; color:#b91c1c;">${exp}</div>
+            <div style="font-size:11px; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
+            <div style="font-size:18px; font-weight:800; color:#b91c1c;">${exp}</div>
           </div>
           <div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:0.75rem; color:#1e3a8a; font-weight:bold;">NET PROFIT</div>
-            <div style="font-size:1.3rem; font-weight:800; color:#1e3a8a;">${profit}</div>
+            <div style="font-size:11px; color:#1e3a8a; font-weight:bold;">NET PROFIT</div>
+            <div style="font-size:18px; font-weight:800; color:#1e3a8a;">${profit}</div>
           </div>
         </div>
 
@@ -2330,23 +2300,12 @@
       `;
     }
 
-    async function exportReportsPDF() {
-      const html = await buildReportsTabHtml();
-      const blob = await renderCleanPdfBlob(html);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BANABLAST_Report_${today}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    function exportReportsPDF() {
+      generatePdfDocument(getReportsTabHtmlContent(), `BANABLAST_Report_${today}.pdf`, false);
     }
 
-    async function shareReportsViaWhatsAppPDF() {
-      const html = await buildReportsTabHtml();
-      const blob = await renderCleanPdfBlob(html);
-      await executeDirectShareOrDownload(blob, `BANABLAST_Report_${today}.pdf`, `Financial Report`);
+    function shareReportsViaWhatsAppPDF() {
+      generatePdfDocument(getReportsTabHtmlContent(), `BANABLAST_Report_${today}.pdf`, true, `Financial Report`);
     }
 
     /* -------------------------------------------------------------
@@ -2789,7 +2748,7 @@
     }
 
     /* -------------------------------------------------------------
-       8. UNIVERSAL LEDGER SHEET (ADDED BY ട്രാക്കിംഗ് സഹിതം)
+       8. UNIVERSAL LEDGER SHEET
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -2943,7 +2902,7 @@
     }
 
     /* -------------------------------------------------------------
-       9. RUNNING BALANCE BREAKDOWN & OPENING BALANCE
+       9. RUNNING BREAKDOWN & OPENING BALANCE
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
