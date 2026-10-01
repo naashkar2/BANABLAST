@@ -1238,7 +1238,7 @@
   <!-- =================== [PART 1 അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
-    const MASTER_SECURITY_KEY = "9999"; // PIN മറന്നുപോയാൽ റീസെറ്റ് ചെയ്യാനുള്ള Master Security Code
+    const MASTER_SECURITY_KEY = "9999"; // PIN മറന്നുപോയാൽ റീസെറ്റ് ചെയ്യാനുള്ള മാസ്റ്റർ കോഡ്
 
     // നിങ്ങളുടെ GEMINI API KEY (GitHub ബോട്ട് നീക്കം ചെയ്യാത്ത വിധം Base64 എൻകോഡ് ചെയ്തത്)
     const HARDCODED_GEMINI_KEY = atob("QVEuQWI4Uk42TFZWVUxGRms5YTBqX0p1TTRMdjB5VE5heGR2MHdxeURGVjByZWhFV2tLRFE=");
@@ -1675,7 +1675,7 @@
     }
 
     /* -------------------------------------------------------------
-       ENTRY MODAL ACTIONS
+       ENTRY MODAL ACTIONS (ADDED BY ഉൾപ്പെടുത്തി സേവ് ചെയ്യുന്നു)
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -1750,6 +1750,7 @@
       document.getElementById(id).style.display = 'none';
     }
 
+    // കണക്കുകൾ രേഖപ്പെടുത്തുമ്പോൾ ലോഗിൻ ചെയ്ത ആളുടെ പേര് കൂടി തനിയെ സേവ് ആകുന്നു
     function saveEntry() {
       const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
@@ -1802,6 +1803,7 @@
         mode,
         note,
         items,
+        addedBy: currentLoggedInUser || 'Admin', // ലോഗിൻ ചെയ്ത പാർട്ണറുടെ പേര് തനിയെ രേഖപ്പെടുത്തുന്നു
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -1820,6 +1822,7 @@
       }
     }
 
+    // ഡെയ്‌ലി ലിസ്റ്റിൽ ആരാണ് ചേർത്തത് എന്ന് കാണിക്കുന്നു
     function renderDailyAccounts() {
       const curDate = document.getElementById('selectedDate').value || today;
       const todayTrans = transactions.filter(t => t.date === curDate);
@@ -1834,6 +1837,7 @@
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
         const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
         let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
+        let addedByTag = t.addedBy ? `<span style="color:#0284c7; font-weight:700;">👤 ${t.addedBy}</span> • ` : '';
 
         const rowHTML = `
           <div class="entry-row">
@@ -1843,7 +1847,7 @@
                 <span class="mode-badge ${badgeClass}">${t.mode.toUpperCase()}</span>
               </div>
               <div class="entry-sub">
-                ${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
+                ${addedByTag}${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
               </div>
             </div>
             <div class="entry-right">
@@ -2167,7 +2171,6 @@
       alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
     }
 
-    // ലോഗിൻ ചെയ്ത പാർട്ണർക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyInvestment(invId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
         alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
@@ -2230,7 +2233,6 @@
       alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
     }
 
-    // ലോഗിൻ ചെയ്ത പാർട്ണർക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyWithdrawal(wthId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
         alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
@@ -2336,7 +2338,7 @@
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
                 ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`}
               </span>
-              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️</button>
+              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️️</button>
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
@@ -2398,7 +2400,7 @@
     }
 
     /* -------------------------------------------------------------
-       UNIVERSAL HISTORY SHEET MODAL
+       UNIVERSAL HISTORY SHEET MODAL (ADDED BY കാണിച്ച് നൽകുന്നു)
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -2440,6 +2442,7 @@
       }
     }
 
+    // ലെഡ്ജർ ഷീറ്റിൽ ആരാണ് ചേർത്തത് (Added by) എന്ന് രേഖപ്പെടുത്തുന്നു
     function renderItemSheetContent(forcedCategory = '') {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -2518,12 +2521,15 @@
           dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
         }
 
+        let addedByDisplay = t.addedBy ? `<div style="font-size:0.7rem; color:#0284c7; font-weight:700; margin-top:3px;">👤 Added by: ${t.addedBy}</div>` : '';
+
         rowsHTML += `
           <tr class="${hasItems && forcedCategory !== 'item_stock' ? 'collapsible-trigger' : ''}" onclick="${hasItems && forcedCategory !== 'item_stock' ? `toggleItemsDropdown('${rowId}')` : ''}">
             <td><strong>${t.date}</strong></td>
             <td>
-              ${t.note ? t.note : (isSale ? 'Sale' : t.category)}
-              ${hasItems && forcedCategory !== 'item_stock' ? '<span style="color:#0284c7; font-size:0.7rem; display:block;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
+              <div>${t.note ? t.note : (isSale ? 'Sale' : t.category)}</div>
+              ${addedByDisplay}
+              ${hasItems && forcedCategory !== 'item_stock' ? '<span style="color:#0284c7; font-size:0.7rem; display:block; margin-top:2px;">▼ സാധനങ്ങൾ കാണുക</span>' : ''}
               ${itemsDropdownHTML}
             </td>
             <td><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
