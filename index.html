@@ -1735,10 +1735,10 @@
         };
 
         // പുതിയതും പഴയതുമായ എല്ലാ മോഡൽ ലിങ്കുകളും സപ്പോർട്ട് ചെയ്യുന്നു
-         const endpoints = [
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${dynamicGeminiKey}`,
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${dynamicGeminiKey}`,
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${dynamicGeminiKey}`
+                 const endpoints = [
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + dynamicGeminiKey.trim(),
+          "https://generativelanguage.googleapis.com/v1/models/gemini-3.8-flash:generateContent?key=" + dynamicGeminiKey.trim(),
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + dynamicGeminiKey.trim()
         ];
 
         let res = null;
