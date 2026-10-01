@@ -511,8 +511,46 @@
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
-    .btn-submit { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; margin-top: 8px; }
-    .btn-cancel { width: 100%; padding: 11px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: var(--text-dark); font-weight: 700; cursor: pointer; margin-top: 6px; }
+    
+    /* 🌟 ബട്ടണുകൾ വ്യക്തവും ഭംഗിയുള്ളതുമാക്കിയ ഹൈ-കോൺട്രാസ്റ്റ് സ്റ്റൈൽ 🌟 */
+    .btn-submit { 
+      width: 100%; 
+      padding: 13px; 
+      border: none; 
+      border-radius: 10px; 
+      font-weight: 700; 
+      color: #ffffff !important; 
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; 
+      font-size: 1rem; 
+      cursor: pointer; 
+      margin-top: 10px; 
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transition: all 0.15s ease;
+      display: block;
+      text-align: center;
+    }
+    .btn-submit:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+    .btn-cancel { 
+      width: 100%; 
+      padding: 12px; 
+      background: #f1f5f9; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 10px; 
+      color: #0f172a !important; 
+      font-weight: 700; 
+      font-size: 0.95rem;
+      cursor: pointer; 
+      margin-top: 8px; 
+      transition: all 0.15s ease;
+      display: block;
+      text-align: center;
+    }
+    .btn-cancel:active {
+      background: #e2e8f0;
+    }
 
     /* Tables */
     .sheet-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
@@ -558,6 +596,36 @@
       margin: 4px 0 8px; 
       border: 1px solid #e2e8f0; 
     }
+
+    /* 📄 പ്രൊഫഷണൽ ആപ്പ് സ്റ്റൈൽ PDF പ്രിന്റ് ഏരിയ 📄 */
+    .pdf-styled-container {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+    .pdf-header-banner {
+      background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
+      color: white;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .pdf-header-banner h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin: 0;
+      color: #ffffff;
+    }
+    .pdf-header-banner p {
+      font-size: 0.82rem;
+      color: #bfdbfe;
+      margin-top: 4px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -566,7 +634,7 @@
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
 
-  <!-- പ്രൊഫഷണൽ ഹെഡർ (ലോഗോ & യൂസർ ബാർ സഹിതം) -->
+  <!-- പ്രൊഫഷണൽ ഹെഡർ -->
   <header class="app-header">
     <div class="header-top-row">
       <div class="brand-box">
@@ -751,7 +819,10 @@
         <div class="list-row"><span>Daily Miscellaneous:</span><strong id="repMiscSum">₹0</strong></div>
       </div>
 
-      <button class="btn-submit" style="background:#2563eb;" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-submit" style="background:#2563eb !important; flex:1;" onclick="exportReportsPDF()">📄 PDF ആക്കുക</button>
+        <button class="btn-submit" style="background:#15803d !important; flex:1;" onclick="shareReportsViaWhatsAppPDF()">💬 WhatsApp PDF</button>
+      </div>
     </div>
 
     <!-- TAB 5: INVESTMENTS & WITHDRAWALS -->
@@ -846,7 +917,7 @@
 
   </div>
 
-  <!-- 1. ENTRY MODAL (ക്യാമറയും ഗാലറിയും ഉള്ളത്) -->
+  <!-- 1. ENTRY MODAL -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -864,7 +935,6 @@
         </select>
       </div>
 
-      <!-- ക്യാമറയും ഗാലറിയും ഒരുപോലെ വരാൻ capture നീക്കം ചെയ്തു -->
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
@@ -928,7 +998,7 @@
     </div>
   </div>
 
-  <!-- 2. TODAY'S SALES REPORT MODAL -->
+  <!-- 2. TODAY'S SALES REPORT MODAL (ആപ്പ് സ്റ്റൈൽ PDF ലേഔട്ട്) -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -936,49 +1006,44 @@
         <button onclick="closeModal('todayReportModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
       </div>
 
-      <div id="todayReportPrintArea" style="padding:10px 0;">
-        <div style="text-align:center; margin-bottom:12px;">
-          <h4 style="margin:0; font-size:1.2rem; color:var(--primary);">BANABLAST</h4>
-          <p id="repModalDateText" style="font-size:0.8rem; color:#64748b; margin-top:2px;">Date: -</p>
+      <!-- ആപ്പ് കാർഡ് ശൈലിയിലുള്ള പ്രിന്റ് ഏരിയ -->
+      <div id="todayReportPrintArea" class="pdf-styled-container" style="margin: 12px 0;">
+        <div class="pdf-header-banner">
+          <h2>🍌 BANABLAST</h2>
+          <p id="repModalDateText">Daily Accounts Summary</p>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-          <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:0.75rem; color:#15803d; font-weight:bold;">TOTAL SALES</div>
-            <div id="modalRepSales" style="font-size:1.2rem; font-weight:800; color:#15803d;">₹0</div>
-            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">Cash: <span id="modalRepSaleCash">₹0</span> | GPay: <span id="modalRepSaleGpay">₹0</span></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:12px; border-radius:10px; text-align:center;">
+            <div style="font-size:0.75rem; color:#15803d; font-weight:800; text-transform:uppercase;">TOTAL SALES</div>
+            <div id="modalRepSales" style="font-size:1.35rem; font-weight:800; color:#15803d; margin-top:2px;">₹0</div>
+            <div style="font-size:0.72rem; color:#475569; margin-top:3px;">Cash: <b id="modalRepSaleCash">₹0</b> | GPay: <b id="modalRepSaleGpay">₹0</b></div>
           </div>
-          <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:0.75rem; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
-            <div id="modalRepExp" style="font-size:1.2rem; font-weight:800; color:#b91c1c;">₹0</div>
-            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">Cash: <span id="modalRepExpCash">₹0</span> | GPay: <span id="modalRepExpGpay">₹0</span></div>
+          <div style="background:#fef2f2; border:1px solid #fecaca; padding:12px; border-radius:10px; text-align:center;">
+            <div style="font-size:0.75rem; color:#b91c1c; font-weight:800; text-transform:uppercase;">TOTAL EXPENSE</div>
+            <div id="modalRepExp" style="font-size:1.35rem; font-weight:800; color:#b91c1c; margin-top:2px;">₹0</div>
+            <div style="font-size:0.72rem; color:#475569; margin-top:3px;">Cash: <b id="modalRepExpCash">₹0</b> | GPay: <b id="modalRepExpGpay">₹0</b></div>
           </div>
         </div>
 
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:8px; text-align:center; margin-bottom:12px;">
-          <div style="font-size:0.8rem; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി</div>
-          <div id="modalRepProfit" style="font-size:1.4rem; font-weight:800; color:#1e3a8a; margin-top:2px;">₹0</div>
+        <div style="background:#eff6ff; border:2px solid #bfdbfe; padding:14px; border-radius:10px; text-align:center; margin-bottom:12px;">
+          <div style="font-size:0.8rem; font-weight:800; color:#1e3a8a; letter-spacing:0.5px;">NET DAILY PROFIT / ബാക്കി ലാഭം</div>
+          <div id="modalRepProfit" style="font-size:1.55rem; font-weight:800; color:#1e3a8a; margin-top:2px;">₹0</div>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:0.8rem;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Counter Cash Balance:</span>
-            <strong id="modalRepCashBal">₹0</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Bank / GPay Balance:</span>
-            <strong id="modalRepBankBal">₹0</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:4px; font-weight:bold; color:var(--primary);">
-            <span>Cumulative Total:</span>
-            <span id="modalRepTotalBal">₹0</span>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px; font-size:0.82rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Counter Cash Box:</span><strong id="modalRepCashBal">₹0</strong></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Bank / GPay Balance:</span><strong id="modalRepBankBal">₹0</strong></div>
+          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:6px; font-weight:800; color:var(--primary); font-size:0.9rem;">
+            <span>TOTAL CUMULATIVE BALANCE:</span><span id="modalRepTotalBal">₹0</span>
           </div>
         </div>
       </div>
 
+      <!-- നേരിട്ട് PDF ആയി വാട്സാപ്പിൽ അയക്കാനുള്ള ബട്ടൺ -->
       <div style="display:flex; gap:8px; margin-top:10px;">
-        <button class="btn-submit" style="background:#b91c1c; margin-top:0;" onclick="downloadTodayPDF()">📄 Download PDF</button>
-        <button class="btn-submit" style="background:#15803d; margin-top:0;" onclick="shareTodayWhatsApp()">💬 WhatsApp Share</button>
+        <button class="btn-submit" style="background:#b91c1c !important; margin-top:0; flex:1;" onclick="downloadTodayPDF()">📄 Download PDF</button>
+        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareTodayWhatsAppPDF()">💬 WhatsApp PDF</button>
       </div>
     </div>
   </div>
@@ -1001,7 +1066,7 @@
         <button class="filter-btn active" style="flex:0 0 60px;" onclick="applyCustomSheetDate()">Apply</button>
       </div>
 
-      <div id="sheetPrintArea" style="max-height:280px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+      <div id="sheetPrintArea" class="pdf-styled-container" style="max-height:280px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
         <table class="sheet-table">
           <thead>
             <tr>
@@ -1021,8 +1086,9 @@
       </div>
 
       <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn-submit" style="background:#2563eb; margin-top:0;" onclick="exportSingleSheetPDF()">📄 Print / PDF</button>
-        <button class="btn-cancel" style="margin-top:0;" onclick="closeModal('itemSheetModal')">Close Sheet</button>
+        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="exportSingleSheetPDF()">📄 Print / PDF</button>
+        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareSingleSheetWhatsAppPDF()">💬 WhatsApp PDF</button>
+        <button class="btn-cancel" style="margin-top:0; flex:0.7;" onclick="closeModal('itemSheetModal')">Close</button>
       </div>
     </div>
   </div>
@@ -1036,7 +1102,7 @@
       </div>
 
       <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകൾ:</p>
-      <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;"></div>
+      <div id="breakdownTableContainer" class="pdf-styled-container" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;"></div>
 
       <div class="sheet-total-box" style="margin-top:12px;">
         <span>CUMULATIVE BALANCE:</span>
@@ -1044,8 +1110,9 @@
       </div>
 
       <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn-submit" style="background:#2563eb; margin-top:0;" onclick="exportBreakdownPDF()">📄 PDF ആക്കി മാറ്റുക</button>
-        <button class="btn-cancel" style="margin-top:0;" onclick="closeModal('runningBreakdownModal')">Close</button>
+        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="exportBreakdownPDF()">📄 PDF ആക്കുക</button>
+        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareBreakdownWhatsAppPDF()">💬 WhatsApp PDF</button>
+        <button class="btn-cancel" style="margin-top:0; flex:0.7;" onclick="closeModal('runningBreakdownModal')">Close</button>
       </div>
     </div>
   </div>
@@ -1088,7 +1155,7 @@
         <input type="text" id="invNote" class="form-control" placeholder="e.g. Advance">
       </div>
 
-      <button class="btn-submit" style="background:var(--accent-purple);" onclick="saveInvestment()">Submit for Verification</button>
+      <button class="btn-submit" style="background:var(--accent-purple) !important;" onclick="saveInvestment()">Submit for Verification</button>
       <button class="btn-cancel" onclick="closeModal('investModal')">Cancel</button>
     </div>
   </div>
@@ -1131,7 +1198,7 @@
         <input type="text" id="withNote" class="form-control" placeholder="e.g. Profit withdrawal">
       </div>
 
-      <button class="btn-submit" style="background:var(--accent-red);" onclick="saveWithdrawal()">Submit for Verification</button>
+      <button class="btn-submit" style="background:var(--accent-red) !important;" onclick="saveWithdrawal()">Submit for Verification</button>
       <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancel</button>
     </div>
   </div>
@@ -1148,12 +1215,12 @@
         <label>Bank Account / GPay Opening (₹)</label>
         <input type="number" id="openBank" class="form-control" value="0">
       </div>
-      <button class="btn-submit" style="background:var(--primary);" onclick="saveOpeningBalance()">Save Opening</button>
+      <button class="btn-submit" onclick="saveOpeningBalance()">Save Opening</button>
       <button class="btn-cancel" onclick="closeModal('openingModal')">Cancel</button>
     </div>
   </div>
 
-  <!-- 8. PARTNER LOGIN MODAL (PIN വഴി ലോഗിൻ) -->
+  <!-- 8. PARTNER LOGIN MODAL (ഹൈ-കോൺട്രാസ്റ്റ് ബട്ടൺ) -->
   <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.88); z-index: 2000;">
     <div class="modal-box" style="text-align: center;">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
@@ -1174,17 +1241,19 @@
         <input type="password" id="loginPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
       </div>
 
-      <button type="button" class="btn-submit" onclick="submitPartnerLogin()">ലോഗിൻ ചെയ്യുക (Login)</button>
+      <button type="button" class="btn-submit" onclick="submitPartnerLogin()">
+        ലോഗിൻ ചെയ്യുക (Login)
+      </button>
       
       <div style="margin-top: 14px;">
-        <button type="button" class="btn-link" onclick="openForgotPinModal()" style="font-size: 0.8rem; color: #0284c7;">
+        <button type="button" class="btn-link" onclick="openForgotPinModal()" style="font-size: 0.82rem; color: #0284c7; font-weight: 700;">
           PIN മറന്നുപോയോ? (Forgot PIN?)
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 9. CHANGE PIN MODAL (PIN മാറ്റാനുള്ള വിൻഡോ) -->
+  <!-- 9. CHANGE PIN MODAL (ഹൈ-കോൺട്രാസ്റ്റ് ബട്ടൺ) -->
   <div class="modal" id="changePinModal" style="display:none; background: rgba(15, 23, 42, 0.8); z-index: 2100;">
     <div class="modal-box">
       <h3 style="color: var(--primary); margin-bottom: 6px;">🔑 PIN മാറ്റുക (Change PIN)</h3>
@@ -1200,12 +1269,16 @@
         <input type="password" id="newPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
       </div>
 
-      <button type="button" class="btn-submit" onclick="submitChangePin()">PIN അപ്‌ഡേറ്റ് ചെയ്യുക</button>
-      <button type="button" class="btn-cancel" onclick="closeModal('changePinModal')">Cancel</button>
+      <button type="button" class="btn-submit" onclick="submitChangePin()">
+        PIN അപ്‌ഡേറ്റ് ചെയ്യുക
+      </button>
+      <button type="button" class="btn-cancel" onclick="closeModal('changePinModal')">
+        Cancel
+      </button>
     </div>
   </div>
 
-  <!-- 10. FORGOT PIN MODAL (മാസ്റ്റർ കോഡ് വഴി റീസെറ്റ് ചെയ്യൽ) -->
+  <!-- 10. FORGOT PIN MODAL (ഹൈ-കോൺട്രാസ്റ്റ് ബട്ടൺ) -->
   <div class="modal" id="forgotPinModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2200;">
     <div class="modal-box">
       <h3 style="color: var(--primary); margin-bottom: 6px;">🔄 Reset PIN</h3>
@@ -1230,8 +1303,12 @@
         <input type="password" id="resetNewPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
       </div>
 
-      <button type="button" class="btn-submit" onclick="submitResetPin()">PIN റീസെറ്റ് ചെയ്യുക</button>
-      <button type="button" class="btn-cancel" onclick="closeModal('forgotPinModal')">Cancel</button>
+      <button type="button" class="btn-submit" onclick="submitResetPin()">
+        PIN റീസെറ്റ് ചെയ്യുക
+      </button>
+      <button type="button" class="btn-cancel" onclick="closeModal('forgotPinModal')">
+        Cancel
+      </button>
     </div>
   </div>
 
@@ -1240,7 +1317,7 @@
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999"; // PIN മറന്നുപോയാൽ റീസെറ്റ് ചെയ്യാനുള്ള മാസ്റ്റർ കോഡ്
 
-    // നിങ്ങളുടെ GEMINI API KEY (GitHub ബോട്ട് നീക്കം ചെയ്യാത്ത വിധം Base64 എൻകോഡ് ചെയ്തത്)
+    // Gemini API Key (ക്ലൗഡ് AI ബിൽ സ്കാനിംഗിനായി Base64 എൻകോഡ് ചെയ്തത്)
     const HARDCODED_GEMINI_KEY = atob("QVEuQWI4Uk42TFZWVUxGRms5YTBqX0p1TTRMdjB5VE5heGR2MHdxeURGVjByZWhFV2tLRFE=");
 
     // ഡിഫോൾട്ട് PIN കോഡുകൾ
@@ -1291,7 +1368,7 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       AUTH & PIN MANAGEMENT (LOGIN, CHANGE PIN, FORGOT PIN)
+       1. AUTH & PIN MANAGEMENT (LOGIN, CHANGE PIN, FORGOT PIN)
        ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
@@ -1399,7 +1476,7 @@
     }
 
     /* -------------------------------------------------------------
-       INITIALIZATION & FIRESTORE SYNC
+       2. INITIALIZATION & FIRESTORE SYNC
        ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
@@ -1592,7 +1669,7 @@
     }
 
     /* -------------------------------------------------------------
-       GEMINI AI BILL SCANNER (ക്യാമറ & ഗാലറി)
+       3. GEMINI AI BILL SCANNER (ക്യാമറ & ഗാലറി)
        ------------------------------------------------------------- */
     async function handleBillImageUpload(event) {
       const file = event.target.files[0];
@@ -1675,7 +1752,7 @@
     }
 
     /* -------------------------------------------------------------
-       ENTRY MODAL ACTIONS (ADDED BY ഉൾപ്പെടുത്തി സേവ് ചെയ്യുന്നു)
+       4. ENTRY MODAL ACTIONS (ADDED BY ട്രാക്കിംഗ് സഹിതം)
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -1750,7 +1827,7 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    // കണക്കുകൾ രേഖപ്പെടുത്തുമ്പോൾ ലോഗിൻ ചെയ്ത ആളുടെ പേര് കൂടി തനിയെ സേവ് ആകുന്നു
+    // കണക്ക് ചേർക്കുമ്പോൾ ലോഗിൻ ചെയ്ത ആളുടെ പേര് തനിയെ സേവ് ചെയ്യുന്നു
     function saveEntry() {
       const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
@@ -1803,7 +1880,7 @@
         mode,
         note,
         items,
-        addedBy: currentLoggedInUser || 'Admin', // ലോഗിൻ ചെയ്ത പാർട്ണറുടെ പേര് തനിയെ രേഖപ്പെടുത്തുന്നു
+        addedBy: currentLoggedInUser || 'Admin', // ആര് ചേർത്തതാണെന്ന് തനിയെ രേഖപ്പെടുത്തുന്നു
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -1822,7 +1899,7 @@
       }
     }
 
-    // ഡെയ്‌ലി ലിസ്റ്റിൽ ആരാണ് ചേർത്തത് എന്ന് കാണിക്കുന്നു
+    // ഡെയ്‌ലി അക്കൗണ്ട്സ് ലിസ്റ്റ് (Added by കാണിച്ച് നൽകുന്നു)
     function renderDailyAccounts() {
       const curDate = document.getElementById('selectedDate').value || today;
       const todayTrans = transactions.filter(t => t.date === curDate);
@@ -1927,9 +2004,55 @@
       document.getElementById('todayReportModal').style.display = 'flex';
     }
 
+    /* -------------------------------------------------------------
+       5. നേരിട്ടുള്ള WHATSAPP PDF ഷെയറിംഗ് എഞ്ചിൻ (DIRECT PDF SHARE)
+       ------------------------------------------------------------- */
+    async function shareElementDirectPDF(elementId, fileName, shareTitle) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        // html2pdf ഉപയോഗിച്ച് ബാക്ക്‌ഗ്രൗണ്ടിൽ നേരിട്ട് PDF Blob ഉണ്ടാക്കുന്നു
+        const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        // മൊബൈലിലെ വാട്സാപ്പ് വഴി നേരിട്ട് PDF അയക്കുന്നു
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({
+            files: [pdfFile],
+            title: shareTitle,
+            text: `🍌 BANABLAST - ${shareTitle}`
+          });
+        } else {
+          // ഡെസ്‌ക്‌ടോപ്പിലോ സപ്പോർട്ട് ഇല്ലാത്ത ബ്രൗസറിലോ ഫയൽ ഡൗൺലോഡ് ചെയ്യുന്നു
+          html2pdf().set(opt).from(element).save();
+          alert("✓ PDF തയ്യാറായിട്ടുണ്ട്. ഡൗൺലോഡ് ചെയ്ത ഫയൽ വാട്സാപ്പിൽ അയക്കാം!");
+        }
+      } catch (err) {
+        console.error("PDF Share Error:", err);
+        if (err.name !== 'AbortError') {
+          // എന്തെങ്കിലും തടസ്സമുണ്ടായാൽ സാധാ ഡൗൺലോഡ് നടത്തുന്നു
+          html2pdf().set(opt).from(element).save();
+        }
+      }
+    }
+
+    // ഇന്നത്തെ റിപ്പോർട്ട് നേരിട്ട് വാട്സാപ്പിലേക്ക് PDF ആയി അയക്കുന്നു
+    function shareTodayWhatsAppPDF() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      shareElementDirectPDF('todayReportPrintArea', `BANABLAST_Report_${curDate}.pdf`, `Today's Sales Report (${curDate})`);
+    }
+
     function downloadTodayPDF() {
       const curDate = document.getElementById('selectedDate').value || today;
-      const element = document.getElementById('todayReportPrintArea');
       const opt = {
         margin: 10,
         filename: `BANABLAST_Report_${curDate}.pdf`,
@@ -1937,24 +2060,60 @@
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(document.getElementById('todayReportPrintArea')).save();
     }
 
-    function shareTodayWhatsApp() {
-      const curDate = document.getElementById('selectedDate').value || today;
-      const sales = document.getElementById('sumDailySales').innerText;
-      const exp = document.getElementById('sumDailyExp').innerText;
-      const profit = document.getElementById('sumDailyProfit').innerText;
-      const cashBal = document.getElementById('runCashBal').innerText;
-      const bankBal = document.getElementById('runBankBal').innerText;
-      const totBal = document.getElementById('runTotalBal').innerText;
-
-      const message = `🍌 *BANABLAST - TODAY'S SALES REPORT* 🍌\n📅 Date: ${curDate}\n----------------------------\n💰 Total Sales: ${sales}\n💸 Total Expense: ${exp}\n📈 Net Daily Profit: ${profit}\n----------------------------\n📦 *RUNNING BALANCES:*\n💵 Cash Box: ${cashBal}\n💳 Bank/GPay: ${bankBal}\n📊 *TOTAL BALANCE: ${totBal}*\n----------------------------\n_Generated via BANABLAST Business Ledger_`;
-
-      const waURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-      window.open(waURL, '_blank');
+    // ലെഡ്ജർ ഷീറ്റ് വാട്സാപ്പിലേക്ക് നേരിട്ട് PDF ആയി അയക്കുന്നു
+    function shareSingleSheetWhatsAppPDF() {
+      shareElementDirectPDF('sheetPrintArea', `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, `${activeSheetKey.toUpperCase()} Ledger Sheet`);
     }
 
+    function exportSingleSheetPDF() {
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(document.getElementById('sheetPrintArea')).save();
+    }
+
+    // ബ്രേക്ക്ഡൗൺ വാട്സാപ്പിലേക്ക് നേരിട്ട് PDF ആയി അയക്കുന്നു
+    function shareBreakdownWhatsAppPDF() {
+      shareElementDirectPDF('breakdownTableContainer', `BANABLAST_Balance_Statement_${today}.pdf`, `Account Breakdown Statement`);
+    }
+
+    function exportBreakdownPDF() {
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(document.getElementById('breakdownTableContainer')).save();
+    }
+
+    // മെയിൻ റിപ്പോർട്ട് ടാബ് വാട്സാപ്പിലേക്ക് നേരിട്ട് PDF ആയി അയക്കുന്നു
+    function shareReportsViaWhatsAppPDF() {
+      shareElementDirectPDF('tab-reports', `BANABLAST_Report_${today}.pdf`, `Financial Report`);
+    }
+
+    function exportReportsPDF() {
+      const opt = {
+        margin: 10,
+        filename: `BANABLAST_Report_${today}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(document.getElementById('tab-reports')).save();
+    }
+
+    /* -------------------------------------------------------------
+       6. STOCK, SUPPLIERS & REPORTS TABS
+       ------------------------------------------------------------- */
     function renderStockItemsTab() {
       const container = document.getElementById('stockItemsListContainer');
       const itemMap = {};
@@ -2123,20 +2282,8 @@
       document.getElementById('repTotalOther').innerText = '₹' + (stock + misc);
     }
 
-    function exportReportsPDF() {
-      const element = document.getElementById('tab-reports');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Report_${today}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
     /* -------------------------------------------------------------
-       TAB 5: INVESTMENTS & WITHDRAWALS (PIN RESTRICTED VERIFICATION)
+       7. INVESTMENTS & WITHDRAWALS (സുരക്ഷിത വെരിഫിക്കേഷൻ)
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
@@ -2171,9 +2318,10 @@
       alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
     }
 
+    // ലോഗിൻ ചെയ്തയാൾക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyInvestment(invId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
         return;
       }
 
@@ -2233,9 +2381,10 @@
       alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
     }
 
+    // ലോഗിൻ ചെയ്തയാൾക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyWithdrawal(wthId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
         return;
       }
 
@@ -2338,7 +2487,7 @@
               <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
                 ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`}
               </span>
-              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️️</button>
+              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️</button>
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
@@ -2400,7 +2549,7 @@
     }
 
     /* -------------------------------------------------------------
-       UNIVERSAL HISTORY SHEET MODAL (ADDED BY കാണിച്ച് നൽകുന്നു)
+       8. UNIVERSAL LEDGER SHEET (ADDED BY ട്രാക്കിംഗ് കാണിച്ച് നൽകുന്നു)
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -2442,7 +2591,7 @@
       }
     }
 
-    // ലെഡ്ജർ ഷീറ്റിൽ ആരാണ് ചേർത്തത് (Added by) എന്ന് രേഖപ്പെടുത്തുന്നു
+    // ലെഡ്ജർ ഷീറ്റിൽ വിവരങ്ങൾക്ക് താഴെ Added by വ്യക്തമായി കാണിക്കുന്നു[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span)
     function renderItemSheetContent(forcedCategory = '') {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -2551,20 +2700,8 @@
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
     }
 
-    function exportSingleSheetPDF() {
-      const element = document.getElementById('sheetPrintArea');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
     /* -------------------------------------------------------------
-       RUNNING BALANCE BREAKDOWN & OPENING
+       9. RUNNING BALANCE BREAKDOWN & OPENING BALANCE
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
@@ -2588,6 +2725,10 @@
       else currentBal = (opening.cash || 0) + (opening.bank || 0);
 
       let tableHTML = `
+        <div style="background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%); color:white; padding:12px; border-radius:8px; text-align:center; margin-bottom:12px;">
+          <h3 style="margin:0; font-size:1.15rem; color:#fff;">🍌 BANABLAST</h3>
+          <p style="margin:2px 0 0; font-size:0.75rem; color:#bfdbfe;">${modeTitle} Statement (as of ${curDate})</p>
+        </div>
         <table class="sheet-table">
           <thead>
             <tr>
@@ -2648,18 +2789,6 @@
       modal.style.display = 'flex';
     }
 
-    function exportBreakdownPDF() {
-      const element = document.getElementById('breakdownTableContainer');
-      const opt = {
-        margin: 10,
-        filename: `BANABLAST_Balance_Statement_${today}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-
     function openOpeningModal() {
       document.getElementById('openCash').value = opening.cash || 0;
       document.getElementById('openBank').value = opening.bank || 0;
@@ -2678,7 +2807,7 @@
       closeModal('openingModal');
     }
 
-    // PWA Service Worker രജിസ്ട്രേഷൻ
+    // PWA Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
