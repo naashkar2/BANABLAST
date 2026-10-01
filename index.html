@@ -813,9 +813,9 @@
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
     // -------------------------------------------------------------
-    // GEMINI API KEY (നിങ്ങൾ എടുത്ത API Key ഇവിടെ നൽകുക)
+    // GEMINI API KEY (നേരിട്ട് ചേർത്തു)
     // -------------------------------------------------------------
-    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+    const GEMINI_API_KEY = "AQ.Ab8RN6IlUCNPfQzgAKwQwTLnUY_LByYaqdLkMv7IRny6yXP1sg"; 
 
     function handleLogoLoadError(img) {
       if (!img.dataset.retryEncoded) {
@@ -984,7 +984,7 @@
       if (sum > 0) {
         document.getElementById('suppTotalBill').value = sum;
         if (!document.getElementById('suppPaidAmount').value) {
-          document.getElementById('suppPaidAmount').value = sum; // ബൈ ഡിഫോൾട്ട് ഫുൾ പെയ്ഡ്
+          document.getElementById('suppPaidAmount').value = sum;
         }
       }
       calcPurchaseDue();
@@ -996,7 +996,7 @@
       const due = bill - paid;
 
       document.getElementById('suppDueText').innerText = '₹' + (due > 0 ? due : 0);
-      document.getElementById('entryAmount').value = paid; // അന്നത്തെ ചിലവായി കൊടുത്ത തുക നൽകുന്നു
+      document.getElementById('entryAmount').value = paid;
     }
 
     function getCollectedPurchaseItems() {
@@ -1017,11 +1017,6 @@
     async function handleBillImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-
-      if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-        alert("ദയവായി കോഡിൽ നിങ്ങളുടെ Gemini API Key നൽകുക!");
-        return;
-      }
 
       const loader = document.getElementById('scanLoadingBox');
       loader.style.display = 'block';
@@ -1195,7 +1190,7 @@
           billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
           paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
           dueAmount = billTotal - paidAmount;
-          amount = paidAmount; // അന്നത്തെ ദിവസച്ചിലവായി നൽകിയ തുക മാത്രം കൂട്ടുന്നു
+          amount = paidAmount;
         } else {
           amount = parseFloat(document.getElementById('entryAmount').value) || 0;
         }
