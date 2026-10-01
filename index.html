@@ -508,7 +508,7 @@
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
     
-    /* തെളിഞ്ഞ ബട്ടണുകൾ */
+    /* ബട്ടണുകൾ */
     .btn-submit { 
       width: 100%; 
       padding: 13px; 
@@ -550,7 +550,7 @@
     .sheet-table th { background: #f8fafc; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; }
     .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
 
-    /* Scan Banner & Items Table in Modal */
+    /* Scan Banner & Items */
     .scan-btn { 
       background: #0284c7; 
       color: white; 
@@ -587,6 +587,204 @@
       border-radius: 6px; 
       margin: 4px 0 8px; 
       border: 1px solid #e2e8f0; 
+    }
+
+    /* ============================================================
+       🌟 A4 LIVE PREVIEW MODAL STYLES (100% ZERO-BLANK ENGINE)
+       ============================================================ */
+    .a4-preview-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      z-index: 2500;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      padding: 16px 10px 40px;
+      backdrop-filter: blur(6px);
+    }
+    .a4-preview-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .a4-action-bar {
+      background: #1e293b;
+      padding: 10px 14px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .a4-action-bar h4 {
+      color: #ffffff;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    .a4-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .a4-btn {
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: white;
+      transition: all 0.15s;
+    }
+    .a4-btn-print { background: #2563eb; }
+    .a4-btn-wa { background: #16a34a; }
+    .a4-btn-close { background: #475569; }
+
+    /* യഥാർത്ഥ A4 പേപ്പർ ഡിസൈൻ */
+    .a4-sheet {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      min-height: 840px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .a4-header {
+      background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .a4-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .a4-header p {
+      margin: 2px 0 0;
+      font-size: 0.75rem;
+      color: #bfdbfe;
+      font-weight: 600;
+    }
+    .a4-meta-box {
+      text-align: right;
+      font-size: 0.75rem;
+      line-height: 1.3;
+    }
+    .a4-meta-box strong {
+      color: #fde047;
+      display: block;
+      font-size: 0.85rem;
+    }
+    .a4-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .a4-card {
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .a4-card.green { background: #f0fdf4; border-color: #86efac; }
+    .a4-card.red { background: #fef2f2; border-color: #fca5a5; }
+    .a4-card.blue { background: #eff6ff; border-color: #93c5fd; }
+    .a4-card h5 { font-size: 0.75rem; color: #475569; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; }
+    .a4-card p { font-size: 1.35rem; font-weight: 800; margin: 0; }
+    .a4-card span { font-size: 0.7rem; color: #64748b; margin-top: 2px; display: block; }
+    
+    .a4-section-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .a4-section-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+    }
+    .a4-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.82rem;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .a4-row:last-child { border-bottom: none; }
+    
+    .a4-footer {
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 14px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 0.72rem;
+      color: #64748b;
+    }
+    .a4-sign-grid {
+      display: flex;
+      gap: 16px;
+    }
+    .a4-sign-col {
+      text-align: center;
+      border-top: 1px solid #94a3b8;
+      width: 70px;
+      padding-top: 3px;
+      font-weight: 700;
+      font-size: 0.65rem;
+      color: #334155;
+    }
+
+    /* പ്രിന്റിംഗ് സിസ്റ്റം (ക്രോം / സഫാരി നേറ്റീവ് PDF) */
+    @media print {
+      body * { visibility: hidden !important; }
+      #a4PreviewModal, #a4PreviewModal * { visibility: visible !important; }
+      #a4PreviewModal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      .a4-action-bar { display: none !important; }
+      .a4-sheet {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 10mm !important;
+        min-height: auto !important;
+      }
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
   </style>
 </head>
@@ -784,8 +982,7 @@
       </div>
 
       <div style="display:flex; gap:8px;">
-        <button class="btn-submit" style="background:#2563eb !important; flex:1;" onclick="exportReportsPDF()">📄 PDF ആക്കുക</button>
-        <button class="btn-submit" style="background:#15803d !important; flex:1;" onclick="shareReportsViaWhatsAppPDF()">💬 WhatsApp PDF</button>
+        <button class="btn-submit" style="background:#2563eb !important; flex:1;" onclick="previewReportsA4()">📄 A4 PDF Preview</button>
       </div>
     </div>
 
@@ -879,6 +1076,25 @@
       <div id="withdrawListContainer"></div>
     </div>
 
+  </div>
+
+  <!-- 🌟 A4 LIVE PREVIEW MODAL (ഇവിടെ നേരിട്ട് A4 ഡിസൈൻ കാണാം) -->
+  <div class="a4-preview-modal" id="a4PreviewModal">
+    <div class="a4-preview-container">
+      <div class="a4-action-bar">
+        <h4 id="a4BarTitle">A4 Statement Preview</h4>
+        <div class="a4-btn-group">
+          <button type="button" class="a4-btn a4-btn-print" onclick="printOrSaveCurrentA4()">🖨️ Print / Save PDF</button>
+          <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp</button>
+          <button type="button" class="a4-btn a4-btn-close" onclick="closeA4PreviewModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- റെൻഡർ ചെയ്യപ്പെടുന്ന യഥാർത്ഥ A4 പേജ് -->
+      <div class="a4-sheet" id="a4SheetPaper">
+        <!-- ഡൈനാമിക് ആയി ഇവിടെ ഡാറ്റ നിറയും -->
+      </div>
+    </div>
   </div>
 
   <!-- 1. ENTRY MODAL -->
@@ -1010,9 +1226,11 @@
         </div>
       </div>
 
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button class="btn-submit" style="background:#b91c1c !important; margin-top:0; flex:1;" onclick="downloadTodayPDF()">📄 Download PDF</button>
-        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareTodayWhatsAppPDF()">💬 WhatsApp PDF</button>
+      <div style="margin-top:10px;">
+        <!-- നേരിട്ട് A4 Preview തുറക്കുന്ന ബട്ടൺ -->
+        <button class="btn-submit" style="background:#2563eb !important; margin-top:0;" onclick="previewTodayA4()">
+          📄 VIEW & PRINT A4 PDF PREVIEW
+        </button>
       </div>
     </div>
   </div>
@@ -1055,8 +1273,7 @@
       </div>
 
       <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="exportSingleSheetPDF()">📄 Print / PDF</button>
-        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareSingleSheetWhatsAppPDF()">💬 WhatsApp PDF</button>
+        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="previewLedgerSheetA4()">📄 A4 Preview</button>
         <button class="btn-cancel" style="margin-top:0; flex:0.7;" onclick="closeModal('itemSheetModal')">Close</button>
       </div>
     </div>
@@ -1079,8 +1296,7 @@
       </div>
 
       <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="exportBreakdownPDF()">📄 PDF ആക്കുക</button>
-        <button class="btn-submit" style="background:#15803d !important; margin-top:0; flex:1;" onclick="shareBreakdownWhatsAppPDF()">💬 WhatsApp PDF</button>
+        <button class="btn-submit" style="background:#2563eb !important; margin-top:0; flex:1;" onclick="previewBreakdownA4()">📄 A4 Preview</button>
         <button class="btn-cancel" style="margin-top:0; flex:0.7;" onclick="closeModal('runningBreakdownModal')">Close</button>
       </div>
     </div>
@@ -1276,7 +1492,7 @@
     <div class="modal-box">
       <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ Gemini AI API Key</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
-        Google AI Studio-ൽ നിന്ന് സൗജന്യമായി എടുത്ത API Key ഇവിടെ നൽകുക:
+        Google AI Studio-ൽ നിന്ന് എടുത്ത API Key ഇവിടെ നൽകുക:
       </p>
 
       <div class="form-group">
@@ -1339,6 +1555,7 @@
     let currentSheetFilter = 'month';
     let currentBreakdownMode = 'total';
     let flatpickrCalendar = null;
+    let currentA4Title = "Statement";
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -1733,7 +1950,6 @@
           }]
         };
 
-        // ഏറ്റവും വേഗതയേറിയതും തിരക്കില്ലാത്തതുമായ മോഡലുകളുടെ ക്രമം
         const candidateModels = [
           "gemini-2.5-flash",
           "gemini-2.5-flash-lite",
@@ -2058,156 +2274,183 @@
     }
 
     /* -------------------------------------------------------------
-       5. 100% ZERO-BLANK PDF & DIRECT WHATSAPP SHARE ENGINE
+       5. 🌟 A4 LIVE PREVIEW & NATIVE PRINT / SHARE ENGINE (ZERO-BLANK)
        ------------------------------------------------------------- */
-    async function generatePdfDocument(contentHtml, fileName, isShare = false, shareTitle = 'BANABLAST Statement') {
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.85);z-index:999998;display:flex;align-items:center;justify-content:center;color:#ffffff;font-weight:bold;font-size:16px;backdrop-filter:blur(4px);';
-      overlay.innerText = '📄 PDF തയ്യാറാക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
-      document.body.appendChild(overlay);
+    function openA4PreviewModal(htmlContent, title) {
+      currentA4Title = title || "BANABLAST_Report";
+      document.getElementById('a4BarTitle').innerText = title;
+      document.getElementById('a4SheetPaper').innerHTML = htmlContent;
+      document.getElementById('a4PreviewModal').style.display = 'flex';
+    }
 
-      // മൊബൈൽ സ്ക്രോൾ തകരാറുകൾ ഒഴിവാക്കാൻ തനിയെ മുകളിലേക്ക് കൊണ്ടുവരുന്നു
-      const originalScrollY = window.scrollY;
-      window.scrollTo(0, 0);
+    function closeA4PreviewModal() {
+      document.getElementById('a4PreviewModal').style.display = 'none';
+    }
 
-      const printDiv = document.createElement('div');
-      printDiv.style.cssText = 'position:absolute;top:0;left:0;width:750px;background:#ffffff;color:#0f172a;padding:25px;z-index:999999;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
-      printDiv.innerHTML = `
-        <div style="border:2px solid #1e3a8a; border-radius:12px; padding:20px; background:#ffffff;">
-          <div style="text-align:center; margin-bottom:16px; border-bottom:2px solid #1e3a8a; padding-bottom:12px;">
-            <h1 style="margin:0; color:#1e3a8a; font-size:26px; font-weight:800; letter-spacing:1px;">BANABLAST</h1>
-            <p style="margin:4px 0 0; color:#64748b; font-size:13px; font-weight:700;">BUSINESS LEDGER FINANCIAL STATEMENT</p>
-          </div>
-          ${contentHtml}
-          <div style="text-align:center; font-size:11px; color:#94a3b8; border-top:1px dashed #cbd5e1; margin-top:24px; padding-top:10px;">
-            BANABLAST Digital Ledger • Automated Cloud System Document
-          </div>
-        </div>
-      `;
-      document.body.appendChild(printDiv);
+    // ഫോണിന്റെ നേറ്റീവ് പ്രിന്റർ വഴി 100% ഒറിജിനൽ വെക്ടർ PDF ഉണ്ടാക്കുന്നു (ഒരിക്കലും ബ്ലാങ്ക് ആകില്ല)
+    function printOrSaveCurrentA4() {
+      window.print();
+    }
 
-      // ഫോണ്ടുകളും ഇമേജുകളും കൃത്യമായി ലോഡ് ആവാൻ 350ms കാത്തിരിക്കുന്നു
-      await new Promise(r => setTimeout(r, 350));
-
-      const opt = {
-        margin: [8, 8, 8, 8],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 800 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      const cleanup = () => {
-        window.scrollTo(0, originalScrollY);
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-        if (printDiv.parentNode) printDiv.parentNode.removeChild(printDiv);
-      };
+    // വാട്സാപ്പിലേക്ക് നേരിട്ട് ഷെയർ ചെയ്യൽ
+    async function shareCurrentA4WhatsApp() {
+      const paper = document.getElementById('a4SheetPaper');
+      const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        if (!isShare) {
-          await html2pdf().set(opt).from(printDiv).save();
-          cleanup();
-        } else {
-          const pdfBlob = await html2pdf().set(opt).from(printDiv).output('blob');
-          cleanup();
-          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({
-              files: [pdfFile],
-              title: shareTitle,
-              text: `BANABLAST - ${shareTitle}`
-            });
-          } else {
-            const url = URL.createObjectURL(pdfBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert("✅ PDF ഫയൽ തയ്യാറായിട്ടുണ്ട്. ഡൗൺലോഡ് ചെയ്ത ഫയൽ വാട്സാപ്പിൽ അയക്കാം!");
-          }
+        const pdfBlob = await html2pdf().set(opt).from(paper).output('blob');
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({
+            files: [pdfFile],
+            title: currentA4Title,
+            text: `BANABLAST - ${currentA4Title}`
+          });
+        } else {
+          // ഡൗൺലോഡ് ചെയ്ത ശേഷം വാട്സാപ്പ് ഓപ്പൺ ചെയ്യുന്നു
+          const url = URL.createObjectURL(pdfBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          const shareText = encodeURIComponent(`📄 BANABLAST - ${currentA4Title}\nതീയതി: ${document.getElementById('selectedDate').value || today}\nPDF ഫയൽ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്.`);
+          window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
         }
       } catch (err) {
-        console.error("PDF Engine Error:", err);
-        cleanup();
+        console.error("WhatsApp share error:", err);
         if (err.name !== 'AbortError') {
-          alert("❌ PDF നിർമ്മിക്കുന്നതിൽ തടസ്സം നേരിട്ടു.");
+          window.print();
         }
       }
     }
 
-    // 1. ഇന്നത്തെ റിപ്പോർട്ട്
-    function getTodayReportHtmlContent() {
+    // 1. ഇന്നത്തെ റിപ്പോർട്ട് A4 പ്രിവ്യൂ
+    function previewTodayA4() {
+      closeModal('todayReportModal');
       const curDate = document.getElementById('selectedDate').value || today;
-      const sales = document.getElementById('modalRepSales').innerText;
-      const sCash = document.getElementById('modalRepSaleCash').innerText;
-      const sGpay = document.getElementById('modalRepSaleGpay').innerText;
+      const sales = document.getElementById('sumDailySales').innerText;
+      const sCash = document.getElementById('subSaleCash').innerText;
+      const sGpay = document.getElementById('subSaleGPay').innerText;
 
-      const exp = document.getElementById('modalRepExp').innerText;
-      const eCash = document.getElementById('modalRepExpCash').innerText;
-      const eGpay = document.getElementById('modalRepExpGpay').innerText;
+      const exp = document.getElementById('sumDailyExp').innerText;
+      const eCash = document.getElementById('subExpCash').innerText;
+      const eGpay = document.getElementById('subExpGPay').innerText;
 
-      const profit = document.getElementById('modalRepProfit').innerText;
-      const cashBal = document.getElementById('modalRepCashBal').innerText;
-      const bankBal = document.getElementById('modalRepBankBal').innerText;
-      const totBal = document.getElementById('modalRepTotalBal').innerText;
+      const profit = document.getElementById('sumDailyProfit').innerText;
+      const cashBal = document.getElementById('runCashBal').innerText;
+      const bankBal = document.getElementById('runBankBal').innerText;
+      const totBal = document.getElementById('runTotalBal').innerText;
 
-      return `
-        <div style="text-align:center; margin-bottom:14px;">
-          <h3 style="margin:0; font-size:16px; color:#1e3a8a;">DAILY SALES & PROFIT REPORT</h3>
-          <p style="margin:2px 0 0; color:#64748b; font-size:13px; font-weight:700;">Date: ${curDate}</p>
-        </div>
-
-        <div style="display:flex; gap:12px; margin-bottom:14px;">
-          <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; padding:12px; border-radius:10px; text-align:center;">
-            <div style="font-size:12px; color:#15803d; font-weight:bold;">TOTAL SALES</div>
-            <div style="font-size:22px; font-weight:800; color:#15803d; margin:4px 0;">${sales}</div>
-            <div style="font-size:11px; color:#64748b;">Cash: ${sCash} | GPay: ${sGpay}</div>
+      const todayTrans = transactions.filter(t => t.date === curDate);
+      let transRows = '';
+      todayTrans.forEach(t => {
+        const isSale = t.type === 'sale';
+        transRows += `
+          <div class="a4-row">
+            <span><strong>${t.title || t.extra}</strong> (${t.mode.toUpperCase()}) ${t.note ? '• ' + t.note : ''}</span>
+            <strong style="color:${isSale ? '#16a34a' : '#dc2626'};">${isSale ? '+' : '-'}${t.amount}</strong>
           </div>
-          <div style="flex:1; background:#fef2f2; border:1px solid #fecaca; padding:12px; border-radius:10px; text-align:center;">
-            <div style="font-size:12px; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
-            <div style="font-size:22px; font-weight:800; color:#b91c1c; margin:4px 0;">${exp}</div>
-            <div style="font-size:11px; color:#64748b;">Cash: ${eCash} | GPay: ${eGpay}</div>
+        `;
+      });
+
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>BUSINESS LEDGER & SALES REPORT</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>STATEMENT DATE</span>
+            <strong>${curDate}</strong>
           </div>
         </div>
 
-        <div style="background:#eff6ff; border:2px solid #bfdbfe; padding:14px; border-radius:10px; text-align:center; margin-bottom:14px;">
-          <div style="font-size:13px; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി ലാഭം</div>
-          <div style="font-size:24px; font-weight:800; color:#1e3a8a; margin-top:2px;">${profit}</div>
+        <div class="a4-card-grid">
+          <div class="a4-card green">
+            <h5>Total Sales (വരവ്)</h5>
+            <p style="color:#16a34a;">${sales}</p>
+            <span>Cash: ${sCash} | GPay: ${sGpay}</span>
+          </div>
+          <div class="a4-card red">
+            <h5>Total Expense (ചിലവ്)</h5>
+            <p style="color:#dc2626;">${exp}</p>
+            <span>Cash: ${eCash} | GPay: ${eGpay}</span>
+          </div>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:10px; font-size:13px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Counter Cash Box Balance:</span><strong>${cashBal}</strong></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Bank / GPay Account Balance:</span><strong>${bankBal}</strong></div>
-          <div style="display:flex; justify-content:space-between; border-top:1px dashed #cbd5e1; padding-top:8px; font-weight:bold; color:#1e3a8a; font-size:15px;">
+        <div class="a4-card blue" style="margin-bottom:14px;">
+          <h5>Daily Net Profit / ബാക്കി</h5>
+          <p style="color:#1e3a8a; font-size:1.6rem;">${profit}</p>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>ഇന്നത്തെ ഇടപാടുകൾ (TODAY'S TRANSACTIONS)</span>
+            <span>AMOUNT (₹)</span>
+          </div>
+          ${transRows || '<div style="text-align:center; color:#94a3b8; padding:10px;">ഇന്ന് ഇടപാടുകൾ ഒന്നും നടന്നിട്ടില്ല</div>'}
+        </div>
+
+        <div class="a4-section-box" style="background:#eff6ff; border-color:#bfdbfe;">
+          <div class="a4-section-title" style="color:#1e3a8a; border-color:#bfdbfe;">
+            <span>റണ്ണിംഗ് ബാലൻസ് (RUNNING BALANCE STATUS)</span>
+            <span>CURRENT</span>
+          </div>
+          <div class="a4-row"><span>Counter Cash Box Balance:</span><strong>${cashBal}</strong></div>
+          <div class="a4-row"><span>Bank / GPay Account Balance:</span><strong>${bankBal}</strong></div>
+          <div class="a4-row" style="border-top:1px dashed #93c5fd; padding-top:6px; font-weight:800; font-size:0.95rem; color:#1e3a8a;">
             <span>TOTAL CUMULATIVE BALANCE:</span><span>${totBal}</span>
           </div>
         </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Digital Cloud Management • Certified Statement</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
+        </div>
       `;
+
+      openA4PreviewModal(html, `Daily_Report_${curDate}`);
     }
 
-    function downloadTodayPDF() {
-      const curDate = document.getElementById('selectedDate').value || today;
-      generatePdfDocument(getTodayReportHtmlContent(), `BANABLAST_Report_${curDate}.pdf`, false);
-    }
-
-    function shareTodayWhatsAppPDF() {
-      const curDate = document.getElementById('selectedDate').value || today;
-      generatePdfDocument(getTodayReportHtmlContent(), `BANABLAST_Report_${curDate}.pdf`, true, `Today's Sales Report (${curDate})`);
-    }
-
-    // 2. ലെഡ്ജർ ഷീറ്റ്
-    function getSingleSheetHtmlContent() {
+    // 2. ലെഡ്ജർ ഷീറ്റ് A4 പ്രിവ്യൂ
+    function previewLedgerSheetA4() {
+      closeModal('itemSheetModal');
       const title = document.getElementById('sheetItemTitle').innerText;
       const bodyRows = document.getElementById('sheetTableBody').innerHTML;
       const totSum = document.getElementById('sheetTotalSum').innerText;
 
-      return `
-        <h3 style="color:#1e3a8a; font-size:16px; margin-bottom:12px;">${title}</h3>
-        <table style="width:100%; border-collapse:collapse; font-size:12px; margin-top:10px;">
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>ACCOUNT STATEMENT & LEDGER SHEET</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>GENERATED DATE</span>
+            <strong>${today}</strong>
+          </div>
+        </div>
+
+        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
+
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
           <thead>
             <tr style="background:#f1f5f9; text-align:left;">
               <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Date</th>
@@ -2218,45 +2461,67 @@
           </thead>
           <tbody>${bodyRows}</tbody>
         </table>
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
-          <span>TOTAL AMOUNT:</span><span style="color:#dc2626;">${totSum}</span>
+
+        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
+          <span>TOTAL AMOUNT / CUMULATIVE:</span>
+          <span>${totSum}</span>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Business Ledger • Automated Record</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
         </div>
       `;
+
+      openA4PreviewModal(html, `Ledger_${activeSheetKey}`);
     }
 
-    function exportSingleSheetPDF() {
-      generatePdfDocument(getSingleSheetHtmlContent(), `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, false);
-    }
-
-    function shareSingleSheetWhatsAppPDF() {
-      generatePdfDocument(getSingleSheetHtmlContent(), `BANABLAST_Ledger_${activeSheetKey}_${today}.pdf`, true, `${activeSheetKey.toUpperCase()} Ledger Sheet`);
-    }
-
-    // 3. ബ്രേക്ക്ഡൗൺ
-    function getBreakdownHtmlContent() {
+    // 3. അക്കൗണ്ട് ബ്രേക്ക്ഡൗൺ A4 പ്രിവ്യൂ
+    function previewBreakdownA4() {
+      closeModal('runningBreakdownModal');
       const title = document.getElementById('breakdownTitle').innerText;
       const tableContent = document.getElementById('breakdownTableContainer').innerHTML;
       const tot = document.getElementById('breakdownTotalSum').innerText;
 
-      return `
-        <h3 style="color:#1e3a8a; font-size:16px; margin-bottom:12px;">${title}</h3>
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>CUMULATIVE AUDIT BREAKDOWN</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>DATE</span>
+            <strong>${today}</strong>
+          </div>
+        </div>
+
+        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
         ${tableContent}
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-top:14px; display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
-          <span>CUMULATIVE BALANCE:</span><span style="color:#0284c7;">${tot}</span>
+
+        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
+          <span>CUMULATIVE BALANCE:</span>
+          <span style="color:#0284c7;">${tot}</span>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Financial Summary</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
         </div>
       `;
+
+      openA4PreviewModal(html, `Balance_Breakdown`);
     }
 
-    function exportBreakdownPDF() {
-      generatePdfDocument(getBreakdownHtmlContent(), `BANABLAST_Balance_Statement_${today}.pdf`, false);
-    }
-
-    function shareBreakdownWhatsAppPDF() {
-      generatePdfDocument(getBreakdownHtmlContent(), `BANABLAST_Balance_Statement_${today}.pdf`, true, `Account Breakdown Statement`);
-    }
-
-    // 4. റിപ്പോർട്ട് ടാബ്
-    function getReportsTabHtmlContent() {
+    // 4. ഫിനാൻഷ്യൽ റിപ്പോർട്ട് A4 പ്രിവ്യൂ
+    function previewReportsA4() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('repSales').innerText;
       const exp = document.getElementById('repExp').innerText;
@@ -2268,58 +2533,68 @@
       const stock = document.getElementById('repStockSum').innerText;
       const misc = document.getElementById('repMiscSum').innerText;
 
-      return `
-        <div style="text-align:center; margin-bottom:14px;">
-          <h3 style="margin:0; font-size:16px; color:#1e3a8a;">FINANCIAL REPORT SUMMARY</h3>
-          <p style="margin:2px 0 0; color:#64748b; font-size:12px; font-weight:bold;">Period: ${currentReportFilter.toUpperCase()} (Ref Date: ${curDate})</p>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-bottom:14px;">
-          <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:11px; color:#15803d; font-weight:bold;">TOTAL SALES</div>
-            <div style="font-size:18px; font-weight:800; color:#15803d;">${sales}</div>
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>FINANCIAL STATEMENTS & REPORT</p>
           </div>
-          <div style="flex:1; background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:11px; color:#b91c1c; font-weight:bold;">TOTAL EXPENSE</div>
-            <div style="font-size:18px; font-weight:800; color:#b91c1c;">${exp}</div>
-          </div>
-          <div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; padding:10px; border-radius:8px; text-align:center;">
-            <div style="font-size:11px; color:#1e3a8a; font-weight:bold;">NET PROFIT</div>
-            <div style="font-size:18px; font-weight:800; color:#1e3a8a;">${profit}</div>
+          <div class="a4-meta-box">
+            <span>PERIOD</span>
+            <strong>${currentReportFilter.toUpperCase()}</strong>
           </div>
         </div>
 
-        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:6px;">
-            <span>🏠 Rent Payments</span><span style="color:#dc2626;">${rent}</span>
+        <div class="a4-card-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="a4-card green">
+            <h5>Total Sales</h5>
+            <p style="color:#16a34a; font-size:1.2rem;">${sales}</p>
+          </div>
+          <div class="a4-card red">
+            <h5>Total Expense</h5>
+            <p style="color:#dc2626; font-size:1.2rem;">${exp}</p>
+          </div>
+          <div class="a4-card blue">
+            <h5>Net Profit</h5>
+            <p style="color:#1e3a8a; font-size:1.2rem;">${profit}</p>
+          </div>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>🏠 Rent Payments (വാടക ചിലവുകൾ)</span>
+            <span style="color:#dc2626;">${rent}</span>
           </div>
           ${rentList}
         </div>
 
-        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:6px;">
-            <span>👥 Staff Salaries</span><span style="color:#dc2626;">${sal}</span>
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>👥 Staff Salaries (സ്റ്റാഫ് ശമ്പളം)</span>
+            <span style="color:#dc2626;">${sal}</span>
           </div>
           ${salList}
         </div>
 
-        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:6px;">
-            <span>📦 Stock Purchases Total</span><span>${stock}</span>
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>📦 Other Purchases & Miscellaneous</span>
           </div>
-          <div style="display:flex; justify-content:space-between; font-weight:bold; padding-top:4px;">
-            <span>Daily Miscellaneous</span><span>${misc}</span>
+          <div class="a4-row"><span>Stock Purchases Total:</span><strong>${stock}</strong></div>
+          <div class="a4-row"><span>Daily Miscellaneous:</span><strong>${misc}</strong></div>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Business Analytics • Auto Verified</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
           </div>
         </div>
       `;
-    }
 
-    function exportReportsPDF() {
-      generatePdfDocument(getReportsTabHtmlContent(), `BANABLAST_Report_${today}.pdf`, false);
-    }
-
-    function shareReportsViaWhatsAppPDF() {
-      generatePdfDocument(getReportsTabHtmlContent(), `BANABLAST_Report_${today}.pdf`, true, `Financial Report`);
+      openA4PreviewModal(html, `Monthly_Report`);
     }
 
     /* -------------------------------------------------------------
