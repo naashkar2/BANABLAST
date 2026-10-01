@@ -2,7 +2,6 @@
   "name": "BANABLAST",
   "short_name": "BANABLAST",
   "description": "BANABLAST Business Ledger App",
-  "id": "/BANABLAST/",
   "start_url": "https://naashkar2.github.io/BANABLAST/",
   "scope": "https://naashkar2.github.io/BANABLAST/",
   "display": "standalone",
@@ -10,16 +9,16 @@
   "theme_color": "#1e3a8a",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "https://naashkar2.github.io/BANABLAST/logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "logo.png",
+      "src": "https://naashkar2.github.io/BANABLAST/logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
