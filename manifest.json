@@ -1,11 +1,17 @@
 {
   "name": "BANABLAST",
   "short_name": "BANABLAST",
+  "description": "BANABLAST Business Ledger App",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#1e3a8a",
   "theme_color": "#1e3a8a",
   "icons": [
+    {
+      "src": "Bana%20blast%20logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    },
     {
       "src": "Logo.png",
       "sizes": "192x192 512x512",
