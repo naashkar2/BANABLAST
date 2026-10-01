@@ -44,7 +44,7 @@
       padding-bottom: 120px; 
     }
 
-    /* 1. പ്രീമിയം ഹെഡർ */
+    /* 1. പ്രീമിയം മിനിമൽ ഹെഡർ */
     .app-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
       padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 12px;
@@ -107,13 +107,46 @@
       margin-top: 2px; 
     }
 
+    /* ലോഗിൻ ചെയ്ത യൂസർ ബാർ */
+    .user-auth-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .user-auth-tag {
+      font-size: 0.76rem;
+      color: #fde047;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .user-auth-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-auth-small {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
     /* ഡേറ്റ് & ഹോളിഡേ ബാർ */
     .calendar-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 8px;
       background: rgba(255,255,255,0.15);
       padding: 6px 10px;
       border-radius: 12px;
@@ -533,7 +566,7 @@
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
 
-  <!-- പ്രൊഫഷണൽ ഹെഡർ (ലോഗോ ഉറപ്പുവരുത്തിയത്) -->
+  <!-- പ്രൊഫഷണൽ ഹെഡർ (ലോഗോ & യൂസർ ബാർ സഹിതം) -->
   <header class="app-header">
     <div class="header-top-row">
       <div class="brand-box">
@@ -545,6 +578,15 @@
           <span class="brand-title">BANABLAST</span>
           <span class="sync-status">🟢 Live Cloud Sync</span>
         </div>
+      </div>
+    </div>
+
+    <!-- യൂസർ ലോഗിൻ & സെക്യൂരിറ്റി ബാർ -->
+    <div class="user-auth-bar">
+      <span id="loggedInUserText" class="user-auth-tag">👤 Logged in: Checking...</span>
+      <div class="user-auth-actions">
+        <button type="button" class="btn-auth-small" onclick="openChangePinModal()">🔑 Change PIN</button>
+        <button type="button" class="btn-auth-small" onclick="logoutPartner()">Logout / Switch</button>
       </div>
     </div>
 
@@ -804,7 +846,7 @@
 
   </div>
 
-  <!-- ENTRY MODAL (ക്യാമറയും ഗാലറിയും ഉള്ളത്) -->
+  <!-- 1. ENTRY MODAL (ക്യാമറയും ഗാലറിയും ഉള്ളത്) -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -886,7 +928,7 @@
     </div>
   </div>
 
-  <!-- TODAY'S SALES REPORT MODAL -->
+  <!-- 2. TODAY'S SALES REPORT MODAL -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -941,7 +983,7 @@
     </div>
   </div>
 
-  <!-- UNIVERSAL ITEM / SUPPLIER LEDGER SHEET MODAL -->
+  <!-- 3. UNIVERSAL ITEM / SUPPLIER LEDGER SHEET MODAL -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
       <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Ledger Sheet</h3>
@@ -985,7 +1027,7 @@
     </div>
   </div>
 
-  <!-- RUNNING BREAKDOWN MODAL -->
+  <!-- 4. RUNNING BREAKDOWN MODAL -->
   <div class="modal" id="runningBreakdownModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -1008,7 +1050,7 @@
     </div>
   </div>
 
-  <!-- ADD INVESTMENT MODAL -->
+  <!-- 5. ADD INVESTMENT MODAL -->
   <div class="modal" id="investModal">
     <div class="modal-box">
       <h3>Add Capital Investment</h3>
@@ -1051,7 +1093,7 @@
     </div>
   </div>
 
-  <!-- ADD WITHDRAWAL MODAL -->
+  <!-- 6. ADD WITHDRAWAL MODAL -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Profit/Money Withdrawal</h3>
@@ -1094,7 +1136,7 @@
     </div>
   </div>
 
-  <!-- OPENING BALANCE MODAL -->
+  <!-- 7. OPENING BALANCE MODAL -->
   <div class="modal" id="openingModal">
     <div class="modal-box">
       <h3>Set Initial Opening Balance</h3>
@@ -1111,12 +1153,104 @@
     </div>
   </div>
 
+  <!-- 8. PARTNER LOGIN MODAL (PIN വഴി ലോഗിൻ) -->
+  <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.88); z-index: 2000;">
+    <div class="modal-box" style="text-align: center;">
+      <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
+      <h3 style="color: var(--primary); margin-bottom: 4px;">BANABLAST LOGIN</h3>
+      <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">നിങ്ങളുടെ പേര് തിരഞ്ഞെടുത്ത് രഹസ്യ PIN നൽകുക</p>
+
+      <div class="form-group" style="text-align: left;">
+        <label>Partner (പാർട്ണർ)</label>
+        <select id="loginPartnerSelect" class="form-control">
+          <option value="ASHIF">ASHIF</option>
+          <option value="SABITH">SABITH</option>
+          <option value="ASHKAR ALI">ASHKAR ALI</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="text-align: left;">
+        <label>Secret PIN (രഹസ്യ കോഡ്)</label>
+        <input type="password" id="loginPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
+      </div>
+
+      <button type="button" class="btn-submit" onclick="submitPartnerLogin()">ലോഗിൻ ചെയ്യുക (Login)</button>
+      
+      <div style="margin-top: 14px;">
+        <button type="button" class="btn-link" onclick="openForgotPinModal()" style="font-size: 0.8rem; color: #0284c7;">
+          PIN മറന്നുപോയോ? (Forgot PIN?)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. CHANGE PIN MODAL (PIN മാറ്റാനുള്ള വിൻഡോ) -->
+  <div class="modal" id="changePinModal" style="display:none; background: rgba(15, 23, 42, 0.8); z-index: 2100;">
+    <div class="modal-box">
+      <h3 style="color: var(--primary); margin-bottom: 6px;">🔑 PIN മാറ്റുക (Change PIN)</h3>
+      <p id="changePinUserText" style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;"></p>
+
+      <div class="form-group">
+        <label>നിലവിലുള്ള പഴയ PIN (Current PIN)</label>
+        <input type="password" id="oldPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
+      </div>
+
+      <div class="form-group">
+        <label>പുതിയ PIN (New PIN)</label>
+        <input type="password" id="newPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
+      </div>
+
+      <button type="button" class="btn-submit" onclick="submitChangePin()">PIN അപ്‌ഡേറ്റ് ചെയ്യുക</button>
+      <button type="button" class="btn-cancel" onclick="closeModal('changePinModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 10. FORGOT PIN MODAL (മാസ്റ്റർ കോഡ് വഴി റീസെറ്റ് ചെയ്യൽ) -->
+  <div class="modal" id="forgotPinModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2200;">
+    <div class="modal-box">
+      <h3 style="color: var(--primary); margin-bottom: 6px;">🔄 Reset PIN</h3>
+      <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">Master Security Code നൽകി പുതിയ PIN സെറ്റ് ചെയ്യുക</p>
+
+      <div class="form-group">
+        <label>Partner (ആരുടെ PIN ആണ് മാറ്റേണ്ടത്?)</label>
+        <select id="resetPartnerSelect" class="form-control">
+          <option value="ASHIF">ASHIF</option>
+          <option value="SABITH">SABITH</option>
+          <option value="ASHKAR ALI">ASHKAR ALI</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Master Security Code (മൂവർക്കും അറിയാവുന്ന കോഡ്)</label>
+        <input type="password" id="masterCodeInput" class="form-control" placeholder="Master Code">
+      </div>
+
+      <div class="form-group">
+        <label>പുതിയ 4 അക്ക PIN</label>
+        <input type="password" id="resetNewPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
+      </div>
+
+      <button type="button" class="btn-submit" onclick="submitResetPin()">PIN റീസെറ്റ് ചെയ്യുക</button>
+      <button type="button" class="btn-cancel" onclick="closeModal('forgotPinModal')">Cancel</button>
+    </div>
+  </div>
+
   <!-- =================== [PART 1 അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
+    const MASTER_SECURITY_KEY = "9999"; // PIN മറന്നുപോയാൽ റീസെറ്റ് ചെയ്യാനുള്ള Master Security Code
 
     // നിങ്ങളുടെ GEMINI API KEY (GitHub ബോട്ട് നീക്കം ചെയ്യാത്ത വിധം Base64 എൻകോഡ് ചെയ്തത്)
     const HARDCODED_GEMINI_KEY = atob("QVEuQWI4Uk42TFZWVUxGRms5YTBqX0p1TTRMdjB5VE5heGR2MHdxeURGVjByZWhFV2tLRFE=");
+
+    // ഡിഫോൾട്ട് PIN കോഡുകൾ
+    let partnerPins = {
+      "ASHIF": "1111",
+      "SABITH": "2222",
+      "ASHKAR ALI": "3333"
+    };
+
+    let currentLoggedInUser = localStorage.getItem('BANABLAST_USER') || null;
 
     function handleLogoLoadError(img) {
       if (!img.dataset.retry) {
@@ -1156,6 +1290,117 @@
 
     const today = new Date().toISOString().split('T')[0];
 
+    /* -------------------------------------------------------------
+       AUTH & PIN MANAGEMENT (LOGIN, CHANGE PIN, FORGOT PIN)
+       ------------------------------------------------------------- */
+    function checkUserLogin() {
+      if (!currentLoggedInUser) {
+        document.getElementById('loginModal').style.display = 'flex';
+      } else {
+        document.getElementById('loginModal').style.display = 'none';
+        const userDisplay = document.getElementById('loggedInUserText');
+        if (userDisplay) userDisplay.innerText = `👤 ${currentLoggedInUser}`;
+      }
+    }
+
+    function submitPartnerLogin() {
+      const selectedUser = document.getElementById('loginPartnerSelect').value;
+      const enteredPin = document.getElementById('loginPinInput').value.trim();
+
+      if (enteredPin === partnerPins[selectedUser]) {
+        currentLoggedInUser = selectedUser;
+        localStorage.setItem('BANABLAST_USER', selectedUser);
+        document.getElementById('loginPinInput').value = '';
+        document.getElementById('loginModal').style.display = 'none';
+        const userDisplay = document.getElementById('loggedInUserText');
+        if (userDisplay) userDisplay.innerText = `👤 ${currentLoggedInUser}`;
+        alert(`✅ സ്വാഗതം, ${selectedUser}!`);
+      } else {
+        alert("❌ തെറ്റായ PIN! ദയവായി ശരിയായ PIN നൽകുക.");
+      }
+    }
+
+    function logoutPartner() {
+      if (confirm("ലോഗൗട്ട് ചെയ്ത് മറ്റൊരു പാർട്ണറുടെ അക്കൗണ്ടിലേക്ക് മാറണോ?")) {
+        localStorage.removeItem('BANABLAST_USER');
+        currentLoggedInUser = null;
+        checkUserLogin();
+      }
+    }
+
+    function openChangePinModal() {
+      if (!currentLoggedInUser) {
+        alert("ദയവായി ആദ്യം ലോഗിൻ ചെയ്യുക");
+        return;
+      }
+      document.getElementById('changePinUserText').innerText = `പാർട്ണർ: ${currentLoggedInUser}`;
+      document.getElementById('oldPinInput').value = '';
+      document.getElementById('newPinInput').value = '';
+      document.getElementById('changePinModal').style.display = 'flex';
+    }
+
+    function submitChangePin() {
+      const oldPin = document.getElementById('oldPinInput').value.trim();
+      const newPin = document.getElementById('newPinInput').value.trim();
+
+      if (oldPin !== partnerPins[currentLoggedInUser]) {
+        alert("❌ നിലവിലുള്ള പഴയ PIN തെറ്റാണ്!");
+        return;
+      }
+
+      if (newPin.length < 4) {
+        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        return;
+      }
+
+      partnerPins[currentLoggedInUser] = newPin;
+      db.collection('settings').doc('security').set({
+        pins: partnerPins
+      }, { merge: true }).then(() => {
+        alert(`✅ ${currentLoggedInUser}-ന്റെ PIN വിജയകരമായി മാറ്റി!`);
+        closeModal('changePinModal');
+      }).catch(err => {
+        console.error("PIN update error:", err);
+        alert("❌ PIN മാറ്റുന്നതിൽ തടസ്സം നേരിട്ടു. കണക്ഷൻ പരിശോധിക്കുക.");
+      });
+    }
+
+    function openForgotPinModal() {
+      document.getElementById('masterCodeInput').value = '';
+      document.getElementById('resetNewPinInput').value = '';
+      document.getElementById('forgotPinModal').style.display = 'flex';
+    }
+
+    function submitResetPin() {
+      const targetPartner = document.getElementById('resetPartnerSelect').value;
+      const enteredMasterKey = document.getElementById('masterCodeInput').value.trim();
+      const newPin = document.getElementById('resetNewPinInput').value.trim();
+
+      if (enteredMasterKey !== MASTER_SECURITY_KEY) {
+        alert("❌ തെറ്റായ Master Security Code! മറ്റ് പാർട്ണർമാരോട് ചോദിച്ച് കൃത്യമായ കോഡ് നൽകുക.");
+        return;
+      }
+
+      if (newPin.length < 4) {
+        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        return;
+      }
+
+      partnerPins[targetPartner] = newPin;
+      db.collection('settings').doc('security').set({
+        pins: partnerPins
+      }, { merge: true }).then(() => {
+        alert(`✅ ${targetPartner}-ന്റെ PIN വിജയകരമായി റീസെറ്റ് ചെയ്തു! ഇനി പുതിയ PIN ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യാം.`);
+        closeModal('forgotPinModal');
+      }).catch(err => {
+        console.error("Reset error:", err);
+        alert("❌ തടസ്സം നേരിട്ടു. കണക്ഷൻ പരിശോധിക്കുക.");
+      });
+    }
+
+    /* -------------------------------------------------------------
+       INITIALIZATION & FIRESTORE SYNC
+       ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
         dateFormat: "Y-m-d",
@@ -1178,6 +1423,7 @@
     }
 
     window.onload = function() {
+      checkUserLogin();
       initFlatpickrCalendar();
 
       document.getElementById('invDate').value = today;
@@ -1186,6 +1432,15 @@
       document.getElementById('sheetToDate').value = today;
       document.getElementById('repFromDate').value = today;
       document.getElementById('repToDate').value = today;
+
+      // PIN സെക്യൂരിറ്റി ക്ലൗഡ് സിങ്ക്
+      db.collection('settings').doc('security').onSnapshot(doc => {
+        if (doc.exists && doc.data().pins) {
+          partnerPins = doc.data().pins;
+        } else {
+          db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
+        }
+      });
 
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
@@ -1336,7 +1591,9 @@
       return items;
     }
 
-    // Gemini AI സ്വയം ബില്ല് സ്കാൻ ചെയ്യുന്ന ഫംഗ്ഷൻ (ക്യാമറ + ഗാലറി)
+    /* -------------------------------------------------------------
+       GEMINI AI BILL SCANNER (ക്യാമറ & ഗാലറി)
+       ------------------------------------------------------------- */
     async function handleBillImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1417,6 +1674,9 @@
       });
     }
 
+    /* -------------------------------------------------------------
+       ENTRY MODAL ACTIONS
+       ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -1871,6 +2131,9 @@
       html2pdf().set(opt).from(element).save();
     }
 
+    /* -------------------------------------------------------------
+       TAB 5: INVESTMENTS & WITHDRAWALS (PIN RESTRICTED VERIFICATION)
+       ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -1904,7 +2167,13 @@
       alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
     }
 
+    // ലോഗിൻ ചെയ്ത പാർട്ണർക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyInvestment(invId, partnerName) {
+      if (currentLoggedInUser !== partnerName) {
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        return;
+      }
+
       const inv = investments.find(i => i.id === invId);
       if (!inv) return;
 
@@ -1919,6 +2188,7 @@
         approvals: currentApprovals,
         status: isVerified ? 'verified' : 'pending'
       });
+      alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
     function deleteInvestment(id) {
@@ -1960,7 +2230,13 @@
       alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
     }
 
+    // ലോഗിൻ ചെയ്ത പാർട്ണർക്ക് സ്വന്തം വെരിഫിക്കേഷൻ മാത്രം അനുവദിക്കുന്നു
     function verifyWithdrawal(wthId, partnerName) {
+      if (currentLoggedInUser !== partnerName) {
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        return;
+      }
+
       const w = withdrawals.find(i => i.id === wthId);
       if (!w) return;
 
@@ -1975,6 +2251,7 @@
         approvals: currentApprovals,
         status: isVerified ? 'verified' : 'pending'
       });
+      alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
     function deleteWithdrawal(id) {
@@ -2120,6 +2397,9 @@
       document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
     }
 
+    /* -------------------------------------------------------------
+       UNIVERSAL HISTORY SHEET MODAL
+       ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
       document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
@@ -2277,6 +2557,9 @@
       html2pdf().set(opt).from(element).save();
     }
 
+    /* -------------------------------------------------------------
+       RUNNING BALANCE BREAKDOWN & OPENING
+       ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
       const modal = document.getElementById('runningBreakdownModal');
