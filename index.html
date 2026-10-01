@@ -39,10 +39,10 @@
       padding-bottom: 120px; 
     }
 
-    /* 1. ക്ലീൻ ഏകീകൃത ഹെഡർ (കറുത്ത ബാറോ ആവർത്തനങ്ങളോ ഇല്ല) */
+    /* 1. പ്രീമിയം മിനിമൽ ഹെഡർ */
     .app-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
-      padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 14px;
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 12px;
       color: white;
       position: sticky;
       top: 0;
@@ -61,8 +61,8 @@
       gap: 10px;
     }
     .brand-logo-frame {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: #ffffff;
       display: flex;
@@ -74,66 +74,79 @@
       flex-shrink: 0;
     }
     .brand-logo { width: 100%; height: 100%; object-fit: cover; }
-    .brand-logo-fallback { font-size: 1.4rem; display: none; }
+    .brand-logo-fallback { font-size: 1.3rem; display: none; }
     
     .brand-text-box { display: flex; flex-direction: column; line-height: 1.15; }
     .brand-title {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: 1px;
       color: #ffffff;
       text-transform: uppercase;
     }
-    .sync-status { font-size: 0.7rem; color: #86efac; font-weight: 600; margin-top: 2px; }
+    .sync-status { font-size: 0.68rem; color: #86efac; font-weight: 600; margin-top: 2px; }
 
-    .header-right-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .icon-action-btn {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.4);
-      padding: 6px 10px;
+    .ai-btn-top {
+      background: rgba(255,255,255,0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 5px 10px;
       border-radius: 8px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       cursor: pointer;
+      backdrop-filter: blur(4px);
     }
-    .holiday-btn { 
-      background: #eab308; 
-      color: #000; 
-      border: none; 
-      padding: 7px 12px; 
-      border-radius: 8px; 
-      font-size: 0.75rem; 
-      font-weight: 800; 
-      cursor: pointer; 
-      white-space: nowrap; 
-    }
-    .holiday-btn.active { background: var(--accent-red); color: white; }
 
-    /* കലണ്ടർ ബാർ */
+    /* ഡേറ്റ് & ഹോളിഡേ ബാർ */
     .calendar-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 8px;
       margin-top: 10px;
-      background: rgba(255,255,255,0.18);
-      padding: 8px 12px;
-      border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      padding: 6px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .cal-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
       cursor: pointer;
     }
     .date-picker-input {
       background: transparent;
       border: none;
       color: white;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       outline: none;
       width: 100%;
       cursor: pointer;
+    }
+
+    /* ഗ്ലാസ് ഹോളിഡേ പിൽ ബട്ടൺ */
+    .holiday-pill-btn { 
+      background: rgba(255, 255, 255, 0.12); 
+      color: #ffffff; 
+      border: 1px solid rgba(255, 255, 255, 0.25); 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      font-size: 0.72rem; 
+      font-weight: 700; 
+      cursor: pointer; 
+      white-space: nowrap; 
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .holiday-pill-btn.active { 
+      background: var(--accent-red); 
+      color: white; 
+      border-color: #f87171; 
+      box-shadow: 0 2px 8px rgba(220,38,38,0.5); 
     }
 
     /* കലണ്ടർ സ്റ്റൈൽ */
@@ -160,7 +173,7 @@
 
     .holiday-banner { background: #fee2e2; color: #991b1b; text-align: center; padding: 10px; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #ef4444; display: none; }
 
-    /* Nav Tabs (5 വ്യത്യസ്ത ടാബുകൾ) */
+    /* Nav Tabs */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -205,7 +218,7 @@
     .color-blue { color: #38bdf8 !important; }
     .color-purple { color: #c084fc !important; }
 
-    /* ഇന്നത്തെ റിപ്പോർട്ട് ബട്ടൺ (ഒറ്റ ഫംഗ്ഷൻ) */
+    /* Today Sales Report Button */
     .btn-today-report {
       width: 100%;
       background: linear-gradient(135deg, #1e3a8a, #2563eb);
@@ -356,7 +369,7 @@
 </head>
 <body>
 
-  <!-- DATALISTS (കമ്പനികളും സാധനങ്ങളും ആവർത്തിക്കാതെ തനിയെ സെലക്ട് ചെയ്യാൻ) -->
+  <!-- DATALISTS (Auto-suggest) -->
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
 
@@ -373,16 +386,18 @@
           <span class="sync-status">🟢 Live Cloud Sync</span>
         </div>
       </div>
-      <div class="header-right-actions">
-        <button class="icon-action-btn" onclick="configureApiKey()" title="AI API Key">⚙️ AI</button>
-        <button class="holiday-btn" id="holidayToggleBtn" onclick="toggleHoliday()">Shop Holiday</button>
-      </div>
+      <button class="ai-btn-top" onclick="configureApiKey()" title="Configure AI Key">⚙️ AI</button>
     </div>
 
-    <!-- കലണ്ടർ ബാർ -->
+    <!-- ഒതുക്കമുള്ള ഡേറ്റ് & ഹോളിഡേ ബാർ -->
     <div class="calendar-bar">
-      <span style="font-size:1.1rem;">📅</span>
-      <input type="text" id="selectedDate" class="date-picker-input" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
+      <div class="cal-input-wrap">
+        <span>📅</span>
+        <input type="text" id="selectedDate" class="date-picker-input" readonly placeholder="തീയതി തിരഞ്ഞെടുക്കുക">
+      </div>
+      <button class="holiday-pill-btn" id="holidayToggleBtn" onclick="toggleHoliday()">
+        <span id="holBtnText">Shop Holiday</span>
+      </button>
     </div>
   </header>
 
@@ -418,7 +433,7 @@
         </div>
       </div>
 
-      <!-- ഇന്നത്തെ സെയിൽസ് റിപ്പോർട്ട് ഒറ്റ ബട്ടൺ -->
+      <!-- ഇന്നത്തെ സെയിൽസ് റിപ്പോർട്ട് സിംഗിൾ ബട്ടൺ -->
       <button class="btn-today-report" onclick="openTodayReportModal()">
         📊 TODAY'S SALES REPORT (ഇന്നത്തെ കണക്ക്)
       </button>
@@ -472,13 +487,13 @@
 
     </div>
 
-    <!-- TAB 2: STOCK ITEMS (സാധനങ്ങളുടെ വിവരങ്ങൾ മാത്രം) -->
+    <!-- TAB 2: STOCK ITEMS -->
     <div id="tab-stock" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
       <div id="stockItemsListContainer"></div>
     </div>
 
-    <!-- TAB 3: SUPPLIER PURCHASES (കമ്പനികളുടെ വിവരങ്ങളും കുടിശ്ശികയും) -->
+    <!-- TAB 3: SUPPLIER PURCHASES -->
     <div id="tab-suppliers" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
       <div id="supplierPurchasesListContainer"></div>
@@ -492,7 +507,6 @@
         <button class="filter-btn" id="btnFiltCustom" onclick="filterReport('custom')">Custom Date</button>
       </div>
 
-      <!-- Custom Date Pickers -->
       <div id="reportCustomDateBox" style="display:none; gap:6px; margin-bottom:12px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
         <div style="flex:1;">
           <label style="font-size:0.7rem; font-weight:700;">From:</label>
@@ -509,28 +523,6 @@
         <div class="sum-box"><h4>Sales</h4><p id="repSales" class="color-green">₹0</p></div>
         <div class="sum-box"><h4>Expense</h4><p id="repExp" class="color-red">₹0</p></div>
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
-      </div>
-
-      <!-- Partners Profit Share (1/3 Each) -->
-      <div class="cat-box">
-        <div class="cat-title">
-          <span>🤝 Partners Profit Split (1/3 Each)</span>
-          <span id="repEachShare" class="color-blue">₹0 / partner</span>
-        </div>
-        <div class="partner-grid">
-          <div class="partner-card">
-            <h5>ASHIF</h5>
-            <div class="p-val color-blue" id="shareAshif">₹0</div>
-          </div>
-          <div class="partner-card">
-            <h5>SABITH</h5>
-            <div class="p-val color-blue" id="shareSabith">₹0</div>
-          </div>
-          <div class="partner-card">
-            <h5>ASHKAR ALI</h5>
-            <div class="p-val color-blue" id="shareAshkar">₹0</div>
-          </div>
-        </div>
       </div>
 
       <div class="cat-box">
@@ -561,11 +553,39 @@
       <button class="btn-submit" style="background:#2563eb;" onclick="exportReportsPDF()">📄 ഈ റിപ്പോർട്ട് PDF ആക്കുക</button>
     </div>
 
-    <!-- TAB 5: INVESTMENTS & WITHDRAWALS (എല്ലാ പാർട്ണർ ഇടപാടുകളും ഇവിടെ) -->
+    <!-- TAB 5: INVESTMENTS & WITHDRAWALS (പാർട്ണർമാരുടെ ലാഭവിഹിതം ഇങ്ങോട്ട് മാറ്റി) -->
     <div id="tab-invest" class="tab-content">
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="section-header-btn" style="background:var(--accent-purple); border-radius:8px;" onclick="openInvestModal()">+ ADD INVESTMENT</button>
         <button class="section-header-btn" style="background:#b91c1c; border-radius:8px;" onclick="openWithdrawModal()">- WITHDRAW MONEY</button>
+      </div>
+
+      <!-- 🤝 PARTNERS PROFIT SPLIT (ഇങ്ങോട്ട് മാറ്റി സ്ഥാപിച്ചു) -->
+      <div class="cat-box" style="border: 2px solid #bfdbfe; background: #f0f7ff;">
+        <div class="cat-title">
+          <span style="color:var(--primary);">🤝 Partners Profit Split (1/3 Each)</span>
+          <span id="repEachShare" class="color-blue" style="font-weight:800;">₹0 / partner</span>
+        </div>
+        <div class="partner-grid">
+          <div class="partner-card" style="background:#fff;">
+            <h5>ASHIF</h5>
+            <div class="p-sub">ലാഭവിഹിതം: <span id="shareAshif" class="color-blue">₹0</span></div>
+            <div class="p-sub">പിൻവലിച്ചത്: <span id="drawAshif" class="color-red">₹0</span></div>
+            <div class="p-val" id="netAshif">₹0</div>
+          </div>
+          <div class="partner-card" style="background:#fff;">
+            <h5>SABITH</h5>
+            <div class="p-sub">ലാഭവിഹിതം: <span id="shareSabith" class="color-blue">₹0</span></div>
+            <div class="p-sub">പിൻവലിച്ചത്: <span id="drawSabith" class="color-red">₹0</span></div>
+            <div class="p-val" id="netSabith">₹0</div>
+          </div>
+          <div class="partner-card" style="background:#fff;">
+            <h5>ASHKAR ALI</h5>
+            <div class="p-sub">ലാഭവിഹിതം: <span id="shareAshkar" class="color-blue">₹0</span></div>
+            <div class="p-sub">പിൻവലിച്ചത്: <span id="drawAshkar" class="color-red">₹0</span></div>
+            <div class="p-val" id="netAshkar">₹0</div>
+          </div>
+        </div>
       </div>
 
       <!-- Capital Invested -->
@@ -590,10 +610,10 @@
         </div>
       </div>
 
-      <!-- Total Withdrawn by Partners -->
+      <!-- Profit Withdrawn -->
       <div class="cat-box">
         <div class="cat-title">
-          <span>💸 Profit Withdrawn (പിൻവലിച്ച തുക)</span>
+          <span>💸 Total Withdrawn (ആകെ പിൻവലിച്ചത്)</span>
           <span id="withTotalVerified" class="color-red">₹0</span>
         </div>
         <div class="partner-grid">
@@ -625,7 +645,7 @@
 
   </div>
 
-  <!-- Entry Modal (Auto-suggest + Items + Due Balance) -->
+  <!-- Entry Modal -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
@@ -643,7 +663,6 @@
         </select>
       </div>
 
-      <!-- AI Bill Scan Button -->
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
@@ -654,7 +673,6 @@
         </div>
       </div>
 
-      <!-- സപ്ലയർ പർച്ചേസ് ഐറ്റംസ് -->
       <div id="supplierItemsBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="font-weight:700; font-size:0.8rem; color:#475569; margin:0;">വാങ്ങിയ സാധനങ്ങളും വിലയും (Items & Price)</label>
@@ -663,13 +681,11 @@
         <div id="purchaseItemsListContainer"></div>
       </div>
 
-      <!-- സപ്ലയർ / കമ്പനി പേര് (Auto-suggest Datalist ലിങ്ക് ചെയ്തിരിക്കുന്നു) -->
       <div class="form-group">
         <label id="itemNameLabel">Supplier / Item / Description</label>
         <input type="text" id="entryTitle" list="suppliersList" class="form-control" placeholder="പേര് ടൈപ്പ് ചെയ്യുമ്പോൾ സെലക്ട് ചെയ്യാം" required>
       </div>
 
-      <!-- ബില്ല് തുകയും നൽകിയ തുകയും (Due Balance) -->
       <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
         <div style="display:flex; gap:8px;">
           <div style="flex:1;">
@@ -710,7 +726,7 @@
     </div>
   </div>
 
-  <!-- TODAY'S SALES REPORT MODAL (പുതിയ മോഡൽ) -->
+  <!-- TODAY'S SALES REPORT MODAL -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -758,7 +774,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div style="display:flex; gap:8px; margin-top:10px;">
         <button class="btn-submit" style="background:#b91c1c; margin-top:0;" onclick="downloadTodayPDF()">📄 Download PDF</button>
         <button class="btn-submit" style="background:#15803d; margin-top:0;" onclick="shareTodayWhatsApp()">💬 WhatsApp Share</button>
@@ -940,9 +955,7 @@
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
 
-    // -------------------------------------------------------------
-    // SECURE GEMINI API KEY (GitHub-ൽ പബ്ലിക് ആകാതെ ഫോണിൽ മാത്രം സൂക്ഷിക്കുന്നു)
-    // -------------------------------------------------------------
+    // SECURE GEMINI API KEY (ഫോണിൽ മാത്രം സൂക്ഷിക്കുന്നു)
     function getGeminiApiKey() {
       return localStorage.getItem('BANABLAST_GEMINI_KEY') || '';
     }
@@ -969,7 +982,7 @@
       }
     }
 
-    // Firebase Init
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -1081,11 +1094,11 @@
 
       if (isHoliday) {
         hBtn.classList.add('active');
-        hBtn.innerText = 'Holiday: Active';
+        document.getElementById('holBtnText').innerText = '🏖️ Holiday Active';
         hBanner.style.display = 'block';
       } else {
         hBtn.classList.remove('active');
-        hBtn.innerText = 'Shop Holiday';
+        document.getElementById('holBtnText').innerText = 'Shop Holiday';
         hBanner.style.display = 'none';
       }
     }
@@ -1103,7 +1116,7 @@
     }
 
     /* -------------------------------------------------------------
-       DATALISTS UPDATE (കമ്പനികളും സാധനങ്ങളും ഓട്ടോ സജഷൻ)
+       DATALISTS UPDATE (Auto-suggest)
        ------------------------------------------------------------- */
     function updateDatalists() {
       const suppliers = new Set();
@@ -1330,7 +1343,7 @@
       document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
       document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
 
-      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര് (ലിസ്റ്റിൽ നിന്ന് തിരഞ്ഞെടുക്കാം)' : 'Item / Description';
+      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര്' : 'Item / Description';
 
       if (!editId && type === 'expense') {
         if (cat === 'tea') titleInput.value = 'Tea';
@@ -1507,7 +1520,7 @@
     }
 
     /* -------------------------------------------------------------
-       TODAY'S SALES REPORT MODAL (ഒറ്റ ഫംഗ്ഷൻ)
+       TODAY'S SALES REPORT MODAL
        ------------------------------------------------------------- */
     function openTodayReportModal() {
       const curDate = document.getElementById('selectedDate').value || today;
@@ -1559,7 +1572,7 @@
     }
 
     /* -------------------------------------------------------------
-       TAB 2: STOCK ITEMS (സാധനങ്ങളുടെ കണക്കുകൾ മാത്രം)
+       TAB 2: STOCK ITEMS (സാധനങ്ങൾ മാത്രം)
        ------------------------------------------------------------- */
     function renderStockItemsTab() {
       const container = document.getElementById('stockItemsListContainer');
@@ -1606,7 +1619,7 @@
     }
 
     /* -------------------------------------------------------------
-       TAB 3: SUPPLIER PURCHASES (കമ്പനികളും കുടിശ്ശികയും മാത്രം)
+       TAB 3: SUPPLIER PURCHASES (കമ്പനികളും കുടിശ്ശികയും)
        ------------------------------------------------------------- */
     function renderSupplierPurchasesTab() {
       const container = document.getElementById('supplierPurchasesListContainer');
@@ -1654,7 +1667,7 @@
     }
 
     /* -------------------------------------------------------------
-       TAB 4: REPORTS (Custom Date Filter ഉള്ളത്)
+       TAB 4: REPORTS
        ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
@@ -1720,13 +1733,6 @@
       document.getElementById('repExp').innerText = '₹' + exp;
       document.getElementById('repProfit').innerText = '₹' + netProfit;
 
-      const eachShare = Math.round(netProfit / 3);
-      document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
-
-      document.getElementById('shareAshif').innerText = '₹' + eachShare;
-      document.getElementById('shareSabith').innerText = '₹' + eachShare;
-      document.getElementById('shareAshkar').innerText = '₹' + eachShare;
-
       document.getElementById('repTotalRent').innerText = '₹' + rent;
       document.getElementById('repRentList').innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
 
@@ -1755,7 +1761,7 @@
     }
 
     /* -------------------------------------------------------------
-       TAB 5: INVESTMENTS & WITHDRAWALS
+       TAB 5: INVESTMENTS & WITHDRAWALS (പാർട്ണർ ലാഭവിഹിതം ഉൾപ്പെടെ)
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
@@ -1876,6 +1882,44 @@
       let totVerWith = 0;
       let hasPending = false;
 
+      // ആകെ ലാഭവിഹിതം (Net Profit Split) കണക്കാക്കൽ
+      let totalSales = 0, totalExp = 0;
+      transactions.forEach(t => {
+        if (t.type === 'sale') totalSales += t.amount;
+        else totalExp += t.amount;
+      });
+      const totalNetProfit = totalSales - totalExp;
+      const eachShare = Math.round(totalNetProfit / 3);
+      document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
+
+      withdrawals.forEach(w => {
+        if (w.status === 'verified') {
+          totVerWith += w.amount;
+          if (withMap[w.partner] !== undefined) withMap[w.partner] += w.amount;
+        } else {
+          hasPending = true;
+        }
+      });
+
+      // ഓരോ പാർട്ണറുടെയും ലാഭവിഹിതം, എടുത്ത തുക, ബാക്കി തുക അപ്ഡേറ്റ് ചെയ്യുന്നു
+      PARTNERS.forEach(p => {
+        const drawn = withMap[p] || 0;
+        const balance = eachShare - drawn;
+        let prefix = p === 'ASHIF' ? 'Ashif' : (p === 'SABITH' ? 'Sabith' : 'Ashkar');
+
+        if (document.getElementById('share' + prefix)) {
+          document.getElementById('share' + prefix).innerText = '₹' + eachShare;
+        }
+        if (document.getElementById('draw' + prefix)) {
+          document.getElementById('draw' + prefix).innerText = '₹' + drawn;
+        }
+        if (document.getElementById('net' + prefix)) {
+          const netElem = document.getElementById('net' + prefix);
+          netElem.innerText = (balance >= 0 ? '+' : '') + '₹' + balance;
+          netElem.className = 'p-val ' + (balance >= 0 ? 'color-green' : 'color-red');
+        }
+      });
+
       let invHTML = '';
       investments.slice().reverse().forEach(inv => {
         const isVer = inv.status === 'verified';
@@ -1928,13 +1972,6 @@
       let withHTML = '';
       withdrawals.slice().reverse().forEach(w => {
         const isVer = w.status === 'verified';
-        if (isVer) {
-          totVerWith += w.amount;
-          withMap[w.partner] = (withMap[w.partner] || 0) + w.amount;
-        } else {
-          hasPending = true;
-        }
-
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
           const hasApproved = (w.approvals || []).includes(p);
