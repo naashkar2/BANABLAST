@@ -25,10 +25,10 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* താഴെ വലിയ ബട്ടണുകൾ ഉള്ളതിനാൽ ലിസ്റ്റ് മറയാതിരിക്കാൻ പാഡിംഗ് */
-    body { background: var(--bg); color: var(--text); padding-bottom: 215px; user-select: none; }
+    /* താഴത്തെ ബട്ടണുകൾ കാരണം ലിസ്റ്റ് മറയാതിരിക്കാനുള്ള പാഡിംഗ് */
+    body { background: var(--bg); color: var(--text); padding-bottom: 220px; user-select: none; }
 
-    /* Compact App Header */
+    /* Compact Header */
     .pos-header {
       background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
       color: white;
@@ -65,7 +65,7 @@
     }
     .btn-head:active { background: rgba(255,255,255,0.3); }
 
-    /* 2 Categories Switcher */
+    /* Category Switcher */
     .cat-toggle-wrap {
       padding: 8px 12px 4px;
       max-width: 1000px;
@@ -101,7 +101,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (SLIGHTLY COMPACT CARDS)
+       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (NEAT & SLIGHTLY COMPACT)
        ------------------------------------------------------------- */
     .items-container {
       padding: 6px 12px 16px;
@@ -122,7 +122,7 @@
       background: var(--card-bg);
       border-radius: 14px;
       border: 1px solid #e2e8f0;
-      padding: 9px 8px; /* പാഡിംഗ് അല്പം കുറച്ചു */
+      padding: 9px 8px; /* ഒതുങ്ങിയ പാഡിംഗ് */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -139,8 +139,8 @@
     }
     
     .item-media-box {
-      width: 60px; /* 76px-ൽ നിന്ന് 60px ആയി കുറച്ചു */
-      height: 60px;
+      width: 62px; /* ഒതുങ്ങിയ മീഡിയ ബോക്സ് */
+      height: 62px;
       border-radius: 10px;
       background: #f8fafc;
       display: flex;
@@ -155,16 +155,16 @@
       object-fit: cover;
     }
     .item-emoji {
-      font-size: 2rem; /* ഇമോജി സൈസ് ഒതുക്കി */
+      font-size: 2.1rem;
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.82rem; /* ഫോണ്ട് സൈസ് അല്പം ക്രമീകരിച്ചു */
+      font-size: 0.84rem;
       font-weight: 700;
       color: #1e293b;
       line-height: 1.2;
-      min-height: 30px;
+      min-height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -196,7 +196,7 @@
     }
 
     /* -------------------------------------------------------------
-       വലുതും വൃത്തിയുള്ളതുമായ മെയിൻ POS ബാർ (MAIN SCREEN CONTROLS)
+       മെയിൻ സ്ക്രീൻ POS കൺട്രോൾ ബാർ (BOTTOM CONTROLS)
        ------------------------------------------------------------- */
     .pos-bottom-bar {
       position: fixed;
@@ -457,7 +457,7 @@
 </head>
 <body>
 
-  <!-- Sleek Header -->
+  <!-- Header -->
   <header class="pos-header">
     <div class="pos-brand">🥤 BANABLAST POS</div>
     <div class="header-btns">
@@ -467,7 +467,7 @@
     </div>
   </header>
 
-  <!-- 2 Categories Only -->
+  <!-- Categories -->
   <div class="cat-toggle-wrap">
     <div class="cat-toggle">
       <button type="button" class="cat-tab-btn active" id="tabAval" onclick="switchCategory('aval_milk')">
@@ -479,12 +479,10 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid (ഒരു പൊടിക്ക് ചെറുതാക്കിയ ലിസ്റ്റ്) -->
+  <!-- Items Touch Grid (ഒരു പൊടിക്ക് ഒതുക്കിയ ബട്ടണുകൾ) -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- -------------------------------------------------------------
-       മെയിൻ സ്ക്രീൻ POS കൺട്രോൾ ബാർ
-       ------------------------------------------------------------- -->
+  <!-- മെയിൻ സ്ക്രീനിലെ POS കൺട്രോൾ ബാർ -->
   <div class="pos-bottom-bar">
     <!-- വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ & കാർട്ട് ഐറ്റങ്ങൾ -->
     <div class="bottom-row-1">
@@ -528,7 +526,7 @@
     </div>
   </div>
 
-  <!-- CART DETAILS / DRAWER MODAL (ഐറ്റങ്ങളുടെ എണ്ണം കൂട്ടാനും കുറയ്ക്കാനും മാത്രം) -->
+  <!-- CART DETAILS / DRAWER MODAL -->
   <div class="modal" id="cartDrawerModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -544,7 +542,7 @@
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (PHOTO & EMOJI SUPPORT) -->
+  <!-- MANAGE ITEMS MODAL -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -576,7 +574,6 @@
         </div>
       </div>
 
-      <!-- Photo / Image Upload Option -->
       <div class="form-group" style="background:#f8fafc; border:1px dashed #cbd5e1; padding:10px; border-radius:10px; text-align:center;">
         <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക (Photo Upload):</label>
         <input type="file" id="newItemImageFile" accept="image/*" style="display:none;" onchange="handleItemImagePick(event)">
@@ -840,7 +837,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & തെർമൽ പ്രിന്റ്
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ്
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -957,10 +954,9 @@
       window.print();
     }
 
-    // മെയിൻ സ്ക്രീനിൽ നിന്ന് നേരിട്ട് WhatsApp ബില്ല് അയക്കൽ
     function sendWhatsAppBillDirect() {
       if (!cart.length) {
-        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
       
@@ -1047,9 +1043,6 @@
       window.location.href = 'index.html';
     }
 
-    /* -------------------------------------------------------------
-       ഫോട്ടോ അപ്‌ലോഡ് & മെനു മാനേജ്‌മെന്റ്
-       ------------------------------------------------------------- */
     function openItemsModal() {
       pickedItemImageBase64 = "";
       document.getElementById('newItemImgPreview').style.display = 'none';
