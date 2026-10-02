@@ -396,9 +396,7 @@
     .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
     .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
 
-    /* ==============================================================
-       COUNTER POS STYLING (LARGE SCREEN / TOUCH READY)
-       ============================================================== */
+    /* COUNTER POS STYLING */
     .pos-container {
       display: grid;
       grid-template-columns: 1fr;
@@ -664,7 +662,7 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 58mm; /* 58mm / 80mm roll */
+        width: 58mm;
         font-family: monospace;
         font-size: 11px;
         line-height: 1.3;
@@ -709,7 +707,7 @@
       </div>
     </div>
 
-    <!-- Calendar Bar (Hidden in Counter Kiosk) -->
+    <!-- Calendar Bar -->
     <div class="calendar-bar" id="appCalendarBar">
       <div class="cal-input-wrap">
         <span>📅</span>
@@ -723,7 +721,7 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- Navigation Tabs (Hidden in Counter Kiosk) -->
+  <!-- Navigation Tabs -->
   <nav class="nav-tabs" id="mainNavTabs">
     <button class="tab-btn active" id="tabBtnDaily" onclick="switchTab('daily', this)">Daily Accounts</button>
     <button class="tab-btn" id="tabBtnPos" onclick="switchTab('pos', this)">🛒 Counter POS</button>
@@ -736,7 +734,7 @@
 
   <div class="content-area">
 
-    <!-- TAB 1: DAILY ACCOUNTS (PARTNERS ONLY) -->
+    <!-- TAB 1: DAILY ACCOUNTS -->
     <div id="tab-daily" class="tab-content active">
       <div class="summary-card">
         <div class="sum-box"><h4>Sales</h4><p id="sumDailySales" class="color-green">₹0</p></div>
@@ -796,7 +794,7 @@
       </div>
     </div>
 
-    <!-- TAB: COUNTER POS (AVAILABLE IN KIOSK & AS A TAB) -->
+    <!-- TAB: COUNTER POS -->
     <div id="tab-pos" class="tab-content">
       <div class="pos-container">
         
@@ -829,7 +827,7 @@
             <p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>
           </div>
 
-          <!-- WhatsApp Number (Optional) -->
+          <!-- WhatsApp Number -->
           <div style="margin-bottom:8px;">
             <input type="tel" id="posCustPhone" class="form-control" placeholder="കസ്റ്റമറുടെ WhatsApp നമ്പർ (ഓപ്ഷണൽ)" style="padding:8px; font-size:0.85rem;">
           </div>
@@ -858,7 +856,7 @@
       </div>
     </div>
 
-    <!-- TAB: POS BILLS & ANALYTICS (PARTNERS ONLY) -->
+    <!-- TAB: POS BILLS & ANALYTICS -->
     <div id="tab-pos-analytics" class="tab-content">
       <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Daily Bills</h3>
       
@@ -867,14 +865,12 @@
         <input type="date" id="posAnalyticsDateInput" class="form-control" style="width:auto; padding:6px;" onchange="renderPosAnalyticsTab()">
       </div>
 
-      <!-- Top Summary Cards -->
       <div class="summary-card" style="grid-template-columns: repeat(3, 1fr);">
         <div class="sum-box"><h4>Counter Total</h4><p id="posAnaTotalSales" class="color-green">₹0</p></div>
         <div class="sum-box"><h4>Cash Collection</h4><p id="posAnaCash" class="color-blue">₹0</p></div>
         <div class="sum-box"><h4>GPay Collection</h4><p id="posAnaGpay" class="color-purple">₹0</p></div>
       </div>
 
-      <!-- Best Sellers & Item Counts -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🏆 കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ (Item-wise Sales)</span>
@@ -883,7 +879,6 @@
         <div id="posAnaItemBreakdownList"></div>
       </div>
 
-      <!-- Detailed Bills Log for Selected Date -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🧾 അന്നത്തെ ബില്ലുകൾ (Individual Bills)</span>
@@ -1015,68 +1010,55 @@
 
   </div>
 
-  <!-- ================= MODALS ================= -->
-
-  <!-- MANAGE POS MENU ITEMS MODAL -->
+  <!-- MODALS -->
   <div class="modal" id="managePosItemsModal">
     <div class="modal-box">
       <h3 style="color:var(--primary); margin-bottom:10px;">⚙️ Manage POS Menu Items</h3>
-      
       <div class="form-group">
-        <label>Category (വിഭാഗം)</label>
+        <label>Category</label>
         <select id="newPosItemCategory" class="form-control">
           <option value="aval_milk">🍌 Aval Milk Specials</option>
           <option value="juices">🥤 Juices & Shakes</option>
           <option value="snacks">🍪 Snacks & Extras</option>
         </select>
       </div>
-
       <div class="form-group">
-        <label>Item Name (പേര്)</label>
-        <input type="text" id="newPosItemName" class="form-control" placeholder="ഉദാ: Special Dry Fruit Aval Milk">
+        <label>Item Name</label>
+        <input type="text" id="newPosItemName" class="form-control" placeholder="Special Aval Milk">
       </div>
-
       <div style="display:flex; gap:8px;">
         <div class="form-group" style="flex:1;">
-          <label>Price ₹ (വില)</label>
+          <label>Price ₹</label>
           <input type="number" id="newPosItemPrice" class="form-control" placeholder="70">
         </div>
         <div class="form-group" style="flex:0.6;">
-          <label>Icon / Emoji</label>
+          <label>Icon</label>
           <input type="text" id="newPosItemIcon" class="form-control" placeholder="🍌" value="🥤">
         </div>
       </div>
-
       <button type="button" class="btn-submit" style="background:var(--accent-green) !important;" onclick="saveNewPosItem()">+ Add to Menu</button>
-
-      <h4 style="margin:16px 0 8px; font-size:0.85rem; color:#475569;">നിലവിലുള്ള മെനു ലിസ്റ്റ്:</h4>
+      <h4 style="margin:16px 0 8px; font-size:0.85rem; color:#475569;">മെനു ലിസ്റ്റ്:</h4>
       <div id="posModalItemsList" style="max-height:180px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
-
       <button type="button" class="btn-cancel" onclick="closeModal('managePosItemsModal')">Close</button>
     </div>
   </div>
 
-  <!-- RECENT POS BILLS / REPRINT MODAL -->
   <div class="modal" id="recentBillsModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
         <h3 style="color:var(--primary); font-size:1.1rem; margin:0;">📋 Recent Bills / Reprint</h3>
         <button onclick="closeModal('recentBillsModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;">✕</button>
       </div>
-      <p style="font-size:0.75rem; color:#64748b; margin-top:6px;">ഇന്ന് അടിച്ച ബില്ലുകൾ തിരുത്താനും റീപ്രിന്റ് ചെയ്യാനും സാധിക്കും:</p>
-      
       <div id="recentBillsListContainer" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
       <button type="button" class="btn-cancel" onclick="closeModal('recentBillsModal')">Close</button>
     </div>
   </div>
 
-  <!-- LOGIN MODAL (UPDATED WITH COUNTER / BILLING OPTION) -->
   <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.9); z-index: 2000;">
     <div class="modal-box" style="text-align: center;">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
       <h3 style="color: var(--primary); margin-bottom: 4px;">BANABLAST LOGIN</h3>
       <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">ഉപയോക്താവിനെ തിരഞ്ഞെടുത്ത് രഹസ്യ PIN നൽകുക</p>
-
       <div class="form-group" style="text-align: left;">
         <label>User Role / Partner</label>
         <select id="loginPartnerSelect" class="form-control">
@@ -1086,31 +1068,24 @@
           <option value="ASHKAR ALI">ASHKAR ALI (Partner)</option>
         </select>
       </div>
-
       <div class="form-group" style="text-align: left;">
-        <label>Secret PIN (രഹസ്യ കോഡ്)</label>
+        <label>Secret PIN</label>
         <input type="password" id="loginPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
       </div>
-
       <button type="button" class="btn-submit" onclick="submitPartnerLogin()">ലോഗിൻ ചെയ്യുക (Login)</button>
-      
       <div style="margin-top: 14px;">
-        <button type="button" class="btn-link" onclick="openForgotPinModal()" style="font-size: 0.82rem; color: #0284c7; font-weight: 700;">
-          PIN മറന്നുപോയോ? (Forgot PIN?)
-        </button>
+        <button type="button" class="btn-link" onclick="openForgotPinModal()" style="font-size: 0.82rem; color: #0284c7; font-weight: 700;">PIN മറന്നുപോയോ?</button>
       </div>
     </div>
   </div>
 
-  <!-- ENTRY MODAL (RETAINED FULL SAFE OCR & LOGIC) -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <h3 id="modalTitle">Add Entry</h3>
       <input type="hidden" id="editEntryId">
       <input type="hidden" id="entryType">
-
       <div class="form-group" id="expCategoryGroup" style="display:none;">
-        <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
+        <label>Expense Category</label>
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
           <option value="tea">Tea / Refreshment</option>
           <option value="stock">Purchase / സപ്ലയർ പർച്ചേസ്</option>
@@ -1119,17 +1094,11 @@
           <option value="other">Daily Expense / Miscellaneous</option>
         </select>
       </div>
-
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
-        <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
-          📸 Scan / Upload Bill with OCR (Free Engine)
-        </button>
-        <div id="scanLoadingBox" class="scanning-loader">
-          🔄 OCR വഴി ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക
-        </div>
+        <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">📸 Scan / Upload Bill with OCR</button>
+        <div id="scanLoadingBox" class="scanning-loader">🔄 OCR വഴി പരിശോധിക്കുന്നു...</div>
       </div>
-
       <div id="supplierItemsBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="font-weight:700; font-size:0.8rem; color:#475569; margin:0;">വാങ്ങിയ സാധനങ്ങളും വിലയും</label>
@@ -1137,34 +1106,24 @@
         </div>
         <div id="purchaseItemsListContainer"></div>
       </div>
-
       <div class="form-group">
         <label id="itemNameLabel">Supplier / Item / Description</label>
         <input type="text" id="entryTitle" list="suppliersList" class="form-control" placeholder="പേര് തിരഞ്ഞെടുക്കുക">
       </div>
-
       <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
         <div style="display:flex; gap:8px;">
-          <div style="flex:1;">
-            <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (₹)</label>
-            <input type="number" id="suppTotalBill" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
-          </div>
-          <div style="flex:1;">
-            <label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (₹)</label>
-            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
-          </div>
+          <div style="flex:1;"><label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (₹)</label><input type="number" id="suppTotalBill" class="form-control" placeholder="0" oninput="calcPurchaseDue()"></div>
+          <div style="flex:1;"><label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (₹)</label><input type="number" id="suppPaidAmount" class="form-control" placeholder="0" oninput="calcPurchaseDue()"></div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
           <span style="color:#b91c1c;">ബാക്കി കുടിശ്ശിക:</span>
           <span id="suppDueText" style="color:#b91c1c; font-size:0.95rem;">₹0</span>
         </div>
       </div>
-
       <div class="form-group" id="generalAmountGroup">
         <label id="amountLabel">Amount (തുക ₹)</label>
         <input type="number" id="entryAmount" class="form-control" placeholder="0.00">
       </div>
-
       <div class="form-group">
         <label>Payment Mode</label>
         <select id="entryMode" class="form-control">
@@ -1172,18 +1131,15 @@
           <option value="gpay">Bank Account (GPay/UPI)</option>
         </select>
       </div>
-
       <div class="form-group">
-        <label>Additional Note (ഓപ്ഷണൽ)</label>
+        <label>Additional Note</label>
         <input type="text" id="entryNote" class="form-control" placeholder="വിവരങ്ങൾ">
       </div>
-
       <button class="btn-submit" id="modalSubmitBtn" onclick="saveEntry()">Save Entry</button>
       <button class="btn-cancel" onclick="closeModal('entryModal')">Cancel</button>
     </div>
   </div>
 
-  <!-- OTHER EXISTING MODALS (TODAY'S REPORT, LEDGER SHEET, RUNNING BREAKDOWN, INVEST, WITHDRAW, OPENING, SETTINGS) -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
@@ -1208,8 +1164,8 @@
           </div>
         </div>
         <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:8px; text-align:center; margin-bottom:12px;">
-          <div style="font-size:0.8rem; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT / ബാക്കി</div>
-          <div id="modalRepProfit" style="font-size:1.4rem; font-weight:800; color:#1e3a8a;">₹0</div>
+          <div style="font-size:0.8rem; font-weight:bold; color:#1e3a8a;">NET DAILY PROFIT</div>
+          <div id="modalRepProfit" style="font-size:1.4rem; font-weight:800; color:#1e3a8a; margin-top:2px;">₹0</div>
         </div>
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:0.8rem;">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Cash Box Balance:</span><strong id="modalRepCashBal">₹0</strong></div>
@@ -1258,9 +1214,9 @@
   <div class="modal" id="investModal">
     <div class="modal-box">
       <h3>Add Capital Investment</h3>
-      <div class="form-group"><label>Investing Partner</label><select id="invPartner" class="form-control"><option value="ASHIF">ASHIF</option><option value="SABITH">SABITH</option><option value="ASHKAR ALI">ASHKAR ALI</option></select></div>
+      <div class="form-group"><label>Partner</label><select id="invPartner" class="form-control"><option value="ASHIF">ASHIF</option><option value="SABITH">SABITH</option><option value="ASHKAR ALI">ASHKAR ALI</option></select></div>
       <div class="form-group"><label>Amount (₹)</label><input type="number" id="invAmount" class="form-control" placeholder="0.00"></div>
-      <div class="form-group"><label>Payment Mode</label><select id="invMode" class="form-control"><option value="bank">Bank Transfer / UPI</option><option value="cash">Direct Cash</option></select></div>
+      <div class="form-group"><label>Mode</label><select id="invMode" class="form-control"><option value="bank">Bank / UPI</option><option value="cash">Direct Cash</option></select></div>
       <div class="form-group"><label>Date</label><input type="date" id="invDate" class="form-control"></div>
       <div class="form-group"><label>Note</label><input type="text" id="invNote" class="form-control"></div>
       <button class="btn-submit" style="background:var(--accent-purple) !important;" onclick="saveInvestment()">Submit for Verification</button>
@@ -1271,7 +1227,7 @@
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Money Withdrawal</h3>
-      <div class="form-group"><label>Withdrawing Partner</label><select id="withPartner" class="form-control"><option value="ASHIF">ASHIF</option><option value="SABITH">SABITH</option><option value="ASHKAR ALI">ASHKAR ALI</option></select></div>
+      <div class="form-group"><label>Partner</label><select id="withPartner" class="form-control"><option value="ASHIF">ASHIF</option><option value="SABITH">SABITH</option><option value="ASHKAR ALI">ASHKAR ALI</option></select></div>
       <div class="form-group"><label>Amount (₹)</label><input type="number" id="withAmount" class="form-control" placeholder="0.00"></div>
       <div class="form-group"><label>Source</label><select id="withMode" class="form-control"><option value="cash">Counter Cash Box</option><option value="gpay">Bank Account / GPay</option></select></div>
       <div class="form-group"><label>Date</label><input type="date" id="withDate" class="form-control"></div>
@@ -1365,12 +1321,13 @@
     </div>
   </div>
   <script>
+    // 1. കോൺഫിഗറേഷനുകൾ & PIN കോഡുകൾ
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
     let dynamicOcrKey = localStorage.getItem('BANABLAST_OCR_KEY') || "";
 
-    // ഡിഫോൾട്ട് PIN കോഡുകൾ (കൗണ്ടർ ബില്ലിംഗിന് 0000)
+    // ഡിഫോൾട്ട് ലോഗിൻ പിൻ കോഡുകൾ (കൗണ്ടർ ബില്ലിംഗിന് 0000)
     let partnerPins = {
       "Counter / Billing": "0000",
       "ASHIF": "1111",
@@ -1391,7 +1348,7 @@
       }
     }
 
-    // Firebase Config
+    // Firebase സുരക്ഷിതമായി ഇനിഷ്യലൈസ് ചെയ്യുന്നു
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -1401,7 +1358,9 @@
       appId: "1:236930066397:web:e8062c9d77080837e3f834"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     // ആപ്പ് സ്റ്റേറ്റ് വേരിയബിളുകൾ
@@ -1417,7 +1376,7 @@
     let posCart = [];
     let posPayMode = 'cash';
     let posSelectedCategory = 'all';
-    let posEditingBill = null; // എഡിറ്റ് ചെയ്യുന്ന ബില്ലിന്റെ വിവരങ്ങൾ
+    let posEditingBill = null;
 
     let currentReportFilter = 'month';
     let activeSheetKey = '';
@@ -1429,14 +1388,22 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       1. റോൾ-ബേസ്ഡ് ലോഗിൻ & സെക്യൂരിറ്റി (KIOSK MODE)
+       2. റോൾ-ബേസ്ഡ് ലോഗിൻ & കിയോസ്ക് മോഡ് (KIOSK MODE)
        ------------------------------------------------------------- */
     function checkUserLogin() {
-      if (!currentLoggedInUser) {
-        document.getElementById('loginModal').style.display = 'flex';
-      } else {
-        document.getElementById('loginModal').style.display = 'none';
-        applyUserRoleRestrictions();
+      try {
+        if (!currentLoggedInUser) {
+          const lModal = document.getElementById('loginModal');
+          if (lModal) lModal.style.display = 'flex';
+          const userTag = document.getElementById('loggedInUserText');
+          if (userTag) userTag.innerText = "👤 Login Required";
+        } else {
+          const lModal = document.getElementById('loginModal');
+          if (lModal) lModal.style.display = 'none';
+          applyUserRoleRestrictions();
+        }
+      } catch (err) {
+        console.error("Login check error:", err);
       }
     }
 
@@ -1453,13 +1420,12 @@
       if (headerTitle) headerTitle.innerText = isStaff ? "BANABLAST POS" : "BANABLAST";
 
       if (isStaff) {
-        // സ്റ്റാഫ് ലോഗിൻ: മറ്റ് എല്ലാ മെയിൻ ടാബുകളും കലണ്ടറും സെൻസിറ്റീവ് ബട്ടണുകളും മറയ്ക്കുന്നു
+        // സ്റ്റാഫ് ലോഗിൻ: മെയിൻ ടാബുകളും രഹസ്യ കണക്കുകളും പൂർണ്ണമായി മറയ്ക്കുന്നു
         if (navTabs) navTabs.style.display = 'none';
         if (calBar) calBar.style.display = 'none';
         if (ocrBtn) ocrBtn.style.display = 'none';
         if (chPinBtn) chPinBtn.style.display = 'none';
 
-        // കൗണ്ടർ POS മാത്രം കാണിക്കുന്നു
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         const posTab = document.getElementById('tab-pos');
         if (posTab) posTab.classList.add('active');
@@ -1489,7 +1455,7 @@
         applyUserRoleRestrictions();
         renderAll();
       } else {
-        alert("❌ തെറ്റായ PIN! ദയവായി ശരിയായ രഹസ്യ കോഡ് നൽകുക.");
+        alert("❌ തെറ്റായ PIN! ദയവായി ശരിയായ കോഡ് നൽകുക.");
       }
     }
 
@@ -1517,11 +1483,11 @@
       const newPin = document.getElementById('newPinInput').value.trim();
 
       if (oldPin !== partnerPins[currentLoggedInUser]) {
-        alert("❌ നിലവിലുള്ള പഴയ PIN തെറ്റാണ്!");
+        alert("❌ പഴയ PIN തെറ്റാണ്!");
         return;
       }
       if (newPin.length < 4) {
-        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        alert("⚠️️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ വേണം!");
         return;
       }
 
@@ -1549,14 +1515,14 @@
         return;
       }
       if (newPin.length < 4) {
-        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ വേണം!");
         return;
       }
 
       partnerPins[targetPartner] = newPin;
       db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true })
         .then(() => {
-          alert(`✅ ${targetPartner}-ന്റെ PIN വിജയകരമായി റീസെറ്റ് ചെയ്തു!`);
+          alert(`✅ ${targetPartner}-ന്റെ PIN റീസെറ്റ് ചെയ്തു!`);
           closeModal('forgotPinModal');
         });
     }
@@ -1571,60 +1537,68 @@
       dynamicOcrKey = val;
       localStorage.setItem('BANABLAST_OCR_KEY', val);
       db.collection('settings').doc('ocr').set({ key: val }, { merge: true });
-      alert("✅ OCR.space Key സേവ് ചെയ്തു!");
+      alert("✅ OCR Key സേവ് ചെയ്തു!");
       closeModal('aiSettingsModal');
     }
 
     /* -------------------------------------------------------------
-       2. INITIALIZATION & FIRESTORE SYNC
+       3. ഇനീഷ്യലൈസേഷൻ & സിൻക്രണൈസേഷൻ
        ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
-      flatpickrCalendar = flatpickr("#selectedDate", {
-        dateFormat: "Y-m-d",
-        defaultDate: today,
-        altInput: true,
-        altFormat: "d/m/Y (D)",
-        disableMobile: true,
-        onDayCreate: function(dObj, dStr, fp, dayElem) {
-          const dateStr = fp.formatDate(dayElem.dateObj, "Y-m-d");
-          if (holidays.includes(dateStr)) dayElem.classList.add("shop-holiday-day");
-        },
-        onChange: function(selectedDates, dateStr) {
-          document.getElementById('selectedDate').value = dateStr;
-          renderAll();
+      try {
+        if (typeof flatpickr !== 'undefined' && document.getElementById('selectedDate')) {
+          flatpickrCalendar = flatpickr("#selectedDate", {
+            dateFormat: "Y-m-d",
+            defaultDate: today,
+            altInput: true,
+            altFormat: "d/m/Y (D)",
+            disableMobile: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+              const dateStr = fp.formatDate(dayElem.dateObj, "Y-m-d");
+              if (holidays.includes(dateStr)) dayElem.classList.add("shop-holiday-day");
+            },
+            onChange: function(selectedDates, dateStr) {
+              document.getElementById('selectedDate').value = dateStr;
+              renderAll();
+            }
+          });
+          document.getElementById('selectedDate').value = today;
         }
-      });
-      document.getElementById('selectedDate').value = today;
+      } catch (e) {
+        console.warn("Flatpickr warning:", e);
+      }
     }
 
     window.onload = function() {
       checkUserLogin();
       initFlatpickrCalendar();
 
-      document.getElementById('posAnalyticsDateInput').value = today;
-      document.getElementById('invDate').value = today;
-      document.getElementById('withDate').value = today;
-      document.getElementById('repFromDate').value = today;
-      document.getElementById('repToDate').value = today;
+      // ഇൻപുട്ടുകളിൽ ഇന്നത്തെ തീയതി നൽകുന്നു
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+      setVal('posAnalyticsDateInput', today);
+      setVal('invDate', today);
+      setVal('withDate', today);
+      setVal('repFromDate', today);
+      setVal('repToDate', today);
 
-      // Sync Security PINs
+      // PIN സിങ്ക്
       db.collection('settings').doc('security').onSnapshot(doc => {
         if (doc.exists && doc.data().pins) {
           partnerPins = { ...partnerPins, ...doc.data().pins };
         } else {
           db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
         }
-      });
+      }, err => console.warn(err));
 
-      // Sync OCR Key
+      // OCR Key സിങ്ക്
       db.collection('settings').doc('ocr').onSnapshot(doc => {
         if (doc.exists && doc.data().key) {
           dynamicOcrKey = doc.data().key;
           localStorage.setItem('BANABLAST_OCR_KEY', dynamicOcrKey);
         }
-      });
+      }, err => console.warn(err));
 
-      // Sync POS Menu Items (ആദ്യ തവണയാണെങ്കിൽ ഡിഫോൾട്ട് അവിൽ മിൽക്ക് ഐറ്റങ്ങൾ നൽകുന്നു)
+      // POS മെനു ഐറ്റങ്ങൾ
       db.collection('billing_items').onSnapshot(snap => {
         posMenuItems = [];
         snap.forEach(doc => posMenuItems.push({ id: doc.id, ...doc.data() }));
@@ -1634,9 +1608,9 @@
           renderPosItemsGrid();
           renderModalPosItemsList();
         }
-      });
+      }, err => console.warn(err));
 
-      // Sync Transactions (Ledger)
+      // ലെഡ്ജർ ട്രാൻസാക്ഷൻസ്
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
@@ -1645,29 +1619,29 @@
         renderStockItemsTab();
         renderSupplierPurchasesTab();
         renderReportsTab();
-      });
+      }, err => console.warn(err));
 
-      // Sync Detailed POS Bills
+      // കൗണ്ടർ ബില്ലുകൾ
       db.collection('pos_bills').onSnapshot(snap => {
         posBills = [];
         snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
         renderPosAnalyticsTab();
-      });
+      }, err => console.warn(err));
 
-      // Sync Withdrawals & Investments
+      // ഇൻവെസ്റ്റ്മെന്റുകൾ & വിത്ത്ഡ്രോവൽസ്
       db.collection('withdrawals').onSnapshot(snap => {
         withdrawals = [];
         snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
         renderInvestTab();
-      });
+      }, err => console.warn(err));
 
       db.collection('investments').onSnapshot(snap => {
         investments = [];
         snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
         renderInvestTab();
-      });
+      }, err => console.warn(err));
 
-      // Sync Settings (Opening & Holidays)
+      // ജനറൽ ക്രമീകരണങ്ങൾ
       db.collection('settings').doc('general').onSnapshot(doc => {
         if (doc.exists) {
           const data = doc.data();
@@ -1677,7 +1651,7 @@
           loadDateData();
           renderDailyAccounts();
         }
-      });
+      }, err => console.warn(err));
     };
 
     function renderAll() {
@@ -1700,7 +1674,7 @@
     }
 
     function loadDateData() {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       const isHoliday = holidays.includes(curDate);
       const hBtn = document.getElementById('holidayToggleBtn');
       const hBanner = document.getElementById('holidayBanner');
@@ -1728,7 +1702,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. COUNTER POS LOGIC (വിഷ്വൽ കാർഡുകൾ, കാർട്ട് & പ്രിന്റ്)
+       4. കൗണ്ടർ POS സിസ്റ്റം (വിഷ്വൽ കാർഡുകൾ & കാർട്ട്)
        ------------------------------------------------------------- */
     function seedDefaultMenuItems() {
       const defaults = [
@@ -1755,6 +1729,7 @@
 
     function renderPosItemsGrid() {
       const container = document.getElementById('posItemsGridContainer');
+      if (!container) return;
       let items = posMenuItems;
       if (posSelectedCategory !== 'all') {
         items = items.filter(i => i.category === posSelectedCategory);
@@ -1809,6 +1784,7 @@
 
     function renderPosCart() {
       const container = document.getElementById('posCartItemsList');
+      if (!container) return;
       if (!posCart.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>';
         document.getElementById('posCartTotalText').innerText = '₹0';
@@ -1845,7 +1821,7 @@
     }
 
     /* -------------------------------------------------------------
-       4. ഓട്ടോ-ലെഡ്ജർ സിങ്ക് (ക്ലീൻ അഗ്രിഗേഷൻ) & ബില്ല് സേവിംഗ്
+       5. ഓട്ടോ-ലെഡ്ജർ അഗ്രിഗേഷൻ (ക്ലീൻ സിങ്ക്) & ബില്ല് സേവിംഗ്
        ------------------------------------------------------------- */
     async function printAndSavePosBill() {
       if (!posCart.length) {
@@ -1857,17 +1833,13 @@
       const curDate = today;
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const phone = document.getElementById('posCustPhone').value.trim();
-
-      // ബില്ല് നമ്പർ നിർണ്ണയിക്കുന്നു
       const billNo = posEditingBill ? posEditingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       try {
         if (posEditingBill) {
-          // --- എഡിറ്റ് ചെയ്ത ബില്ല് അപ്‌ഡേറ്റ് ചെയ്യുന്നു ---
           const oldTotal = posEditingBill.total;
           const oldMode = posEditingBill.mode;
 
-          // 1. pos_bills-ൽ അപ്‌ഡേറ്റ് ചെയ്യുന്നു
           await db.collection('pos_bills').doc(posEditingBill.id).update({
             items: posCart,
             total: total,
@@ -1876,13 +1848,11 @@
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-          // 2. മെയിൻ ലെഡ്ജറിൽ പഴയ തുക കുറച്ച് പുതിയ തുക കൂട്ടുന്നു
           await adjustDailyLedgerAggregatedSale(curDate, oldMode, -oldTotal);
           await adjustDailyLedgerAggregatedSale(curDate, posPayMode, total);
 
           alert(`✅ ബില്ല് #${billNo} വിജയകരമായി തിരുത്തി!`);
         } else {
-          // --- പുതിയ ബില്ല് സേവ് ചെയ്യുന്നു ---
           await db.collection('pos_bills').add({
             billNo,
             date: curDate,
@@ -1895,14 +1865,11 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-          // മെയിൻ ലെഡ്ജറിലെ ഒരൊറ്റ വരിയിലേക്ക് (Counter Sales) തുക കൂട്ടിച്ചേർക്കുന്നു
           await adjustDailyLedgerAggregatedSale(curDate, posPayMode, total);
         }
 
-        // തെർമൽ പ്രിന്റ് വിൻഡോ തുറക്കുന്നു
         triggerThermalPrint(billNo, curDate, timeStr, total, posPayMode, posCart);
 
-        // കാർട്ട് റീസെറ്റ് ചെയ്യുന്നു
         posCart = [];
         posEditingBill = null;
         document.getElementById('posCurrentBillNoTag').innerText = "New Order";
@@ -1915,7 +1882,6 @@
       }
     }
 
-    // മെയിൻ ആപ്പിലെ Counter Sales (Cash) / Counter Sales (GPay) എൻട്രിയിൽ തുക അപ്‌ഡേറ്റ് ചെയ്യുന്ന ഫംഗ്ഷൻ
     async function adjustDailyLedgerAggregatedSale(dateStr, mode, deltaAmount) {
       const targetTitle = (mode === 'cash') ? 'Counter Sales (Cash)' : 'Counter Sales (GPay)';
       
@@ -1967,7 +1933,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. WHATSAPP BILLING & RECENT BILLS REPRINT
+       6. WHATSAPP ബില്ലിംഗ് & റീസെന്റ് ബില്ലുകൾ
        ------------------------------------------------------------- */
     function sendPosWhatsAppBill() {
       if (!posCart.length) {
@@ -2037,7 +2003,7 @@
     }
 
     /* -------------------------------------------------------------
-       6. POS MENU MANAGEMENT (ഐറ്റങ്ങൾ ചേർക്കലും നീക്കലും)
+       7. POS മെനു ക്രമീകരണങ്ങൾ (ഐറ്റങ്ങൾ ചേർക്കലും നീക്കലും)
        ------------------------------------------------------------- */
     function openManagePosItemsModal() {
       document.getElementById('managePosItemsModal').style.display = 'flex';
@@ -2090,10 +2056,11 @@
     }
 
     /* -------------------------------------------------------------
-       7. PARTNERS POS ANALYTICS TAB (ഐറ്റം വിൽപ്പന & സ്ഥിതിവിവരക്കണക്കുകൾ)
+       8. POS അനലിറ്റിക്സ് ടാബ് (പാർട്ണർമാർക്ക് മാത്രം)
        ------------------------------------------------------------- */
     function renderPosAnalyticsTab() {
-      const selectedDate = document.getElementById('posAnalyticsDateInput').value || today;
+      const dateEl = document.getElementById('posAnalyticsDateInput');
+      const selectedDate = dateEl ? dateEl.value || today : today;
       const filtered = posBills.filter(b => b.date === selectedDate);
 
       let totalSales = 0, cashSales = 0, gpaySales = 0;
@@ -2116,47 +2083,50 @@
         }
       });
 
-      document.getElementById('posAnaTotalSales').innerText = '₹' + Math.round(totalSales * 100) / 100;
-      document.getElementById('posAnaCash').innerText = '₹' + Math.round(cashSales * 100) / 100;
-      document.getElementById('posAnaGpay').innerText = '₹' + Math.round(gpaySales * 100) / 100;
-      document.getElementById('posAnaTotalGlassCount').innerText = `${totalGlasses} Glasses Sold`;
-      document.getElementById('posAnaBillsCountTag').innerText = `${filtered.length} Bills`;
+      const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setT('posAnaTotalSales', '₹' + Math.round(totalSales * 100) / 100);
+      setT('posAnaCash', '₹' + Math.round(cashSales * 100) / 100);
+      setT('posAnaGpay', '₹' + Math.round(gpaySales * 100) / 100);
+      setT('posAnaTotalGlassCount', `${totalGlasses} Glasses Sold`);
+      setT('posAnaBillsCountTag', `${filtered.length} Bills`);
 
-      // കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ ക്രമപ്പെടുത്തുന്നു (Top Sellers first)
       const sortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
       const breakdownContainer = document.getElementById('posAnaItemBreakdownList');
-      if (!sortedItems.length) {
-        breakdownContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">വിൽപ്പന വിവരങ്ങൾ ലഭ്യമല്ല</p>';
-      } else {
-        breakdownContainer.innerHTML = sortedItems.map((item, idx) => `
-          <div class="list-row" style="align-items:center;">
-            <span><strong>#${idx + 1} ${item.name}</strong> (${item.count} ഗ്ലാസ്)</span>
-            <strong class="color-green">₹${item.revenue}</strong>
-          </div>
-        `).join('');
+      if (breakdownContainer) {
+        if (!sortedItems.length) {
+          breakdownContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">വിൽപ്പന വിവരങ്ങൾ ലഭ്യമല്ല</p>';
+        } else {
+          breakdownContainer.innerHTML = sortedItems.map((item, idx) => `
+            <div class="list-row" style="align-items:center;">
+              <span><strong>#${idx + 1} ${item.name}</strong> (${item.count} ഗ്ലാസ്)</span>
+              <strong class="color-green">₹${item.revenue}</strong>
+            </div>
+          `).join('');
+        }
       }
 
-      // അന്നത്തെ ഇൻഡിവിജ്വൽ ബില്ലുകളുടെ ലിസ്റ്റ്
       const billsContainer = document.getElementById('posAnaBillsListContainer');
-      if (!filtered.length) {
-        billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ തീയതിയിൽ ബില്ലുകൾ ഇല്ല</p>';
-      } else {
-        billsContainer.innerHTML = filtered.slice().reverse().map(b => `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${b.time || '-'})</span>
-              <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${b.mode.toUpperCase()})</span>
+      if (billsContainer) {
+        if (!filtered.length) {
+          billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ തീയതിയിൽ ബില്ലുകൾ ഇല്ല</p>';
+        } else {
+          billsContainer.innerHTML = filtered.slice().reverse().map(b => `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${b.time || '-'})</span>
+                <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${b.mode.toUpperCase()})</span>
+              </div>
+              <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
+                ${(b.items || []).map(i => `${i.name} (x${i.qty})`).join(', ')}
+              </div>
             </div>
-            <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
-              ${(b.items || []).map(i => `${i.name} (x${i.qty})`).join(', ')}
-            </div>
-          </div>
-        `).join('');
+          `).join('');
+        }
       }
     }
 
     /* -------------------------------------------------------------
-       8. OCR സ്കാനിംഗ് & പർച്ചേസ് ഐറ്റം വാലിഡേഷൻ
+       9. OCR സ്കാനിംഗ് & പർച്ചേസ് ഐറ്റം വാലിഡേഷൻ
        ------------------------------------------------------------- */
     function updateDatalists() {
       const suppliers = new Set();
@@ -2175,6 +2145,7 @@
 
     function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
       const container = document.getElementById('purchaseItemsListContainer');
+      if (!container) return;
       const div = document.createElement('div');
       div.className = 'purchase-item-row';
       
@@ -2343,7 +2314,7 @@
     }
 
     /* -------------------------------------------------------------
-       9. മെയിൻ ലെഡ്ജർ എൻട്രികൾ & ഡെയ്‌ലി അക്കൗണ്ട്സ്
+       10. മെയിൻ ലെഡ്ജർ എൻട്രികൾ & ഡെയ്‌ലി അക്കൗണ്ട്സ്
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -2410,10 +2381,13 @@
       }
     }
 
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeModal(id) { 
+      const el = document.getElementById(id); 
+      if (el) el.style.display = 'none'; 
+    }
 
     function saveEntry() {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       const editId = document.getElementById('editEntryId').value;
       const type = document.getElementById('entryType').value;
       const mode = document.getElementById('entryMode').value;
@@ -2487,7 +2461,7 @@
     }
 
     function renderDailyAccounts() {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       const todayTrans = transactions.filter(t => t.date === curDate);
 
       let totalSales = 0, totalExp = 0;
@@ -2536,20 +2510,24 @@
         }
       });
 
-      document.getElementById('salesEntriesList').innerHTML = salesHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">വരവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
-      document.getElementById('expenseEntriesList').innerHTML = expHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">ചിലവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
+      const sList = document.getElementById('salesEntriesList');
+      if (sList) sList.innerHTML = salesHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">വരവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
+      
+      const eList = document.getElementById('expenseEntriesList');
+      if (eList) eList.innerHTML = expHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.85rem; padding:20px;">ചിലവുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല</p>';
 
       totalSales = Math.round(totalSales * 100) / 100;
       totalExp = Math.round(totalExp * 100) / 100;
 
-      document.getElementById('sumDailySales').innerText = '₹' + totalSales;
-      document.getElementById('sumDailyExp').innerText = '₹' + totalExp;
-      document.getElementById('sumDailyProfit').innerText = '₹' + (Math.round((totalSales - totalExp) * 100) / 100);
+      const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setT('sumDailySales', '₹' + totalSales);
+      setT('sumDailyExp', '₹' + totalExp);
+      setT('sumDailyProfit', '₹' + (Math.round((totalSales - totalExp) * 100) / 100));
 
-      document.getElementById('subSaleCash').innerText = '₹' + (Math.round(saleCash * 100) / 100);
-      document.getElementById('subSaleGPay').innerText = '₹' + (Math.round(saleGPay * 100) / 100);
-      document.getElementById('subExpCash').innerText = '₹' + (Math.round(expCash * 100) / 100);
-      document.getElementById('subExpGPay').innerText = '₹' + (Math.round(expGPay * 100) / 100);
+      setT('subSaleCash', '₹' + (Math.round(saleCash * 100) / 100));
+      setT('subSaleGPay', '₹' + (Math.round(saleGPay * 100) / 100));
+      setT('subExpCash', '₹' + (Math.round(expCash * 100) / 100));
+      setT('subExpGPay', '₹' + (Math.round(expGPay * 100) / 100));
 
       let cumCash = opening.cash || 0;
       let cumBank = opening.bank || 0;
@@ -2570,13 +2548,13 @@
       cumCash = Math.round(cumCash * 100) / 100;
       cumBank = Math.round(cumBank * 100) / 100;
 
-      document.getElementById('runCashBal').innerText = '₹' + cumCash;
-      document.getElementById('runBankBal').innerText = '₹' + cumBank;
-      document.getElementById('runTotalBal').innerText = '₹' + (Math.round((cumCash + cumBank) * 100) / 100);
+      setT('runCashBal', '₹' + cumCash);
+      setT('runBankBal', '₹' + cumBank);
+      setT('runTotalBal', '₹' + (Math.round((cumCash + cumBank) * 100) / 100));
     }
 
     function openTodayReportModal() {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       document.getElementById('repModalDateText').innerText = `Date: ${curDate}`;
       document.getElementById('modalRepSales').innerText = document.getElementById('sumDailySales').innerText;
       document.getElementById('modalRepSaleCash').innerText = document.getElementById('subSaleCash').innerText;
@@ -2592,10 +2570,11 @@
     }
 
     /* -------------------------------------------------------------
-       10. STOCK, SUPPLIERS, REPORTS & INVESTMENTS
+       11. STOCK, SUPPLIERS, REPORTS & INVESTMENTS
        ------------------------------------------------------------- */
     function renderStockItemsTab() {
       const container = document.getElementById('stockItemsListContainer');
+      if (!container) return;
       const itemMap = {};
       transactions.forEach(t => {
         if (t.category === 'stock' && t.items && t.items.length) {
@@ -2631,6 +2610,7 @@
 
     function renderSupplierPurchasesTab() {
       const container = document.getElementById('supplierPurchasesListContainer');
+      if (!container) return;
       const suppTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
       if (!suppTrans.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സപ്ലയർ പർച്ചേസുകൾ ഇല്ല</p>';
@@ -2670,7 +2650,8 @@
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('reportCustomDateBox').style.display = (period === 'custom') ? 'flex' : 'none';
+      const customBox = document.getElementById('reportCustomDateBox');
+      if (customBox) customBox.style.display = (period === 'custom') ? 'flex' : 'none';
       if (period === 'month') document.getElementById('btnFiltMonth').classList.add('active');
       if (period === 'week') document.getElementById('btnFiltWeek').classList.add('active');
       if (period === 'custom') document.getElementById('btnFiltCustom').classList.add('active');
@@ -2678,7 +2659,7 @@
     }
 
     function renderReportsTab() {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       const refDate = new Date(curDate);
       const fromDate = document.getElementById('repFromDate').value;
       const toDate = document.getElementById('repToDate').value;
@@ -2715,18 +2696,24 @@
 
       sales = Math.round(sales * 100) / 100;
       exp = Math.round(exp * 100) / 100;
-      document.getElementById('repSales').innerText = '₹' + sales;
-      document.getElementById('repExp').innerText = '₹' + exp;
-      document.getElementById('repProfit').innerText = '₹' + (Math.round((sales - exp) * 100) / 100);
-      document.getElementById('repTotalRent').innerText = '₹' + (Math.round(rent * 100) / 100);
-      document.getElementById('repRentList').innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
-      document.getElementById('repTotalSalary').innerText = '₹' + (Math.round(salary * 100) / 100);
-      document.getElementById('repStaffList').innerHTML = Object.keys(staffGroup).map(s => `
+      const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setT('repSales', '₹' + sales);
+      setT('repExp', '₹' + exp);
+      setT('repProfit', '₹' + (Math.round((sales - exp) * 100) / 100));
+      setT('repTotalRent', '₹' + (Math.round(rent * 100) / 100));
+      
+      const rList = document.getElementById('repRentList');
+      if (rList) rList.innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
+      
+      setT('repTotalSalary', '₹' + (Math.round(salary * 100) / 100));
+      const sList = document.getElementById('repStaffList');
+      if (sList) sList.innerHTML = Object.keys(staffGroup).map(s => `
         <div class="list-row"><span>👤 ${s}</span><strong class="color-red">₹${staffGroup[s]}</strong></div>
       `).join('') || '<p style="font-size:0.8rem; color:#94a3b8;">സാലറി വിവരങ്ങൾ ഇല്ല</p>';
-      document.getElementById('repStockSum').innerText = '₹' + (Math.round(stock * 100) / 100);
-      document.getElementById('repMiscSum').innerText = '₹' + (Math.round(misc * 100) / 100);
-      document.getElementById('repTotalOther').innerText = '₹' + (Math.round((stock + misc) * 100) / 100);
+      
+      setT('repStockSum', '₹' + (Math.round(stock * 100) / 100));
+      setT('repMiscSum', '₹' + (Math.round(misc * 100) / 100));
+      setT('repTotalOther', '₹' + (Math.round((stock + misc) * 100) / 100));
     }
 
     function openInvestModal() {
@@ -2794,7 +2781,7 @@
 
     function verifyWithdrawal(wthId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ!`);
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ സാധിക്കൂ!`);
         return;
       }
       const w = withdrawals.find(i => i.id === wthId);
@@ -2818,7 +2805,9 @@
       transactions.forEach(t => { if (t.type === 'sale') totalSales += t.amount; else totalExp += t.amount; });
       const totalNetProfit = totalSales - totalExp;
       const eachShare = Math.round((totalNetProfit / 3) * 100) / 100;
-      document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
+      
+      const shareEl = document.getElementById('repEachShare');
+      if (shareEl) shareEl.innerText = `₹${eachShare} / partner`;
 
       withdrawals.forEach(w => {
         if (w.status === 'verified') {
@@ -2865,11 +2854,14 @@
         `;
       });
 
-      document.getElementById('invTotalVerified').innerText = '₹' + (Math.round(totVerInvest * 100) / 100);
-      document.getElementById('invCapAshif').innerText = '₹' + (Math.round((capMap['ASHIF'] || 0) * 100) / 100);
-      document.getElementById('invCapSabith').innerText = '₹' + (Math.round((capMap['SABITH'] || 0) * 100) / 100);
-      document.getElementById('invCapAshkar').innerText = '₹' + (Math.round((capMap['ASHKAR ALI'] || 0) * 100) / 100);
-      document.getElementById('investListContainer').innerHTML = invHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">ഇൻവെസ്റ്റ്മെന്റുകൾ ഇല്ല</p>';
+      const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setT('invTotalVerified', '₹' + (Math.round(totVerInvest * 100) / 100));
+      setT('invCapAshif', '₹' + (Math.round((capMap['ASHIF'] || 0) * 100) / 100));
+      setT('invCapSabith', '₹' + (Math.round((capMap['SABITH'] || 0) * 100) / 100));
+      setT('invCapAshkar', '₹' + (Math.round((capMap['ASHKAR ALI'] || 0) * 100) / 100));
+      
+      const invCont = document.getElementById('investListContainer');
+      if (invCont) invCont.innerHTML = invHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">ഇൻവെസ്റ്റ്മെന്റുകൾ ഇല്ല</p>';
 
       let withHTML = '';
       withdrawals.slice().reverse().forEach(w => {
@@ -2891,16 +2883,20 @@
         `;
       });
 
-      document.getElementById('withTotalVerified').innerText = '₹' + (Math.round(totVerWith * 100) / 100);
-      document.getElementById('withCapAshif').innerText = '₹' + (Math.round((withMap['ASHIF'] || 0) * 100) / 100);
-      document.getElementById('withCapSabith').innerText = '₹' + (Math.round((withMap['SABITH'] || 0) * 100) / 100);
-      document.getElementById('withCapAshkar').innerText = '₹' + (Math.round((withMap['ASHKAR ALI'] || 0) * 100) / 100);
-      document.getElementById('withdrawListContainer').innerHTML = withHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">പിൻവലിക്കലുകൾ ഇല്ല</p>';
-      document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
+      setT('withTotalVerified', '₹' + (Math.round(totVerWith * 100) / 100));
+      setT('withCapAshif', '₹' + (Math.round((withMap['ASHIF'] || 0) * 100) / 100));
+      setT('withCapSabith', '₹' + (Math.round((withMap['SABITH'] || 0) * 100) / 100));
+      setT('withCapAshkar', '₹' + (Math.round((withMap['ASHKAR ALI'] || 0) * 100) / 100));
+      
+      const withCont = document.getElementById('withdrawListContainer');
+      if (withCont) withCont.innerHTML = withHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">പിൻവലിക്കലുകൾ ഇല്ല</p>';
+      
+      const pAlert = document.getElementById('pendingAlertBox');
+      if (pAlert) pAlert.style.display = hasPending ? 'block' : 'none';
     }
 
     /* -------------------------------------------------------------
-       11. LEDGER SHEET & RUNNING BREAKDOWN
+       12. ലെഡ്ജർ ഷീറ്റ്, ബ്രേക്ക്‌ഡൗൺ & ഓപ്പണിംഗ് ബാലൻസ്
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -2920,7 +2916,7 @@
     }
 
     function renderItemSheetContent(forcedCategory = '') {
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
       const refDate = new Date(curDate);
 
       let matched = transactions.filter(t => (t.title || t.extra || '').toLowerCase() === activeSheetKey);
@@ -2937,25 +2933,29 @@
 
       filtered.sort((a,b) => b.date.localeCompare(a.date));
       let totalSum = 0;
-      document.getElementById('sheetTableBody').innerHTML = filtered.map(t => {
-        totalSum += t.amount;
-        return `
-          <tr>
-            <td style="padding:8px;"><strong>${t.date}</strong></td>
-            <td style="padding:8px;">${t.note || t.category}</td>
-            <td style="padding:8px;"><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
-            <td style="padding:8px; text-align:right; font-weight:800;" class="${t.type === 'sale' ? 'color-green' : 'color-red'}">₹${t.amount}</td>
-          </tr>
-        `;
-      }).join('') || '<tr><td colspan="4" style="text-align:center; padding:15px; color:#94a3b8;">എൻട്രികൾ ഇല്ല</td></tr>';
+      const tableBody = document.getElementById('sheetTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = filtered.map(t => {
+          totalSum += t.amount;
+          return `
+            <tr>
+              <td style="padding:8px;"><strong>${t.date}</strong></td>
+              <td style="padding:8px;">${t.note || t.category}</td>
+              <td style="padding:8px;"><span class="mode-badge ${t.mode === 'cash' ? 'badge-cash' : 'badge-gpay'}">${t.mode.toUpperCase()}</span></td>
+              <td style="padding:8px; text-align:right; font-weight:800;" class="${t.type === 'sale' ? 'color-green' : 'color-red'}">₹${t.amount}</td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="4" style="text-align:center; padding:15px; color:#94a3b8;">എൻട്രികൾ ഇല്ല</td></tr>';
+      }
 
-      document.getElementById('sheetTotalSum').innerText = '₹' + (Math.round(totalSum * 100) / 100);
+      const totalSumEl = document.getElementById('sheetTotalSum');
+      if (totalSumEl) totalSumEl.innerText = '₹' + (Math.round(totalSum * 100) / 100);
     }
 
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
       const modal = document.getElementById('runningBreakdownModal');
-      const curDate = document.getElementById('selectedDate').value || today;
+      const curDate = document.getElementById('selectedDate') ? document.getElementById('selectedDate').value || today : today;
 
       let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
       document.getElementById('breakdownTitle').innerText = `${modeTitle} - Date-wise Breakdown`;
