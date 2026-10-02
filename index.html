@@ -7,10 +7,13 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="logo.png">
 
-  <!-- Flatpickr & html2pdf Bundle -->
+  <!-- Flatpickr -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- html2canvas & jsPDF Libraries (Essential for Zero-Blank PDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1060,7 +1063,7 @@
         <h4 id="a4BarTitle">A4 Statement Preview</h4>
         <div class="a4-btn-group">
           <button type="button" class="a4-btn a4-btn-print" onclick="printOrSaveCurrentA4()">💾 Download PDF</button>
-          <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp Share</button>
+          <button type="button" class="a4-btn a4-btn-wa" onclick="shareCurrentA4WhatsApp()">💬 WhatsApp</button>
           <button type="button" class="a4-btn a4-btn-close" onclick="closeA4PreviewModal()">✕</button>
         </div>
       </div>
@@ -1479,8 +1482,8 @@
     </div>
   </div>
 
-  <!-- =================== [PART 1 ഇതോടെ അവസാനിച്ചു] =================== -->
-      <script>
+  <!-- =================== [PART 1 ഇതോടെ പൂർത്തിയായി] =================== -->
+  <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
@@ -1625,7 +1628,7 @@
       }
 
       if (newPin.length < 4) {
-        alert("⚠️️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        alert("⚠️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
         return;
       }
 
@@ -2248,8 +2251,29 @@
     }
 
     /* -------------------------------------------------------------
-       5. 🌟 100% DIRECT SCREEN-TO-PDF ENGINE (ZERO-BLANK GUARANTEED)
+       5. 🌟 100% WORKING ZERO-BLANK PDF & SHARE ENGINE
        ------------------------------------------------------------- */
+    async function ensurePdfLibraries() {
+      if (typeof html2canvas === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+      if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+    }
+
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
@@ -2271,13 +2295,14 @@
       document.getElementById('a4PreviewModal').style.display = 'none';
     }
 
-    // സ്ക്രീനിലുള്ള യഥാർത്ഥ A4 ഷീറ്റിൽ നിന്ന് നേരിട്ട് ചിത്രം എടുത്ത് PDF ഉണ്ടാക്കുന്നു
+    // സ്ക്രീനിലുള്ള ഷീറ്റിൽ നിന്ന് തത്സമയം 100% വ്യക്തതയുള്ള PDF ബ്ലോബ് നിർമ്മിക്കുന്നു
     async function createCleanA4PdfBlob(fileName) {
+      await ensurePdfLibraries();
+
       const element = document.getElementById('a4SheetPaper');
       const modal = document.getElementById('a4PreviewModal');
       if (modal) modal.scrollTop = 0;
 
-      // സ്ക്രീനിലുള്ള യഥാർത്ഥ വ്യൂവിന്റെ ചിത്രം പകർത്തുന്നു
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -2288,7 +2313,6 @@
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-      // jsPDF വഴി നേരിട്ട് A4 പേപ്പറിൽ വരയ്ക്കുന്നു
       const JsPdf = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
       if (JsPdf) {
         const pdf = new JsPdf('p', 'mm', 'a4');
@@ -2313,17 +2337,11 @@
 
         return pdf.output('blob');
       } else {
-        return await html2pdf().set({
-          margin: [8, 8, 8, 8],
-          filename: fileName,
-          image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(element).output('blob');
+        throw new Error("jsPDF library not available");
       }
     }
 
-    // 1. ഡൗൺലോഡ് ബട്ടൺ (തത്സമയം ഫോണിലേക്ക് സേവ് ആകുന്നു)
+    // 1. ഡൗൺലോഡ് ബട്ടൺ (നേരിട്ട് ഫോണിലേക്ക് സേവ് ആകുന്നു)
     async function printOrSaveCurrentA4() {
       const btn = document.querySelector('.a4-btn-print');
       if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
@@ -2356,7 +2374,7 @@
       }
     }
 
-    // 2. വാട്സാപ്പ് ബട്ടൺ (നേരിട്ട് യഥാർത്ഥ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു)
+    // 2. വാട്സാപ്പ് ബട്ടൺ (യഥാർത്ഥ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു)
     async function shareCurrentA4WhatsApp() {
       const btn = document.querySelector('.a4-btn-wa');
       if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
