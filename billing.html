@@ -25,7 +25,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* താഴെ വലിയ ബട്ടണുകൾ ഉള്ളതിനാൽ താഴത്തെ ഭാഗം മറയാതിരിക്കാൻ 210px പാഡിംഗ് നൽകിയിരിക്കുന്നു */
+    /* താഴെ വലിയ ബട്ടണുകൾ ഉള്ളതിനാൽ ലിസ്റ്റ് മറയാതിരിക്കാൻ പാഡിംഗ് */
     body { background: var(--bg); color: var(--text); padding-bottom: 215px; user-select: none; }
 
     /* Compact App Header */
@@ -67,7 +67,7 @@
 
     /* 2 Categories Switcher */
     .cat-toggle-wrap {
-      padding: 10px 14px 6px;
+      padding: 8px 12px 4px;
       max-width: 1000px;
       margin: 0 auto;
     }
@@ -80,10 +80,10 @@
     }
     .cat-tab-btn {
       flex: 1;
-      padding: 11px;
+      padding: 10px;
       border: none;
       border-radius: 10px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       color: #64748b;
       background: transparent;
@@ -100,34 +100,36 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    /* Items Grid */
+    /* -------------------------------------------------------------
+       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (SLIGHTLY COMPACT CARDS)
+       ------------------------------------------------------------- */
     .items-container {
-      padding: 8px 14px 20px;
+      padding: 6px 12px 16px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 10px;
     }
     @media (min-width: 600px) {
-      .items-container { grid-template-columns: repeat(3, 1fr); }
+      .items-container { grid-template-columns: repeat(3, 1fr); gap: 12px; }
     }
     @media (min-width: 900px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); }
+      .items-container { grid-template-columns: repeat(4, 1fr); gap: 14px; }
     }
 
     .item-card {
       background: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 14px;
       border: 1px solid #e2e8f0;
-      padding: 12px 10px;
+      padding: 9px 8px; /* പാഡിംഗ് അല്പം കുറച്ചു */
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       cursor: pointer;
       position: relative;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
       transition: transform 0.1s ease, border-color 0.1s;
     }
     .item-card:active {
@@ -137,15 +139,15 @@
     }
     
     .item-media-box {
-      width: 76px;
-      height: 76px;
-      border-radius: 12px;
+      width: 60px; /* 76px-ൽ നിന്ന് 60px ആയി കുറച്ചു */
+      height: 60px;
+      border-radius: 10px;
       background: #f8fafc;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .item-img {
       width: 100%;
@@ -153,39 +155,39 @@
       object-fit: cover;
     }
     .item-emoji {
-      font-size: 2.5rem;
+      font-size: 2rem; /* ഇമോജി സൈസ് ഒതുക്കി */
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.88rem;
+      font-size: 0.82rem; /* ഫോണ്ട് സൈസ് അല്പം ക്രമീകരിച്ചു */
       font-weight: 700;
       color: #1e293b;
-      line-height: 1.25;
-      min-height: 34px;
+      line-height: 1.2;
+      min-height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .item-price-tag {
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 900;
       color: var(--accent-green);
       background: #dcfce7;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 16px;
+      margin-top: 5px;
     }
     .item-badge-qty {
       position: absolute;
-      top: 6px;
-      right: 6px;
+      top: 5px;
+      right: 5px;
       background: var(--primary);
       color: white;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 800;
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -194,7 +196,7 @@
     }
 
     /* -------------------------------------------------------------
-       വലുതും വൃത്തിയുള്ളതുമായ സ്മാർട്ട് POS ബാർ (MAIN BOTTOM CONTROL)
+       വലുതും വൃത്തിയുള്ളതുമായ മെയിൻ POS ബാർ (MAIN SCREEN CONTROLS)
        ------------------------------------------------------------- */
     .pos-bottom-bar {
       position: fixed;
@@ -203,17 +205,17 @@
       right: 0;
       background: #ffffff;
       border-top: 2px solid #cbd5e1;
-      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
       box-shadow: 0 -6px 25px rgba(0,0,0,0.14);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    /* വരി 1: വലിയ CASH / GPAY ബട്ടണുകൾ + കാർട്ട് ഐറ്റങ്ങൾ */
+    /* വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ + കാർട്ട് ബട്ടൺ */
     .bottom-row-1 {
       display: flex;
       align-items: center;
@@ -297,21 +299,21 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-width: 95px;
+      min-width: 90px;
       line-height: 1.1;
       padding-left: 2px;
     }
-    .total-box-lbl { font-size: 0.72rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
-    .total-box-amt { font-size: 1.6rem; font-weight: 900; color: var(--primary); }
+    .total-box-lbl { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+    .total-box-amt { font-size: 1.55rem; font-weight: 900; color: var(--primary); }
 
     .btn-print-huge {
       flex: 1;
       background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
       color: white;
       border: none;
-      padding: 14px 12px;
+      padding: 13px 12px;
       border-radius: 14px;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -477,11 +479,11 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid -->
+  <!-- Items Touch Grid (ഒരു പൊടിക്ക് ചെറുതാക്കിയ ലിസ്റ്റ്) -->
   <div class="items-container" id="posItemsContainer"></div>
 
   <!-- -------------------------------------------------------------
-       വലുതും ഭംഗിയുള്ളതുമായ പുതിയ സ്മാർട്ട് POS ബാർ (MAIN SCREEN)
+       മെയിൻ സ്ക്രീൻ POS കൺട്രോൾ ബാർ
        ------------------------------------------------------------- -->
   <div class="pos-bottom-bar">
     <!-- വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ & കാർട്ട് ഐറ്റങ്ങൾ -->
@@ -515,7 +517,7 @@
       </button>
     </div>
 
-    <!-- വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp Bill & Recent Bills ബട്ടണുകൾ -->
+    <!-- വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp & Recent Bills -->
     <div class="bottom-row-3">
       <button type="button" class="btn-quick-action btn-quick-wa" onclick="sendWhatsAppBillDirect()">
         📲 WhatsApp Bill
@@ -688,7 +690,6 @@
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
-      // മെനു ഐറ്റങ്ങൾ സിങ്ക് ചെയ്യുന്നു
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => menuItems.push({ id: doc.id, ...doc.data() }));
@@ -700,7 +701,6 @@
         }
       });
 
-      // ഇന്നത്തെ കൗണ്ടർ ബില്ലുകൾ സിങ്ക് ചെയ്യുന്നു
       db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
@@ -840,7 +840,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ്
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & തെർമൽ പ്രിന്റ്
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -957,10 +957,10 @@
       window.print();
     }
 
-    // മെയിൻ സ്ക്രീനിൽ നിന്ന് നേരിട്ട് WhatsApp ബില്ല് അയക്കാനുള്ള ഫംഗ്ഷൻ
+    // മെയിൻ സ്ക്രീനിൽ നിന്ന് നേരിട്ട് WhatsApp ബില്ല് അയക്കൽ
     function sendWhatsAppBillDirect() {
       if (!cart.length) {
-        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
       
