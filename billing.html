@@ -25,8 +25,8 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* താഴത്തെ ബട്ടണുകൾ കാരണം ലിസ്റ്റ് മറയാതിരിക്കാനുള്ള പാഡിംഗ് */
-    body { background: var(--bg); color: var(--text); padding-bottom: 220px; user-select: none; }
+    /* താഴത്തെ ബട്ടണുകൾ മൂലം ലിസ്റ്റ് മറയാതിരിക്കാൻ പാഡിംഗ് */
+    body { background: var(--bg); color: var(--text); padding-bottom: 230px; user-select: none; }
 
     /* Compact Header */
     .pos-header {
@@ -65,7 +65,7 @@
     }
     .btn-head:active { background: rgba(255,255,255,0.3); }
 
-    /* Category Switcher */
+    /* Category Switcher (Avil Milk & Juices) */
     .cat-toggle-wrap {
       padding: 8px 12px 4px;
       max-width: 1000px;
@@ -101,35 +101,35 @@
     }
 
     /* -------------------------------------------------------------
-       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (NEAT & SLIGHTLY COMPACT)
+       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (NEAT & COMPACT TILES)
        ------------------------------------------------------------- */
     .items-container {
-      padding: 6px 12px 16px;
+      padding: 6px 10px 16px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 8px; /* ഗ്യാപ്പ് കുറച്ചു */
     }
     @media (min-width: 600px) {
-      .items-container { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .items-container { grid-template-columns: repeat(3, 1fr); gap: 10px; }
     }
     @media (min-width: 900px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .items-container { grid-template-columns: repeat(4, 1fr); gap: 12px; }
     }
 
     .item-card {
       background: var(--card-bg);
-      border-radius: 14px;
+      border-radius: 12px;
       border: 1px solid #e2e8f0;
-      padding: 9px 8px; /* ഒതുങ്ങിയ പാഡിംഗ് */
+      padding: 8px 6px; /* പാഡിംഗ് ഒതുക്കി */
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       cursor: pointer;
       position: relative;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       transition: transform 0.1s ease, border-color 0.1s;
     }
     .item-card:active {
@@ -139,15 +139,15 @@
     }
     
     .item-media-box {
-      width: 62px; /* ഒതുങ്ങിയ മീഡിയ ബോക്സ് */
-      height: 62px;
+      width: 50px; /* ബോക്സ് 62px-ൽ നിന്ന് 50px ആയി ഒതുക്കി */
+      height: 50px;
       border-radius: 10px;
       background: #f8fafc;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .item-img {
       width: 100%;
@@ -155,36 +155,36 @@
       object-fit: cover;
     }
     .item-emoji {
-      font-size: 2.1rem;
+      font-size: 1.8rem;
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.84rem;
+      font-size: 0.8rem; /* ഫോണ്ട് സൈസ് ഒതുക്കി ഭംഗിയാക്കി */
       font-weight: 700;
       color: #1e293b;
       line-height: 1.2;
-      min-height: 32px;
+      min-height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .item-price-tag {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 900;
       color: var(--accent-green);
       background: #dcfce7;
-      padding: 3px 10px;
-      border-radius: 16px;
-      margin-top: 5px;
+      padding: 2px 10px;
+      border-radius: 14px;
+      margin-top: 4px;
     }
     .item-badge-qty {
       position: absolute;
-      top: 5px;
-      right: 5px;
+      top: 4px;
+      right: 4px;
       background: var(--primary);
       color: white;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 800;
       width: 22px;
       height: 22px;
@@ -196,7 +196,7 @@
     }
 
     /* -------------------------------------------------------------
-       മെയിൻ സ്ക്രീൻ POS കൺട്രോൾ ബാർ (BOTTOM CONTROLS)
+       വലുതും ബോൾഡുമായ മെയിൻ POS കൺട്രോൾ ബാർ (LARGE TOUCH CONTROLS)
        ------------------------------------------------------------- */
     .pos-bottom-bar {
       position: fixed;
@@ -205,17 +205,17 @@
       right: 0;
       background: #ffffff;
       border-top: 2px solid #cbd5e1;
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -6px 25px rgba(0,0,0,0.14);
+      padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 25px rgba(0,0,0,0.15);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
-    /* വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ + കാർട്ട് ബട്ടൺ */
+    /* വരി 1: കൂടുതൽ വലിപ്പമുള്ള CASH / GPAY / CART ബട്ടണുകൾ */
     .bottom-row-1 {
       display: flex;
       align-items: center;
@@ -224,17 +224,17 @@
     .pay-switcher-large {
       display: flex;
       background: #e2e8f0;
-      border-radius: 12px;
-      padding: 3px;
-      flex: 1.6;
-      gap: 4px;
+      border-radius: 14px;
+      padding: 4px;
+      flex: 1.7;
+      gap: 6px;
     }
     .pay-btn-big {
       flex: 1;
-      padding: 11px 4px;
+      height: 48px; /* വലിയ ടച്ച് ബട്ടൺ */
       border: none;
-      border-radius: 10px;
-      font-size: 0.92rem;
+      border-radius: 11px;
+      font-size: 1rem;
       font-weight: 900;
       background: transparent;
       color: #64748b;
@@ -243,28 +243,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
       transition: all 0.15s ease;
     }
     .pay-btn-big.active.cash {
       background: #16a34a;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.4);
     }
     .pay-btn-big.active.gpay {
       background: #0284c7;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.4);
     }
 
     .btn-cart-bubble {
       flex: 1;
+      height: 48px; /* കാർട്ട് ബട്ടൺ വലുതാക്കി */
       background: #eff6ff;
-      border: 1.5px solid #bfdbfe;
+      border: 2px solid #bfdbfe;
       color: var(--primary);
-      padding: 11px 8px;
-      border-radius: 12px;
-      font-size: 0.88rem;
+      border-radius: 14px;
+      font-size: 0.95rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -277,10 +277,10 @@
       background: #fee2e2;
       border: 1.5px solid #fecaca;
       color: var(--accent-red);
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      font-size: 1.1rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      font-size: 1.2rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -289,7 +289,7 @@
       flex-shrink: 0;
     }
 
-    /* വരി 2: ആകെ തുക & വലിയ PRINT BILL ബട്ടൺ */
+    /* വരി 2: ആകെ തുക & കൂടുതൽ വലിയ PRINT & COMPLETE BILL ബട്ടൺ */
     .bottom-row-2 {
       display: flex;
       gap: 10px;
@@ -299,21 +299,21 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-width: 90px;
+      min-width: 95px;
       line-height: 1.1;
-      padding-left: 2px;
+      padding-left: 4px;
     }
-    .total-box-lbl { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
-    .total-box-amt { font-size: 1.55rem; font-weight: 900; color: var(--primary); }
+    .total-box-lbl { font-size: 0.72rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+    .total-box-amt { font-size: 1.7rem; font-weight: 900; color: var(--primary); }
 
     .btn-print-huge {
       flex: 1;
+      height: 52px; /* കൂടുതൽ ഉയരവും തെളിച്ചവുമുള്ള പ്രിന്റ് ബട്ടൺ */
       background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
       color: white;
       border: none;
-      padding: 13px 12px;
       border-radius: 14px;
-      font-size: 1.02rem;
+      font-size: 1.05rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -321,7 +321,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
     }
     .btn-print-huge:active { transform: scale(0.98); }
 
@@ -332,10 +332,10 @@
     }
     .btn-quick-action {
       flex: 1;
-      padding: 10px 8px;
+      height: 44px; /* ഉയരം കൂട്ടി */
       border: none;
-      border-radius: 10px;
-      font-size: 0.82rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -344,10 +344,11 @@
       gap: 6px;
       transition: all 0.15s ease;
     }
+    /* WhatsApp യഥാർത്ഥ പച്ച നിറത്തിൽ */
     .btn-quick-wa {
-      background: #0284c7;
-      color: white;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+      background: #25d366;
+      color: #064e3b;
+      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
     }
     .btn-quick-recent {
       background: #334155;
@@ -418,8 +419,8 @@
     .cart-row-sub { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
     .qty-stepper { display: flex; align-items: center; gap: 8px; margin: 0 8px; }
     .qty-btn {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -467,11 +468,11 @@
     </div>
   </header>
 
-  <!-- Categories -->
+  <!-- Categories (കൃത്യമായി Avil Milk Specials എന്ന് മാറ്റി) -->
   <div class="cat-toggle-wrap">
     <div class="cat-toggle">
-      <button type="button" class="cat-tab-btn active" id="tabAval" onclick="switchCategory('aval_milk')">
-        🍌 Aval Milk Specials
+      <button type="button" class="cat-tab-btn active" id="tabAvil" onclick="switchCategory('avil_milk')">
+        🍌 Avil Milk Specials
       </button>
       <button type="button" class="cat-tab-btn" id="tabJuices" onclick="switchCategory('juices')">
         🥤 Juices & Shakes
@@ -482,7 +483,7 @@
   <!-- Items Touch Grid (ഒരു പൊടിക്ക് ഒതുക്കിയ ബട്ടണുകൾ) -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- മെയിൻ സ്ക്രീനിലെ POS കൺട്രോൾ ബാർ -->
+  <!-- മെയിൻ സ്ക്രീനിലെ വലിയ POS കൺട്രോൾ ബാർ -->
   <div class="pos-bottom-bar">
     <!-- വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ & കാർട്ട് ഐറ്റങ്ങൾ -->
     <div class="bottom-row-1">
@@ -504,7 +505,7 @@
       </button>
     </div>
 
-    <!-- വരി 2: ആകെ തുക & വലിയ PRINT BILL ബട്ടൺ -->
+    <!-- വരി 2: ആകെ തുക & കൂടുതൽ വലിയ PRINT BILL ബട്ടൺ -->
     <div class="bottom-row-2">
       <div class="total-box-large">
         <span class="total-box-lbl">Total Amt</span>
@@ -518,7 +519,7 @@
     <!-- വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp & Recent Bills -->
     <div class="bottom-row-3">
       <button type="button" class="btn-quick-action btn-quick-wa" onclick="sendWhatsAppBillDirect()">
-        📲 WhatsApp Bill
+        💬 WhatsApp Bill
       </button>
       <button type="button" class="btn-quick-action btn-quick-recent" onclick="openRecentBillsModal()">
         📋 Recent Bills / Reprint
@@ -536,7 +537,7 @@
 
       <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 12px;"></div>
 
-      <button type="button" class="btn-print-huge" style="width:100%;" onclick="closeModal('cartDrawerModal')">
+      <button type="button" class="btn-print-huge" style="width:100%; height:48px;" onclick="closeModal('cartDrawerModal')">
         ശരി (Done)
       </button>
     </div>
@@ -553,20 +554,20 @@
       <div class="form-group">
         <label>Category (വിഭാഗം)</label>
         <select id="newItemCat" class="form-control">
-          <option value="aval_milk">🍌 Aval Milk Specials</option>
+          <option value="avil_milk">🍌 Avil Milk Specials</option>
           <option value="juices">🥤 Juices & Shakes</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Item Name (പേര്)</label>
-        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Mango Shake">
+        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Special Dry Fruit Avil Milk">
       </div>
 
       <div style="display:flex; gap:8px;">
         <div class="form-group" style="flex:1;">
           <label>Price ₹ (വില)</label>
-          <input type="number" id="newItemPrice" class="form-control" placeholder="60">
+          <input type="number" id="newItemPrice" class="form-control" placeholder="70">
         </div>
         <div class="form-group" style="flex:0.6;">
           <label>Emoji Icon</label>
@@ -638,7 +639,7 @@
   <!-- THERMAL RECEIPT SLIP -->
   <div id="receiptPrintArea">
     <div class="r-center" style="font-size:15px; font-weight:bold;">BANABLAST</div>
-    <div class="r-center">Special Aval Milk & Juices</div>
+    <div class="r-center">Special Avil Milk & Juices</div>
     <div class="r-center" id="rBillDate"></div>
     <div class="r-center" id="rBillNo" style="font-weight:bold;"></div>
     <div class="r-line"></div>
@@ -680,16 +681,38 @@
     let todayBills = [];
     let cart = [];
     let currentPayMode = 'cash';
-    let currentCategory = 'aval_milk';
+    let currentCategory = 'avil_milk'; // 'avil_milk' ഡിഫോൾട്ട് ആക്കി
     let editingBill = null;
     let pickedItemImageBase64 = "";
 
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
+      // ഡാറ്റാബേസിൽ 'Aval' എന്ന് കിടക്കുന്നവ തനിയെ 'Avil' എന്ന് മാറ്റുന്നു
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
-        snap.forEach(doc => menuItems.push({ id: doc.id, ...doc.data() }));
+        snap.forEach(doc => {
+          const data = doc.data();
+          let fixedName = data.name || '';
+          let fixedCat = data.category || '';
+          let needsUpdate = false;
+
+          if (fixedName.includes('Aval')) {
+            fixedName = fixedName.replace(/Aval/g, 'Avil');
+            needsUpdate = true;
+          }
+          if (fixedCat === 'aval_milk') {
+            fixedCat = 'avil_milk';
+            needsUpdate = true;
+          }
+
+          if (needsUpdate) {
+            doc.ref.update({ name: fixedName, category: fixedCat });
+          }
+
+          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat });
+        });
+
         if (menuItems.length === 0) {
           seedDefaultItems();
         } else {
@@ -706,10 +729,10 @@
 
     function seedDefaultItems() {
       const defaults = [
-        { name: "Classic Aval Milk", price: 50, category: "aval_milk", icon: "🍌", imageUrl: "" },
-        { name: "Special Dry Fruit Aval Milk", price: 70, category: "aval_milk", icon: "🥜", imageUrl: "" },
-        { name: "Butterscotch Aval Milk", price: 70, category: "aval_milk", icon: "🍨", imageUrl: "" },
-        { name: "Chocolate Aval Milk", price: 80, category: "aval_milk", icon: "🍫", imageUrl: "" },
+        { name: "Classic Avil Milk", price: 50, category: "avil_milk", icon: "🍌", imageUrl: "" },
+        { name: "Special Dry Fruit Avil Milk", price: 70, category: "avil_milk", icon: "🥜", imageUrl: "" },
+        { name: "Butterscotch Avil Milk", price: 70, category: "avil_milk", icon: "🍨", imageUrl: "" },
+        { name: "Chocolate Avil Milk", price: 80, category: "avil_milk", icon: "🍫", imageUrl: "" },
         { name: "Sharjah Shake", price: 60, category: "juices", icon: "🥤", imageUrl: "" },
         { name: "Orange Juice", price: 50, category: "juices", icon: "🍊", imageUrl: "" },
         { name: "Mango Shake", price: 60, category: "juices", icon: "🥭", imageUrl: "" }
@@ -721,17 +744,23 @@
 
     function switchCategory(cat) {
       currentCategory = cat;
-      document.getElementById('tabAval').className = 'cat-tab-btn ' + (cat === 'aval_milk' ? 'active' : '');
+      document.getElementById('tabAvil').className = 'cat-tab-btn ' + (cat === 'avil_milk' ? 'active' : '');
       document.getElementById('tabJuices').className = 'cat-tab-btn ' + (cat === 'juices' ? 'active' : '');
       renderMenuItems();
     }
 
     function renderMenuItems() {
       const container = document.getElementById('posItemsContainer');
-      const items = menuItems.filter(i => i.category === currentCategory);
+      // avil_milk അല്ലെങ്കിൽ പഴയ aval_milk കാറ്റഗറി ഉള്ളവയും കൃത്യമായി ഫിൽട്ടർ ചെയ്യുന്നു
+      const items = menuItems.filter(i => {
+        if (currentCategory === 'avil_milk') {
+          return i.category === 'avil_milk' || i.category === 'aval_milk';
+        }
+        return i.category === currentCategory;
+      });
 
       if (!items.length) {
-        container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:40px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
+        container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
         return;
       }
 
@@ -742,11 +771,14 @@
           ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
           : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
 
+        // പേരിലെ Aval മാറ്റി Avil എന്ന് ഉറപ്പാക്കുന്നു
+        const displayName = it.name.replace(/Aval/g, 'Avil');
+
         return `
           <div class="item-card" onclick="addToCart('${it.id}')">
             ${qtyBadge}
             <div class="item-media-box">${mediaHTML}</div>
-            <div class="item-name">${it.name}</div>
+            <div class="item-name">${displayName}</div>
             <div class="item-price-tag">₹${it.price}</div>
           </div>
         `;
@@ -757,11 +789,12 @@
       const item = menuItems.find(i => i.id === id);
       if (!item) return;
 
+      const itemName = item.name.replace(/Aval/g, 'Avil');
       const existing = cart.find(c => c.id === id);
       if (existing) {
         existing.qty += 1;
       } else {
-        cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+        cart.push({ id: item.id, name: itemName, price: item.price, qty: 1 });
       }
       renderCartUI();
       renderMenuItems();
@@ -975,7 +1008,7 @@
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       let itemsText = cart.map(i => `• ${i.name} (x${i.qty}) - ₹${i.price * i.qty}`).join('\n');
-      const msg = `🥤 *BANABLAST SPECIAL AVAL MILK* 🥤\n--------------------------------\n📅 തീയതി: ${todayDate} | ${timeStr}\n🧾 ബില്ല് നമ്പർ: #${billNo}\n--------------------------------\n${itemsText}\n--------------------------------\n*ആകെ തുക (TOTAL): ₹${total}*\nപേയ്‌മെന്റ് രീതി: ${currentPayMode.toUpperCase()}\n--------------------------------\nസന്ദർശിച്ചതിന് നന്ദി! ❤️`;
+      const msg = `🥤 *BANABLAST SPECIAL AVIL MILK* 🥤\n--------------------------------\n📅 തീയതി: ${todayDate} | ${timeStr}\n🧾 ബില്ല് നമ്പർ: #${billNo}\n--------------------------------\n${itemsText}\n--------------------------------\n*ആകെ തുക (TOTAL): ₹${total}*\nപേയ്‌മെന്റ് രീതി: ${currentPayMode.toUpperCase()}\n--------------------------------\nസന്ദർശിച്ചതിന് നന്ദി! ❤️`;
 
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -1085,7 +1118,7 @@
     }
 
     function saveNewItem() {
-      const name = document.getElementById('newItemName').value.trim();
+      let name = document.getElementById('newItemName').value.trim();
       const price = parseFloat(document.getElementById('newItemPrice').value);
       const category = document.getElementById('newItemCat').value;
       const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
@@ -1094,6 +1127,8 @@
         alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
         return;
       }
+
+      name = name.replace(/Aval/g, 'Avil');
 
       db.collection('billing_items').add({
         name,
@@ -1128,7 +1163,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.82rem;">
           <div style="display:flex; align-items:center; gap:6px;">
             ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">` : `<span>${it.icon || '🥤'}</span>`}
-            <strong>${it.name}</strong> - ₹${it.price}
+            <strong>${it.name.replace(/Aval/g, 'Avil')}</strong> - ₹${it.price}
           </div>
           <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:4px; padding:3px 6px; cursor:pointer;">🗑️</button>
         </div>
