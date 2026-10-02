@@ -109,7 +109,7 @@
       margin-top: 2px; 
     }
 
-    /* ലോഗിൻ ചെയ്ത യൂസർ ബാർ */
+    /* യൂസർ ലോഗിൻ & സെക്യൂരിറ്റി ബാർ */
     .user-auth-bar {
       display: flex;
       align-items: center;
@@ -785,7 +785,7 @@
         </div>
       </div>
       <div>
-        <button type="button" class="btn-auth-small" onclick="openAISettingsModal()" title="AI Settings">⚙️ AI Keys</button>
+        <button type="button" class="btn-auth-small" onclick="openAISettingsModal()" title="AI Settings">⚙️ AI Key</button>
       </div>
     </div>
 
@@ -1096,7 +1096,7 @@
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
-          📸 Scan / Upload Bill with AI (Gemini + Groq)
+          📸 Scan / Upload Bill with AI (Gemini Flash)
         </button>
         <div id="scanLoadingBox" class="scanning-loader">
           🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക
@@ -1464,33 +1464,26 @@
     </div>
   </div>
 
-  <!-- 11. AI SETTINGS / MULTI-AI KEY MODAL (GEMINI + GROQ) -->
+  <!-- 11. AI SETTINGS / GEMINI KEY MODAL -->
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
-      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ AI Settings (Gemini & Groq)</h3>
+      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ Gemini AI API Key</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
-        സ്കാനിംഗ് കൂടുതൽ കാര്യക്ഷമമാക്കാൻ API കീകൾ ഇവിടെ നൽകുക:
+        Google AI Studio (aistudio.google.com)-ൽ നിന്ന് എടുത്ത API Key ഇവിടെ നൽകുക:
       </p>
 
       <div class="form-group">
-        <label>1. Google Gemini API Key (Primary)</label>
+        <label>Google Gemini API Key (AIzaSy...)</label>
         <input type="text" id="aiKeyInput" class="form-control" placeholder="AIzaSy...">
-        <span style="font-size:0.68rem; color:#64748b;">aistudio.google.com വഴി ലഭിക്കുന്നത്</span>
       </div>
 
-      <div class="form-group" style="margin-top:10px;">
-        <label>2. Groq Vision API Key (Backup)</label>
-        <input type="text" id="groqKeyInput" class="form-control" placeholder="gsk_...">
-        <span style="font-size:0.68rem; color:#64748b;">console.groq.com വഴി ലഭിക്കുന്ന സൗജന്യ കീ</span>
-      </div>
-
-      <button type="button" class="btn-submit" onclick="saveAISettingsKey()">കീകൾ സേവ് ചെയ്യുക</button>
+      <button type="button" class="btn-submit" onclick="saveAISettingsKey()">Key സേവ് ചെയ്യുക</button>
       <button type="button" class="btn-cancel" onclick="closeModal('aiSettingsModal')">Cancel</button>
     </div>
   </div>
 
-  <!-- =================== [PART 1 ഇതോടെ അവസാനിച്ചു] =================== -->
-    <script>
+  <!-- =================== [PART 1 ഇതോടെ പൂർത്തിയായി] =================== -->
+  <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
@@ -1866,7 +1859,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & 100% STABLE GEMINI AI സ്കാനർ
+       3. ഇമേജ് കംപ്രഷൻ & STABLE GEMINI 1.5 FLASH സ്കാനർ
        ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
       return new Promise((resolve, reject) => {
@@ -1908,7 +1901,7 @@
       if (!file) return;
 
       if (!dynamicGeminiKey || dynamicGeminiKey.trim() === '') {
-        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ AI Keys' ബട്ടൺ വഴി നിങ്ങളുടെ Gemini API Key നൽകുക.");
+        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ AI Key' ബട്ടൺ വഴി നിങ്ങളുടെ Gemini API Key നൽകുക.");
         openAISettingsModal();
         event.target.value = '';
         return;
@@ -1920,7 +1913,7 @@
       try {
         const base64Data = await compressImageFile(file);
         
-        const promptText = `Extract items from this purchase receipt bill. Return ONLY valid JSON in format:
+        const promptText = `Extract items from this purchase receipt bill. Return ONLY a valid JSON object matching this schema:
 {"supplier": "Store Name", "total": 0, "items": [{"name": "item description", "price": 0}]}`;
 
         const payload = {
@@ -1932,11 +1925,9 @@
           }]
         };
 
-        // ഗൂഗിൾ AI സ്റ്റുഡിയോയിൽ 100% സപ്പോർട്ട് ചെയ്യുന്ന സ്റ്റേബിൾ മോഡലുകൾ
         const candidateModels = [
           "gemini-1.5-flash",
-          "gemini-1.5-flash-8b",
-          "gemini-2.0-flash"
+          "gemini-1.5-flash-8b"
         ];
 
         let parsedResult = null;
@@ -1944,8 +1935,8 @@
         let usedModel = "";
 
         for (const model of candidateModels) {
-          loader.innerText = `🔄 AI ബില്ല് പരിശോധിക്കുന്നു (${model})...`;
-          const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=` + dynamicGeminiKey.trim();
+          loader.innerText = `🔄 AI പരിശോധിക്കുന്നു (${model})...`;
+          const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${dynamicGeminiKey.trim()}`;
 
           try {
             const res = await fetch(targetUrl, {
@@ -1965,8 +1956,8 @@
               }
             } else {
               const errData = await res.json().catch(() => ({}));
-              lastErrorMsg = errData.error ? errData.error.message : `HTTP ${res.status}`;
-              console.warn(`Model ${model} rejected:`, lastErrorMsg);
+              lastErrorMsg = errData.error ? `${errData.error.message} (Status: ${res.status})` : `HTTP ${res.status}`;
+              console.warn(`Model ${model} error:`, lastErrorMsg);
             }
           } catch (netErr) {
             lastErrorMsg = netErr.message;
@@ -1975,7 +1966,7 @@
         }
 
         if (!parsedResult) {
-          throw new Error(lastErrorMsg || "API Connection Failed");
+          throw new Error(lastErrorMsg || "API സർവറുമായി ബന്ധപ്പെടാൻ സാധിച്ചില്ല.");
         }
 
         if (parsedResult.supplier) document.getElementById('entryTitle').value = parsedResult.supplier;
@@ -1993,11 +1984,11 @@
         }
         recalcTotalBillFromItems();
 
-        alert(`✅ ബില്ലിലെ വിവരങ്ങൾ AI വിജയകരമായി എടുത്തു! (${usedModel})`);
+        alert(`✅ ബില്ലിലെ വിവരങ്ങൾ AI വിജയകരമായി എടുത്തു! [Model: ${usedModel}]`);
 
       } catch (err) {
         console.error("Scan error:", err);
-        alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല: " + err.message);
+        alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല!\n\nകാരണം: " + err.message);
       } finally {
         loader.style.display = 'none';
         loader.innerText = '🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
@@ -2006,7 +1997,7 @@
     }
 
     /* -------------------------------------------------------------
-       4. ENTRY ACTIONS & ADDED BY TRACKING
+       4. ENTRY ACTIONS & TRACKING
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -2263,7 +2254,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. 🌟 100% ZERO-BLANK PDF & INSTANT SHARE ENGINE
+       5. 100% ZERO-BLANK PDF & INSTANT SHARE ENGINE
        ------------------------------------------------------------- */
     async function ensurePdfLibraries() {
       if (typeof html2canvas === 'undefined') {
@@ -2348,7 +2339,7 @@
 
         return pdf.output('blob');
       } else {
-        throw new Error("jsPDF library not available");
+        throw new Error("jsPDF ലൈബ്രറി ലഭ്യമല്ല");
       }
     }
 
@@ -2402,7 +2393,7 @@
           });
         } else {
           printOrSaveCurrentA4();
-          alert("✅ PDF ഫയൽ ഫോണിലേക്ക് ഡൗൺലോഡ് ആയിട്ടുണ്ട്. ഇനി വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാം!");
+          alert("✅ PDF ഫയൽ ഡൗൺലോഡ് ആയിട്ടുണ്ട്. ഇനി വാട്സാപ്പിൽ അയക്കാം!");
         }
       } catch (err) {
         console.error("Share error:", err);
@@ -2846,7 +2837,7 @@
     }
 
     /* -------------------------------------------------------------
-       7. INVESTMENTS & WITHDRAWALS (പാർട്ണർ വെരിഫിക്കേഷൻ)
+       7. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION)
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
