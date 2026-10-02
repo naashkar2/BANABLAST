@@ -14,16 +14,19 @@
     :root {
       --primary: #1e3a8a;
       --primary-dark: #091e42;
-      --accent-green: #16a34a;
+      --accent-green: #15803d;
+      --accent-green-bright: #16a34a;
       --accent-blue: #0284c7;
       --accent-red: #dc2626;
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
       --text: #0f172a;
       --border: #e2e8f0;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 110px; user-select: none; }
+    
+    /* താഴെ വലിയ ബട്ടണുകൾ ഉള്ളതിനാൽ താഴത്തെ ഭാഗം മറയാതിരിക്കാൻ 210px പാഡിംഗ് നൽകിയിരിക്കുന്നു */
+    body { background: var(--bg); color: var(--text); padding-bottom: 215px; user-select: none; }
 
     /* Compact App Header */
     .pos-header {
@@ -42,8 +45,8 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 1.05rem;
-      font-weight: 800;
+      font-size: 1.1rem;
+      font-weight: 900;
       letter-spacing: 0.5px;
     }
     .header-btns {
@@ -54,15 +57,15 @@
       background: rgba(255,255,255,0.18);
       border: 1px solid rgba(255,255,255,0.25);
       color: white;
-      padding: 5px 9px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-head:active { background: rgba(255,255,255,0.3); }
 
-    /* Clean 2-Tab Switcher (Only Aval Milk & Juices) */
+    /* 2 Categories Switcher */
     .cat-toggle-wrap {
       padding: 10px 14px 6px;
       max-width: 1000px;
@@ -71,16 +74,16 @@
     .cat-toggle {
       display: flex;
       background: #e2e8f0;
-      padding: 3px;
+      padding: 4px;
       border-radius: 12px;
-      gap: 4px;
+      gap: 6px;
     }
     .cat-tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 11px;
       border: none;
       border-radius: 10px;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #64748b;
       background: transparent;
@@ -97,14 +100,14 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    /* Items Grid (Mobile 2-Column, Tablet 3-4 Columns) */
+    /* Items Grid */
     .items-container {
       padding: 8px 14px 20px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 12px;
     }
     @media (min-width: 600px) {
       .items-container { grid-template-columns: repeat(3, 1fr); }
@@ -115,16 +118,16 @@
 
     .item-card {
       background: var(--card-bg);
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      padding: 10px 8px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 12px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       cursor: pointer;
       position: relative;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       transition: transform 0.1s ease, border-color 0.1s;
     }
     .item-card:active {
@@ -133,10 +136,9 @@
       background: #eff6ff;
     }
     
-    /* Item Image or Emoji */
     .item-media-box {
-      width: 72px;
-      height: 72px;
+      width: 76px;
+      height: 76px;
       border-radius: 12px;
       background: #f8fafc;
       display: flex;
@@ -151,26 +153,26 @@
       object-fit: cover;
     }
     .item-emoji {
-      font-size: 2.3rem;
+      font-size: 2.5rem;
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: #1e293b;
       line-height: 1.25;
-      min-height: 32px;
+      min-height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .item-price-tag {
-      font-size: 0.95rem;
-      font-weight: 800;
+      font-size: 1rem;
+      font-weight: 900;
       color: var(--accent-green);
       background: #dcfce7;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
       margin-top: 6px;
     }
@@ -180,111 +182,177 @@
       right: 6px;
       background: var(--primary);
       color: white;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 800;
-      width: 22px;
-      height: 22px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
     }
 
-    /* Modern Sticky Bottom POS Bar */
+    /* -------------------------------------------------------------
+       വലുതും വൃത്തിയുള്ളതുമായ സ്മാർട്ട് POS ബാർ (MAIN BOTTOM CONTROL)
+       ------------------------------------------------------------- */
     .pos-bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       background: #ffffff;
-      border-top: 1px solid #cbd5e1;
-      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -4px 18px rgba(0,0,0,0.12);
+      border-top: 2px solid #cbd5e1;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -6px 25px rgba(0,0,0,0.14);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
+
+    /* വരി 1: വലിയ CASH / GPAY ബട്ടണുകൾ + കാർട്ട് ഐറ്റങ്ങൾ */
     .bottom-row-1 {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
       gap: 8px;
     }
-    .pay-switcher {
+    .pay-switcher-large {
       display: flex;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 2px;
-      flex: 1;
+      background: #e2e8f0;
+      border-radius: 12px;
+      padding: 3px;
+      flex: 1.6;
+      gap: 4px;
     }
-    .pay-pill {
+    .pay-btn-big {
       flex: 1;
-      padding: 7px;
+      padding: 11px 4px;
       border: none;
-      border-radius: 6px;
-      font-size: 0.76rem;
-      font-weight: 800;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 900;
       background: transparent;
       color: #64748b;
       cursor: pointer;
       text-align: center;
-    }
-    .pay-pill.active {
-      background: #ffffff;
-      color: var(--accent-green);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-    .pay-pill.active.gpay {
-      color: var(--accent-blue);
-    }
-
-    .btn-view-cart {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #334155;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .pay-btn-big.active.cash {
+      background: #16a34a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);
+    }
+    .pay-btn-big.active.gpay {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
     }
 
-    .bottom-row-2 {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .total-pill-box {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-      min-width: 85px;
-    }
-    .total-pill-label { font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .total-pill-amt { font-size: 1.35rem; font-weight: 900; color: var(--primary); }
-
-    .btn-checkout {
+    .btn-cart-bubble {
       flex: 1;
-      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
-      color: white;
-      border: none;
-      padding: 13px;
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      color: var(--primary);
+      padding: 11px 8px;
       border-radius: 12px;
-      font-size: 0.98rem;
+      font-size: 0.88rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);
+      white-space: nowrap;
     }
-    .btn-checkout:active { transform: scale(0.98); }
+    .btn-cart-clear {
+      background: #fee2e2;
+      border: 1.5px solid #fecaca;
+      color: var(--accent-red);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* വരി 2: ആകെ തുക & വലിയ PRINT BILL ബട്ടൺ */
+    .bottom-row-2 {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .total-box-large {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 95px;
+      line-height: 1.1;
+      padding-left: 2px;
+    }
+    .total-box-lbl { font-size: 0.72rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+    .total-box-amt { font-size: 1.6rem; font-weight: 900; color: var(--primary); }
+
+    .btn-print-huge {
+      flex: 1;
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+      color: white;
+      border: none;
+      padding: 14px 12px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+    }
+    .btn-print-huge:active { transform: scale(0.98); }
+
+    /* വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp & Recent Bills */
+    .bottom-row-3 {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-quick-action {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-quick-wa {
+      background: #0284c7;
+      color: white;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+    .btn-quick-recent {
+      background: #334155;
+      color: white;
+      box-shadow: 0 2px 6px rgba(51, 65, 85, 0.25);
+    }
+    .btn-quick-action:active { transform: scale(0.97); }
 
     /* Modals & Cart Drawer */
     .modal {
@@ -327,10 +395,11 @@
     .btn-close {
       background: #f1f5f9;
       border: none;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
     }
 
@@ -339,27 +408,27 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 9px 0;
+      padding: 10px 0;
       border-bottom: 1px dashed #e2e8f0;
     }
     .cart-row-info { flex: 1; }
-    .cart-row-name { font-weight: 700; font-size: 0.88rem; }
-    .cart-row-sub { font-size: 0.72rem; color: #64748b; }
-    .qty-stepper { display: flex; align-items: center; gap: 6px; margin: 0 8px; }
+    .cart-row-name { font-weight: 800; font-size: 0.92rem; }
+    .cart-row-sub { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+    .qty-stepper { display: flex; align-items: center; gap: 8px; margin: 0 8px; }
     .qty-btn {
-      width: 30px;
-      height: 30px;
+      width: 34px;
+      height: 34px;
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
     }
 
-    .form-group { margin-bottom: 10px; }
-    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 700; color: #64748b; margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
 
     /* Thermal Receipt Print Styles */
     #receiptPrintArea { display: none; }
@@ -396,7 +465,7 @@
     </div>
   </header>
 
-  <!-- 2 Categories Only (Segmented Switcher) -->
+  <!-- 2 Categories Only -->
   <div class="cat-toggle-wrap">
     <div class="cat-toggle">
       <button type="button" class="cat-tab-btn active" id="tabAval" onclick="switchCategory('aval_milk')">
@@ -411,33 +480,53 @@
   <!-- Items Touch Grid -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- Smart Sticky Bottom POS Bar -->
+  <!-- -------------------------------------------------------------
+       വലുതും ഭംഗിയുള്ളതുമായ പുതിയ സ്മാർട്ട് POS ബാർ (MAIN SCREEN)
+       ------------------------------------------------------------- -->
   <div class="pos-bottom-bar">
+    <!-- വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ & കാർട്ട് ഐറ്റങ്ങൾ -->
     <div class="bottom-row-1">
-      <div class="pay-switcher">
-        <button type="button" class="pay-pill active" id="btnPayCash" onclick="setPaymentMode('cash')">💵 CASH</button>
-        <button type="button" class="pay-pill gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">📱 GPAY</button>
+      <div class="pay-switcher-large">
+        <button type="button" class="pay-btn-big active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
+          💵 CASH
+        </button>
+        <button type="button" class="pay-btn-big gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
+          📱 GPAY
+        </button>
       </div>
-      <button type="button" class="btn-view-cart" onclick="openCartDrawer()">
+
+      <button type="button" class="btn-cart-bubble" onclick="openCartDrawer()">
         🛒 <span id="cartCountTag">0 Items</span> ▾
       </button>
-      <button type="button" class="btn-view-cart" style="color:var(--accent-red);" onclick="clearCart()">
+      
+      <button type="button" class="btn-cart-clear" onclick="clearCart()" title="കാർട്ട് ക്ലിയർ ചെയ്യുക">
         🗑️
       </button>
     </div>
 
+    <!-- വരി 2: ആകെ തുക & വലിയ PRINT BILL ബട്ടൺ -->
     <div class="bottom-row-2">
-      <div class="total-pill-box">
-        <span class="total-pill-label">Total</span>
-        <span class="total-pill-amt" id="cartTotalText">₹0</span>
+      <div class="total-box-large">
+        <span class="total-box-lbl">Total Amt</span>
+        <span class="total-box-amt" id="cartTotalText">₹0</span>
       </div>
-      <button type="button" class="btn-checkout" onclick="printAndSaveBill()">
-        🖨️ PRINT BILL
+      <button type="button" class="btn-print-huge" onclick="printAndSaveBill()">
+        🖨️ PRINT & COMPLETE BILL
+      </button>
+    </div>
+
+    <!-- വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp Bill & Recent Bills ബട്ടണുകൾ -->
+    <div class="bottom-row-3">
+      <button type="button" class="btn-quick-action btn-quick-wa" onclick="sendWhatsAppBillDirect()">
+        📲 WhatsApp Bill
+      </button>
+      <button type="button" class="btn-quick-action btn-quick-recent" onclick="openRecentBillsModal()">
+        📋 Recent Bills / Reprint
       </button>
     </div>
   </div>
 
-  <!-- CART DETAILS / DRAWER MODAL -->
+  <!-- CART DETAILS / DRAWER MODAL (ഐറ്റങ്ങളുടെ എണ്ണം കൂട്ടാനും കുറയ്ക്കാനും മാത്രം) -->
   <div class="modal" id="cartDrawerModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -445,25 +534,15 @@
         <button class="btn-close" onclick="closeModal('cartDrawerModal')">✕</button>
       </div>
 
-      <div id="cartItemsList" style="max-height: 240px; overflow-y: auto; margin-bottom: 12px;"></div>
+      <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 12px;"></div>
 
-      <div class="form-group">
-        <label>Customer WhatsApp (ഓപ്ഷണൽ)</label>
-        <input type="tel" id="custPhoneInput" class="form-control" placeholder="10 അക്ക മൊബൈൽ നമ്പർ">
-      </div>
-
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button type="button" onclick="sendWhatsAppBill()" style="flex:1; background:#0284c7; color:white; border:none; padding:11px; border-radius:10px; font-weight:700; cursor:pointer;">
-          📲 WhatsApp Bill
-        </button>
-        <button type="button" onclick="openRecentBillsModal()" style="flex:1; background:#475569; color:white; border:none; padding:11px; border-radius:10px; font-weight:700; cursor:pointer;">
-          📋 Recent Bills
-        </button>
-      </div>
+      <button type="button" class="btn-print-huge" style="width:100%;" onclick="closeModal('cartDrawerModal')">
+        ശരി (Done)
+      </button>
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (WITH PHOTO / IMAGE UPLOAD & EMOJI) -->
+  <!-- MANAGE ITEMS MODAL (PHOTO & EMOJI SUPPORT) -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -500,7 +579,7 @@
         <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക (Photo Upload):</label>
         <input type="file" id="newItemImageFile" accept="image/*" style="display:none;" onchange="handleItemImagePick(event)">
         <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:6px;">
-          <button type="button" onclick="document.getElementById('newItemImageFile').click()" style="background:#e0f2fe; color:#0369a1; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer;">
+          <button type="button" onclick="document.getElementById('newItemImageFile').click()" style="background:#e0f2fe; color:#0369a1; border:none; padding:7px 14px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer;">
             ചിത്രം തിരഞ്ഞെടുക്കുക
           </button>
           <img id="newItemImgPreview" src="" alt="Preview" style="display:none; width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid #cbd5e1;">
@@ -523,7 +602,7 @@
         <div class="modal-title">📋 Recent Bills / Reprint</div>
         <button class="btn-close" onclick="closeModal('recentBillsModal')">✕</button>
       </div>
-      <div id="recentBillsContainer" style="max-height:320px; overflow-y:auto;"></div>
+      <div id="recentBillsContainer" style="max-height:340px; overflow-y:auto;"></div>
     </div>
   </div>
 
@@ -609,7 +688,7 @@
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
-      // 1. മെനു ഐറ്റങ്ങൾ സിങ്ക് ചെയ്യുന്നു
+      // മെനു ഐറ്റങ്ങൾ സിങ്ക് ചെയ്യുന്നു
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => menuItems.push({ id: doc.id, ...doc.data() }));
@@ -621,7 +700,7 @@
         }
       });
 
-      // 2. ഇന്നത്തെ കൗണ്ടർ ബില്ലുകൾ സിങ്ക് ചെയ്യുന്നു
+      // ഇന്നത്തെ കൗണ്ടർ ബില്ലുകൾ സിങ്ക് ചെയ്യുന്നു
       db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
@@ -703,13 +782,11 @@
     }
 
     function clearCart() {
-      if (cart.length && confirm("കാർട്ട് കാലിയാക്കണോ?")) {
+      if (cart.length && confirm("കാർട്ട് പൂർണ്ണമായും കാലിയാക്കണോ?")) {
         cart = [];
         editingBill = null;
-        document.getElementById('custPhoneInput').value = '';
         renderCartUI();
         renderMenuItems();
-        closeModal('cartDrawerModal');
       }
     }
 
@@ -724,10 +801,9 @@
       document.getElementById('cartTotalText').innerText = '₹' + total;
       document.getElementById('cartCountTag').innerText = `${totalQty} Items`;
 
-      // Draw inside Cart Modal
       const container = document.getElementById('cartItemsList');
       if (!cart.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:25px 0; font-size:0.85rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>';
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.9rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>';
       } else {
         container.innerHTML = cart.map(item => `
           <div class="cart-row">
@@ -737,7 +813,7 @@
             </div>
             <div class="qty-stepper">
               <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-              <span style="font-weight:800; font-size:0.9rem;">${item.qty}</span>
+              <span style="font-weight:900; font-size:1rem; min-width:20px; text-align:center;">${item.qty}</span>
               <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
             </div>
           </div>
@@ -747,8 +823,16 @@
 
     function setPaymentMode(mode) {
       currentPayMode = mode;
-      document.getElementById('btnPayCash').className = 'pay-pill ' + (mode === 'cash' ? 'active' : '');
-      document.getElementById('btnPayGPay').className = 'pay-pill gpay ' + (mode === 'gpay' ? 'active' : '');
+      const bCash = document.getElementById('btnPayCash');
+      const bGpay = document.getElementById('btnPayGPay');
+
+      if (mode === 'cash') {
+        bCash.className = 'pay-btn-big active cash';
+        bGpay.className = 'pay-btn-big gpay';
+      } else {
+        bCash.className = 'pay-btn-big cash';
+        bGpay.className = 'pay-btn-big active gpay';
+      }
     }
 
     function openCartDrawer() {
@@ -766,7 +850,6 @@
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const phone = document.getElementById('custPhoneInput').value.trim();
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       try {
@@ -778,7 +861,6 @@
             items: cart,
             total,
             mode: currentPayMode,
-            phone,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
@@ -794,7 +876,6 @@
             items: cart,
             total,
             mode: currentPayMode,
-            phone,
             addedBy: 'Counter Staff',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
@@ -806,7 +887,6 @@
 
         cart = [];
         editingBill = null;
-        document.getElementById('custPhoneInput').value = '';
         renderCartUI();
         renderMenuItems();
         closeModal('cartDrawerModal');
@@ -819,38 +899,45 @@
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
       const targetTitle = (mode === 'cash') ? 'Counter Sales (Cash)' : 'Counter Sales (GPay)';
-      
+      const docId = `counter_sale_${dateStr}_${mode}`;
+      const fixedDocRef = db.collection('transactions').doc(docId);
+
       const snap = await db.collection('transactions')
         .where('date', '==', dateStr)
         .where('type', '==', 'sale')
-        .where('title', '==', targetTitle)
+        .where('mode', '==', mode)
+        .where('addedBy', '==', 'Counter POS')
         .get();
 
-      if (!snap.empty) {
-        const doc = snap.docs[0];
-        const currentAmt = doc.data().amount || 0;
-        const newAmt = Math.round((currentAmt + deltaAmount) * 100) / 100;
-        await db.collection('transactions').doc(doc.id).update({
-          amount: newAmt > 0 ? newAmt : 0,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } else if (deltaAmount > 0) {
-        await db.collection('transactions').add({
-          date: dateStr,
-          type: 'sale',
-          category: 'sale',
-          title: targetTitle,
-          extra: targetTitle,
-          amount: Math.round(deltaAmount * 100) / 100,
-          billTotal: Math.round(deltaAmount * 100) / 100,
-          paidAmount: Math.round(deltaAmount * 100) / 100,
-          dueAmount: 0,
-          mode: mode,
-          note: 'Counter POS Auto Aggregation',
-          addedBy: 'Counter POS',
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
+      let totalExistingAmount = 0;
+      const batch = db.batch();
+
+      snap.forEach(d => {
+        totalExistingAmount += (d.data().amount || 0);
+        if (d.id !== docId) {
+          batch.delete(d.ref);
+        }
+      });
+
+      const finalAmount = Math.round((totalExistingAmount + deltaAmount) * 100) / 100;
+
+      batch.set(fixedDocRef, {
+        date: dateStr,
+        type: 'sale',
+        category: 'sale',
+        title: targetTitle,
+        extra: targetTitle,
+        amount: finalAmount > 0 ? finalAmount : 0,
+        billTotal: finalAmount > 0 ? finalAmount : 0,
+        paidAmount: finalAmount > 0 ? finalAmount : 0,
+        dueAmount: 0,
+        mode: mode,
+        note: 'Counter POS Auto Aggregation',
+        addedBy: 'Counter POS',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      await batch.commit();
     }
 
     function triggerThermalPrint(billNo, date, time, total, mode, items) {
@@ -870,18 +957,22 @@
       window.print();
     }
 
-    function sendWhatsAppBill() {
+    // മെയിൻ സ്ക്രീനിൽ നിന്ന് നേരിട്ട് WhatsApp ബില്ല് അയക്കാനുള്ള ഫംഗ്ഷൻ
+    function sendWhatsAppBillDirect() {
       if (!cart.length) {
         alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
-      let phone = document.getElementById('custPhoneInput').value.trim().replace(/[^0-9]/g, '');
-      if (!phone || phone.length < 10) {
-        phone = prompt("കസ്റ്റമറുടെ 10 അക്ക WhatsApp നമ്പർ നൽകുക:");
-        if (!phone) return;
-        phone = phone.replace(/[^0-9]/g, '');
-      }
+      
+      let phone = prompt("കസ്റ്റമറുടെ 10 അക്ക WhatsApp മൊബൈൽ നമ്പർ നൽകുക:");
+      if (!phone) return;
+      phone = phone.replace(/[^0-9]/g, '');
+
       if (phone.length === 10) phone = "91" + phone;
+      if (phone.length < 10) {
+        alert("❌ സാധുവായ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക!");
+        return;
+      }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -898,22 +989,21 @@
       const sorted = todayBills.slice().sort((a,b) => (b.time || '').localeCompare(a.time || ''));
 
       if (!sorted.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:25px;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
       } else {
         container.innerHTML = sorted.map(b => `
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-weight:800; font-size:0.88rem; color:#1e3a8a;">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#15803d' : '#0369a1'};">${b.mode.toUpperCase()}</span></div>
-              <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
+              <div style="font-weight:800; font-size:0.92rem; color:#1e3a8a;">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#15803d' : '#0369a1'};">${b.mode.toUpperCase()}</span></div>
+              <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
             </div>
             <div style="display:flex; gap:6px;">
-              <button type="button" style="background:#2563eb; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
-              <button type="button" style="background:#f59e0b; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️ Edit</button>
+              <button type="button" style="background:#2563eb; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
+              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️ Edit</button>
             </div>
           </div>
         `).join('');
       }
-      closeModal('cartDrawerModal');
       document.getElementById('recentBillsModal').style.display = 'flex';
     }
 
@@ -930,12 +1020,10 @@
       cart = JSON.parse(JSON.stringify(b.items || []));
       editingBill = b;
       setPaymentMode(b.mode || 'cash');
-      document.getElementById('custPhoneInput').value = b.phone || '';
       renderCartUI();
       renderMenuItems();
       closeModal('recentBillsModal');
-      openCartDrawer();
-      alert(`⚠️ ബില്ല് #${b.billNo} കാർട്ടിലേക്ക് എടുത്തു.`);
+      alert(`⚠️ ബില്ല് #${b.billNo} തിരുത്താനായി കാർട്ടിലേക്ക് എടുത്തു.`);
     }
 
     function openTodaySummaryModal() {
