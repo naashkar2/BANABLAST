@@ -10,6 +10,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- PDF Engine Libraries (html2canvas & jsPDF for WhatsApp PDF Billing) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
       --bg: #f8fafc;
@@ -31,7 +35,7 @@
     
     body { background: var(--bg); color: var(--primary-dark); padding-bottom: 195px; user-select: none; }
 
-    /* Top Executive Header (മഞ്ഞ POS ഒഴിവാക്കി വൃത്തിയാക്കി) */
+    /* Top Executive Header */
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
@@ -105,7 +109,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* Items Grid */
+    /* Items Touch Grid */
     .items-container {
       padding: 8px 12px 20px;
       max-width: 1000px;
@@ -272,11 +276,10 @@
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1fr 1fr; /* തുല്യമായ 2 കോളങ്ങൾ */
-      gap: 8px; /* തുല്യ അകലം */
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
-    /* എല്ലാ 6 ബോക്സുകൾക്കും ഒരേ ഉയരവും ലുക്കും */
     .dock-box {
       height: 48px;
       border-radius: 12px;
@@ -292,7 +295,7 @@
     }
     .dock-box:active { transform: scale(0.98); }
 
-    /* ബോക്സ് 1: CASH / GPAY സെഗ്മെന്റഡ് ബോക്സ് */
+    /* ബോക്സ് 1: CASH / GPAY സ്വിച്ച് */
     .box-payment {
       background: #e2e8f0;
       padding: 3px;
@@ -326,7 +329,7 @@
       box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
     }
 
-    /* ബോക്സ് 2: ITEMS & DELETE സംയോജിപ്പിച്ച ബോക്സ് */
+    /* ബോക്സ് 2: ITEMS & DELETE കോംബോ */
     .box-cart-combo {
       background: #f8fafc;
       border-color: #cbd5e1;
@@ -371,7 +374,7 @@
     }
     .btn-clear-part:active { background: #fecaca; }
 
-    /* ബോക്സ് 3: TOTAL AMOUNT ബോക്സ് */
+    /* ബോക്സ് 3: TOTAL DUE തുക ബോക്സ് */
     .box-total {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -523,7 +526,7 @@
 </head>
 <body>
 
-  <!-- Header (മഞ്ഞ POS ഒഴിവാക്കി) -->
+  <!-- Header -->
   <header class="pos-header">
     <div class="pos-brand">🥤 BANABLAST</div>
     <div class="header-btns">
@@ -548,11 +551,9 @@
   <!-- Items Touch Grid -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- -------------------------------------------------------------
-       ഏകീകൃത രൂപത്തിലുള്ള 6 ബോക്സുകൾ (2x3 SYMMETRICAL DOCK)
-       ------------------------------------------------------------- -->
+  <!-- 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് -->
   <div class="pos-bottom-dock">
-    <!-- വരി 1 / ബോക്സ് 1: CASH / GPAY സ്വിച്ച് -->
+    <!-- ബോക്സ് 1: CASH / GPAY -->
     <div class="dock-box box-payment">
       <button type="button" class="btn-pay-sub active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
         💵 CASH
@@ -562,34 +563,34 @@
       </button>
     </div>
 
-    <!-- വരി 1 / ബോക്സ് 2: ITEMS & DELETE കോംബോ -->
+    <!-- ബോക്സ് 2: ITEMS & DELETE -->
     <div class="dock-box box-cart-combo">
       <button type="button" class="btn-cart-part" onclick="openCartDrawer()">
         🛒 <span id="cartCountTag">0 Items</span> ▾
       </button>
       <div class="cart-divider"></div>
       <button type="button" class="btn-clear-part" onclick="clearCart()" title="കാർട്ട് ഒഴിവാക്കുക">
-        🗑️
+        🗑️️
       </button>
     </div>
 
-    <!-- വരി 2 / ബോക്സ് 3: TOTAL DUE തുക ബോക്സ് -->
+    <!-- ബോക്സ് 3: TOTAL DUE -->
     <div class="dock-box box-total">
       <span class="box-total-lbl">TOTAL DUE</span>
       <span class="box-total-val" id="cartTotalText">₹0</span>
     </div>
 
-    <!-- വരി 2 / ബോക്സ് 4: PRINT ബട്ടൺ -->
+    <!-- ബോക്സ് 4: PRINT -->
     <button type="button" class="dock-box box-print" onclick="printAndSaveBill()">
       🖨️ PRINT
     </button>
 
-    <!-- വരി 3 / ബോക്സ് 5: WHATSAPP BILL -->
+    <!-- ബോക്സ് 5: WHATSAPP BILL (PDF ആയി അയക്കും) -->
     <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
       💬 WhatsApp Bill
     </button>
 
-    <!-- വരി 3 / ബോക്സ് 6: RECENT BILLS -->
+    <!-- ബോക്സ് 6: RECENT BILLS -->
     <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
       📋 Recent Bills
     </button>
@@ -730,6 +731,45 @@
     <div class="r-line"></div>
     <div class="r-center" style="margin-top:4px;">*** THANK YOU ***</div>
     <div class="r-center">Visit Again!</div>
+  </div>
+
+  <!-- WHATSAPP PDF ബില്ലിനായുള്ള പ്രൊഫഷണൽ കാർഡ് (OFFSCREEN RENDER) -->
+  <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
+    <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
+      <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
+      <p style="font-size:0.8rem; font-weight:700; color:#475569; margin-top:3px;">SPECIAL AVIL MILK & JUICES</p>
+      <div style="font-size:0.75rem; color:#64748b; margin-top:6px; display:flex; justify-content:space-between; font-weight:600;">
+        <span id="pdfDateText">Date: -</span>
+        <span id="pdfBillNoText">Bill: #-</span>
+      </div>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem; margin-bottom:14px;">
+      <thead>
+        <tr style="border-bottom:1px solid #cbd5e1; text-align:left; color:#475569;">
+          <th style="padding:6px 0; font-weight:800;">ITEM</th>
+          <th style="padding:6px 0; text-align:center; font-weight:800;">QTY</th>
+          <th style="padding:6px 0; text-align:right; font-weight:800;">PRICE</th>
+        </tr>
+      </thead>
+      <tbody id="pdfItemsTableBody"></tbody>
+    </table>
+
+    <div style="border-top:1.5px dashed #0f172a; border-bottom:1.5px dashed #0f172a; padding:10px 0; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:900;">
+        <span>TOTAL DUE:</span>
+        <span id="pdfTotalAmtText">₹0</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; font-weight:700; margin-top:4px;">
+        <span>PAYMENT MODE:</span>
+        <span id="pdfPayModeText">CASH</span>
+      </div>
+    </div>
+
+    <div style="text-align:center; font-size:0.75rem; color:#64748b; font-weight:700;">
+      <p>Thank you for visiting BANABLAST!</p>
+      <p style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Digital Receipt</p>
+    </div>
   </div>
 
   <script>
@@ -946,7 +986,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ്
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & തെർമൽ പ്രിന്റ്
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1063,19 +1103,12 @@
       window.print();
     }
 
-    function sendWhatsAppBillDirect() {
+    /* -------------------------------------------------------------
+       WHATSAPP PDF ബില്ല് ഷെയറിംഗ് എൻജിൻ (DIRECT PDF DOCUMENT SHARE)
+       ------------------------------------------------------------- */
+    async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
-        return;
-      }
-      
-      let phone = prompt("കസ്റ്റമറുടെ 10 അക്ക WhatsApp മൊബൈൽ നമ്പർ നൽകുക:");
-      if (!phone) return;
-      phone = phone.replace(/[^0-9]/g, '');
-
-      if (phone.length === 10) phone = "91" + phone;
-      if (phone.length < 10) {
-        alert("❌ സാധുവായ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക!");
         return;
       }
 
@@ -1083,10 +1116,59 @@
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
-      let itemsText = cart.map(i => `• ${i.name} (x${i.qty}) - ₹${i.price * i.qty}`).join('\n');
-      const msg = `🥤 *BANABLAST SPECIAL AVIL MILK* 🥤\n--------------------------------\n📅 തീയതി: ${todayDate} | ${timeStr}\n🧾 ബില്ല് നമ്പർ: #${billNo}\n--------------------------------\n${itemsText}\n--------------------------------\n*ആകെ തുക (TOTAL): ₹${total}*\nപേയ്‌മെന്റ് രീതി: ${currentPayMode.toUpperCase()}\n--------------------------------\nസന്ദർശിച്ചതിന് നന്ദി! ❤️`;
+      await generateAndSharePdfBill(billNo, todayDate, timeStr, total, currentPayMode, cart);
+    }
 
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    async function generateAndSharePdfBill(billNo, date, time, total, mode, items) {
+      // 1. PDF ടെംപ്ലേറ്റിലേക്ക് വിവരങ്ങൾ നൽകുന്നു
+      document.getElementById('pdfDateText').innerText = `${date} ${time}`;
+      document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
+      document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
+      document.getElementById('pdfPayModeText').innerText = (mode || 'cash').toUpperCase();
+
+      const tbody = document.getElementById('pdfItemsTableBody');
+      tbody.innerHTML = items.map(i => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+          <td style="padding:6px 0; font-weight:700;">${i.name}</td>
+          <td style="padding:6px 0; text-align:center; font-weight:800;">${i.qty}</td>
+          <td style="padding:6px 0; text-align:right; font-weight:800;">₹${i.price * i.qty}</td>
+        </tr>
+      `).join('');
+
+      const card = document.getElementById('pdfInvoiceCard');
+
+      try {
+        // 2. ഇമേജ് ആക്കി മാറ്റി jsPDF വഴി PDF ക്രിയേറ്റ് ചെയ്യുന്നു
+        const canvas = await html2canvas(card, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        const { jsPDF } = window.jspdf;
+        const pdfWidth = 80; // 80mm സ്ലിപ്പ് വലിപ്പം
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+        const pdfBlob = pdf.output('blob');
+        const fileName = `BANABLAST_Bill_${billNo}.pdf`;
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        // 3. Web Share API വഴി നേരിട്ട് WhatsApp-ലേക്ക് PDF ഫയൽ ഷെയർ ചെയ്യുന്നു
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({
+            files: [pdfFile],
+            title: `BANABLAST Bill #${billNo}`,
+            text: `🥤 BANABLAST Bill #${billNo} (₹${total})`
+          });
+        } else {
+          // ഡെസ്ക്ടോപ്പ് അല്ലെങ്കിൽ സപ്പോർട്ട് ഇല്ലാത്ത ബ്രൗസറുകളിൽ തനിയെ ഡൗൺലോഡ് ആകുന്നു
+          pdf.save(fileName);
+          alert(`✅ PDF ബില്ല് ഫോണിൽ ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
+        }
+      } catch (err) {
+        console.error("PDF Share Error:", err);
+        alert("❌ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
+      }
     }
 
     function openRecentBillsModal() {
@@ -1103,13 +1185,20 @@
               <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
             </div>
             <div style="display:flex; gap:6px;">
-              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
-              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️ Edit</button>
+              <button type="button" style="background:#25d366; color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillPdf('${b.id}')">💬 PDF</button>
+              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️</button>
+              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️</button>
             </div>
           </div>
         `).join('');
       }
       document.getElementById('recentBillsModal').style.display = 'flex';
+    }
+
+    function shareExistingBillPdf(id) {
+      const b = todayBills.find(x => x.id === id);
+      if (!b) return;
+      generateAndSharePdfBill(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
     }
 
     function reprintBill(id) {
