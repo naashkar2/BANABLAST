@@ -12,7 +12,7 @@
 
   <style>
     :root {
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
       --primary-dark: #0f172a;
       --slate-800: #1e293b;
@@ -20,21 +20,18 @@
       --slate-400: #94a3b8;
       --emerald: #059669;
       --emerald-dark: #047857;
-      --emerald-light: #ecfdf5;
       --blue: #2563eb;
-      --blue-light: #eff6ff;
       --red: #ef4444;
-      --red-light: #fef2f2;
       --border-color: #e2e8f0;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-      --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+      --shadow-dock: 0 -8px 25px rgba(15, 23, 42, 0.12);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    body { background: var(--bg); color: var(--primary-dark); padding-bottom: 215px; user-select: none; }
+    body { background: var(--bg); color: var(--primary-dark); padding-bottom: 195px; user-select: none; }
 
-    /* Top Executive Header */
+    /* Top Executive Header (മഞ്ഞ POS ഒഴിവാക്കി വൃത്തിയാക്കി) */
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
@@ -51,11 +48,11 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       font-weight: 900;
       letter-spacing: 0.5px;
+      color: #ffffff;
     }
-    .pos-brand span { color: #f59e0b; }
     .header-btns {
       display: flex;
       gap: 8px;
@@ -73,7 +70,7 @@
     }
     .btn-head:active { background: rgba(255,255,255,0.25); }
 
-    /* iOS Style Segmented Category Switcher */
+    /* Category Switcher */
     .cat-toggle-wrap {
       padding: 10px 14px 4px;
       max-width: 1000px;
@@ -108,9 +105,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* -------------------------------------------------------------
-       പ്രൊഫഷണൽ ഐറ്റം കാർഡുകൾ (WITH [+] & [-] STEPPERS)
-       ------------------------------------------------------------- */
+    /* Items Grid */
     .items-container {
       padding: 8px 12px 20px;
       max-width: 1000px;
@@ -178,7 +173,7 @@
       margin-bottom: 8px;
     }
 
-    /* കാർഡിന്റെ താഴത്തെ [+] വില [-] സ്റ്റെപ്പർ ബാർ */
+    /* Stepper Bar inside Item Box */
     .item-stepper-box {
       width: 100%;
       background: #f1f5f9;
@@ -262,45 +257,54 @@
     }
 
     /* -------------------------------------------------------------
-       പ്രൊഫഷണൽ POS ബോട്ടം കൺട്രോൾ ഡോക്ക് (SLEEK POS DOCK)
+       6 ബോക്സുകൾ ചേർന്ന സിമെട്രിക്കൽ POS കൺട്രോൾ ഡോക്ക് (2x3 GRID)
        ------------------------------------------------------------- */
-    .pos-bottom-bar {
+    .pos-bottom-dock {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       background: #ffffff;
       border-top: 1px solid #cbd5e1;
-      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-      box-shadow: var(--shadow-lg);
+      padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow: var(--shadow-dock);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* തുല്യമായ 2 കോളങ്ങൾ */
+      gap: 8px; /* തുല്യ അകലം */
     }
 
-    /* വരി 1: CASH / GPAY സെഗ്മെന്റഡ് ടോഗിൾ & കാർട്ട് */
-    .dock-row-1 {
+    /* എല്ലാ 6 ബോക്സുകൾക്കും ഒരേ ഉയരവും ലുക്കും */
+    .dock-box {
+      height: 48px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      box-sizing: border-box;
+      font-weight: 800;
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid transparent;
+      transition: transform 0.1s ease, box-shadow 0.15s;
     }
-    .pay-switch-dock {
-      display: flex;
+    .dock-box:active { transform: scale(0.98); }
+
+    /* ബോക്സ് 1: CASH / GPAY സെഗ്മെന്റഡ് ബോക്സ് */
+    .box-payment {
       background: #e2e8f0;
-      border-radius: 12px;
       padding: 3px;
-      flex: 1.6;
       gap: 4px;
+      border-color: #cbd5e1;
     }
-    .pay-opt-btn {
+    .btn-pay-sub {
       flex: 1;
-      height: 42px;
+      height: 100%;
       border: none;
-      border-radius: 10px;
-      font-size: 0.92rem;
+      border-radius: 9px;
+      font-size: 0.88rem;
       font-weight: 900;
       background: transparent;
       color: var(--slate-600);
@@ -308,116 +312,127 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
       transition: all 0.15s ease;
     }
-    .pay-opt-btn.active.cash {
+    .btn-pay-sub.active.cash {
       background: var(--emerald);
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
+      box-shadow: 0 2px 5px rgba(5, 150, 105, 0.3);
     }
-    .pay-opt-btn.active.gpay {
+    .btn-pay-sub.active.gpay {
       background: var(--blue);
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
     }
 
-    .btn-dock-cart {
-      flex: 1;
-      height: 42px;
+    /* ബോക്സ് 2: ITEMS & DELETE സംയോജിപ്പിച്ച ബോക്സ് */
+    .box-cart-combo {
       background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
+      border-color: #cbd5e1;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+    }
+    .btn-cart-part {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
       color: var(--slate-800);
-      border-radius: 12px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 800;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      white-space: nowrap;
+      gap: 5px;
+      cursor: pointer;
+      border-radius: 9px;
     }
-    .btn-dock-clear {
-      width: 42px;
-      height: 42px;
-      background: var(--red-light);
-      border: 1.5px solid #fecaca;
+    .btn-cart-part:active { background: #e2e8f0; }
+    .cart-divider {
+      width: 1.5px;
+      height: 24px;
+      background: #cbd5e1;
+      margin: 0 3px;
+    }
+    .btn-clear-part {
+      width: 40px;
+      height: 100%;
+      background: #fee2e2;
+      border: none;
+      border-radius: 9px;
       color: var(--red);
-      border-radius: 12px;
       font-size: 1.1rem;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      cursor: pointer;
     }
+    .btn-clear-part:active { background: #fecaca; }
 
-    /* വരി 2: ആകെ തുക & ക്ലീൻ 'PRINT' ബട്ടൺ */
-    .dock-row-2 {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .dock-total-box {
+    /* ബോക്സ് 3: TOTAL AMOUNT ബോക്സ് */
+    .box-total {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-width: 90px;
+      padding: 0 12px;
+      text-align: left;
+      align-items: flex-start;
     }
-    .dock-total-lbl { font-size: 0.68rem; color: var(--slate-400); font-weight: 800; letter-spacing: 0.5px; }
-    .dock-total-amt { font-size: 1.7rem; font-weight: 900; color: var(--primary-dark); line-height: 1.1; }
+    .box-total-lbl {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--slate-400);
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+    .box-total-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+      line-height: 1.1;
+      margin-top: 1px;
+    }
 
-    .btn-print-action {
-      flex: 1;
-      height: 50px;
+    /* ബോക്സ് 4: PRINT ബട്ടൺ ബോക്സ് */
+    .box-print {
       background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
       color: #ffffff;
       border: none;
-      border-radius: 14px;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 900;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
-      transition: transform 0.1s ease;
-    }
-    .btn-print-action:active { transform: scale(0.98); }
-
-    /* വരി 3: WhatsApp & Recent Bills */
-    .dock-row-3 {
-      display: flex;
-      gap: 8px;
-    }
-    .btn-quick-dock {
-      flex: 1;
-      height: 38px;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35);
       gap: 6px;
-      transition: all 0.15s ease;
     }
-    .btn-dock-wa {
+
+    /* ബോക്സ് 5: WHATSAPP BILL ബോക്സ് */
+    .box-whatsapp {
       background: #25d366;
       color: #064e3b;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
       box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+      gap: 6px;
     }
-    .btn-dock-recent {
+
+    /* ബോക്സ് 6: RECENT BILLS ബോക്സ് */
+    .box-recent {
       background: var(--slate-800);
       color: #ffffff;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
       box-shadow: 0 2px 6px rgba(30, 41, 59, 0.25);
+      gap: 6px;
     }
-    .btn-quick-dock:active { transform: scale(0.98); }
 
     /* Modals & Drawers */
     .modal {
@@ -508,9 +523,9 @@
 </head>
 <body>
 
-  <!-- Top Header -->
+  <!-- Header (മഞ്ഞ POS ഒഴിവാക്കി) -->
   <header class="pos-header">
-    <div class="pos-brand">🥤 BANABLAST <span>POS</span></div>
+    <div class="pos-brand">🥤 BANABLAST</div>
     <div class="header-btns">
       <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
       <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
@@ -533,48 +548,51 @@
   <!-- Items Touch Grid -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- പ്രൊഫഷണൽ POS ബോട്ടം കൺട്രോൾ ഡോക്ക് -->
-  <div class="pos-bottom-bar">
-    <!-- വരി 1: CASH / GPAY ടോഗിൾ & കാർട്ട് വിവരങ്ങൾ -->
-    <div class="dock-row-1">
-      <div class="pay-switch-dock">
-        <button type="button" class="pay-opt-btn active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
-          💵 CASH
-        </button>
-        <button type="button" class="pay-opt-btn gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
-          📱 GPAY
-        </button>
-      </div>
+  <!-- -------------------------------------------------------------
+       ഏകീകൃത രൂപത്തിലുള്ള 6 ബോക്സുകൾ (2x3 SYMMETRICAL DOCK)
+       ------------------------------------------------------------- -->
+  <div class="pos-bottom-dock">
+    <!-- വരി 1 / ബോക്സ് 1: CASH / GPAY സ്വിച്ച് -->
+    <div class="dock-box box-payment">
+      <button type="button" class="btn-pay-sub active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
+        💵 CASH
+      </button>
+      <button type="button" class="btn-pay-sub gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
+        📱 GPAY
+      </button>
+    </div>
 
-      <button type="button" class="btn-dock-cart" onclick="openCartDrawer()">
+    <!-- വരി 1 / ബോക്സ് 2: ITEMS & DELETE കോംബോ -->
+    <div class="dock-box box-cart-combo">
+      <button type="button" class="btn-cart-part" onclick="openCartDrawer()">
         🛒 <span id="cartCountTag">0 Items</span> ▾
       </button>
-      
-      <button type="button" class="btn-dock-clear" onclick="clearCart()" title="ക്ലിയർ ചെയ്യുക">
+      <div class="cart-divider"></div>
+      <button type="button" class="btn-clear-part" onclick="clearCart()" title="കാർട്ട് ഒഴിവാക്കുക">
         🗑️
       </button>
     </div>
 
-    <!-- വരി 2: ആകെ തുക & വലിയ 'PRINT' ബട്ടൺ -->
-    <div class="dock-row-2">
-      <div class="dock-total-box">
-        <span class="dock-total-lbl">TOTAL DUE</span>
-        <span class="dock-total-amt" id="cartTotalText">₹0</span>
-      </div>
-      <button type="button" class="btn-print-action" onclick="printAndSaveBill()">
-        🖨️ PRINT
-      </button>
+    <!-- വരി 2 / ബോക്സ് 3: TOTAL DUE തുക ബോക്സ് -->
+    <div class="dock-box box-total">
+      <span class="box-total-lbl">TOTAL DUE</span>
+      <span class="box-total-val" id="cartTotalText">₹0</span>
     </div>
 
-    <!-- വരി 3: WhatsApp & Recent Bills -->
-    <div class="dock-row-3">
-      <button type="button" class="btn-quick-dock btn-dock-wa" onclick="sendWhatsAppBillDirect()">
-        💬 WhatsApp Bill
-      </button>
-      <button type="button" class="btn-quick-dock btn-dock-recent" onclick="openRecentBillsModal()">
-        📋 Recent Bills / Reprint
-      </button>
-    </div>
+    <!-- വരി 2 / ബോക്സ് 4: PRINT ബട്ടൺ -->
+    <button type="button" class="dock-box box-print" onclick="printAndSaveBill()">
+      🖨️ PRINT
+    </button>
+
+    <!-- വരി 3 / ബോക്സ് 5: WHATSAPP BILL -->
+    <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
+      💬 WhatsApp Bill
+    </button>
+
+    <!-- വരി 3 / ബോക്സ് 6: RECENT BILLS -->
+    <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
+      📋 Recent Bills
+    </button>
   </div>
 
   <!-- CART DRAWER MODAL -->
@@ -587,7 +605,7 @@
 
       <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 12px;"></div>
 
-      <button type="button" class="btn-print-action" style="width:100%; height:46px; font-size:1rem;" onclick="closeModal('cartDrawerModal')">
+      <button type="button" class="dock-box box-print" style="width:100%; height:46px; font-size:1rem;" onclick="closeModal('cartDrawerModal')">
         ശരി (Done)
       </button>
     </div>
@@ -798,9 +816,6 @@
       renderMenuItems();
     }
 
-    /* -------------------------------------------------------------
-       മെയിൻ സ്ക്രീനിലെ ഐറ്റം കാർഡുകളിൽ നേരിട്ടുള്ള [+] & [-] ബട്ടണുകൾ
-       ------------------------------------------------------------- */
     function renderMenuItems() {
       const container = document.getElementById('posItemsContainer');
       const items = menuItems.filter(i => {
@@ -833,7 +848,6 @@
             <div class="item-media-box">${mediaHTML}</div>
             <div class="item-name">${displayName}</div>
             
-            <!-- വിലയുടെ ഇരുവശത്തുമായുള്ള സ്റ്റെപ്പർ ബട്ടണുകൾ -->
             <div class="item-stepper-box" onclick="event.stopPropagation()">
               <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
               <div class="item-price-center">
@@ -919,11 +933,11 @@
       const bGpay = document.getElementById('btnPayGPay');
 
       if (mode === 'cash') {
-        bCash.className = 'pay-opt-btn active cash';
-        bGpay.className = 'pay-opt-btn gpay';
+        bCash.className = 'btn-pay-sub active cash';
+        bGpay.className = 'btn-pay-sub gpay';
       } else {
-        bCash.className = 'pay-opt-btn cash';
-        bGpay.className = 'pay-opt-btn active gpay';
+        bCash.className = 'btn-pay-sub cash';
+        bGpay.className = 'btn-pay-sub active gpay';
       }
     }
 
