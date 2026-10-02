@@ -221,7 +221,7 @@
       border-radius: 50% !important;
     }
 
-    /* Navigation Tabs */
+    /* Navigation Tabs (Open Counter POS പൂർണ്ണമായി ഒഴിവാക്കി) */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -801,11 +801,10 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- നാവിഗേഷൻ ടാബുകൾ (POS Analytics & Kiosk ലിങ്ക് സഹിതം) -->
+  <!-- നാവിഗേഷൻ ടാബുകൾ (ക്ലീൻ ടാബുകൾ മാത്രം - POS ബട്ടൺ ഇല്ല) -->
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily', this)">Daily Accounts</button>
     <button class="tab-btn" onclick="switchTab('pos-analytics', this)">📊 POS Bills & Analytics</button>
-    <button class="tab-btn" onclick="window.location.href='billing.html'" style="background:#0284c7; color:white; border-color:#0284c7;">🛒 Open Counter POS</button>
     <button class="tab-btn" onclick="switchTab('stock', this)">Stock Items</button>
     <button class="tab-btn" onclick="switchTab('suppliers', this)">Supplier Purchases</button>
     <button class="tab-btn" onclick="switchTab('reports', this)">Reports</button>
@@ -1452,7 +1451,7 @@
         <input type="password" id="newPinInput" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric">
       </div>
 
-      <button type="button" class="btn-submit" onclick="submitChangePin()">PIN അപ്‌ഡേറ്റ് ചെയ്യുക</button>
+      <button type="button" class="btn-submit" onclick="submitChangePin()">PIN അപ്‌‌ഡേറ്റ് ചെയ്യുക</button>
       <button type="button" class="btn-cancel" onclick="closeModal('changePinModal')">Cancel</button>
     </div>
   </div>
@@ -1694,7 +1693,7 @@
     }
 
     /* -------------------------------------------------------------
-       2. INITIALIZATION & FIRESTORE SYNC
+       2. INITIALIZATION & FIRESTORE SYNC (SAFE MERGE)
        ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
@@ -1731,9 +1730,10 @@
         document.getElementById('posAnalyticsDateInput').value = today;
       }
 
+      // Safe PIN Merge: കൗണ്ടർ PIN ഒരിക്കലും നഷ്ടപ്പെടില്ല
       db.collection('settings').doc('security').onSnapshot(doc => {
         if (doc.exists && doc.data().pins) {
-          partnerPins = doc.data().pins;
+          partnerPins = { ...partnerPins, ...doc.data().pins };
         } else {
           db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
         }
@@ -2163,7 +2163,7 @@
       }
     }
     /* -------------------------------------------------------------
-       4. ENTRY ACTIONS & TRACKING (സേവിംഗ് ഫ്ലെക്സിബിലിറ്റി)
+       4. ENTRY ACTIONS & TRACKING (സേവിംഗ് & ക്ലീൻ ലെഡ്ജർ സിങ്ക്)
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -2323,9 +2323,37 @@
       }
     }
 
+    // കൗണ്ടർ സെയിൽസ് ഒന്നിലധികം വരികളായി വന്ന് നിറയാതെ ഒരൊറ്റ വരിയായി ക്ലബ്ബ് ചെയ്യുന്നു
     function renderDailyAccounts() {
       const curDate = document.getElementById('selectedDate').value || today;
-      const todayTrans = transactions.filter(t => t.date === curDate);
+      const todayTransRaw = transactions.filter(t => t.date === curDate);
+
+      let todayTrans = [];
+      let counterCashEntry = null;
+      let counterGpayEntry = null;
+
+      todayTransRaw.forEach(t => {
+        const isCounter = (t.addedBy === 'Counter POS') || (t.title && t.title.startsWith('Counter Sales'));
+        if (isCounter && t.type === 'sale') {
+          if (t.mode === 'cash') {
+            if (!counterCashEntry) {
+              counterCashEntry = { ...t, title: 'Counter Sales (Cash)', extra: 'Counter Sales (Cash)', amount: 0 };
+              todayTrans.push(counterCashEntry);
+            }
+            counterCashEntry.amount = Math.round((counterCashEntry.amount + t.amount) * 100) / 100;
+          } else if (t.mode === 'gpay') {
+            if (!counterGpayEntry) {
+              counterGpayEntry = { ...t, title: 'Counter Sales (GPay)', extra: 'Counter Sales (GPay)', amount: 0 };
+              todayTrans.push(counterGpayEntry);
+            }
+            counterGpayEntry.amount = Math.round((counterGpayEntry.amount + t.amount) * 100) / 100;
+          } else {
+            todayTrans.push(t);
+          }
+        } else {
+          todayTrans.push(t);
+        }
+      });
 
       let totalSales = 0, totalExp = 0;
       let saleCash = 0, saleGPay = 0;
@@ -2903,7 +2931,7 @@
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
         const totDue = Math.round(item.totalDue * 100) / 100;
-        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
+        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
 
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
