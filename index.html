@@ -801,9 +801,11 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- നാവിഗേഷൻ ടാബുകൾ -->
+  <!-- നാവിഗേഷൻ ടാബുകൾ (POS Analytics & Kiosk ലിങ്ക് സഹിതം) -->
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily', this)">Daily Accounts</button>
+    <button class="tab-btn" onclick="switchTab('pos-analytics', this)">📊 POS Bills & Analytics</button>
+    <button class="tab-btn" onclick="window.location.href='billing.html'" style="background:#0284c7; color:white; border-color:#0284c7;">🛒 Open Counter POS</button>
     <button class="tab-btn" onclick="switchTab('stock', this)">Stock Items</button>
     <button class="tab-btn" onclick="switchTab('suppliers', this)">Supplier Purchases</button>
     <button class="tab-btn" onclick="switchTab('reports', this)">Reports</button>
@@ -882,6 +884,41 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- TAB: POS BILLS & ANALYTICS (PARTNERS ONLY) -->
+    <div id="tab-pos-analytics" class="tab-content">
+      <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Daily Bills</h3>
+      
+      <div style="background:white; border:1px solid var(--border-color); border-radius:10px; padding:12px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
+        <label style="font-weight:700; font-size:0.85rem;">തീയതി തിരഞ്ഞെടുക്കുക:</label>
+        <input type="date" id="posAnalyticsDateInput" class="form-control" style="width:auto; padding:6px;" onchange="renderPosAnalyticsTab()">
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-card" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="sum-box"><h4>Counter Total</h4><p id="posAnaTotalSales" class="color-green">₹0</p></div>
+        <div class="sum-box"><h4>Cash</h4><p id="posAnaCash" class="color-blue">₹0</p></div>
+        <div class="sum-box"><h4>GPay</h4><p id="posAnaGpay" class="color-purple">₹0</p></div>
+      </div>
+
+      <!-- Best Sellers & Item Breakdown -->
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>🏆 കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ (Item-wise Sales)</span>
+          <span id="posAnaTotalGlassCount" style="color:#0284c7; font-size:0.8rem;">0 Sold</span>
+        </div>
+        <div id="posAnaItemBreakdownList"></div>
+      </div>
+
+      <!-- Detailed Bills Log for Selected Date -->
+      <div class="cat-box">
+        <div class="cat-title">
+          <span>🧾 അന്നത്തെ ബില്ലുകൾ (Individual Bills)</span>
+          <span id="posAnaBillsCountTag" style="color:#64748b; font-size:0.8rem;">0 Bills</span>
+        </div>
+        <div id="posAnaBillsListContainer" style="max-height:350px; overflow-y:auto;"></div>
+      </div>
     </div>
 
     <!-- TAB 2: STOCK ITEMS -->
@@ -1367,7 +1404,7 @@
     </div>
   </div>
 
-  <!-- 8. PARTNER LOGIN MODAL -->
+  <!-- 8. PARTNER LOGIN MODAL (COUNTER / BILLING OPTION INCLUDED) -->
   <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.88); z-index: 2000;">
     <div class="modal-box" style="text-align: center;">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
@@ -1375,11 +1412,12 @@
       <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">നിങ്ങളുടെ പേര് തിരഞ്ഞെടുത്ത് രഹസ്യ PIN നൽകുക</p>
 
       <div class="form-group" style="text-align: left;">
-        <label>Partner (പാർട്ണർ)</label>
+        <label>Partner / Role</label>
         <select id="loginPartnerSelect" class="form-control">
           <option value="ASHIF">ASHIF</option>
           <option value="SABITH">SABITH</option>
           <option value="ASHKAR ALI">ASHKAR ALI</option>
+          <option value="Counter / Billing">🛒 Counter / Billing (Staff)</option>
         </select>
       </div>
 
@@ -1431,6 +1469,7 @@
           <option value="ASHIF">ASHIF</option>
           <option value="SABITH">SABITH</option>
           <option value="ASHKAR ALI">ASHKAR ALI</option>
+          <option value="Counter / Billing">Counter / Billing</option>
         </select>
       </div>
 
@@ -1472,10 +1511,12 @@
 
     let dynamicOcrKey = localStorage.getItem('BANABLAST_OCR_KEY') || localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
 
+    // ഡിഫോൾട്ട് ലോഗിൻ PIN കോഡുകൾ (കൗണ്ടർ സ്റ്റാഫിന് 0000 ഉൾപ്പെടെ)
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
-      "ASHKAR ALI": "3333"
+      "ASHKAR ALI": "3333",
+      "Counter / Billing": "0000"
     };
 
     let currentLoggedInUser = localStorage.getItem('BANABLAST_USER') || null;
@@ -1501,13 +1542,16 @@
       appId: "1:236930066397:web:e8062c9d77080837e3f834"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     let transactions = [];
     let withdrawals = [];
     let investments = [];
     let holidays = [];
+    let posBills = [];
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
@@ -1520,7 +1564,7 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       1. AUTH, PIN & OCR SETTINGS
+       1. AUTH, PIN & OCR SETTINGS (WITH COUNTER KIOSK ROUTE)
        ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
@@ -1537,6 +1581,14 @@
       const enteredPin = document.getElementById('loginPinInput').value.trim();
 
       if (enteredPin === partnerPins[selectedUser]) {
+        // കൗണ്ടർ സ്റ്റാഫ് ആണെങ്കിൽ നേരിട്ട് billing.html-ലേക്ക് പോകുന്നു
+        if (selectedUser === "Counter / Billing") {
+          document.getElementById('loginPinInput').value = '';
+          document.getElementById('loginModal').style.display = 'none';
+          window.location.href = 'billing.html';
+          return;
+        }
+
         currentLoggedInUser = selectedUser;
         localStorage.setItem('BANABLAST_USER', selectedUser);
         document.getElementById('loginPinInput').value = '';
@@ -1675,6 +1727,9 @@
       document.getElementById('sheetToDate').value = today;
       document.getElementById('repFromDate').value = today;
       document.getElementById('repToDate').value = today;
+      if (document.getElementById('posAnalyticsDateInput')) {
+        document.getElementById('posAnalyticsDateInput').value = today;
+      }
 
       db.collection('settings').doc('security').onSnapshot(doc => {
         if (doc.exists && doc.data().pins) {
@@ -1697,6 +1752,12 @@
         updateDatalists();
         renderAll();
       }, err => console.error("Trans sync err:", err));
+
+      db.collection('pos_bills').onSnapshot(snap => {
+        posBills = [];
+        snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
+        renderPosAnalyticsTab();
+      }, err => console.error("POS bills sync err:", err));
 
       db.collection('withdrawals').onSnapshot(snap => {
         withdrawals = [];
@@ -1728,6 +1789,7 @@
       renderSupplierPurchasesTab();
       renderReportsTab();
       renderInvestTab();
+      renderPosAnalyticsTab();
     }
 
     function switchTab(tabId, el) {
@@ -1736,6 +1798,7 @@
       if (el) el.classList.add('active');
       const target = document.getElementById('tab-' + tabId);
       if (target) target.classList.add('active');
+      if (tabId === 'pos-analytics') renderPosAnalyticsTab();
     }
 
     function loadDateData() {
@@ -1767,6 +1830,77 @@
       }, { merge: true });
     }
 
+    /* -------------------------------------------------------------
+       POS ANALYTICS TAB (PARTNERS ONLY)
+       ------------------------------------------------------------- */
+    function renderPosAnalyticsTab() {
+      const dateInput = document.getElementById('posAnalyticsDateInput');
+      const selectedDate = dateInput ? dateInput.value || today : today;
+      const filtered = posBills.filter(b => b.date === selectedDate);
+
+      let totalSales = 0, cashSales = 0, gpaySales = 0;
+      let totalGlasses = 0;
+      let itemFreqMap = {};
+
+      filtered.forEach(b => {
+        totalSales += (b.total || 0);
+        if (b.mode === 'cash') cashSales += (b.total || 0);
+        else gpaySales += (b.total || 0);
+
+        if (b.items && Array.isArray(b.items)) {
+          b.items.forEach(it => {
+            const qty = (it.qty || 1);
+            totalGlasses += qty;
+            const k = (it.name || 'Unknown').trim();
+            if (!itemFreqMap[k]) itemFreqMap[k] = { name: k, count: 0, revenue: 0 };
+            itemFreqMap[k].count += qty;
+            itemFreqMap[k].revenue += ((it.price || 0) * qty);
+          });
+        }
+      });
+
+      const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setT('posAnaTotalSales', '₹' + Math.round(totalSales * 100) / 100);
+      setT('posAnaCash', '₹' + Math.round(cashSales * 100) / 100);
+      setT('posAnaGpay', '₹' + Math.round(gpaySales * 100) / 100);
+      setT('posAnaTotalGlassCount', `${totalGlasses} Glasses Sold`);
+      setT('posAnaBillsCountTag', `${filtered.length} Bills`);
+
+      const sortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
+      const breakdownContainer = document.getElementById('posAnaItemBreakdownList');
+      if (breakdownContainer) {
+        if (!sortedItems.length) {
+          breakdownContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">വിൽപ്പന വിവരങ്ങൾ ലഭ്യമല്ല</p>';
+        } else {
+          breakdownContainer.innerHTML = sortedItems.map((item, idx) => `
+            <div class="list-row" style="align-items:center;">
+              <span><strong>#${idx + 1} ${item.name}</strong> (${item.count} ഗ്ലാസ്)</span>
+              <strong class="color-green">₹${Math.round(item.revenue * 100) / 100}</strong>
+            </div>
+          `).join('');
+        }
+      }
+
+      const billsContainer = document.getElementById('posAnaBillsListContainer');
+      if (billsContainer) {
+        if (!filtered.length) {
+          billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ തീയതിയിൽ ബില്ലുകൾ ഇല്ല</p>';
+        } else {
+          billsContainer.innerHTML = filtered.slice().reverse().map(b => `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${b.time || '-'})</span>
+                <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${(b.mode||'').toUpperCase()})</span>
+              </div>
+              <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
+                ${(b.items || []).map(i => `${i.name} (x${i.qty})`).join(', ')}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
     function updateDatalists() {
       const suppliers = new Set();
       const items = new Set();
@@ -1793,7 +1927,6 @@
       }
     }
 
-    // റെഡ് മാർക്കും സേഫ് വാലിഡേഷനും ഉള്ള ഐറ്റം റോ
     function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
       const container = document.getElementById('purchaseItemsListContainer');
       const div = document.createElement('div');
@@ -1855,7 +1988,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ (ഉറപ്പില്ലാത്തവ റെഡ് മാർക്കിൽ)
+       3. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ
        ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
       return new Promise((resolve, reject) => {
@@ -1935,7 +2068,6 @@
 
         if (lines.length === 0) throw new Error("വിവരങ്ങളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല.");
 
-        // 1. സപ്ലയറുടെ പേര് കണ്ടെത്തുന്നു
         let supplierName = "";
         for (let i = 0; i < Math.min(5, lines.length); i++) {
           const l = lines[i];
@@ -1948,7 +2080,6 @@
           supplierName = lines[0].replace(/[^a-zA-Z0-9\s]/g, '').trim();
         }
 
-        // 2. ആകെ തുക (Grand Total) കണ്ടെത്തുന്നു
         let totalBill = 0;
         for (let i = lines.length - 1; i >= 0; i--) {
           const match = lines[i].match(/(?:total|grand\s*total|net\s*amount)[\s:]*([0-9,]+(?:\.[0-9]{1,2})?)/i);
@@ -1958,24 +2089,11 @@
           }
         }
 
-        // 3. സാധനങ്ങളും വിലയും വേർതിരിക്കുന്നു
         const items = [];
-        let inItemsSection = false;
-
         for (let line of lines) {
-          if (/itemname|item\s*name|rate|qty|particulars/i.test(line)) {
-            inItemsSection = true;
-            continue;
-          }
-
-          if (/otherexpense|taxsplit|taxable|cgst|sgst|floodcess|grand\s*total/i.test(line) || /^total\s*:/i.test(line)) {
-            inItemsSection = false;
-            break;
-          }
-
-          if (/party\s*:|date\s*:|invtime|phone|gst\s*no|mannarkkad/i.test(line)) {
-            continue;
-          }
+          if (/itemname|item\s*name|rate|qty|particulars/i.test(line)) continue;
+          if (/otherexpense|taxsplit|taxable|cgst|sgst|floodcess|grand\s*total/i.test(line) || /^total\s*:/i.test(line)) break;
+          if (/party\s*:|date\s*:|invtime|phone|gst\s*no|mannarkkad/i.test(line)) continue;
 
           const numbers = line.match(/[0-9]+(?:\.[0-9]{1,2})?/g);
           if (numbers && numbers.length > 0) {
@@ -1988,7 +2106,6 @@
               .trim();
 
             if (itemName.length >= 3) {
-              // കർശന പരിശോധന: അവസാന സംഖ്യ 1-ൽ താഴെയാണെങ്കിൽ (ഉദാ: 0.25 തൂക്കം), അത് ഒരിക്കലും വിലയായി എടുക്കില്ല!
               if (lastNum < 1) {
                 items.push({ 
                   name: itemName, 
@@ -2045,7 +2162,6 @@
         event.target.value = '';
       }
     }
-
     /* -------------------------------------------------------------
        4. ENTRY ACTIONS & TRACKING (സേവിംഗ് ഫ്ലെക്സിബിലിറ്റി)
        ------------------------------------------------------------- */
@@ -2149,7 +2265,6 @@
             }
           });
 
-          // എന്തെങ്കിലും സാധനത്തിന് വില നൽകാതെ കിടക്കുന്നുണ്ടെങ്കിൽ മാത്രം ഓർമ്മിപ്പിക്കുന്നു
           if (hasEmptyPrice) {
             const proceed = confirm("⚠️ ചില സാധനങ്ങൾക്ക് വില നൽകിയിട്ടില്ല. അവ ഒഴിവാക്കി ബാക്കി വിവരങ്ങൾ സേവ് ചെയ്യണമെന്നുണ്ടോ?");
             if (!proceed) return;
@@ -2319,7 +2434,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. PDF ENGINE
+       5. PDF ENGINE (ZERO-BLANK & PERFECT FIT)
        ------------------------------------------------------------- */
     async function ensurePdfLibraries() {
       if (typeof html2canvas === 'undefined') {
