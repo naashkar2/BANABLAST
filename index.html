@@ -1466,7 +1466,6 @@
       <button type="button" class="btn-cancel" onclick="closeModal('aiSettingsModal')">Cancel</button>
     </div>
   </div>
-
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
@@ -1843,7 +1842,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ (100% സൗജന്യം & സ്ഥിരത)
+       3. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ (കൃത്യമായ കോളം ഫിൽട്ടറിംഗ്)
        ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
       return new Promise((resolve, reject) => {
@@ -1911,62 +1910,80 @@
           body: formData
         });
 
-        if (!res.ok) {
-          throw new Error(`സെർവർ പ്രതികരിച്ചില്ല (Status: ${res.status})`);
-        }
+        if (!res.ok) throw new Error(`Status: ${res.status}`);
 
         const data = await res.json();
         if (data.IsErroredOnProcessing || !data.ParsedResults || !data.ParsedResults[0]) {
-          throw new Error(data.ErrorMessage ? data.ErrorMessage[0] : "ബില്ലിലെ വിവരങ്ങൾ വായിക്കാൻ സാധിച്ചില്ല.");
+          throw new Error(data.ErrorMessage ? data.ErrorMessage[0] : "ബില്ല് വായിക്കാൻ സാധിച്ചില്ല.");
         }
 
         const fullText = data.ParsedResults[0].ParsedText || "";
         const lines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-        if (lines.length === 0) {
-          throw new Error("ബില്ലിൽ വിവരങ്ങളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല.");
+        if (lines.length === 0) throw new Error("വിവരങ്ങളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല.");
+
+        // 1. സപ്ലയർ / കടയുടെ പേര് കണ്ടെത്തുന്നു
+        let supplierName = "";
+        for (let i = 0; i < Math.min(5, lines.length); i++) {
+          const l = lines[i];
+          if (/traders|store|bazaar|supermarket|hypermarket|mart|plaza|bakery|fruits|shop/i.test(l)) {
+            supplierName = l.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+            break;
+          }
+        }
+        if (!supplierName && lines.length > 0) {
+          supplierName = lines[0].replace(/[^a-zA-Z0-9\s]/g, '').trim();
         }
 
-        // 1. കടയുടെ പേര് കണ്ടെത്തുന്നു
-        let supplierName = lines[0].replace(/[^a-zA-Z0-9\s]/g, '').trim();
-        if (lines.length > 1 && supplierName.length < 3) {
-          supplierName = lines[1].replace(/[^a-zA-Z0-9\s]/g, '').trim();
-        }
-
-        // 2. ആകെ തുക കണ്ടെത്തുന്നു
+        // 2. ആകെ തുക (Grand Total) കണ്ടെത്തുന്നു
         let totalBill = 0;
-        const totalRegex = /(?:total|grand\s*total|net\s*amount|net\s*total|amount|due|bal)[\s:]*([0-9]+(?:\.[0-9]{1,2})?)/i;
-        
         for (let i = lines.length - 1; i >= 0; i--) {
-          const match = lines[i].match(totalRegex);
+          const match = lines[i].match(/(?:total|grand\s*total|net\s*amount)[\s:]*([0-9,]+(?:\.[0-9]{1,2})?)/i);
           if (match && match[1]) {
-            totalBill = parseFloat(match[1]);
+            totalBill = parseFloat(match[1].replace(/,/g, ''));
             break;
           }
         }
 
-        // 3. ഐറ്റങ്ങളും വിലയും കണ്ടെത്തുന്നു
+        // 3. സാധനങ്ങളും വിലയും വേർതിരിക്കുന്നു
         const items = [];
-        const itemRowRegex = /^(.*?)\s+([0-9]+(?:\.[0-9]{1,2})?)$/;
+        let inItemsSection = false;
 
-        lines.forEach(line => {
-          if (/total|grand|date|invoice|gst|tax|cash|gpay|balance/i.test(line)) return;
-          const match = line.match(itemRowRegex);
-          if (match) {
-            const name = match[1].replace(/[^a-zA-Z0-9\s]/g, '').trim();
-            const price = parseFloat(match[2]);
-            if (name.length > 2 && price > 0 && price < 100000) {
-              items.push({ name, price });
+        for (let line of lines) {
+          if (/itemname|item\s*name|rate|qty|particulars/i.test(line)) {
+            inItemsSection = true;
+            continue;
+          }
+
+          if (/otherexpense|taxsplit|taxable|cgst|sgst|floodcess|grand\s*total/i.test(line) || /^total\s*:/i.test(line)) {
+            inItemsSection = false;
+            break;
+          }
+
+          if (/party\s*:|date\s*:|invtime|phone|gst\s*no|mannarkkad/i.test(line)) {
+            continue;
+          }
+
+          const numbers = line.match(/[0-9]+(?:\.[0-9]{1,2})?/g);
+          if (numbers && numbers.length > 0) {
+            // വരിയിലെ അവസാന സംഖ്യയാണ് ആ സാധനത്തിന്റെ യഥാർത്ഥ Total Price
+            const lineTotal = parseFloat(numbers[numbers.length - 1]);
+            
+            // നമ്പറുകൾ മാറ്റി പേര് മാത്രം വൃത്തിയാക്കുന്നു
+            let itemName = line
+              .replace(/^[0-9]+\s*/, '')
+              .replace(/[0-9]+(?:\.[0-9]{1,2})?/g, '')
+              .replace(/[^a-zA-Z0-9\s()]/g, '')
+              .trim();
+
+            if (itemName.length >= 3 && lineTotal > 0 && lineTotal < 100000) {
+              items.push({ name: itemName, price: lineTotal });
             }
           }
-        });
-
-        if (supplierName) document.getElementById('entryTitle').value = supplierName;
-        if (totalBill > 0) {
-          document.getElementById('suppTotalBill').value = totalBill;
-          document.getElementById('suppPaidAmount').value = totalBill;
         }
 
+        if (supplierName) document.getElementById('entryTitle').value = supplierName;
+        
         const container = document.getElementById('purchaseItemsListContainer');
         container.innerHTML = '';
         if (items.length > 0) {
@@ -1974,16 +1991,23 @@
         } else {
           addNewPurchaseItemRow();
         }
-        recalcTotalBillFromItems();
 
-        alert("✅ ബില്ലിലെ അക്കങ്ങളും വിവരങ്ങളും വിജയകരമായി എടുത്തു!");
+        if (totalBill > 0) {
+          document.getElementById('suppTotalBill').value = totalBill;
+          document.getElementById('suppPaidAmount').value = totalBill;
+          calcPurchaseDue();
+        } else {
+          recalcTotalBillFromItems();
+        }
+
+        alert("✅ ബില്ലിലെ വിവരങ്ങൾ കൃത്യമായി എടുത്തു!");
 
       } catch (err) {
         console.error("OCR error:", err);
         alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല!\n\nകാരണം: " + err.message);
       } finally {
         loader.style.display = 'none';
-        loader.innerText = '🔄 OCR വഴി ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
+        loader.innerText = '🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
         event.target.value = '';
       }
     }
@@ -2715,7 +2739,7 @@
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
         const totDue = Math.round(item.totalDue * 100) / 100;
-        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
+        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
 
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
