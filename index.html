@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-  <!-- html2canvas & jsPDF Libraries (Essential for Zero-Blank PDF) -->
+  <!-- html2canvas & jsPDF Libraries (Zero-Blank Engine) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -785,7 +785,7 @@
         </div>
       </div>
       <div>
-        <button type="button" class="btn-auth-small" onclick="openAISettingsModal()" title="AI Settings">⚙️ AI Key</button>
+        <button type="button" class="btn-auth-small" onclick="openAISettingsModal()" title="AI Settings">⚙️ AI Keys</button>
       </div>
     </div>
 
@@ -1096,7 +1096,7 @@
       <div id="aiScanSection" style="display:none; margin-bottom:12px;">
         <input type="file" id="billCameraInput" accept="image/*" style="display:none;" onchange="handleBillImageUpload(event)">
         <button type="button" class="scan-btn" onclick="document.getElementById('billCameraInput').click()">
-          📸 Scan / Upload Bill with AI (ക്യാമറ / ഗാലറി)
+          📸 Scan / Upload Bill with AI (Gemini + Groq)
         </button>
         <div id="scanLoadingBox" class="scanning-loader">
           🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക
@@ -1464,30 +1464,39 @@
     </div>
   </div>
 
-  <!-- 11. AI SETTINGS / KEY MODAL -->
+  <!-- 11. AI SETTINGS / MULTI-AI KEY MODAL (GEMINI + GROQ) -->
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
-      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ Gemini AI API Key</h3>
+      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ AI Settings (Gemini & Groq)</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
-        Google AI Studio-ൽ നിന്ന് എടുത്ത API Key ഇവിടെ നൽകുക:
+        സ്കാനിംഗ് കൂടുതൽ കാര്യക്ഷമമാക്കാൻ API കീകൾ ഇവിടെ നൽകുക:
       </p>
 
       <div class="form-group">
-        <label>Gemini API Key (AIzaSy...)</label>
+        <label>1. Google Gemini API Key (Primary)</label>
         <input type="text" id="aiKeyInput" class="form-control" placeholder="AIzaSy...">
+        <span style="font-size:0.68rem; color:#64748b;">aistudio.google.com വഴി ലഭിക്കുന്നത്</span>
       </div>
 
-      <button type="button" class="btn-submit" onclick="saveAISettingsKey()">Key സേവ് ചെയ്യുക</button>
+      <div class="form-group" style="margin-top:10px;">
+        <label>2. Groq Vision API Key (Backup)</label>
+        <input type="text" id="groqKeyInput" class="form-control" placeholder="gsk_...">
+        <span style="font-size:0.68rem; color:#64748b;">console.groq.com വഴി ലഭിക്കുന്ന സൗജന്യ കീ</span>
+      </div>
+
+      <button type="button" class="btn-submit" onclick="saveAISettingsKey()">കീകൾ സേവ് ചെയ്യുക</button>
       <button type="button" class="btn-cancel" onclick="closeModal('aiSettingsModal')">Cancel</button>
     </div>
   </div>
 
-  <!-- =================== [PART 1 ഇതോടെ പൂർത്തിയായി] =================== -->
+  <!-- =================== [PART 1 ഇതോടെ അവസാനിച്ചു] =================== -->
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
+    // AI API Keys (LocalStorage & Firebase Sync)
     let dynamicGeminiKey = localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
+    let dynamicGroqKey = localStorage.getItem('BANABLAST_GROQ_KEY') || "";
 
     let partnerPins = {
       "ASHIF": "1111",
@@ -1537,7 +1546,7 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       1. AUTH, PIN & AI SETTINGS
+       1. AUTH, PIN & MULTI-AI SETTINGS
        ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
@@ -1646,17 +1655,26 @@
 
     function openAISettingsModal() {
       document.getElementById('aiKeyInput').value = dynamicGeminiKey || '';
+      document.getElementById('groqKeyInput').value = dynamicGroqKey || '';
       document.getElementById('aiSettingsModal').style.display = 'flex';
     }
 
     function saveAISettingsKey() {
-      const val = document.getElementById('aiKeyInput').value.trim();
-      if (val) {
-        dynamicGeminiKey = val;
-        localStorage.setItem('BANABLAST_GEMINI_KEY', val);
-        db.collection('settings').doc('ai').set({ key: val }, { merge: true });
-        alert("✅ Gemini AI Key വിജയകരമായി സേവ് ചെയ്തു!");
-      }
+      const geminiVal = document.getElementById('aiKeyInput').value.trim();
+      const groqVal = document.getElementById('groqKeyInput').value.trim();
+
+      dynamicGeminiKey = geminiVal;
+      dynamicGroqKey = groqVal;
+
+      localStorage.setItem('BANABLAST_GEMINI_KEY', geminiVal);
+      localStorage.setItem('BANABLAST_GROQ_KEY', groqVal);
+
+      db.collection('settings').doc('ai').set({ 
+        key: geminiVal,
+        groqKey: groqVal 
+      }, { merge: true });
+
+      alert("✅ AI API Keys വിജയകരമായി സേവ് ചെയ്തു!");
       closeModal('aiSettingsModal');
     }
 
@@ -1704,9 +1722,16 @@
       });
 
       db.collection('settings').doc('ai').onSnapshot(doc => {
-        if (doc.exists && doc.data().key) {
-          dynamicGeminiKey = doc.data().key;
-          localStorage.setItem('BANABLAST_GEMINI_KEY', dynamicGeminiKey);
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.key) {
+            dynamicGeminiKey = d.key;
+            localStorage.setItem('BANABLAST_GEMINI_KEY', dynamicGeminiKey);
+          }
+          if (d.groqKey) {
+            dynamicGroqKey = d.groqKey;
+            localStorage.setItem('BANABLAST_GROQ_KEY', dynamicGroqKey);
+          }
         }
       });
 
@@ -1861,7 +1886,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & SMART GEMINI AI സ്കാനർ (MULTI-FALLBACK)
+       3. ഇമേജ് കംപ്രഷൻ & DUAL-AI സ്കാനർ (GEMINI + GROQ VISION BACKUP)
        ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
       return new Promise((resolve, reject) => {
@@ -1902,8 +1927,8 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      if (!dynamicGeminiKey || dynamicGeminiKey.trim() === '') {
-        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ AI Key' ബട്ടൺ വഴി നിങ്ങളുടെ Gemini API Key നൽകുക.");
+      if (!dynamicGeminiKey && !dynamicGroqKey) {
+        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ AI Keys' ബട്ടൺ വഴി നിങ്ങളുടെ Gemini അല്ലെങ്കിൽ Groq API Key നൽകുക.");
         openAISettingsModal();
         event.target.value = '';
         return;
@@ -1914,74 +1939,108 @@
 
       try {
         const base64Data = await compressImageFile(file);
-        
-        const promptText = `Extract items from this purchase receipt bill. Return ONLY valid JSON:
+        const promptText = `Extract items from this purchase receipt bill. Return ONLY valid JSON in format:
 {"supplier": "Store Name", "total": 0, "items": [{"name": "item description", "price": 0}]}`;
 
-        const payload = {
-          contents: [{
-            parts: [
-              { text: promptText },
-              { inline_data: { mime_type: "image/jpeg", data: base64Data } }
-            ]
-          }]
-        };
+        let parsedResult = null;
+        let scanSuccessEngine = "";
 
-        const candidateModels = [
-          "gemini-2.5-flash",
-          "gemini-2.5-flash-lite",
-          "gemini-2.0-flash-lite",
-          "gemini-3.8-flash"
-        ];
+        // 1. ഒന്നാമതായി Gemini-യിലെ 2 പ്രധാന മോഡലുകൾ ഉപയോഗിക്കുന്നു
+        if (dynamicGeminiKey && dynamicGeminiKey.trim() !== '') {
+          const candidateModels = [
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite"
+          ];
 
-        let res = null;
-        let lastErrorMsg = "";
+          for (const model of candidateModels) {
+            loader.innerText = `🔄 Google Gemini പരിശോധിക്കുന്നു (${model})...`;
+            const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=` + dynamicGeminiKey.trim();
+            const payload = {
+              contents: [{
+                parts: [
+                  { text: promptText },
+                  { inline_data: { mime_type: "image/jpeg", data: base64Data } }
+                ]
+              }]
+            };
 
-        for (const model of candidateModels) {
-          loader.innerText = `🔄 AI പരിശോധിക്കുന്നു (${model})...`;
-          const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=` + dynamicGeminiKey.trim();
+            try {
+              const res = await fetch(targetUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+              });
 
-          try {
-            res = await fetch(targetUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
-
-            if (res.ok) break;
-
-            const errJson = await res.json().catch(() => ({}));
-            lastErrorMsg = errJson.error ? errJson.error.message : "Server busy";
-          } catch (netErr) {
-            lastErrorMsg = netErr.message;
+              if (res.ok) {
+                const data = await res.json();
+                let rawText = data.candidates[0].content.parts[0].text;
+                rawText = rawText.replace(/```json|```/gi, '').trim();
+                parsedResult = JSON.parse(rawText);
+                scanSuccessEngine = `Gemini (${model})`;
+                break;
+              }
+            } catch (err) {
+              console.warn(`Gemini ${model} failed, trying next...`, err);
+            }
           }
         }
 
-        if (!res || !res.ok) {
-          throw new Error(lastErrorMsg || "API Connection Failed");
+        // 2. Gemini പരാജയപ്പെടുകയോ ക്വാട്ട തീരുകയോ ചെയ്താൽ Groq (Llama 3.2 Vision) ബാക്കപ്പായി എടുക്കുന്നു
+        if (!parsedResult && dynamicGroqKey && dynamicGroqKey.trim() !== '') {
+          loader.innerText = `🔄 ബാക്കപ്പ് AI (Groq Vision) പരിശോധിക്കുന്നു...`;
+          try {
+            const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${dynamicGroqKey.trim()}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "llama-3.2-11b-vision-preview",
+                messages: [{
+                  role: "user",
+                  content: [
+                    { type: "text", text: promptText },
+                    { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Data}` } }
+                  ]
+                }],
+                response_format: { type: "json_object" }
+              })
+            });
+
+            if (groqRes.ok) {
+              const groqData = await groqRes.json();
+              let groqRaw = groqData.choices[0].message.content;
+              groqRaw = groqRaw.replace(/```json|```/gi, '').trim();
+              parsedResult = JSON.parse(groqRaw);
+              scanSuccessEngine = "Groq Llama-Vision";
+            }
+          } catch (groqErr) {
+            console.error("Groq attempt failed:", groqErr);
+          }
         }
 
-        const data = await res.json();
-        let rawText = data.candidates[0].content.parts[0].text;
-        rawText = rawText.replace(/```json|```/gi, '').trim();
-        const parsed = JSON.parse(rawText);
+        if (!parsedResult) {
+          throw new Error("Gemini, Groq സെർവറുകളിൽ നിന്ന് ബില്ല് സ്കാൻ ചെയ്യാൻ കഴിഞ്ഞില്ല. ദയവായി കീ ശരിയാണോ എന്ന് പരിശോധിക്കുക.");
+        }
 
-        if (parsed.supplier) document.getElementById('entryTitle').value = parsed.supplier;
-        if (parsed.total) {
-          document.getElementById('suppTotalBill').value = parsed.total;
-          document.getElementById('suppPaidAmount').value = parsed.total;
+        // ലഭിച്ച ഡാറ്റ ഫോമിലേക്ക് ഫിൽ ചെയ്യുന്നു
+        if (parsedResult.supplier) document.getElementById('entryTitle').value = parsedResult.supplier;
+        if (parsedResult.total) {
+          document.getElementById('suppTotalBill').value = parsedResult.total;
+          document.getElementById('suppPaidAmount').value = parsedResult.total;
         }
 
         const container = document.getElementById('purchaseItemsListContainer');
         container.innerHTML = '';
-        if (parsed.items && Array.isArray(parsed.items) && parsed.items.length > 0) {
-          parsed.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
+        if (parsedResult.items && Array.isArray(parsedResult.items) && parsedResult.items.length > 0) {
+          parsedResult.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
         } else {
           addNewPurchaseItemRow();
         }
         recalcTotalBillFromItems();
 
-        alert("✅ ബില്ലിലെ വിവരങ്ങൾ AI വിജയകരമായി എടുത്തു!");
+        alert(`✅ ബില്ലിലെ വിവരങ്ങൾ AI വിജയകരമായി എടുത്തു! [ഉപയോഗിച്ചത്: ${scanSuccessEngine}]`);
 
       } catch (err) {
         console.error("Scan error:", err);
@@ -2251,7 +2310,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. 🌟 100% WORKING ZERO-BLANK PDF & SHARE ENGINE
+       5. 🌟 100% ZERO-BLANK PDF & INSTANT SHARE ENGINE
        ------------------------------------------------------------- */
     async function ensurePdfLibraries() {
       if (typeof html2canvas === 'undefined') {
@@ -2295,7 +2354,6 @@
       document.getElementById('a4PreviewModal').style.display = 'none';
     }
 
-    // സ്ക്രീനിലുള്ള ഷീറ്റിൽ നിന്ന് തത്സമയം 100% വ്യക്തതയുള്ള PDF ബ്ലോബ് നിർമ്മിക്കുന്നു
     async function createCleanA4PdfBlob(fileName) {
       await ensurePdfLibraries();
 
@@ -2341,7 +2399,6 @@
       }
     }
 
-    // 1. ഡൗൺലോഡ് ബട്ടൺ (നേരിട്ട് ഫോണിലേക്ക് സേവ് ആകുന്നു)
     async function printOrSaveCurrentA4() {
       const btn = document.querySelector('.a4-btn-print');
       if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
@@ -2374,7 +2431,6 @@
       }
     }
 
-    // 2. വാട്സാപ്പ് ബട്ടൺ (യഥാർത്ഥ PDF ഫയലായി ഷെയർ ചെയ്യുന്നു)
     async function shareCurrentA4WhatsApp() {
       const btn = document.querySelector('.a4-btn-wa');
       if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
@@ -2405,7 +2461,6 @@
       }
     }
 
-    // 1. ഇന്നത്തെ റിപ്പോർട്ട് A4 പ്രിവ്യൂ
     function previewTodayA4() {
       closeModal('todayReportModal');
       const curDate = document.getElementById('selectedDate').value || today;
@@ -2497,7 +2552,6 @@
       openA4PreviewModal(html, `Daily_Report_${curDate}`);
     }
 
-    // 2. ലെഡ്ജർ ഷീറ്റ് A4 പ്രിവ്യൂ
     function previewLedgerSheetA4() {
       closeModal('itemSheetModal');
       const title = document.getElementById('sheetItemTitle').innerText;
@@ -2548,7 +2602,6 @@
       openA4PreviewModal(html, `Ledger_${activeSheetKey}`);
     }
 
-    // 3. അക്കൗണ്ട് ബ്രേക്ക്ഡൗൺ A4 പ്രിവ്യൂ
     function previewBreakdownA4() {
       closeModal('runningBreakdownModal');
       const title = document.getElementById('breakdownTitle').innerText;
@@ -2588,7 +2641,6 @@
       openA4PreviewModal(html, `Balance_Breakdown`);
     }
 
-    // 4. ഫിനാൻഷ്യൽ റിപ്പോർട്ട് A4 പ്രിവ്യൂ
     function previewReportsA4() {
       const curDate = document.getElementById('selectedDate').value || today;
       const sales = document.getElementById('repSales').innerText;
