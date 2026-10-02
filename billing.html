@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BANABLAST - Counter POS</title>
+  <link rel="icon" href="logo.png">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #0f172a;
+      --accent-green: #16a34a;
+      --accent-blue: #0284c7;
+      --accent-red: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --border-color: #cbd5e1;
+    }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    }
+    
+    body { 
+      background-color: var(--bg); 
+      color: var(--text-dark); 
+      padding-bottom: 30px; 
+      user-select: none;
+    }
+
+    /* Top Kiosk Header */
+    .pos-header {
+      background: linear-gradient(135deg, #091e42 0%, #1e3a8a 100%);
+      color: white;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+    }
+    .pos-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-header {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: all 0.15s ease;
+    }
+    .btn-header:active { transform: scale(0.96); background: rgba(255,255,255,0.28); }
+
+    /* Main Container (Large Screen & Tablet Grid) */
+    .pos-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 14px;
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+    @media (min-width: 820px) {
+      .pos-container {
+        grid-template-columns: 1.35fr 1fr;
+      }
+    }
+
+    /* Category Navigation */
+    .cat-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .cat-bar::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .cat-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(30,58,138,0.25);
+    }
+
+    /* Visual Items Touch Grid */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      max-height: 68vh;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .item-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: all 0.1s ease;
+    }
+    .item-card:active {
+      transform: scale(0.95);
+      background: #eff6ff;
+      border-color: var(--primary);
+    }
+    .item-icon { font-size: 2.2rem; margin-bottom: 4px; }
+    .item-name { font-weight: 700; font-size: 0.88rem; color: #1e293b; line-height: 1.25; }
+    .item-price { font-weight: 800; font-size: 1.05rem; color: var(--accent-green); margin-top: 6px; }
+
+    /* Cart & Bill Section */
+    .cart-box {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    .cart-title { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+    .cart-items-list { max-height: 250px; overflow-y: auto; margin-bottom: 10px; }
+
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .cart-row-info { flex: 1; }
+    .cart-row-name { font-weight: 700; font-size: 0.9rem; }
+    .cart-row-rate { font-size: 0.72rem; color: #64748b; }
+    .qty-stepper { display: flex; align-items: center; gap: 6px; margin: 0 8px; }
+    .qty-btn {
+      width: 30px;
+      height: 30px;
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .cart-row-subtotal { font-weight: 800; font-size: 0.95rem; width: 65px; text-align: right; }
+
+    /* Payment Modes */
+    .pay-mode-grid { display: flex; gap: 8px; margin: 10px 0; }
+    .pay-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      background: #f8fafc;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .pay-btn.active {
+      border-color: var(--accent-green);
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .total-box {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .btn-print-bill {
+      width: 100%;
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+      transition: transform 0.1s;
+    }
+    .btn-print-bill:active { transform: scale(0.98); }
+
+    .cart-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-action-sm {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: white;
+    }
+    .btn-wa { background: #0284c7; }
+    .btn-recent { background: #475569; }
+
+    /* Modals */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: white;
+      width: 100%;
+      max-width: 460px;
+      border-radius: 14px;
+      padding: 18px;
+      max-height: 82vh;
+      overflow-y: auto;
+    }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; outline: none; }
+
+    /* Thermal Print Style (58mm / 80mm Roll) */
+    #receiptPrintArea { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      #receiptPrintArea, #receiptPrintArea * { visibility: visible; }
+      #receiptPrintArea {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 58mm;
+        font-family: monospace;
+        font-size: 11px;
+        line-height: 1.3;
+        color: #000;
+        padding: 4px;
+      }
+      .r-center { text-align: center; }
+      .r-row { display: flex; justify-content: space-between; }
+      .r-line { border-top: 1px dashed #000; margin: 4px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Kiosk Header -->
+  <header class="pos-header">
+    <div class="pos-brand">🥤 BANABLAST POS</div>
+    <div class="header-actions">
+      <button type="button" class="btn-header" onclick="openItemsModal()">⚙️ Menu</button>
+      <button type="button" class="btn-header" onclick="openTodaySummaryModal()">📊 Today</button>
+      <button type="button" class="btn-header" onclick="returnToMainApp()">🏠 Ledger App</button>
+      <button type="button" class="btn-header" onclick="clearCart()">🗑️ Clear</button>
+    </div>
+  </header>
+
+  <!-- Main POS Area -->
+  <div class="pos-container">
+
+    <!-- Left: Categories & Touch Grid -->
+    <div>
+      <div class="cat-bar">
+        <button type="button" class="cat-pill active" onclick="filterCategory('all', this)">All Items</button>
+        <button type="button" class="cat-pill" onclick="filterCategory('aval_milk', this)">🍌 Aval Milk</button>
+        <button type="button" class="cat-pill" onclick="filterCategory('juices', this)">🥤 Juices & Shakes</button>
+        <button type="button" class="cat-pill" onclick="filterCategory('snacks', this)">🍪 Snacks</button>
+      </div>
+
+      <div class="items-grid" id="posItemsContainer"></div>
+    </div>
+
+    <!-- Right: Cart & Actions -->
+    <div class="cart-box">
+      <div class="cart-header">
+        <div>
+          <div class="cart-title">Counter Bill</div>
+          <span id="billStatusTag" style="font-size:0.75rem; color:#64748b; font-weight:bold;">New Order</span>
+        </div>
+        <span id="cartCountTag" style="font-size:0.8rem; color:#64748b; font-weight:bold;">0 items</span>
+      </div>
+
+      <div id="cartItemsList" class="cart-items-list">
+        <p style="text-align:center; color:#94a3b8; padding:35px 0; font-size:0.85rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>
+      </div>
+
+      <!-- Optional Phone for WhatsApp Bill -->
+      <div style="margin-bottom:8px;">
+        <input type="tel" id="custPhoneInput" class="form-control" placeholder="കസ്റ്റമറുടെ WhatsApp നമ്പർ (ഓപ്ഷണൽ)" style="padding:8px; font-size:0.85rem;">
+      </div>
+
+      <!-- Payment Mode Toggle -->
+      <div class="pay-mode-grid">
+        <button type="button" class="pay-btn active" id="btnPayCash" onclick="setPaymentMode('cash')">💵 CASH (Cash Box)</button>
+        <button type="button" class="pay-btn" id="btnPayGPay" onclick="setPaymentMode('gpay')">📱 GPAY (Bank)</button>
+      </div>
+
+      <div class="total-box">
+        <span>TOTAL:</span>
+        <span id="cartTotalText">₹0</span>
+      </div>
+
+      <button type="button" class="btn-print-bill" onclick="printAndSaveBill()">
+        🖨️ PRINT & COMPLETE BILL
+      </button>
+
+      <div class="cart-actions-grid">
+        <button type="button" class="btn-action-sm btn-wa" onclick="sendWhatsAppBill()">📲 WhatsApp Bill</button>
+        <button type="button" class="btn-action-sm btn-recent" onclick="openRecentBillsModal()">📋 Recent / Reprint</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MANAGE ITEMS MODAL -->
+  <div class="modal" id="itemsModal">
+    <div class="modal-box">
+      <h3 style="color:var(--primary); margin-bottom:10px;">⚙️ Manage Menu Items</h3>
+      <div class="form-group">
+        <label>Category (വിഭാഗം)</label>
+        <select id="newItemCat" class="form-control">
+          <option value="aval_milk">🍌 Aval Milk Specials</option>
+          <option value="juices">🥤 Juices & Shakes</option>
+          <option value="snacks">🍪 Snacks</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Item Name (പേര്)</label>
+        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Mango Shake">
+      </div>
+      <div style="display:flex; gap:8px;">
+        <div class="form-group" style="flex:1;">
+          <label>Price ₹ (വില)</label>
+          <input type="number" id="newItemPrice" class="form-control" placeholder="60">
+        </div>
+        <div class="form-group" style="flex:0.6;">
+          <label>Icon / Emoji</label>
+          <input type="text" id="newItemIcon" class="form-control" value="🥤">
+        </div>
+      </div>
+      <button type="button" onclick="saveNewItem()" style="width:100%; background:var(--accent-green); color:white; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">+ Add to Menu</button>
+
+      <h4 style="margin:16px 0 8px; font-size:0.85rem; color:#475569;">മെനു ലിസ്റ്റ്:</h4>
+      <div id="modalExistingItems" style="max-height:180px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
+      <button type="button" onclick="closeModal('itemsModal')" style="width:100%; background:#e2e8f0; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:12px;">Close</button>
+    </div>
+  </div>
+
+  <!-- RECENT BILLS / REPRINT MODAL -->
+  <div class="modal" id="recentBillsModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+        <h3 style="color:var(--primary); font-size:1.05rem;">📋 Recent Bills / Reprint</h3>
+        <button onclick="closeModal('recentBillsModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;">✕</button>
+      </div>
+      <div id="recentBillsContainer" style="max-height:320px; overflow-y:auto; margin-top:10px;"></div>
+      <button type="button" onclick="closeModal('recentBillsModal')" style="width:100%; background:#e2e8f0; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:12px;">Close</button>
+    </div>
+  </div>
+
+  <!-- TODAY'S SUMMARY MODAL -->
+  <div class="modal" id="todaySummaryModal">
+    <div class="modal-box" style="text-align:center;">
+      <h3 style="color:var(--primary); margin-bottom:8px;">📊 Today's Counter Summary</h3>
+      <p id="sumDateText" style="font-size:0.8rem; color:#64748b; margin-bottom:14px;"></p>
+      
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px; margin-bottom:10px;">
+        <div style="font-size:0.75rem; color:#1e3a8a; font-weight:bold;">TOTAL COUNTER SALES</div>
+        <div id="sumTotalSalesText" style="font-size:1.6rem; font-weight:900; color:#1e3a8a;">₹0</div>
+        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">
+          Cash: <b id="sumCashText" style="color:#16a34a;">₹0</b> | GPay: <b id="sumGpayText" style="color:#0284c7;">₹0</b>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px; text-align:left; font-size:0.85rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>ആകെ ബില്ലുകൾ:</span>
+          <strong id="sumBillsCountText">0</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>വിറ്റഴിഞ്ഞ ഗ്ലാസുകൾ:</span>
+          <strong id="sumGlassesCountText">0</strong>
+        </div>
+      </div>
+
+      <button type="button" onclick="closeModal('todaySummaryModal')" style="width:100%; background:var(--primary); color:white; border:none; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:12px;">Close</button>
+    </div>
+  </div>
+
+  <!-- THERMAL RECEIPT SLIP -->
+  <div id="receiptPrintArea">
+    <div class="r-center" style="font-size:15px; font-weight:bold;">BANABLAST</div>
+    <div class="r-center">Special Aval Milk & Juices</div>
+    <div class="r-center" id="rBillDate"></div>
+    <div class="r-center" id="rBillNo" style="font-weight:bold;"></div>
+    <div class="r-line"></div>
+    <div class="r-row" style="font-weight:bold;">
+      <span>ITEM</span>
+      <span>QTY</span>
+      <span>AMT</span>
+    </div>
+    <div class="r-line"></div>
+    <div id="rItemsList"></div>
+    <div class="r-line"></div>
+    <div class="r-row" style="font-size:13px; font-weight:bold;">
+      <span>TOTAL:</span>
+      <span id="rTotalAmt">₹0</span>
+    </div>
+    <div class="r-row" style="font-size:9px; margin-top:2px;">
+      <span>PAYMENT:</span>
+      <span id="rPayMode">CASH</span>
+    </div>
+    <div class="r-line"></div>
+    <div class="r-center" style="margin-top:4px;">*** THANK YOU ***</div>
+    <div class="r-center">Visit Again!</div>
+  </div>
+  <script>
+    // Firebase കോൺഫിഗറേഷൻ
+    const firebaseConfig = {
+      apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
+      authDomain: "banablast-64513.firebaseapp.com",
+      projectId: "banablast-64513",
+      storageBucket: "banablast-64513.firebasestorage.app",
+      messagingSenderId: "236930066397",
+      appId: "1:236930066397:web:e8062c9d77080837e3f834"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let menuItems = [];
+    let todayBills = [];
+    let cart = [];
+    let currentPayMode = 'cash';
+    let currentCategory = 'all';
+    let editingBill = null;
+
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    window.onload = function() {
+      // 1. മെനു ഐറ്റങ്ങൾ തത്സമയം സിങ്ക് ചെയ്യുന്നു
+      db.collection('billing_items').onSnapshot(snap => {
+        menuItems = [];
+        snap.forEach(doc => menuItems.push({ id: doc.id, ...doc.data() }));
+        if (menuItems.length === 0) {
+          seedDefaultItems();
+        } else {
+          renderMenuItems();
+          renderModalItems();
+        }
+      });
+
+      // 2. ഇന്നത്തെ കൗണ്ടർ ബില്ലുകൾ സിങ്ക് ചെയ്യുന്നു
+      db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
+        todayBills = [];
+        snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
+      });
+    };
+
+    // മെനുവിൽ ഐറ്റങ്ങൾ ഇല്ലെങ്കിൽ നൽകുന്ന ഡിഫോൾട്ട് വിഭവങ്ങൾ
+    function seedDefaultItems() {
+      const defaults = [
+        { name: "Classic Aval Milk", price: 50, category: "aval_milk", icon: "🍌" },
+        { name: "Special Dry Fruit Aval Milk", price: 70, category: "aval_milk", icon: "🥜" },
+        { name: "Butterscotch Aval Milk", price: 70, category: "aval_milk", icon: "🍨" },
+        { name: "Chocolate Aval Milk", price: 80, category: "aval_milk", icon: "🍫" },
+        { name: "Sharjah Shake", price: 60, category: "juices", icon: "🥤" },
+        { name: "Orange Juice", price: 50, category: "juices", icon: "🍊" },
+        { name: "Mango Shake", price: 60, category: "juices", icon: "🥭" },
+        { name: "Cutlet / Roll", price: 20, category: "snacks", icon: "🥟" }
+      ];
+      defaults.forEach(it => {
+        db.collection('billing_items').add({
+          ...it,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    }
+
+    /* -------------------------------------------------------------
+       മെനു ഡിസ്‌പ്ലേ & കാർട്ട് ലോജിക്
+       ------------------------------------------------------------- */
+    function filterCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderMenuItems();
+    }
+
+    function renderMenuItems() {
+      const container = document.getElementById('posItemsContainer');
+      let items = menuItems;
+      if (currentCategory !== 'all') {
+        items = items.filter(i => i.category === currentCategory);
+      }
+
+      if (!items.length) {
+        container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:35px;">സാധനങ്ങൾ ലഭ്യമല്ല. മുകളിലെ "Menu" വഴി ചേർക്കുക.</p>';
+        return;
+      }
+
+      container.innerHTML = items.map(it => `
+        <div class="item-card" onclick="addToCart('${it.id}')">
+          <div class="item-icon">${it.icon || '🥤'}</div>
+          <div class="item-name">${it.name}</div>
+          <div class="item-price">₹${it.price}</div>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(id) {
+      const item = menuItems.find(i => i.id === id);
+      if (!item) return;
+
+      const existing = cart.find(c => c.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(c => c.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(c => c.id !== id);
+      }
+      renderCart();
+    }
+
+    function clearCart() {
+      if (cart.length && confirm("കാർട്ട് പൂർണ്ണമായി കാലിയാക്കണോ?")) {
+        cart = [];
+        editingBill = null;
+        document.getElementById('billStatusTag').innerText = "New Order";
+        document.getElementById('custPhoneInput').value = '';
+        renderCart();
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartItemsList');
+      if (!cart.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:35px 0; font-size:0.85rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>';
+        document.getElementById('cartTotalText').innerText = '₹0';
+        document.getElementById('cartCountTag').innerText = '0 items';
+        return;
+      }
+
+      let total = 0;
+      let totalQty = 0;
+      container.innerHTML = cart.map(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        totalQty += item.qty;
+        return `
+          <div class="cart-row">
+            <div class="cart-row-info">
+              <div class="cart-row-name">${item.name}</div>
+              <div class="cart-row-rate">₹${item.price} x ${item.qty}</div>
+            </div>
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+              <span style="font-weight:700;">${item.qty}</span>
+              <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+            </div>
+            <div class="cart-row-subtotal">₹${subtotal}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cartTotalText').innerText = '₹' + total;
+      document.getElementById('cartCountTag').innerText = `${totalQty} items`;
+    }
+
+    function setPaymentMode(mode) {
+      currentPayMode = mode;
+      document.getElementById('btnPayCash').className = 'pay-btn ' + (mode === 'cash' ? 'active' : '');
+      document.getElementById('btnPayGPay').className = 'pay-btn ' + (mode === 'gpay' ? 'active' : '');
+    }
+
+    /* -------------------------------------------------------------
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് (ക്ലീൻ സിൻക്രണൈസേഷൻ)
+       ------------------------------------------------------------- */
+    async function printAndSaveBill() {
+      if (!cart.length) {
+        alert("⚠️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല!");
+        return;
+      }
+
+      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const phone = document.getElementById('custPhoneInput').value.trim();
+      const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
+
+      try {
+        if (editingBill) {
+          // എഡിറ്റ് ചെയ്ത ബില്ല് അപ്‌ഡേറ്റ് ചെയ്യുന്നു
+          const oldTotal = editingBill.total;
+          const oldMode = editingBill.mode;
+
+          await db.collection('pos_bills').doc(editingBill.id).update({
+            items: cart,
+            total,
+            mode: currentPayMode,
+            phone,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          // മെയിൻ ലെഡ്ജറിലെ പഴയ തുക കുറച്ച് പുതിയ തുക ക്രമപ്പെടുത്തുന്നു
+          await syncAggregatedLedger(todayDate, oldMode, -oldTotal);
+          await syncAggregatedLedger(todayDate, currentPayMode, total);
+
+          alert(`✅ ബില്ല് #${billNo} വിജയകരമായി തിരുത്തി!`);
+        } else {
+          // പുതിയ ബില്ല് pos_bills-ൽ സേവ് ചെയ്യുന്നു
+          await db.collection('pos_bills').add({
+            billNo,
+            date: todayDate,
+            time: timeStr,
+            items: cart,
+            total,
+            mode: currentPayMode,
+            phone,
+            addedBy: 'Counter Staff',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          // മെയിൻ ആപ്പിലെ ഒരൊറ്റ വരിയിലേക്ക് (Counter Sales) തുക പ്ലസ് ചെയ്യുന്നു
+          await syncAggregatedLedger(todayDate, currentPayMode, total);
+        }
+
+        // തെർമൽ പ്രിന്റ് വിൻഡോ തുറക്കുന്നു
+        triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
+
+        // കാർട്ട് റീസെറ്റ് ചെയ്യുന്നു
+        cart = [];
+        editingBill = null;
+        document.getElementById('billStatusTag').innerText = "New Order";
+        document.getElementById('custPhoneInput').value = '';
+        renderCart();
+
+      } catch (err) {
+        console.error("Save error:", err);
+        alert("❌ ബില്ല് സേവ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
+      }
+    }
+
+    // index.html-ലെ transactions ലിസ്റ്റിലേക്ക് ഒരൊറ്റ വരിയായി സിങ്ക് ചെയ്യുന്ന ഫംഗ്ഷൻ
+    async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
+      const targetTitle = (mode === 'cash') ? 'Counter Sales (Cash)' : 'Counter Sales (GPay)';
+      
+      const snap = await db.collection('transactions')
+        .where('date', '==', dateStr)
+        .where('type', '==', 'sale')
+        .where('title', '==', targetTitle)
+        .get();
+
+      if (!snap.empty) {
+        const doc = snap.docs[0];
+        const currentAmt = doc.data().amount || 0;
+        const newAmt = Math.round((currentAmt + deltaAmount) * 100) / 100;
+        await db.collection('transactions').doc(doc.id).update({
+          amount: newAmt > 0 ? newAmt : 0,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } else if (deltaAmount > 0) {
+        await db.collection('transactions').add({
+          date: dateStr,
+          type: 'sale',
+          category: 'sale',
+          title: targetTitle,
+          extra: targetTitle,
+          amount: Math.round(deltaAmount * 100) / 100,
+          billTotal: Math.round(deltaAmount * 100) / 100,
+          paidAmount: Math.round(deltaAmount * 100) / 100,
+          dueAmount: 0,
+          mode: mode,
+          note: 'Counter POS Auto Aggregation',
+          addedBy: 'Counter POS',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }
+
+    function triggerThermalPrint(billNo, date, time, total, mode, items) {
+      document.getElementById('rBillDate').innerText = `${date} ${time}`;
+      document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
+      document.getElementById('rTotalAmt').innerText = `₹${total}`;
+      document.getElementById('rPayMode').innerText = mode.toUpperCase();
+
+      document.getElementById('rItemsList').innerHTML = items.map(i => `
+        <div class="r-row">
+          <span>${i.name.substring(0, 15)}</span>
+          <span>${i.qty}</span>
+          <span>₹${i.price * i.qty}</span>
+        </div>
+      `).join('');
+
+      window.print();
+    }
+
+    /* -------------------------------------------------------------
+       WHATSAPP ബില്ലിംഗ് & റീപ്രിന്റ് സിസ്റ്റം
+       ------------------------------------------------------------- */
+    function sendWhatsAppBill() {
+      if (!cart.length) {
+        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        return;
+      }
+      let phone = document.getElementById('custPhoneInput').value.trim().replace(/[^0-9]/g, '');
+      if (!phone || phone.length < 10) {
+        phone = prompt("കസ്റ്റമറുടെ 10 അക്ക WhatsApp നമ്പർ നൽകുക:");
+        if (!phone) return;
+        phone = phone.replace(/[^0-9]/g, '');
+      }
+      if (phone.length === 10) phone = "91" + phone;
+
+      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
+
+      let itemsText = cart.map(i => `• ${i.name} (x${i.qty}) - ₹${i.price * i.qty}`).join('\n');
+
+      const msg = `🥤 *BANABLAST SPECIAL AVAL MILK* 🥤\n--------------------------------\n📅 തീയതി: ${todayDate} | ${timeStr}\n🧾 ബില്ല് നമ്പർ: #${billNo}\n--------------------------------\n${itemsText}\n--------------------------------\n*ആകെ തുക (TOTAL): ₹${total}*\nപേയ്‌മെന്റ് രീതി: ${currentPayMode.toUpperCase()}\n--------------------------------\nസന്ദർശിച്ചതിന് നന്ദി! വീണ്ടും വരിക! ❤️`;
+
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function openRecentBillsModal() {
+      const container = document.getElementById('recentBillsContainer');
+      const sorted = todayBills.slice().sort((a,b) => (b.time || '').localeCompare(a.time || ''));
+
+      if (!sorted.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:25px;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
+      } else {
+        container.innerHTML = sorted.map(b => `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:800; font-size:0.9rem; color:#1e3a8a;">#${b.billNo} - ₹${b.total} <span style="font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#15803d' : '#0369a1'};">${b.mode.toUpperCase()}</span></div>
+              <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" style="background:#2563eb; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
+              <button type="button" style="background:#f59e0b; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️ Edit</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      document.getElementById('recentBillsModal').style.display = 'flex';
+    }
+
+    function reprintBill(id) {
+      const b = todayBills.find(x => x.id === id);
+      if (!b) return;
+      triggerThermalPrint(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
+      closeModal('recentBillsModal');
+    }
+
+    function loadBillToEdit(id) {
+      const b = todayBills.find(x => x.id === id);
+      if (!b) return;
+      cart = JSON.parse(JSON.stringify(b.items || []));
+      editingBill = b;
+      setPaymentMode(b.mode || 'cash');
+      document.getElementById('billStatusTag').innerText = `Editing Bill #${b.billNo}`;
+      document.getElementById('custPhoneInput').value = b.phone || '';
+      renderCart();
+      closeModal('recentBillsModal');
+      alert(`⚠️ ബില്ല് #${b.billNo} കാർട്ടിലേക്ക് എടുത്തു. മാറ്റങ്ങൾ വരുത്തിയ ശേഷം വീണ്ടും 'Print & Complete Bill' അമർത്തുക.`);
+    }
+
+    function openTodaySummaryModal() {
+      let total = 0, cash = 0, gpay = 0, glasses = 0;
+      todayBills.forEach(b => {
+        total += b.total;
+        if (b.mode === 'cash') cash += b.total; else gpay += b.total;
+        if (b.items) b.items.forEach(it => { glasses += (it.qty || 1); });
+      });
+
+      document.getElementById('sumDateText').innerText = `Date: ${todayDate}`;
+      document.getElementById('sumTotalSalesText').innerText = '₹' + Math.round(total * 100) / 100;
+      document.getElementById('sumCashText').innerText = '₹' + Math.round(cash * 100) / 100;
+      document.getElementById('sumGpayText').innerText = '₹' + Math.round(gpay * 100) / 100;
+      document.getElementById('sumBillsCountText').innerText = todayBills.length;
+      document.getElementById('sumGlassesCountText').innerText = glasses;
+      document.getElementById('todaySummaryModal').style.display = 'flex';
+    }
+
+    function returnToMainApp() {
+      window.location.href = 'index.html';
+    }
+
+    /* -------------------------------------------------------------
+       മെനു മാനേജ്‌മെന്റ് (ഐറ്റങ്ങൾ ചേർക്കലും ഒഴിവാക്കലും)
+       ------------------------------------------------------------- */
+    function openItemsModal() {
+      document.getElementById('itemsModal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function saveNewItem() {
+      const name = document.getElementById('newItemName').value.trim();
+      const price = parseFloat(document.getElementById('newItemPrice').value);
+      const category = document.getElementById('newItemCat').value;
+      const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
+
+      if (!name || isNaN(price) || price <= 0) {
+        alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
+        return;
+      }
+
+      db.collection('billing_items').add({
+        name,
+        price,
+        category,
+        icon,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemPrice').value = '';
+        alert("✅ പുതിയ ഐറ്റം മെനുവിൽ ചേർത്തു!");
+      });
+    }
+
+    function deleteItem(id) {
+      if (confirm("ഈ ഐറ്റം മെനുവിൽ നിന്ന് ഒഴിവാക്കണോ?")) {
+        db.collection('billing_items').doc(id).delete();
+      }
+    }
+
+    function renderModalItems() {
+      const container = document.getElementById('modalExistingItems');
+      if (!container) return;
+      if (!menuItems.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem;">മെനുവിൽ ഐറ്റങ്ങൾ ഇല്ല</p>';
+        return;
+      }
+      container.innerHTML = menuItems.map(it => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid #f1f5f9; font-size:0.82rem;">
+          <span>${it.icon || '🥤'} <strong>${it.name}</strong> - ₹${it.price}</span>
+          <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:4px; padding:3px 6px; cursor:pointer;">🗑️</button>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
