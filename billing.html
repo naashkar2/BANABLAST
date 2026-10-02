@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>BANABLAST - Counter POS</title>
+  <title>BANABLAST POS Terminal</title>
   <link rel="icon" href="logo.png">
 
   <!-- Firebase SDKs -->
@@ -12,62 +12,70 @@
 
   <style>
     :root {
-      --primary: #1e3a8a;
-      --primary-dark: #091e42;
-      --accent-green: #15803d;
-      --accent-green-bright: #16a34a;
-      --accent-blue: #0284c7;
-      --accent-red: #dc2626;
-      --bg: #f8fafc;
+      --bg: #f1f5f9;
       --card-bg: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
+      --primary-dark: #0f172a;
+      --slate-800: #1e293b;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --emerald: #059669;
+      --emerald-dark: #047857;
+      --emerald-light: #ecfdf5;
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* താഴത്തെ ബട്ടണുകൾ മൂലം ലിസ്റ്റ് മറയാതിരിക്കാൻ പാഡിംഗ് */
-    body { background: var(--bg); color: var(--text); padding-bottom: 230px; user-select: none; }
+    body { background: var(--bg); color: var(--primary-dark); padding-bottom: 215px; user-select: none; }
 
-    /* Compact Header */
+    /* Top Executive Header */
     .pos-header {
-      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-      color: white;
-      padding: 10px 14px;
+      background: var(--primary-dark);
+      color: #ffffff;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     .pos-brand {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 1.1rem;
+      gap: 8px;
+      font-size: 1.15rem;
       font-weight: 900;
       letter-spacing: 0.5px;
     }
+    .pos-brand span { color: #f59e0b; }
     .header-btns {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
     .btn-head {
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: white;
-      padding: 6px 10px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ffffff;
+      padding: 6px 12px;
       border-radius: 8px;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-head:active { background: rgba(255,255,255,0.3); }
+    .btn-head:active { background: rgba(255,255,255,0.25); }
 
-    /* Category Switcher (Avil Milk & Juices) */
+    /* iOS Style Segmented Category Switcher */
     .cat-toggle-wrap {
-      padding: 8px 12px 4px;
+      padding: 10px 14px 4px;
       max-width: 1000px;
       margin: 0 auto;
     }
@@ -75,20 +83,20 @@
       display: flex;
       background: #e2e8f0;
       padding: 4px;
-      border-radius: 12px;
-      gap: 6px;
+      border-radius: 14px;
+      gap: 4px;
     }
     .cat-tab-btn {
       flex: 1;
       padding: 10px;
       border: none;
-      border-radius: 10px;
+      border-radius: 11px;
       font-size: 0.88rem;
       font-weight: 800;
-      color: #64748b;
+      color: var(--slate-600);
       background: transparent;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -96,58 +104,57 @@
     }
     .cat-tab-btn.active {
       background: #ffffff;
-      color: var(--primary);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: var(--primary-dark);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     /* -------------------------------------------------------------
-       ഒരു പൊടിക്ക് ഒതുക്കിയ ഐറ്റം ഗ്രിഡ് (NEAT & COMPACT TILES)
+       പ്രൊഫഷണൽ ഐറ്റം കാർഡുകൾ (WITH [+] & [-] STEPPERS)
        ------------------------------------------------------------- */
     .items-container {
-      padding: 6px 10px 16px;
+      padding: 8px 12px 20px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px; /* ഗ്യാപ്പ് കുറച്ചു */
+      gap: 10px;
     }
     @media (min-width: 600px) {
-      .items-container { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .items-container { grid-template-columns: repeat(3, 1fr); gap: 12px; }
     }
     @media (min-width: 900px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .items-container { grid-template-columns: repeat(4, 1fr); gap: 14px; }
     }
 
     .item-card {
       background: var(--card-bg);
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      padding: 8px 6px; /* പാഡിംഗ് ഒതുക്കി */
+      border-radius: 16px;
+      border: 1.5px solid var(--border-color);
+      padding: 10px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      cursor: pointer;
       position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-      transition: transform 0.1s ease, border-color 0.1s;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, border-color 0.15s, box-shadow 0.15s;
     }
-    .item-card:active {
-      transform: scale(0.96);
-      border-color: var(--primary);
-      background: #eff6ff;
+    .item-card.in-cart {
+      border-color: var(--blue);
+      background: #f8faff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
     }
     
     .item-media-box {
-      width: 50px; /* ബോക്സ് 62px-ൽ നിന്ന് 50px ആയി ഒതുക്കി */
-      height: 50px;
-      border-radius: 10px;
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
       background: #f8fafc;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .item-img {
       width: 100%;
@@ -155,48 +162,107 @@
       object-fit: cover;
     }
     .item-emoji {
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.8rem; /* ഫോണ്ട് സൈസ് ഒതുക്കി ഭംഗിയാക്കി */
-      font-weight: 700;
-      color: #1e293b;
-      line-height: 1.2;
-      min-height: 28px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.25;
+      min-height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 8px;
     }
-    .item-price-tag {
+
+    /* കാർഡിന്റെ താഴത്തെ [+] വില [-] സ്റ്റെപ്പർ ബാർ */
+    .item-stepper-box {
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: 20px;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #e2e8f0;
+    }
+    .item-card.in-cart .item-stepper-box {
+      background: #dbeafe;
+      border-color: #bfdbfe;
+    }
+
+    .btn-step {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .btn-step:active { transform: scale(0.9); }
+
+    .btn-step-minus {
+      background: #ffffff;
+      color: var(--slate-600);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .btn-step-minus.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .item-price-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      line-height: 1.1;
+    }
+    .price-val {
       font-size: 0.88rem;
       font-weight: 900;
-      color: var(--accent-green);
-      background: #dcfce7;
-      padding: 2px 10px;
-      border-radius: 14px;
-      margin-top: 4px;
+      color: var(--slate-800);
     }
+    .qty-in-box {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--blue);
+    }
+
+    .btn-step-plus {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+
     .item-badge-qty {
       position: absolute;
-      top: 4px;
-      right: 4px;
-      background: var(--primary);
+      top: 6px;
+      right: 6px;
+      background: var(--blue);
       color: white;
       font-size: 0.72rem;
-      font-weight: 800;
+      font-weight: 900;
       width: 22px;
       height: 22px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
     }
 
     /* -------------------------------------------------------------
-       വലുതും ബോൾഡുമായ മെയിൻ POS കൺട്രോൾ ബാർ (LARGE TOUCH CONTROLS)
+       പ്രൊഫഷണൽ POS ബോട്ടം കൺട്രോൾ ഡോക്ക് (SLEEK POS DOCK)
        ------------------------------------------------------------- */
     .pos-bottom-bar {
       position: fixed;
@@ -204,9 +270,9 @@
       left: 0;
       right: 0;
       background: #ffffff;
-      border-top: 2px solid #cbd5e1;
-      padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -8px 25px rgba(0,0,0,0.15);
+      border-top: 1px solid #cbd5e1;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow: var(--shadow-lg);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
@@ -215,125 +281,53 @@
       gap: 10px;
     }
 
-    /* വരി 1: കൂടുതൽ വലിപ്പമുള്ള CASH / GPAY / CART ബട്ടണുകൾ */
-    .bottom-row-1 {
+    /* വരി 1: CASH / GPAY സെഗ്മെന്റഡ് ടോഗിൾ & കാർട്ട് */
+    .dock-row-1 {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .pay-switcher-large {
+    .pay-switch-dock {
       display: flex;
       background: #e2e8f0;
-      border-radius: 14px;
-      padding: 4px;
-      flex: 1.7;
-      gap: 6px;
+      border-radius: 12px;
+      padding: 3px;
+      flex: 1.6;
+      gap: 4px;
     }
-    .pay-btn-big {
+    .pay-opt-btn {
       flex: 1;
-      height: 48px; /* വലിയ ടച്ച് ബട്ടൺ */
+      height: 42px;
       border: none;
-      border-radius: 11px;
-      font-size: 1rem;
+      border-radius: 10px;
+      font-size: 0.92rem;
       font-weight: 900;
       background: transparent;
-      color: #64748b;
-      cursor: pointer;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.15s ease;
-    }
-    .pay-btn-big.active.cash {
-      background: #16a34a;
-      color: #ffffff;
-      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.4);
-    }
-    .pay-btn-big.active.gpay {
-      background: #0284c7;
-      color: #ffffff;
-      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.4);
-    }
-
-    .btn-cart-bubble {
-      flex: 1;
-      height: 48px; /* കാർട്ട് ബട്ടൺ വലുതാക്കി */
-      background: #eff6ff;
-      border: 2px solid #bfdbfe;
-      color: var(--primary);
-      border-radius: 14px;
-      font-size: 0.95rem;
-      font-weight: 800;
+      color: var(--slate-600);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      white-space: nowrap;
+      transition: all 0.15s ease;
     }
-    .btn-cart-clear {
-      background: #fee2e2;
-      border: 1.5px solid #fecaca;
-      color: var(--accent-red);
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      font-size: 1.2rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    .pay-opt-btn.active.cash {
+      background: var(--emerald);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
+    }
+    .pay-opt-btn.active.gpay {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
     }
 
-    /* വരി 2: ആകെ തുക & കൂടുതൽ വലിയ PRINT & COMPLETE BILL ബട്ടൺ */
-    .bottom-row-2 {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .total-box-large {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-width: 95px;
-      line-height: 1.1;
-      padding-left: 4px;
-    }
-    .total-box-lbl { font-size: 0.72rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
-    .total-box-amt { font-size: 1.7rem; font-weight: 900; color: var(--primary); }
-
-    .btn-print-huge {
+    .btn-dock-cart {
       flex: 1;
-      height: 52px; /* കൂടുതൽ ഉയരവും തെളിച്ചവുമുള്ള പ്രിന്റ് ബട്ടൺ */
-      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 1.05rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
-    }
-    .btn-print-huge:active { transform: scale(0.98); }
-
-    /* വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp & Recent Bills */
-    .bottom-row-3 {
-      display: flex;
-      gap: 8px;
-    }
-    .btn-quick-action {
-      flex: 1;
-      height: 44px; /* ഉയരം കൂട്ടി */
-      border: none;
+      height: 42px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      color: var(--slate-800);
       border-radius: 12px;
       font-size: 0.88rem;
       font-weight: 800;
@@ -342,27 +336,95 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-dock-clear {
+      width: 42px;
+      height: 42px;
+      background: var(--red-light);
+      border: 1.5px solid #fecaca;
+      color: var(--red);
+      border-radius: 12px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* വരി 2: ആകെ തുക & ക്ലീൻ 'PRINT' ബട്ടൺ */
+    .dock-row-2 {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .dock-total-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 90px;
+    }
+    .dock-total-lbl { font-size: 0.68rem; color: var(--slate-400); font-weight: 800; letter-spacing: 0.5px; }
+    .dock-total-amt { font-size: 1.7rem; font-weight: 900; color: var(--primary-dark); line-height: 1.1; }
+
+    .btn-print-action {
+      flex: 1;
+      height: 50px;
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+      transition: transform 0.1s ease;
+    }
+    .btn-print-action:active { transform: scale(0.98); }
+
+    /* വരി 3: WhatsApp & Recent Bills */
+    .dock-row-3 {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-quick-dock {
+      flex: 1;
+      height: 38px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       transition: all 0.15s ease;
     }
-    /* WhatsApp യഥാർത്ഥ പച്ച നിറത്തിൽ */
-    .btn-quick-wa {
+    .btn-dock-wa {
       background: #25d366;
       color: #064e3b;
-      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
+      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
     }
-    .btn-quick-recent {
-      background: #334155;
-      color: white;
-      box-shadow: 0 2px 6px rgba(51, 65, 85, 0.25);
+    .btn-dock-recent {
+      background: var(--slate-800);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(30, 41, 59, 0.25);
     }
-    .btn-quick-action:active { transform: scale(0.97); }
+    .btn-quick-dock:active { transform: scale(0.98); }
 
-    /* Modals & Cart Drawer */
+    /* Modals & Drawers */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.75);
       z-index: 1000;
       justify-content: center;
       align-items: flex-end;
@@ -375,14 +437,14 @@
       background: white;
       width: 100%;
       max-width: 480px;
-      border-radius: 20px 20px 0 0;
-      padding: 18px;
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
       max-height: 85vh;
       overflow-y: auto;
       animation: slideUp 0.2s ease-out;
     }
     @media (min-width: 600px) {
-      .modal-box { border-radius: 16px; }
+      .modal-box { border-radius: 20px; }
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -390,11 +452,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
     }
-    .modal-title { font-size: 1.05rem; font-weight: 800; color: var(--primary); }
+    .modal-title { font-size: 1.05rem; font-weight: 900; color: var(--primary-dark); }
     .btn-close {
       background: #f1f5f9;
       border: none;
@@ -406,34 +468,22 @@
       cursor: pointer;
     }
 
-    /* Cart Rows inside Drawer */
     .cart-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px dashed #e2e8f0;
+      border-bottom: 1px dashed var(--border-color);
     }
-    .cart-row-info { flex: 1; }
     .cart-row-name { font-weight: 800; font-size: 0.92rem; }
-    .cart-row-sub { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
-    .qty-stepper { display: flex; align-items: center; gap: 8px; margin: 0 8px; }
-    .qty-btn {
-      width: 36px;
-      height: 36px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      cursor: pointer;
-    }
+    .cart-row-sub { font-size: 0.78rem; color: var(--slate-600); margin-top: 2px; }
 
     .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.78rem; font-weight: 700; color: #64748b; margin-bottom: 4px; }
-    .form-control { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--slate-600); margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; }
+    .form-control:focus { border-color: var(--blue); }
 
-    /* Thermal Receipt Print Styles */
+    /* Thermal Print Area */
     #receiptPrintArea { display: none; }
     @media print {
       body * { visibility: hidden; }
@@ -458,9 +508,9 @@
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Top Header -->
   <header class="pos-header">
-    <div class="pos-brand">🥤 BANABLAST POS</div>
+    <div class="pos-brand">🥤 BANABLAST <span>POS</span></div>
     <div class="header-btns">
       <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
       <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
@@ -468,7 +518,7 @@
     </div>
   </header>
 
-  <!-- Categories (കൃത്യമായി Avil Milk Specials എന്ന് മാറ്റി) -->
+  <!-- Categories -->
   <div class="cat-toggle-wrap">
     <div class="cat-toggle">
       <button type="button" class="cat-tab-btn active" id="tabAvil" onclick="switchCategory('avil_milk')">
@@ -480,54 +530,54 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid (ഒരു പൊടിക്ക് ഒതുക്കിയ ബട്ടണുകൾ) -->
+  <!-- Items Touch Grid -->
   <div class="items-container" id="posItemsContainer"></div>
 
-  <!-- മെയിൻ സ്ക്രീനിലെ വലിയ POS കൺട്രോൾ ബാർ -->
+  <!-- പ്രൊഫഷണൽ POS ബോട്ടം കൺട്രോൾ ഡോക്ക് -->
   <div class="pos-bottom-bar">
-    <!-- വരി 1: വലിയ CASH / GPAY ടോഗിളുകൾ & കാർട്ട് ഐറ്റങ്ങൾ -->
-    <div class="bottom-row-1">
-      <div class="pay-switcher-large">
-        <button type="button" class="pay-btn-big active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
+    <!-- വരി 1: CASH / GPAY ടോഗിൾ & കാർട്ട് വിവരങ്ങൾ -->
+    <div class="dock-row-1">
+      <div class="pay-switch-dock">
+        <button type="button" class="pay-opt-btn active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
           💵 CASH
         </button>
-        <button type="button" class="pay-btn-big gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
+        <button type="button" class="pay-opt-btn gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
           📱 GPAY
         </button>
       </div>
 
-      <button type="button" class="btn-cart-bubble" onclick="openCartDrawer()">
+      <button type="button" class="btn-dock-cart" onclick="openCartDrawer()">
         🛒 <span id="cartCountTag">0 Items</span> ▾
       </button>
       
-      <button type="button" class="btn-cart-clear" onclick="clearCart()" title="കാർട്ട് ക്ലിയർ ചെയ്യുക">
+      <button type="button" class="btn-dock-clear" onclick="clearCart()" title="ക്ലിയർ ചെയ്യുക">
         🗑️
       </button>
     </div>
 
-    <!-- വരി 2: ആകെ തുക & കൂടുതൽ വലിയ PRINT BILL ബട്ടൺ -->
-    <div class="bottom-row-2">
-      <div class="total-box-large">
-        <span class="total-box-lbl">Total Amt</span>
-        <span class="total-box-amt" id="cartTotalText">₹0</span>
+    <!-- വരി 2: ആകെ തുക & വലിയ 'PRINT' ബട്ടൺ -->
+    <div class="dock-row-2">
+      <div class="dock-total-box">
+        <span class="dock-total-lbl">TOTAL DUE</span>
+        <span class="dock-total-amt" id="cartTotalText">₹0</span>
       </div>
-      <button type="button" class="btn-print-huge" onclick="printAndSaveBill()">
-        🖨️ PRINT & COMPLETE BILL
+      <button type="button" class="btn-print-action" onclick="printAndSaveBill()">
+        🖨️ PRINT
       </button>
     </div>
 
-    <!-- വരി 3: PRINT BILL-ന് താഴെ നേരിട്ട് WhatsApp & Recent Bills -->
-    <div class="bottom-row-3">
-      <button type="button" class="btn-quick-action btn-quick-wa" onclick="sendWhatsAppBillDirect()">
+    <!-- വരി 3: WhatsApp & Recent Bills -->
+    <div class="dock-row-3">
+      <button type="button" class="btn-quick-dock btn-dock-wa" onclick="sendWhatsAppBillDirect()">
         💬 WhatsApp Bill
       </button>
-      <button type="button" class="btn-quick-action btn-quick-recent" onclick="openRecentBillsModal()">
+      <button type="button" class="btn-quick-dock btn-dock-recent" onclick="openRecentBillsModal()">
         📋 Recent Bills / Reprint
       </button>
     </div>
   </div>
 
-  <!-- CART DETAILS / DRAWER MODAL -->
+  <!-- CART DRAWER MODAL -->
   <div class="modal" id="cartDrawerModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -537,7 +587,7 @@
 
       <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 12px;"></div>
 
-      <button type="button" class="btn-print-huge" style="width:100%; height:48px;" onclick="closeModal('cartDrawerModal')">
+      <button type="button" class="btn-print-action" style="width:100%; height:46px; font-size:1rem;" onclick="closeModal('cartDrawerModal')">
         ശരി (Done)
       </button>
     </div>
@@ -570,13 +620,13 @@
           <input type="number" id="newItemPrice" class="form-control" placeholder="70">
         </div>
         <div class="form-group" style="flex:0.6;">
-          <label>Emoji Icon</label>
+          <label>Emoji</label>
           <input type="text" id="newItemIcon" class="form-control" value="🥤">
         </div>
       </div>
 
       <div class="form-group" style="background:#f8fafc; border:1px dashed #cbd5e1; padding:10px; border-radius:10px; text-align:center;">
-        <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക (Photo Upload):</label>
+        <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക:</label>
         <input type="file" id="newItemImageFile" accept="image/*" style="display:none;" onchange="handleItemImagePick(event)">
         <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:6px;">
           <button type="button" onclick="document.getElementById('newItemImageFile').click()" style="background:#e0f2fe; color:#0369a1; border:none; padding:7px 14px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer;">
@@ -586,7 +636,7 @@
         </div>
       </div>
 
-      <button type="button" onclick="saveNewItem()" style="width:100%; background:var(--accent-green); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer; margin-top:6px;">
+      <button type="button" onclick="saveNewItem()" style="width:100%; background:var(--emerald); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer; margin-top:6px;">
         + Add to Menu
       </button>
 
@@ -615,16 +665,16 @@
       </div>
       <p id="sumDateText" style="font-size:0.8rem; color:#64748b; margin-bottom:12px;"></p>
       
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px; margin-bottom:12px;">
-        <div style="font-size:0.75rem; color:#1e3a8a; font-weight:bold;">TOTAL COUNTER SALES</div>
-        <div id="sumTotalSalesText" style="font-size:1.8rem; font-weight:900; color:#1e3a8a;">₹0</div>
-        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">
-          Cash: <b id="sumCashText" style="color:#16a34a;">₹0</b> | GPay: <b id="sumGpayText" style="color:#0284c7;">₹0</b>
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:12px;">
+        <div style="font-size:0.75rem; color:var(--slate-600); font-weight:bold;">TOTAL COUNTER SALES</div>
+        <div id="sumTotalSalesText" style="font-size:2rem; font-weight:900; color:var(--emerald); margin:4px 0;">₹0</div>
+        <div style="font-size:0.8rem; color:#64748b;">
+          Cash: <b id="sumCashText" style="color:var(--emerald);">₹0</b> | GPay: <b id="sumGpayText" style="color:var(--blue);">₹0</b>
         </div>
       </div>
 
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px; text-align:left; font-size:0.85rem;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; text-align:left; font-size:0.85rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
           <span>ആകെ ബില്ലുകൾ:</span>
           <strong id="sumBillsCountText">0</strong>
         </div>
@@ -681,14 +731,13 @@
     let todayBills = [];
     let cart = [];
     let currentPayMode = 'cash';
-    let currentCategory = 'avil_milk'; // 'avil_milk' ഡിഫോൾട്ട് ആക്കി
+    let currentCategory = 'avil_milk';
     let editingBill = null;
     let pickedItemImageBase64 = "";
 
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
-      // ഡാറ്റാബേസിൽ 'Aval' എന്ന് കിടക്കുന്നവ തനിയെ 'Avil' എന്ന് മാറ്റുന്നു
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => {
@@ -749,9 +798,11 @@
       renderMenuItems();
     }
 
+    /* -------------------------------------------------------------
+       മെയിൻ സ്ക്രീനിലെ ഐറ്റം കാർഡുകളിൽ നേരിട്ടുള്ള [+] & [-] ബട്ടണുകൾ
+       ------------------------------------------------------------- */
     function renderMenuItems() {
       const container = document.getElementById('posItemsContainer');
-      // avil_milk അല്ലെങ്കിൽ പഴയ aval_milk കാറ്റഗറി ഉള്ളവയും കൃത്യമായി ഫിൽട്ടർ ചെയ്യുന്നു
       const items = menuItems.filter(i => {
         if (currentCategory === 'avil_milk') {
           return i.category === 'avil_milk' || i.category === 'aval_milk';
@@ -766,20 +817,31 @@
 
       container.innerHTML = items.map(it => {
         const cartItem = cart.find(c => c.id === it.id);
-        const qtyBadge = cartItem ? `<div class="item-badge-qty">${cartItem.qty}</div>` : '';
+        const qty = cartItem ? cartItem.qty : 0;
+        const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
+        const isSelected = qty > 0 ? 'in-cart' : '';
+
         const mediaHTML = it.imageUrl 
           ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
           : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
 
-        // പേരിലെ Aval മാറ്റി Avil എന്ന് ഉറപ്പാക്കുന്നു
         const displayName = it.name.replace(/Aval/g, 'Avil');
 
         return `
-          <div class="item-card" onclick="addToCart('${it.id}')">
+          <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
             ${qtyBadge}
             <div class="item-media-box">${mediaHTML}</div>
             <div class="item-name">${displayName}</div>
-            <div class="item-price-tag">₹${it.price}</div>
+            
+            <!-- വിലയുടെ ഇരുവശത്തുമായുള്ള സ്റ്റെപ്പർ ബട്ടണുകൾ -->
+            <div class="item-stepper-box" onclick="event.stopPropagation()">
+              <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
+              <div class="item-price-center">
+                <span class="price-val">₹${it.price}</span>
+                ${qty > 0 ? `<span class="qty-in-box">(${qty} qty)</span>` : ''}
+              </div>
+              <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
+            </div>
           </div>
         `;
       }).join('');
@@ -837,14 +899,14 @@
       } else {
         container.innerHTML = cart.map(item => `
           <div class="cart-row">
-            <div class="cart-row-info">
+            <div>
               <div class="cart-row-name">${item.name}</div>
               <div class="cart-row-sub">₹${item.price} x ${item.qty} = <b>₹${item.price * item.qty}</b></div>
             </div>
-            <div class="qty-stepper">
-              <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-              <span style="font-weight:900; font-size:1rem; min-width:20px; text-align:center;">${item.qty}</span>
-              <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" class="btn-step btn-step-minus" style="width:34px; height:34px;" onclick="changeQty('${item.id}', -1)">−</button>
+              <span style="font-weight:900; font-size:1.05rem; min-width:24px; text-align:center;">${item.qty}</span>
+              <button type="button" class="btn-step btn-step-plus" style="width:34px; height:34px;" onclick="changeQty('${item.id}', 1)">+</button>
             </div>
           </div>
         `).join('');
@@ -857,11 +919,11 @@
       const bGpay = document.getElementById('btnPayGPay');
 
       if (mode === 'cash') {
-        bCash.className = 'pay-btn-big active cash';
-        bGpay.className = 'pay-btn-big gpay';
+        bCash.className = 'pay-opt-btn active cash';
+        bGpay.className = 'pay-opt-btn gpay';
       } else {
-        bCash.className = 'pay-btn-big cash';
-        bGpay.className = 'pay-btn-big active gpay';
+        bCash.className = 'pay-opt-btn cash';
+        bGpay.className = 'pay-opt-btn active gpay';
       }
     }
 
@@ -1021,13 +1083,13 @@
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
       } else {
         container.innerHTML = sorted.map(b => `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-weight:800; font-size:0.92rem; color:#1e3a8a;">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#15803d' : '#0369a1'};">${b.mode.toUpperCase()}</span></div>
+              <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${b.mode.toUpperCase()}</span></div>
               <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
             </div>
             <div style="display:flex; gap:6px;">
-              <button type="button" style="background:#2563eb; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
+              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️ Print</button>
               <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️ Edit</button>
             </div>
           </div>
