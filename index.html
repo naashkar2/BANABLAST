@@ -221,7 +221,7 @@
       border-radius: 50% !important;
     }
 
-    /* Navigation Tabs (Open Counter POS പൂർണ്ണമായി ഒഴിവാക്കി) */
+    /* Navigation Tabs */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -461,6 +461,37 @@
       font-size: 0.85rem; 
     }
 
+    /* Leaderboard Analytics Styling */
+    .top-rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-right: 6px;
+    }
+    .rank-1 { background: #fef08a; color: #854d0e; }
+    .rank-2 { background: #e2e8f0; color: #334155; }
+    .rank-3 { background: #fed7aa; color: #9a3412; }
+    .rank-other { background: #f1f5f9; color: #64748b; }
+    
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #16a34a);
+      border-radius: 4px;
+    }
+
     .partner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .partner-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center; }
     .partner-card h5 { font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
@@ -472,10 +503,39 @@
     .inv-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
     .status-pending { background: #fef3c7; color: #b45309; }
     .status-verified { background: #dcfce7; color: #15803d; }
+    .status-delete-req { background: #fee2e2; color: #b91c1c; }
     .verify-box { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #e2e8f0; font-size: 0.75rem; }
     .verify-buttons { display: flex; gap: 6px; margin-top: 6px; }
     .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
     .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
+
+    /* 3-Partner Delete Verification UI */
+    .delete-approval-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      font-size: 0.75rem;
+    }
+    .del-verify-buttons { display: flex; gap: 6px; margin-top: 6px; }
+    .btn-del-verify {
+      flex: 1;
+      padding: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      background: #fee2e2;
+      color: #b91c1c;
+      cursor: pointer;
+    }
+    .btn-del-verify.done {
+      background: #dc2626;
+      border-color: #b91c1c;
+      color: white;
+      pointer-events: none;
+    }
 
     /* Modals */
     .modal { 
@@ -801,7 +861,7 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- നാവിഗേഷൻ ടാബുകൾ (ക്ലീൻ ടാബുകൾ മാത്രം - POS ബട്ടൺ ഇല്ല) -->
+  <!-- നാവിഗേഷൻ ടാബുകൾ -->
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily', this)">Daily Accounts</button>
     <button class="tab-btn" onclick="switchTab('pos-analytics', this)">📊 POS Bills & Analytics</button>
@@ -889,9 +949,11 @@
     <div id="tab-pos-analytics" class="tab-content">
       <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Daily Bills</h3>
       
-      <div style="background:white; border:1px solid var(--border-color); border-radius:10px; padding:12px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
+      <!-- തീയതി തിരഞ്ഞെടുക്കലും 'Today' ക്വിക്ക് ബട്ടണും -->
+      <div style="background:white; border:1px solid var(--border-color); border-radius:10px; padding:12px; margin-bottom:14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <label style="font-weight:700; font-size:0.85rem;">തീയതി തിരഞ്ഞെടുക്കുക:</label>
         <input type="date" id="posAnalyticsDateInput" class="form-control" style="width:auto; padding:6px;" onchange="renderPosAnalyticsTab()">
+        <button type="button" class="btn-auth-small" style="background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="setPosDateToToday()">📅 Today</button>
       </div>
 
       <!-- Summary Cards -->
@@ -901,16 +963,19 @@
         <div class="sum-box"><h4>GPay</h4><p id="posAnaGpay" class="color-purple">₹0</p></div>
       </div>
 
-      <!-- Best Sellers & Item Breakdown -->
+      <!-- Best Sellers & Item Breakdown (Top 5-6 വിഭവങ്ങൾ മാത്രം പ്രൊഫഷണലായി) -->
       <div class="cat-box">
         <div class="cat-title">
-          <span>🏆 കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ (Item-wise Sales)</span>
+          <span>🏆 കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ (Top Best Sellers)</span>
           <span id="posAnaTotalGlassCount" style="color:#0284c7; font-size:0.8rem;">0 Sold</span>
         </div>
         <div id="posAnaItemBreakdownList"></div>
+        <button type="button" class="btn-submit" style="background:#f1f5f9 !important; color:#1e3a8a !important; border:1px solid #cbd5e1; box-shadow:none; padding:9px; font-size:0.82rem; margin-top:8px;" onclick="openFullPosSalesReportModal()">
+          👁️ മുഴുവൻ റിപ്പോർട്ട് കാണുക (View Full Report)
+        </button>
       </div>
 
-      <!-- Detailed Bills Log for Selected Date -->
+      <!-- Detailed Bills Log for Selected Date (സമയക്രമത്തിൽ പുതിയത് മുകളിൽ) -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🧾 അന്നത്തെ ബില്ലുകൾ (Individual Bills)</span>
@@ -920,15 +985,45 @@
       </div>
     </div>
 
-    <!-- TAB 2: STOCK ITEMS -->
+    <!-- TAB 2: STOCK ITEMS (WITH DATE FILTERS) -->
     <div id="tab-stock" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
+
+      <!-- തീയതി ഫിൽട്ടറുകൾ -->
+      <div class="report-filter" style="margin-bottom:10px;">
+        <button class="filter-btn active" id="stockFiltAll" onclick="filterStockTab('all')">All Time</button>
+        <button class="filter-btn" id="stockFiltToday" onclick="filterStockTab('today')">Today</button>
+        <button class="filter-btn" id="stockFiltMonth" onclick="filterStockTab('month')">This Month</button>
+        <button class="filter-btn" id="stockFiltCustom" onclick="filterStockTab('custom')">Custom</button>
+      </div>
+
+      <div id="stockCustomDateBox" style="display:none; gap:6px; margin-bottom:10px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+        <input type="date" id="stockFromDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <input type="date" id="stockToDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <button class="filter-btn active" style="flex:0 0 60px;" onclick="renderStockItemsTab()">Apply</button>
+      </div>
+
       <div id="stockItemsListContainer"></div>
     </div>
 
-    <!-- TAB 3: SUPPLIER PURCHASES -->
+    <!-- TAB 3: SUPPLIER PURCHASES (WITH DATE FILTERS) -->
     <div id="tab-suppliers" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
+
+      <!-- തീയതി ഫിൽട്ടറുകൾ -->
+      <div class="report-filter" style="margin-bottom:10px;">
+        <button class="filter-btn active" id="suppFiltAll" onclick="filterSupplierTab('all')">All Time</button>
+        <button class="filter-btn" id="suppFiltToday" onclick="filterSupplierTab('today')">Today</button>
+        <button class="filter-btn" id="suppFiltMonth" onclick="filterSupplierTab('month')">This Month</button>
+        <button class="filter-btn" id="suppFiltCustom" onclick="filterSupplierTab('custom')">Custom</button>
+      </div>
+
+      <div id="suppCustomDateBox" style="display:none; gap:6px; margin-bottom:10px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+        <input type="date" id="suppFromDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <input type="date" id="suppToDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        <button class="filter-btn active" style="flex:0 0 60px;" onclick="renderSupplierPurchasesTab()">Apply</button>
+      </div>
+
       <div id="supplierPurchasesListContainer"></div>
     </div>
 
@@ -1023,7 +1118,7 @@
         </div>
       </div>
 
-      <!-- Capital Invested -->
+      <!-- Capital Invested (Net Capital = Investment - Capital Withdrawals) -->
       <div class="cat-box">
         <div class="cat-title">
           <span>💼 Capital Invested (നിക്ഷേപം)</span>
@@ -1048,7 +1143,7 @@
       <!-- Profit Withdrawn -->
       <div class="cat-box">
         <div class="cat-title">
-          <span>💸 Total Withdrawn (ആകെ പിൻവലിച്ചത്)</span>
+          <span>💸 Profit Withdrawn (ലാഭം പിൻവലിച്ചത്)</span>
           <span id="withTotalVerified" class="color-red">₹0</span>
         </div>
         <div class="partner-grid">
@@ -1068,7 +1163,7 @@
       </div>
 
       <div id="pendingAlertBox" style="display:none; background:#fef3c7; color:#92400e; padding:10px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:14px; border:1px solid #fde68a;">
-        ⚠️ സ്ഥിരീകരിക്കാത്ത (Pending) എൻട്രികൾ താഴെയുണ്ട്. 3 പേരും വെരിഫൈ ചെയ്താൽ മാത്രമേ തുക പ്രാബല്യത്തിൽ വരൂ.
+        ⚠️ സ്ഥിരീകരിക്കാത്ത (Pending) എൻട്രികളും ഡിലീറ്റ് റിക്വസ്റ്റുകളും താഴെയുണ്ട്. 3 പേരും വെരിഫൈ ചെയ്താൽ മാത്രമേ തുക പ്രാബല്യത്തിൽ വരൂ.
       </div>
 
       <h3 style="font-size:0.95rem; margin:14px 0 8px; color:var(--text-dark);">Investments Log (നിക്ഷേപങ്ങൾ)</h3>
@@ -1343,7 +1438,7 @@
     </div>
   </div>
 
-  <!-- 6. ADD WITHDRAWAL MODAL -->
+  <!-- 6. ADD WITHDRAWAL MODAL (WITH PROFIT VS CAPITAL RETURN SELECTION) -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Profit/Money Withdrawal</h3>
@@ -1355,6 +1450,15 @@
           <option value="ASHIF">ASHIF</option>
           <option value="SABITH">SABITH</option>
           <option value="ASHKAR ALI">ASHKAR ALI</option>
+        </select>
+      </div>
+
+      <!-- പുതിയ വിത്ത്‌‌ഡ്രോവൽ ടൈപ്പ് സെലക്ഷൻ (Profit Share vs Capital Return) -->
+      <div class="form-group">
+        <label>Withdrawal Type (പിൻവലിക്കൽ വിഭാഗം)</label>
+        <select id="withType" class="form-control" style="font-weight:700;">
+          <option value="profit">💰 Profit Share (ലാഭവിഹിതത്തിൽ നിന്ന്)</option>
+          <option value="capital">🏛️ Capital / Investment Return (നിക്ഷേപത്തിൽ നിന്ന് തിരിച്ചെടുക്കൽ)</option>
         </select>
       </div>
 
@@ -1378,7 +1482,7 @@
 
       <div class="form-group">
         <label>Note / Reason</label>
-        <input type="text" id="withNote" class="form-control" placeholder="e.g. Profit withdrawal">
+        <input type="text" id="withNote" class="form-control" placeholder="e.g. Profit withdrawal or Capital refund">
       </div>
 
       <button class="btn-submit" style="background:var(--accent-red) !important;" onclick="saveWithdrawal()">Submit for Verification</button>
@@ -1403,7 +1507,7 @@
     </div>
   </div>
 
-  <!-- 8. PARTNER LOGIN MODAL (COUNTER / BILLING OPTION INCLUDED) -->
+  <!-- 8. PARTNER LOGIN MODAL -->
   <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.88); z-index: 2000;">
     <div class="modal-box" style="text-align: center;">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
@@ -1504,6 +1608,19 @@
       <button type="button" class="btn-cancel" onclick="closeModal('aiSettingsModal')">Cancel</button>
     </div>
   </div>
+
+  <!-- 12. FULL POS SALES REPORT MODAL (പുതിയ മോഡൽ) -->
+  <div class="modal" id="fullPosReportModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px;">
+        <h3 style="color:var(--primary); font-size:1.1rem; margin:0;">🏆 മുഴുവൻ സെയിൽസ് റിപ്പോർട്ട്</h3>
+        <button onclick="closeModal('fullPosReportModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
+      </div>
+      <p id="fullPosReportDateText" style="font-size:0.8rem; color:#64748b; margin-bottom:10px;"></p>
+      <div id="fullPosReportItemsList" style="max-height:350px; overflow-y:auto;"></div>
+      <button class="btn-cancel" style="margin-top:12px;" onclick="closeModal('fullPosReportModal')">Close</button>
+    </div>
+  </div>
   <script>
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
@@ -1554,6 +1671,11 @@
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
+    // പുതിയ തീയതി ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
+    let currentStockFilter = 'all';
+    let currentSupplierFilter = 'all';
+    let posAnaSortedItems = [];
+
     let activeSheetKey = '';
     let currentSheetFilter = 'month';
     let currentBreakdownMode = 'total';
@@ -1563,7 +1685,7 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       1. AUTH, PIN & OCR SETTINGS (WITH COUNTER KIOSK ROUTE)
+       1. AUTH, PIN & OCR SETTINGS
        ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
@@ -1580,7 +1702,6 @@
       const enteredPin = document.getElementById('loginPinInput').value.trim();
 
       if (enteredPin === partnerPins[selectedUser]) {
-        // കൗണ്ടർ സ്റ്റാഫ് ആണെങ്കിൽ നേരിട്ട് billing.html-ലേക്ക് പോകുന്നു
         if (selectedUser === "Counter / Billing") {
           document.getElementById('loginPinInput').value = '';
           document.getElementById('loginModal').style.display = 'none';
@@ -1693,7 +1814,7 @@
     }
 
     /* -------------------------------------------------------------
-       2. INITIALIZATION & FIRESTORE SYNC (SAFE MERGE)
+       2. INITIALIZATION & FIRESTORE SYNC
        ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
@@ -1729,8 +1850,15 @@
       if (document.getElementById('posAnalyticsDateInput')) {
         document.getElementById('posAnalyticsDateInput').value = today;
       }
+      if (document.getElementById('stockFromDate')) {
+        document.getElementById('stockFromDate').value = today;
+        document.getElementById('stockToDate').value = today;
+      }
+      if (document.getElementById('suppFromDate')) {
+        document.getElementById('suppFromDate').value = today;
+        document.getElementById('suppToDate').value = today;
+      }
 
-      // Safe PIN Merge: കൗണ്ടർ PIN ഒരിക്കലും നഷ്ടപ്പെടില്ല
       db.collection('settings').doc('security').onSnapshot(doc => {
         if (doc.exists && doc.data().pins) {
           partnerPins = { ...partnerPins, ...doc.data().pins };
@@ -1831,8 +1959,29 @@
     }
 
     /* -------------------------------------------------------------
-       POS ANALYTICS TAB (PARTNERS ONLY)
+       3. POS ANALYTICS TAB (പുതിയ സമയക്രമം & പ്രൊഫഷണൽ ടോപ്പ് ഐറ്റംസ്)
        ------------------------------------------------------------- */
+    function setPosDateToToday() {
+      if (document.getElementById('posAnalyticsDateInput')) {
+        document.getElementById('posAnalyticsDateInput').value = today;
+        renderPosAnalyticsTab();
+      }
+    }
+
+    function parseTimeStringToMinutes(tStr) {
+      if (!tStr) return 0;
+      tStr = tStr.trim().toLowerCase();
+      let isPM = tStr.includes('pm');
+      let isAM = tStr.includes('am');
+      let clean = tStr.replace(/[^\d:]/g, '');
+      let parts = clean.split(':');
+      let h = parseInt(parts[0], 10) || 0;
+      let m = parseInt(parts[1], 10) || 0;
+      if (isPM && h < 12) h += 12;
+      if (isAM && h === 12) h = 0;
+      return h * 60 + m;
+    }
+
     function renderPosAnalyticsTab() {
       const dateInput = document.getElementById('posAnalyticsDateInput');
       const selectedDate = dateInput ? dateInput.value || today : today;
@@ -1851,7 +2000,7 @@
           b.items.forEach(it => {
             const qty = (it.qty || 1);
             totalGlasses += qty;
-            const k = (it.name || 'Unknown').trim();
+            const k = (it.name || 'Unknown').replace(/Aval/g, 'Avil').trim();
             if (!itemFreqMap[k]) itemFreqMap[k] = { name: k, count: 0, revenue: 0 };
             itemFreqMap[k].count += qty;
             itemFreqMap[k].revenue += ((it.price || 0) * qty);
@@ -1866,39 +2015,91 @@
       setT('posAnaTotalGlassCount', `${totalGlasses} Glasses Sold`);
       setT('posAnaBillsCountTag', `${filtered.length} Bills`);
 
-      const sortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
+      // ഏറ്റവും കൂടുതൽ വിറ്റഴിഞ്ഞത് ക്രമപ്പെടുത്തുന്നു
+      posAnaSortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
+
+      // ടോപ്പ് 5 വിഭവങ്ങൾ മാത്രം പ്രോഗ്രസ്സ് ബാറുകളോടെ കാണിക്കുന്നു
       const breakdownContainer = document.getElementById('posAnaItemBreakdownList');
       if (breakdownContainer) {
-        if (!sortedItems.length) {
+        if (!posAnaSortedItems.length) {
           breakdownContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">വിൽപ്പന വിവരങ്ങൾ ലഭ്യമല്ല</p>';
         } else {
-          breakdownContainer.innerHTML = sortedItems.map((item, idx) => `
-            <div class="list-row" style="align-items:center;">
-              <span><strong>#${idx + 1} ${item.name}</strong> (${item.count} ഗ്ലാസ്)</span>
-              <strong class="color-green">₹${Math.round(item.revenue * 100) / 100}</strong>
-            </div>
-          `).join('');
+          const topItems = posAnaSortedItems.slice(0, 5);
+          const maxVolume = topItems[0].count || 1;
+
+          breakdownContainer.innerHTML = topItems.map((item, idx) => {
+            let rankClass = 'rank-other';
+            let rankIcon = `#${idx + 1}`;
+            if (idx === 0) { rankClass = 'rank-1'; rankIcon = '🥇'; }
+            else if (idx === 1) { rankClass = 'rank-2'; rankIcon = '🥈'; }
+            else if (idx === 2) { rankClass = 'rank-3'; rankIcon = '🥉'; }
+
+            const percentage = Math.round((item.count / maxVolume) * 100);
+
+            return `
+              <div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="display:flex; align-items:center;">
+                    <span class="top-rank-badge ${rankClass}">${rankIcon}</span>
+                    <span style="font-weight:700; font-size:0.85rem; color:#1e293b;">${item.name}</span>
+                    <span style="font-size:0.75rem; color:#64748b; margin-left:6px;">(${item.count} ഗ്ലാസ്)</span>
+                  </div>
+                  <strong class="color-green" style="font-size:0.9rem;">₹${Math.round(item.revenue * 100) / 100}</strong>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
         }
       }
 
+      // അന്നത്തെ ബില്ലുകൾ കൃത്യമായ സമയക്രമത്തിൽ (പുതിയത് ഏറ്റവും മുകളിൽ)
       const billsContainer = document.getElementById('posAnaBillsListContainer');
       if (billsContainer) {
         if (!filtered.length) {
           billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ തീയതിയിൽ ബില്ലുകൾ ഇല്ല</p>';
         } else {
-          billsContainer.innerHTML = filtered.slice().reverse().map(b => `
+          const sortedBills = filtered.slice().sort((a, b) => {
+            return parseTimeStringToMinutes(b.time) - parseTimeStringToMinutes(a.time);
+          });
+
+          billsContainer.innerHTML = sortedBills.map(b => `
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${b.time || '-'})</span>
                 <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${(b.mode||'').toUpperCase()})</span>
               </div>
               <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
-                ${(b.items || []).map(i => `${i.name} (x${i.qty})`).join(', ')}
+                ${(b.items || []).map(i => `${(i.name || '').replace(/Aval/g, 'Avil')} (x${i.qty})`).join(', ')}
               </div>
             </div>
           `).join('');
         }
       }
+    }
+
+    function openFullPosSalesReportModal() {
+      const dateInput = document.getElementById('posAnalyticsDateInput');
+      const selectedDate = dateInput ? dateInput.value || today : today;
+      document.getElementById('fullPosReportDateText').innerText = `Date: ${selectedDate} | ആകെ വിറ്റത്: ${posAnaSortedItems.reduce((acc, x) => acc + x.count, 0)} ഗ്ലാസ്`;
+      
+      const listContainer = document.getElementById('fullPosReportItemsList');
+      if (!posAnaSortedItems.length) {
+        listContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">വിൽപ്പന വിവരങ്ങൾ ലഭ്യമല്ല</p>';
+      } else {
+        listContainer.innerHTML = posAnaSortedItems.map((item, idx) => `
+          <div class="list-row" style="align-items:center; padding:8px 0;">
+            <div>
+              <strong style="color:#0f172a;">#${idx + 1} ${item.name}</strong>
+              <div style="font-size:0.75rem; color:#64748b;">${item.count} ഗ്ലാസ് വിറ്റു</div>
+            </div>
+            <strong class="color-green" style="font-size:0.95rem;">₹${Math.round(item.revenue * 100) / 100}</strong>
+          </div>
+        `).join('');
+      }
+      document.getElementById('fullPosReportModal').style.display = 'flex';
     }
 
     function updateDatalists() {
@@ -1988,7 +2189,7 @@
     }
 
     /* -------------------------------------------------------------
-       3. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ
+       4. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ
        ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
       return new Promise((resolve, reject) => {
@@ -2031,7 +2232,7 @@
 
       const apiKey = (dynamicOcrKey || '').trim();
       if (!apiKey) {
-        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️ OCR Key' ബട്ടൺ വഴി നിങ്ങളുടെ OCR.space API Key നൽകുക.");
+        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️️ OCR Key' ബട്ടൺ വഴി നിങ്ങളുടെ OCR.space API Key നൽകുക.");
         openAISettingsModal();
         event.target.value = '';
         return;
@@ -2162,8 +2363,9 @@
         event.target.value = '';
       }
     }
+
     /* -------------------------------------------------------------
-       4. ENTRY ACTIONS & TRACKING (സേവിംഗ് & ക്ലീൻ ലെഡ്ജർ സിങ്ക്)
+       5. ENTRY ACTIONS & TRACKING
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -2323,7 +2525,6 @@
       }
     }
 
-    // കൗണ്ടർ സെയിൽസ് ഒന്നിലധികം വരികളായി വന്ന് നിറയാതെ ഒരൊറ്റ വരിയായി ക്ലബ്ബ് ചെയ്യുന്നു
     function renderDailyAccounts() {
       const curDate = document.getElementById('selectedDate').value || today;
       const todayTransRaw = transactions.filter(t => t.date === curDate);
@@ -2462,7 +2663,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. PDF ENGINE (ZERO-BLANK & PERFECT FIT)
+       6. PDF ENGINE (ZERO-BLANK ENGINE & PERFECT FIT)
        ------------------------------------------------------------- */
     async function ensurePdfLibraries() {
       if (typeof html2canvas === 'undefined') {
@@ -2859,29 +3060,62 @@
     }
 
     /* -------------------------------------------------------------
-       6. STOCK, SUPPLIERS & REPORTS TAB LOGIC
+       7. STOCK & SUPPLIERS TAB (തീയതി ഫിൽട്ടറുകളോടെ)
        ------------------------------------------------------------- */
+    function filterStockTab(period) {
+      currentStockFilter = period;
+      document.querySelectorAll('#tab-stock .filter-btn').forEach(b => b.classList.remove('active'));
+      const customBox = document.getElementById('stockCustomDateBox');
+      
+      if (period === 'all') document.getElementById('stockFiltAll').classList.add('active');
+      if (period === 'today') document.getElementById('stockFiltToday').classList.add('active');
+      if (period === 'month') document.getElementById('stockFiltMonth').classList.add('active');
+      if (period === 'custom') {
+        document.getElementById('stockFiltCustom').classList.add('active');
+        customBox.style.display = 'flex';
+        return;
+      } else {
+        customBox.style.display = 'none';
+      }
+      renderStockItemsTab();
+    }
+
     function renderStockItemsTab() {
       const container = document.getElementById('stockItemsListContainer');
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+      const fromDate = document.getElementById('stockFromDate') ? document.getElementById('stockFromDate').value : today;
+      const toDate = document.getElementById('stockToDate') ? document.getElementById('stockToDate').value : today;
+
       const itemMap = {};
 
       transactions.forEach(t => {
         if (t.category === 'stock' && t.items && t.items.length) {
-          t.items.forEach(it => {
-            const key = it.name.trim().toLowerCase();
-            if (!itemMap[key]) {
-              itemMap[key] = { displayName: it.name, totalSpent: 0, count: 0, lastDate: t.date };
-            }
-            itemMap[key].totalSpent += it.price;
-            itemMap[key].count += 1;
-            if (t.date > itemMap[key].lastDate) itemMap[key].lastDate = t.date;
-          });
+          const tDate = new Date(t.date);
+          let match = false;
+
+          if (currentStockFilter === 'all') match = true;
+          else if (currentStockFilter === 'today') match = (t.date === curDate);
+          else if (currentStockFilter === 'month') match = (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
+          else if (currentStockFilter === 'custom') match = (t.date >= fromDate && t.date <= toDate);
+
+          if (match) {
+            t.items.forEach(it => {
+              const key = it.name.trim().toLowerCase();
+              if (!itemMap[key]) {
+                itemMap[key] = { displayName: it.name, totalSpent: 0, count: 0, lastDate: t.date };
+              }
+              itemMap[key].totalSpent += it.price;
+              itemMap[key].count += 1;
+              if (t.date > itemMap[key].lastDate) itemMap[key].lastDate = t.date;
+            });
+          }
         }
       });
 
       const keys = Object.keys(itemMap);
       if (!keys.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സാധനങ്ങൾ വാങ്ങിയ വിവരങ്ങൾ ഒന്നും ലഭ്യമല്ല</p>';
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">ഈ കാലയളവിൽ വാങ്ങിയ സാധനങ്ങളുടെ വിവരങ്ങൾ ലഭ്യമല്ല</p>';
         return;
       }
 
@@ -2905,9 +3139,40 @@
       container.innerHTML = html;
     }
 
+    function filterSupplierTab(period) {
+      currentSupplierFilter = period;
+      document.querySelectorAll('#tab-suppliers .filter-btn').forEach(b => b.classList.remove('active'));
+      const customBox = document.getElementById('suppCustomDateBox');
+
+      if (period === 'all') document.getElementById('suppFiltAll').classList.add('active');
+      if (period === 'today') document.getElementById('suppFiltToday').classList.add('active');
+      if (period === 'month') document.getElementById('suppFiltMonth').classList.add('active');
+      if (period === 'custom') {
+        document.getElementById('suppFiltCustom').classList.add('active');
+        customBox.style.display = 'flex';
+        return;
+      } else {
+        customBox.style.display = 'none';
+      }
+      renderSupplierPurchasesTab();
+    }
+
     function renderSupplierPurchasesTab() {
       const container = document.getElementById('supplierPurchasesListContainer');
-      const suppTrans = transactions.filter(t => t.type === 'expense' && t.category === 'stock');
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+      const fromDate = document.getElementById('suppFromDate') ? document.getElementById('suppFromDate').value : today;
+      const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
+
+      const suppTrans = transactions.filter(t => {
+        if (t.type !== 'expense' || t.category !== 'stock') return false;
+        const tDate = new Date(t.date);
+        if (currentSupplierFilter === 'all') return true;
+        if (currentSupplierFilter === 'today') return (t.date === curDate);
+        if (currentSupplierFilter === 'month') return (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
+        if (currentSupplierFilter === 'custom') return (t.date >= fromDate && t.date <= toDate);
+        return true;
+      });
 
       if (!suppTrans.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല</p>';
@@ -2931,7 +3196,7 @@
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
         const totDue = Math.round(item.totalDue * 100) / 100;
-        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
+        const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
 
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
@@ -3034,7 +3299,7 @@
     }
 
     /* -------------------------------------------------------------
-       7. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION)
+       8. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION FOR DELETE & CAPITAL RETURN)
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
@@ -3062,6 +3327,8 @@
         note,
         approvals: [partner],
         status: 'pending',
+        deleteRequested: false,
+        deleteApprovals: [],
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -3092,9 +3359,47 @@
       alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
-    function deleteInvestment(id) {
-      if (confirm('ഈ ഇൻവെസ്റ്റ്മെന്റ് റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
-        db.collection('investments').doc(id).delete();
+    // നിക്ഷേപം ഒഴിവാക്കാൻ 3 പാർട്ണർമാരുടെയും അനുമതി നിർബന്ധമാക്കുന്നു
+    function requestDeleteInvestment(invId) {
+      const inv = investments.find(i => i.id === invId);
+      if (!inv) return;
+
+      if (!confirm(`⚠️ ഈ നിക്ഷേപം (+₹${inv.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും (Ashif, Sabith, Ashkar Ali) തങ്ങളുടെ ലോഗിനിൽ നിന്ന് അംഗീകരിച്ചാൽ മാത്രമേ ഇത് അക്കൗണ്ടിൽ നിന്ന് ഒഴിവാകൂ.`)) {
+        return;
+      }
+
+      db.collection('investments').doc(invId).update({
+        deleteRequested: true,
+        deleteApprovals: [currentLoggedInUser]
+      }).then(() => {
+        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു. ബാക്കി പാർട്ണർമാർ ലോഗിൻ ചെയ്ത് അംഗീകരിക്കേണ്ടതുണ്ട്.`);
+      });
+    }
+
+    function approveDeleteInvestment(invId, partnerName) {
+      if (currentLoggedInUser !== partnerName) {
+        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്. ലോഗിൻ മാറ്റുക.`);
+        return;
+      }
+
+      const inv = investments.find(i => i.id === invId);
+      if (!inv) return;
+
+      let delApprovals = inv.deleteApprovals || [];
+      if (!delApprovals.includes(partnerName)) {
+        delApprovals.push(partnerName);
+      }
+
+      if (PARTNERS.every(p => delApprovals.includes(p))) {
+        db.collection('investments').doc(invId).delete().then(() => {
+          alert("🗑️ 3 പങ്കാളികളും അംഗീകരിച്ചതിനാൽ നിക്ഷേപം പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
+        });
+      } else {
+        db.collection('investments').doc(invId).update({
+          deleteApprovals: delApprovals
+        }).then(() => {
+          alert(`✅ ഡിലീറ്റ് ചെയ്യാൻ ${partnerName} അനുമതി നൽകി (${delApprovals.length}/3).`);
+        });
       }
     }
 
@@ -3106,6 +3411,7 @@
 
     function saveWithdrawal() {
       const partner = document.getElementById('withPartner').value;
+      const type = document.getElementById('withType').value; // profit vs capital
       const amount = parseFloat(document.getElementById('withAmount').value);
       const mode = document.getElementById('withMode').value;
       const date = document.getElementById('withDate').value;
@@ -3118,17 +3424,20 @@
 
       db.collection('withdrawals').add({
         partner,
+        type: type || 'profit',
         amount: Math.round(amount * 100) / 100,
         mode,
         date,
         note,
         approvals: [partner],
         status: 'pending',
+        deleteRequested: false,
+        deleteApprovals: [],
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
       closeModal('withdrawModal');
-      alert('Withdrawal request added! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.');
+      alert(`Withdrawal request added (${type === 'capital' ? 'നിക്ഷേപത്തിൽ നിന്ന്' : 'ലാഭത്തിൽ നിന്ന്'})! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.`);
     }
 
     function verifyWithdrawal(wthId, partnerName) {
@@ -3154,15 +3463,53 @@
       alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
-    function deleteWithdrawal(id) {
-      if (confirm('ഈ Withdrawal റദ്ദാക്കണമെന്ന് ഉറപ്പാണോ?')) {
-        db.collection('withdrawals').doc(id).delete();
+    // പിൻവലിക്കൽ ഒഴിവാക്കാൻ 3 പാർട്ണർമാരുടെയും അനുമതി നിർബന്ധമാക്കുന്നു
+    function requestDeleteWithdrawal(wthId) {
+      const w = withdrawals.find(i => i.id === wthId);
+      if (!w) return;
+
+      if (!confirm(`⚠️ ഈ പിൻവലിക്കൽ (-₹${w.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും അംഗീകരിച്ചാൽ മാത്രമേ തുക തിരികെ അക്കൗണ്ടിലേക്ക് വരികയും റെക്കോർഡ് ഒഴിവാകുകയും ചെയ്യൂ.`)) {
+        return;
+      }
+
+      db.collection('withdrawals').doc(wthId).update({
+        deleteRequested: true,
+        deleteApprovals: [currentLoggedInUser]
+      }).then(() => {
+        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു. ബാക്കി പാർട്ണർമാർ ലോഗിൻ ചെയ്ത് അംഗീകരിക്കേണ്ടതുണ്ട്.`);
+      });
+    }
+
+    function approveDeleteWithdrawal(wthId, partnerName) {
+      if (currentLoggedInUser !== partnerName) {
+        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്. ലോഗിൻ മാറ്റുക.`);
+        return;
+      }
+
+      const w = withdrawals.find(i => i.id === wthId);
+      if (!w) return;
+
+      let delApprovals = w.deleteApprovals || [];
+      if (!delApprovals.includes(partnerName)) {
+        delApprovals.push(partnerName);
+      }
+
+      if (PARTNERS.every(p => delApprovals.includes(p))) {
+        db.collection('withdrawals').doc(wthId).delete().then(() => {
+          alert("🗑️ 3 പങ്കാളികളും അംഗീകരിച്ചതിനാൽ പിൻവലിക്കൽ എൻട്രി പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
+        });
+      } else {
+        db.collection('withdrawals').doc(wthId).update({
+          deleteApprovals: delApprovals
+        }).then(() => {
+          alert(`✅ ഡിലീറ്റ് ചെയ്യാൻ ${partnerName} അനുമതി നൽകി (${delApprovals.length}/3).`);
+        });
       }
     }
 
     function renderInvestTab() {
       let capMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
-      let withMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
+      let withProfitMap = { "ASHIF": 0, "SABITH": 0, "ASHKAR ALI": 0 };
       let totVerInvest = 0;
       let totVerWith = 0;
       let hasPending = false;
@@ -3176,17 +3523,35 @@
       const eachShare = Math.round((totalNetProfit / 3) * 100) / 100;
       document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
 
-      withdrawals.forEach(w => {
-        if (w.status === 'verified') {
-          totVerWith += w.amount;
-          if (withMap[w.partner] !== undefined) withMap[w.partner] += w.amount;
+      // നിക്ഷേപങ്ങൾ കൂട്ടുന്നു
+      investments.forEach(inv => {
+        if (inv.status === 'verified') {
+          totVerInvest += inv.amount;
+          capMap[inv.partner] = (capMap[inv.partner] || 0) + inv.amount;
         } else {
           hasPending = true;
         }
       });
 
+      // പിൻവലിക്കലുകൾ (Capital vs Profit തരംതിരിച്ച് കണക്കുകൂട്ടൽ)
+      withdrawals.forEach(w => {
+        if (w.status === 'verified') {
+          totVerWith += w.amount;
+          if (w.type === 'capital') {
+            // നിക്ഷേപത്തിൽ നിന്ന് നേരിട്ട് കുറയുന്നു
+            if (capMap[w.partner] !== undefined) capMap[w.partner] -= w.amount;
+          } else {
+            // ലാഭവിഹിതത്തിൽ നിന്ന് കുറയുന്നു
+            if (withProfitMap[w.partner] !== undefined) withProfitMap[w.partner] += w.amount;
+          }
+        } else {
+          hasPending = true;
+        }
+        if (w.deleteRequested) hasPending = true;
+      });
+
       PARTNERS.forEach(p => {
-        const drawn = Math.round((withMap[p] || 0) * 100) / 100;
+        const drawn = Math.round((withProfitMap[p] || 0) * 100) / 100;
         const balance = Math.round((eachShare - drawn) * 100) / 100;
         let prefix = p === 'ASHIF' ? 'Ashif' : (p === 'SABITH' ? 'Sabith' : 'Ashkar');
 
@@ -3203,15 +3568,12 @@
         }
       });
 
+      // Investments Cards & 3-Partner Deletion UI
       let invHTML = '';
       investments.slice().reverse().forEach(inv => {
         const isVer = inv.status === 'verified';
-        if (isVer) {
-          totVerInvest += inv.amount;
-          capMap[inv.partner] = (capMap[inv.partner] || 0) + inv.amount;
-        } else {
-          hasPending = true;
-        }
+        const isDelReq = Boolean(inv.deleteRequested);
+        const delApprovals = inv.deleteApprovals || [];
 
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
@@ -3223,6 +3585,27 @@
           `;
         });
 
+        let deleteApprovalHTML = '';
+        if (isDelReq) {
+          hasPending = true;
+          let delButtonsHTML = '';
+          PARTNERS.forEach(p => {
+            const hasApp = delApprovals.includes(p);
+            delButtonsHTML += `
+              <button class="btn-del-verify ${hasApp ? 'done' : ''}" onclick="approveDeleteInvestment('${inv.id}', '${p}')">
+                ${hasApp ? '✓ ' + p : 'Approve Del: ' + p}
+              </button>
+            `;
+          });
+
+          deleteApprovalHTML = `
+            <div class="delete-approval-box">
+              <strong style="color:#b91c1c;">⚠️ ഡിലീറ്റ് റിക്വസ്റ്റ് അനുമതികൾ (${delApprovals.length}/3 Approved):</strong>
+              <div class="del-verify-buttons">${delButtonsHTML}</div>
+            </div>
+          `;
+        }
+
         invHTML += `
           <div class="inv-card">
             <div class="inv-header">
@@ -3233,15 +3616,16 @@
               📅 ${inv.date} | Mode: ${inv.mode.toUpperCase()} ${inv.note ? '| ' + inv.note : ''}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-              <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
-                ${isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`}
+              <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
+                ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`)}
               </span>
-              <button class="btn-icon" onclick="deleteInvestment('${inv.id}')">🗑️</button>
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteInvestment('${inv.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
               <div class="verify-buttons">${verifyButtonsHTML}</div>
             </div>
+            ${deleteApprovalHTML}
           </div>
         `;
       });
@@ -3252,9 +3636,14 @@
       document.getElementById('invCapAshkar').innerText = '₹' + (Math.round((capMap['ASHKAR ALI'] || 0) * 100) / 100);
       document.getElementById('investListContainer').innerHTML = invHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">ഇൻവെസ്റ്റ്മെന്റുകൾ ഇല്ല</p>';
 
+      // Withdrawals Cards & 3-Partner Deletion UI
       let withHTML = '';
       withdrawals.slice().reverse().forEach(w => {
         const isVer = w.status === 'verified';
+        const isDelReq = Boolean(w.deleteRequested);
+        const delApprovals = w.deleteApprovals || [];
+        const isCapital = (w.type === 'capital');
+
         let verifyButtonsHTML = '';
         PARTNERS.forEach(p => {
           const hasApproved = (w.approvals || []).includes(p);
@@ -3265,40 +3654,67 @@
           `;
         });
 
+        let deleteApprovalHTML = '';
+        if (isDelReq) {
+          hasPending = true;
+          let delButtonsHTML = '';
+          PARTNERS.forEach(p => {
+            const hasApp = delApprovals.includes(p);
+            delButtonsHTML += `
+              <button class="btn-del-verify ${hasApp ? 'done' : ''}" onclick="approveDeleteWithdrawal('${w.id}', '${p}')">
+                ${hasApp ? '✓ ' + p : 'Approve Del: ' + p}
+              </button>
+            `;
+          });
+
+          deleteApprovalHTML = `
+            <div class="delete-approval-box">
+              <strong style="color:#b91c1c;">⚠️ ഡിലീറ്റ് റിക്വസ്റ്റ് അനുമതികൾ (${delApprovals.length}/3 Approved):</strong>
+              <div class="del-verify-buttons">${delButtonsHTML}</div>
+            </div>
+          `;
+        }
+
         withHTML += `
           <div class="inv-card">
             <div class="inv-header">
-              <span>👤 ${w.partner}</span>
+              <div>
+                <span>👤 ${w.partner}</span>
+                <span style="font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px; background:${isCapital ? '#fee2e2' : '#e0f2fe'}; color:${isCapital ? '#b91c1c' : '#0369a1'};">
+                  ${isCapital ? '🏛️ CAPITAL RETURN' : '💰 PROFIT SHARE'}
+                </span>
+              </div>
               <span class="color-red">-₹${w.amount}</span>
             </div>
             <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
               📅 ${w.date} | Mode: ${w.mode.toUpperCase()} ${w.note ? '| ' + w.note : ''}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-              <span class="inv-status ${isVer ? 'status-verified' : 'status-pending'}">
-                ${isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`}
+              <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
+                ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
               </span>
-              <button class="btn-icon" onclick="deleteWithdrawal('${w.id}')">🗑️</button>
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
               <div class="verify-buttons">${verifyButtonsHTML}</div>
             </div>
+            ${deleteApprovalHTML}
           </div>
         `;
       });
 
       document.getElementById('withTotalVerified').innerText = '₹' + (Math.round(totVerWith * 100) / 100);
-      document.getElementById('withCapAshif').innerText = '₹' + (Math.round((withMap['ASHIF'] || 0) * 100) / 100);
-      document.getElementById('withCapSabith').innerText = '₹' + (Math.round((withMap['SABITH'] || 0) * 100) / 100);
-      document.getElementById('withCapAshkar').innerText = '₹' + (Math.round((withMap['ASHKAR ALI'] || 0) * 100) / 100);
+      document.getElementById('withCapAshif').innerText = '₹' + (Math.round((withProfitMap['ASHIF'] || 0) * 100) / 100);
+      document.getElementById('withCapSabith').innerText = '₹' + (Math.round((withProfitMap['SABITH'] || 0) * 100) / 100);
+      document.getElementById('withCapAshkar').innerText = '₹' + (Math.round((withProfitMap['ASHKAR ALI'] || 0) * 100) / 100);
       document.getElementById('withdrawListContainer').innerHTML = withHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">പിൻവലിക്കലുകൾ ഒന്നും ഇല്ല</p>';
       
       document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
     }
 
     /* -------------------------------------------------------------
-       8. UNIVERSAL LEDGER SHEET
+       9. UNIVERSAL LEDGER SHEET
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -3452,7 +3868,7 @@
     }
 
     /* -------------------------------------------------------------
-       9. RUNNING BREAKDOWN & OPENING BALANCE
+       10. RUNNING BREAKDOWN & OPENING BALANCE
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
