@@ -112,7 +112,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* Sticky Quick-Jump Sub-Category Chips (Option 1) */
+    /* Sticky Quick-Jump Sub-Category Chips (പുതിയ ക്രമം: Kids -> Regular -> Fruit -> Special -> Premium) */
     .subcat-sticky-bar {
       position: sticky;
       top: 54px;
@@ -159,7 +159,7 @@
       color: #1e3a8a;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin: 10px 10px 6px;
+      margin: 12px 10px 6px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -602,13 +602,14 @@
     </div>
   </div>
 
-  <!-- Sticky Sub-Category Quick-Jump Bar (Option 1) -->
+  <!-- Sticky Sub-Category Quick-Jump Bar (യഥാർത്ഥ മെനു കാർഡ് ക്രമം) -->
   <div class="subcat-sticky-bar" id="subcatStickyBar">
     <button type="button" class="subcat-chip active" id="chip-all" onclick="scrollToSection('sec-all')">🌐 All</button>
-    <button type="button" class="subcat-chip" id="chip-regular" onclick="scrollToSection('sec-regular')">🍌 Regular</button>
-    <button type="button" class="subcat-chip" id="chip-special" onclick="scrollToSection('sec-special')">⭐ Special</button>
-    <button type="button" class="subcat-chip" id="chip-fruit" onclick="scrollToSection('sec-fruit')">🍓 Fruit Items</button>
     <button type="button" class="subcat-chip" id="chip-kids" onclick="scrollToSection('sec-kids')">👶 Kids</button>
+    <button type="button" class="subcat-chip" id="chip-regular" onclick="scrollToSection('sec-regular')">🍌 Regular</button>
+    <button type="button" class="subcat-chip" id="chip-fruit" onclick="scrollToSection('sec-fruit')">🍓 Fruit Items</button>
+    <button type="button" class="subcat-chip" id="chip-special" onclick="scrollToSection('sec-special')">⭐ Special</button>
+    <button type="button" class="subcat-chip" id="chip-premium_nuts" onclick="scrollToSection('sec-premium_nuts')">🥜 Premium & Nuts</button>
   </div>
 
   <!-- Main POS Items Root -->
@@ -669,7 +670,7 @@
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (WITH SUB-CATEGORY SELECTION) -->
+  <!-- MANAGE ITEMS MODAL (5 SUB-CATEGORIES DROPDOWN) -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -685,26 +686,27 @@
         </select>
       </div>
 
-      <!-- പുതിയ സബ് കാറ്റഗറി ഡ്രോപ്പ്ഡൗൺ -->
+      <!-- 5 സബ്-കാറ്റഗറികളുള്ള ഡ്രോപ്പ്ഡൗൺ -->
       <div class="form-group" id="subCatFormField">
         <label>Avil Milk Sub-Category (ഉപവിഭാഗം)</label>
         <select id="newItemSubCat" class="form-control" style="font-weight:700;">
-          <option value="regular">🍌 Regular</option>
-          <option value="special">⭐ Special</option>
-          <option value="fruit">🍓 Fruit Items</option>
           <option value="kids">👶 Kids</option>
+          <option value="regular">🍌 Regular</option>
+          <option value="fruit">🍓 Fruit Items</option>
+          <option value="special">⭐ Special Items</option>
+          <option value="premium_nuts">🥜 Premium & Nuts</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Item Name (പേര്)</label>
-        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Special Dry Fruit Avil Milk">
+        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Micky Mouse / Kulfi / Fig Honey">
       </div>
 
       <div style="display:flex; gap:8px;">
         <div class="form-group" style="flex:1;">
           <label>Price ₹ (വില)</label>
-          <input type="number" id="newItemPrice" class="form-control" placeholder="70">
+          <input type="number" id="newItemPrice" class="form-control" placeholder="60">
         </div>
         <div class="form-group" style="flex:0.6;">
           <label>Emoji</label>
@@ -737,7 +739,7 @@
     </div>
   </div>
 
-  <!-- RECENT BILLS / REPRINT MODAL (WITH 12-HR TIMESTAMP ORDER & DELETE) -->
+  <!-- RECENT BILLS / REPRINT MODAL -->
   <div class="modal" id="recentBillsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -896,6 +898,31 @@
       return d.getTime();
     }
 
+    // നിങ്ങളുടെ യഥാർത്ഥ മെനു കാർഡ് അടിസ്ഥാനമാക്കിയുള്ള സ്മാർട്ട് ഓട്ടോ-മാപ്പിംഗ്
+    function matchMenuCardSubCategory(name, price) {
+      const nm = (name || '').toLowerCase();
+      const p = Number(price) || 0;
+
+      // 1. Kids
+      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy') || nm.includes('doara')) {
+        return 'kids';
+      }
+      // 2. Fruit Items
+      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut') || nm.includes('fruit and nut')) {
+        return 'fruit';
+      }
+      // 3. Premium & Nuts
+      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dray fruit') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || nm.includes('biscoff') || nm.includes('roasted almond') || p >= 110) {
+        return 'premium_nuts';
+      }
+      // 4. Special Items
+      if (nm.includes('kulfi') || nm.includes('jack fruit') || nm.includes('caramount') || nm.includes('royal') || nm.includes('khajoor') || nm.includes('red velvet') || nm.includes('spanish') || nm.includes('passion') || (p >= 90 && p <= 100)) {
+        return 'special';
+      }
+      // 5. Regular
+      return 'regular';
+    }
+
     window.onload = function() {
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
@@ -904,15 +931,9 @@
           let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
           let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
           
-          // സബ് കാറ്റഗറി ഇല്ലെങ്കിൽ തനിയെ തിരിച്ചറിയുന്നു
           let subCat = data.subCategory;
           if (!subCat && fixedCat === 'avil_milk') {
-            const p = Number(data.price) || 0;
-            const nm = fixedName.toLowerCase();
-            if (nm.includes('fruit') || nm.includes('mango') || nm.includes('straw') || nm.includes('apple')) subCat = 'fruit';
-            else if (nm.includes('kid') || nm.includes('mini')) subCat = 'kids';
-            else if (p <= 50) subCat = 'regular';
-            else subCat = 'special';
+            subCat = matchMenuCardSubCategory(fixedName, data.price);
           }
 
           menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat, subCategory: subCat || 'regular' });
@@ -943,7 +964,6 @@
       renderMenuItems();
     }
 
-    /* സബ്-കാറ്റഗറി ക്വിക്ക് ജമ്പ് (Smooth Scroll) */
     function scrollToSection(secId) {
       document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
       const clickedBtn = document.getElementById('chip-' + secId.replace('sec-', ''));
@@ -965,7 +985,8 @@
     }
 
     /* -------------------------------------------------------------
-       മെനു റെൻഡറിംഗ്: സബ്-കാറ്റഗറി അടിസ്ഥാനത്തിൽ ഭംഗിയായി തരംതിരിച്ചത്
+       മെനു റെൻഡറിംഗ്: ആവശ്യപ്പെട്ട കൃത്യമായ 5 ഉപവിഭാഗങ്ങളുടെ ക്രമം
+       (1. Kids -> 2. Regular -> 3. Fruit Items -> 4. Special -> 5. Premium & Nuts)
        ------------------------------------------------------------- */
     function renderMenuItems() {
       const root = document.getElementById('posItemsRoot');
@@ -985,12 +1006,13 @@
         return;
       }
 
-      // അവിൽ മിൽക്ക് സബ്-കാറ്റഗറികളായി ലിസ്റ്റ് ചെയ്യുന്നു
+      // ഉപവിഭാഗങ്ങളുടെ കൃത്യമായ ക്രമം
       const subCats = [
+        { id: 'kids', name: '👶 Kids Specials', filter: 'kids' },
         { id: 'regular', name: '🍌 Regular Avil Milk', filter: 'regular' },
-        { id: 'special', name: '⭐ Special Avil Milk', filter: 'special' },
-        { id: 'fruit', name: '🍓 Fruit Specials', filter: 'fruit' },
-        { id: 'kids', name: '👶 Kids Specials', filter: 'kids' }
+        { id: 'fruit', name: '🍓 Fruit Items', filter: 'fruit' },
+        { id: 'special', name: '⭐ Special Items', filter: 'special' },
+        { id: 'premium_nuts', name: '🥜 Premium & Nuts', filter: 'premium_nuts' }
       ];
 
       let fullHTML = '<div id="sec-all"></div>';
@@ -1123,7 +1145,7 @@
     }
 
     /* -------------------------------------------------------------
-       ബില്ല് സേവിംഗ് & പ്രിന്റ് (12-Hour AM/PM & ടൈംസ്റ്റാമ്പ്)
+       ബില്ല് സേവിംഗ് & പ്രിന്റ് (12-Hour AM/PM & കൃത്യമായ ടൈംസ്റ്റാമ്പ്)
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1132,8 +1154,8 @@
       }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const timeStr = get12HourTimeString(); // 12-Hour AM/PM
-      const createdAtMillis = Date.now(); // കൃത്യമായ സോർട്ടിംഗിനായി
+      const timeStr = get12HourTimeString();
+      const createdAtMillis = Date.now();
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       try {
@@ -1243,7 +1265,7 @@
 
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
-        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
@@ -1311,7 +1333,7 @@
       const sorted = todayBills.slice().sort((a, b) => {
         const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
         const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
-        return tB - tA; // Newest on Top
+        return tB - tA;
       });
 
       if (!sorted.length) {
@@ -1401,7 +1423,7 @@
     }
 
     /* -------------------------------------------------------------
-       മെനു മാനേജ്‌മെന്റ് (സബ്-കാറ്റഗറി സഹിതം)
+       മെനു മാനേജ്‌മെന്റ് (5 ഉപവിഭാഗങ്ങൾ സഹിതം)
        ------------------------------------------------------------- */
     function toggleSubCategoryField() {
       const cat = document.getElementById('newItemCat').value;
