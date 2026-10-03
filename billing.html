@@ -16,7 +16,7 @@
 
   <style>
     :root {
-      --bg: #eef2f6; /* മോഡേൺ സോഫ്റ്റ് സ്ലേറ്റ് കാൻവാസ് ബാക്ക്‌ഗ്രൗണ്ട് */
+      --bg: #eef2f6;
       --card-bg: #ffffff;
       --primary-dark: #0f172a;
       --slate-800: #1e293b;
@@ -112,13 +112,72 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* 3-കോളം ഒതുക്കമുള്ള മൊബൈൽ ഗ്രിഡ് (3-Column Elevated Cards) */
+    /* Sticky Quick-Jump Sub-Category Chips (Option 1) */
+    .subcat-sticky-bar {
+      position: sticky;
+      top: 54px;
+      z-index: 90;
+      background: rgba(238, 242, 246, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 6px 10px 8px;
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .subcat-sticky-bar::-webkit-scrollbar { display: none; }
+    .subcat-chip {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      color: var(--slate-800);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .subcat-chip:active { transform: scale(0.95); }
+    .subcat-chip.active {
+      background: #1e3a8a;
+      color: #ffffff;
+      border-color: #1e3a8a;
+      box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
+    }
+
+    /* Sub-Category Section Headings */
+    .subcat-section-title {
+      font-size: 0.82rem;
+      font-weight: 900;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 10px 10px 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .subcat-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #cbd5e1;
+    }
+
+    /* 3-Column Items Grid */
     .items-container {
-      padding: 8px 8px 20px;
+      padding: 4px 8px 16px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 കോളങ്ങൾ */
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
     @media (min-width: 700px) {
@@ -148,12 +207,11 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.16);
     }
     
-    /* ഇമോജിക്ക് പിന്നിൽ വാം ബാക്ക്‌‌ഡ്രോപ്പ് സർക്കിൾ */
     .item-media-box {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: #fef3c7; /* വാം ക്രീം ആക്സെന്റ് */
+      background: #fef3c7;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -185,7 +243,6 @@
       word-break: break-word;
     }
 
-    /* എലിവേറ്റഡ് പ്രൈസ് ചിപ്പ് */
     .price-chip {
       background: var(--emerald-light);
       color: var(--emerald-dark);
@@ -197,7 +254,6 @@
       display: inline-block;
     }
 
-    /* Stepper Bar */
     .item-stepper-box {
       width: 100%;
       background: #f1f5f9;
@@ -266,7 +322,7 @@
       box-shadow: 0 2px 5px rgba(37, 99, 235, 0.35);
     }
 
-    /* 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് */
+    /* 6-Box POS Control Dock */
     .pos-bottom-dock {
       position: fixed;
       bottom: 0;
@@ -435,7 +491,7 @@
       gap: 6px;
     }
 
-    /* Modals & Drawers */
+    /* Modals */
     .modal {
       display: none;
       position: fixed;
@@ -534,7 +590,7 @@
     </div>
   </header>
 
-  <!-- Categories -->
+  <!-- Categories Toggle -->
   <div class="cat-toggle-wrap">
     <div class="cat-toggle">
       <button type="button" class="cat-tab-btn active" id="tabAvil" onclick="switchCategory('avil_milk')">
@@ -546,12 +602,20 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid (3-കോളം ഒതുക്കമുള്ള രൂപത്തിൽ, വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക്) -->
-  <div class="items-container" id="posItemsContainer"></div>
+  <!-- Sticky Sub-Category Quick-Jump Bar (Option 1) -->
+  <div class="subcat-sticky-bar" id="subcatStickyBar">
+    <button type="button" class="subcat-chip active" id="chip-all" onclick="scrollToSection('sec-all')">🌐 All</button>
+    <button type="button" class="subcat-chip" id="chip-regular" onclick="scrollToSection('sec-regular')">🍌 Regular</button>
+    <button type="button" class="subcat-chip" id="chip-special" onclick="scrollToSection('sec-special')">⭐ Special</button>
+    <button type="button" class="subcat-chip" id="chip-fruit" onclick="scrollToSection('sec-fruit')">🍓 Fruit Items</button>
+    <button type="button" class="subcat-chip" id="chip-kids" onclick="scrollToSection('sec-kids')">👶 Kids</button>
+  </div>
 
-  <!-- 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് -->
+  <!-- Main POS Items Root -->
+  <div id="posItemsRoot" style="max-width:1000px; margin:0 auto;"></div>
+
+  <!-- 6-Box POS Control Dock -->
   <div class="pos-bottom-dock">
-    <!-- ബോക്സ് 1: CASH / GPAY -->
     <div class="dock-box box-payment">
       <button type="button" class="btn-pay-sub active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
         💵 CASH
@@ -561,7 +625,6 @@
       </button>
     </div>
 
-    <!-- ബോക്സ് 2: ITEMS & DELETE -->
     <div class="dock-box box-cart-combo">
       <button type="button" class="btn-cart-part" onclick="openCartDrawer()">
         🛒 <span id="cartCountTag">0 Items</span> ▾
@@ -572,23 +635,19 @@
       </button>
     </div>
 
-    <!-- ബോക്സ് 3: TOTAL DUE -->
     <div class="dock-box box-total">
       <span class="box-total-lbl">TOTAL DUE</span>
       <span class="box-total-val" id="cartTotalText">₹0</span>
     </div>
 
-    <!-- ബോക്സ് 4: PRINT -->
     <button type="button" class="dock-box box-print" onclick="printAndSaveBill()">
       🖨️ PRINT
     </button>
 
-    <!-- ബോക്സ് 5: WHATSAPP BILL -->
     <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
       💬 WhatsApp Bill
     </button>
 
-    <!-- ബോക്സ് 6: RECENT BILLS -->
     <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
       📋 Recent Bills
     </button>
@@ -610,7 +669,7 @@
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (WITH EDIT & UPDATE) -->
+  <!-- MANAGE ITEMS MODAL (WITH SUB-CATEGORY SELECTION) -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -620,9 +679,20 @@
 
       <div class="form-group">
         <label>Category (വിഭാഗം)</label>
-        <select id="newItemCat" class="form-control">
+        <select id="newItemCat" class="form-control" onchange="toggleSubCategoryField()">
           <option value="avil_milk">🍌 Avil Milk Specials</option>
           <option value="juices">🥤 Juices & Shakes</option>
+        </select>
+      </div>
+
+      <!-- പുതിയ സബ് കാറ്റഗറി ഡ്രോപ്പ്ഡൗൺ -->
+      <div class="form-group" id="subCatFormField">
+        <label>Avil Milk Sub-Category (ഉപവിഭാഗം)</label>
+        <select id="newItemSubCat" class="form-control" style="font-weight:700;">
+          <option value="regular">🍌 Regular</option>
+          <option value="special">⭐ Special</option>
+          <option value="fruit">🍓 Fruit Items</option>
+          <option value="kids">👶 Kids</option>
         </select>
       </div>
 
@@ -642,7 +712,7 @@
         </div>
       </div>
 
-      <div class="form-group" style="background:#f8fafc; border:1px dashed #cbd5e1; padding:10px; border-radius:10px; text-align:center;">
+      <div class="form-group" style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:10px; text-align:center;">
         <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക:</label>
         <input type="file" id="newItemImageFile" accept="image/*" style="display:none;" onchange="handleItemImagePick(event)">
         <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:6px;">
@@ -653,7 +723,6 @@
         </div>
       </div>
 
-      <!-- Add / Update Action Buttons -->
       <div style="display:flex; gap:8px; margin-top:6px;">
         <button type="button" id="btnSaveItemAction" onclick="saveOrUpdateItem()" style="flex:1; background:var(--emerald); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;">
           + Add to Menu
@@ -663,12 +732,12 @@
         </button>
       </div>
 
-      <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ് (വില ക്രമത്തിൽ):</h4>
+      <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ്:</h4>
       <div id="modalExistingItems" style="max-height:190px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
     </div>
   </div>
 
-  <!-- RECENT BILLS / REPRINT MODAL (WITH DELETE & LEDGER SYNC) -->
+  <!-- RECENT BILLS / REPRINT MODAL (WITH 12-HR TIMESTAMP ORDER & DELETE) -->
   <div class="modal" id="recentBillsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -709,7 +778,7 @@
     </div>
   </div>
 
-  <!-- THERMAL RECEIPT SLIP (പുതുക്കിയ ലൊക്കേഷൻ, ഫോൺ നമ്പർ, ലേബൽ) -->
+  <!-- THERMAL RECEIPT SLIP -->
   <div id="receiptPrintArea">
     <div class="r-center" style="font-size:15px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
     <div class="r-center" style="font-size:10px; font-weight:bold; margin-top:1px;">NELLIPPUZHA, MANNARKKAD</div>
@@ -738,7 +807,7 @@
     <div class="r-center">Visit Again!</div>
   </div>
 
-  <!-- WHATSAPP PDF ബില്ലിനായുള്ള പ്രൊഫഷണൽ കാർഡ് -->
+  <!-- WHATSAPP PDF INVOICE CARD -->
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
@@ -802,22 +871,51 @@
 
     const todayDate = new Date().toISOString().split('T')[0];
 
+    // 12-Hour AM/PM Helper
+    function get12HourTimeString(dateObj = new Date()) {
+      let h = dateObj.getHours();
+      let m = dateObj.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      h = h ? h : 12;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    function parseToTimeMillis(timeStr, dateStr = todayDate) {
+      if (!timeStr) return 0;
+      let clean = timeStr.trim().toLowerCase();
+      let isPM = clean.includes('pm');
+      let isAM = clean.includes('am');
+      clean = clean.replace(/[^\d:]/g, '');
+      let [h, m] = clean.split(':').map(Number);
+      h = h || 0; m = m || 0;
+      if (isPM && h < 12) h += 12;
+      if (isAM && h === 12) h = 0;
+      const d = new Date(dateStr);
+      d.setHours(h, m, 0, 0);
+      return d.getTime();
+    }
+
     window.onload = function() {
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => {
           const data = doc.data();
-          let fixedName = data.name || '';
-          let fixedCat = data.category || '';
-
-          if (fixedName.includes('Aval')) {
-            fixedName = fixedName.replace(/Aval/g, 'Avil');
+          let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
+          
+          // സബ് കാറ്റഗറി ഇല്ലെങ്കിൽ തനിയെ തിരിച്ചറിയുന്നു
+          let subCat = data.subCategory;
+          if (!subCat && fixedCat === 'avil_milk') {
+            const p = Number(data.price) || 0;
+            const nm = fixedName.toLowerCase();
+            if (nm.includes('fruit') || nm.includes('mango') || nm.includes('straw') || nm.includes('apple')) subCat = 'fruit';
+            else if (nm.includes('kid') || nm.includes('mini')) subCat = 'kids';
+            else if (p <= 50) subCat = 'regular';
+            else subCat = 'special';
           }
-          if (fixedCat === 'aval_milk') {
-            fixedCat = 'avil_milk';
-          }
 
-          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat });
+          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat, subCategory: subCat || 'regular' });
         });
 
         renderMenuItems();
@@ -834,68 +932,122 @@
       currentCategory = cat;
       document.getElementById('tabAvil').className = 'cat-tab-btn ' + (cat === 'avil_milk' ? 'active' : '');
       document.getElementById('tabJuices').className = 'cat-tab-btn ' + (cat === 'juices' ? 'active' : '');
+      
+      const stickyBar = document.getElementById('subcatStickyBar');
+      if (cat === 'avil_milk') {
+        stickyBar.style.display = 'flex';
+      } else {
+        stickyBar.style.display = 'none';
+      }
+
       renderMenuItems();
     }
 
-    /* -------------------------------------------------------------
-       വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് ക്രമീകരിച്ച 3-കോളം മെനു
-       ------------------------------------------------------------- */
-    function renderMenuItems() {
-      const container = document.getElementById('posItemsContainer');
-      let items = menuItems.filter(i => {
-        if (currentCategory === 'avil_milk') {
-          return i.category === 'avil_milk' || i.category === 'aval_milk';
-        }
-        return i.category === currentCategory;
-      });
+    /* സബ്-കാറ്റഗറി ക്വിക്ക് ജമ്പ് (Smooth Scroll) */
+    function scrollToSection(secId) {
+      document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
+      const clickedBtn = document.getElementById('chip-' + secId.replace('sec-', ''));
+      if (clickedBtn) clickedBtn.classList.add('active');
 
-      // വില അടിസ്ഥാനമാക്കി അസെൻഡിംഗ് ഓർഡറിൽ സോർട്ട് ചെയ്യുന്നു (₹30 -> ₹130)
-      items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-
-      if (!items.length) {
-        container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
+      if (secId === 'sec-all') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
-      container.innerHTML = items.map(it => {
-        const cartItem = cart.find(c => c.id === it.id);
-        const qty = cartItem ? cartItem.qty : 0;
-        const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
-        const isSelected = qty > 0 ? 'in-cart' : '';
+      const el = document.getElementById(secId);
+      if (el) {
+        const offset = 100;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = el.getBoundingClientRect().top;
+        const offsetPosition = (elementRect - bodyRect) - offset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+    }
 
-        const mediaHTML = it.imageUrl 
-          ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
-          : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
+    /* -------------------------------------------------------------
+       മെനു റെൻഡറിംഗ്: സബ്-കാറ്റഗറി അടിസ്ഥാനത്തിൽ ഭംഗിയായി തരംതിരിച്ചത്
+       ------------------------------------------------------------- */
+    function renderMenuItems() {
+      const root = document.getElementById('posItemsRoot');
+      let items = menuItems.filter(i => {
+        if (currentCategory === 'avil_milk') return i.category === 'avil_milk' || i.category === 'aval_milk';
+        return i.category === currentCategory;
+      });
 
-        const displayName = it.name.replace(/Aval/g, 'Avil');
+      if (!items.length) {
+        root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
+        return;
+      }
 
-        return `
-          <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
-            ${qtyBadge}
-            <div class="item-media-box">${mediaHTML}</div>
-            <div class="item-name">${displayName}</div>
-            <div class="price-chip">₹${it.price}</div>
-            
-            <div class="item-stepper-box" onclick="event.stopPropagation()">
-              <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
-              <span class="item-qty-center">${qty > 0 ? qty : ''}</span>
-              <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
+      if (currentCategory === 'juices') {
+        items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+        root.innerHTML = `<div class="items-container">${items.map(it => renderCardHTML(it)).join('')}</div>`;
+        return;
+      }
+
+      // അവിൽ മിൽക്ക് സബ്-കാറ്റഗറികളായി ലിസ്റ്റ് ചെയ്യുന്നു
+      const subCats = [
+        { id: 'regular', name: '🍌 Regular Avil Milk', filter: 'regular' },
+        { id: 'special', name: '⭐ Special Avil Milk', filter: 'special' },
+        { id: 'fruit', name: '🍓 Fruit Specials', filter: 'fruit' },
+        { id: 'kids', name: '👶 Kids Specials', filter: 'kids' }
+      ];
+
+      let fullHTML = '<div id="sec-all"></div>';
+
+      subCats.forEach(sc => {
+        const catItems = items.filter(i => i.subCategory === sc.filter);
+        if (catItems.length) {
+          catItems.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+          fullHTML += `
+            <div id="sec-${sc.id}">
+              <div class="subcat-section-title">${sc.name} (${catItems.length})</div>
+              <div class="items-container">
+                ${catItems.map(it => renderCardHTML(it)).join('')}
+              </div>
             </div>
+          `;
+        }
+      });
+
+      root.innerHTML = fullHTML;
+    }
+
+    function renderCardHTML(it) {
+      const cartItem = cart.find(c => c.id === it.id);
+      const qty = cartItem ? cartItem.qty : 0;
+      const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
+      const isSelected = qty > 0 ? 'in-cart' : '';
+
+      const mediaHTML = it.imageUrl 
+        ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
+        : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
+
+      return `
+        <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
+          ${qtyBadge}
+          <div class="item-media-box">${mediaHTML}</div>
+          <div class="item-name">${it.name}</div>
+          <div class="price-chip">₹${it.price}</div>
+          
+          <div class="item-stepper-box" onclick="event.stopPropagation()">
+            <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
+            <span class="item-qty-center">${qty > 0 ? qty : ''}</span>
+            <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
           </div>
-        `;
-      }).join('');
+        </div>
+      `;
     }
 
     function addToCart(id) {
       const item = menuItems.find(i => i.id === id);
       if (!item) return;
 
-      const itemName = item.name.replace(/Aval/g, 'Avil');
       const existing = cart.find(c => c.id === id);
       if (existing) {
         existing.qty += 1;
       } else {
-        cart.push({ id: item.id, name: itemName, price: item.price, qty: 1 });
+        cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
       }
       renderCartUI();
       renderMenuItems();
@@ -971,7 +1123,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ് (സമയക്രമം 24-Hour ഫോർമാറ്റിൽ)
+       ബില്ല് സേവിംഗ് & പ്രിന്റ് (12-Hour AM/PM & ടൈംസ്റ്റാമ്പ്)
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -980,12 +1132,8 @@
       }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      
-      // കൃത്യമായ സോർട്ടിംഗിനായി സ്റ്റാൻഡേർഡ് 24-മണിക്കൂർ ഫോർമാറ്റ്
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      const timeStr = `${hours}:${mins}`;
+      const timeStr = get12HourTimeString(); // 12-Hour AM/PM
+      const createdAtMillis = Date.now(); // കൃത്യമായ സോർട്ടിംഗിനായി
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       try {
@@ -1009,6 +1157,7 @@
             billNo,
             date: todayDate,
             time: timeStr,
+            createdAtMillis: createdAtMillis,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             items: cart,
             total,
@@ -1051,9 +1200,7 @@
 
       snap.forEach(d => {
         totalExistingAmount += (d.data().amount || 0);
-        if (d.id !== docId) {
-          batch.delete(d.ref);
-        }
+        if (d.id !== docId) batch.delete(d.ref);
       });
 
       const finalAmount = Math.round((totalExistingAmount + deltaAmount) * 100) / 100;
@@ -1094,18 +1241,14 @@
       window.print();
     }
 
-    /* -------------------------------------------------------------
-       WHATSAPP PDF ബില്ല് ഷെയറിംഗ് എൻജിൻ
-       ------------------------------------------------------------- */
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
-        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const timeStr = get12HourTimeString();
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       await generateAndSharePdfBill(billNo, todayDate, timeStr, total, currentPayMode, cart);
@@ -1160,14 +1303,15 @@
     }
 
     /* -------------------------------------------------------------
-       റീസെന്റ് ബില്ലുകൾ: സമയം പ്രകാരം സോർട്ട് ചെയ്ത് കാണിക്കൽ & ഡിലീറ്റ്
+       റീസെന്റ് ബില്ലുകൾ: ടൈംസ്റ്റാമ്പ് പ്രകാരം ഏറ്റവും പുതിയത് മുകളിൽ (#1)
        ------------------------------------------------------------- */
     function openRecentBillsModal() {
       const container = document.getElementById('recentBillsContainer');
-      const sorted = todayBills.slice().sort((a,b) => {
-        const tA = (a.time || '').toLowerCase().replace(/[^0-9:]/g, '');
-        const tB = (b.time || '').toLowerCase().replace(/[^0-9:]/g, '');
-        return tB.localeCompare(tA);
+      
+      const sorted = todayBills.slice().sort((a, b) => {
+        const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
+        const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
+        return tB - tA; // Newest on Top
       });
 
       if (!sorted.length) {
@@ -1176,7 +1320,7 @@
         container.innerHTML = sorted.map(b => `
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${b.mode.toUpperCase()}</span></div>
+              <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${(b.mode || 'cash').toUpperCase()}</span></div>
               <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
             </div>
             <div style="display:flex; gap:5px;">
@@ -1191,7 +1335,6 @@
       document.getElementById('recentBillsModal').style.display = 'flex';
     }
 
-    /* റീസെന്റ് ബില്ല് ഡിലീറ്റ് ചെയ്യലും ലെഡ്ജർ തുക തനിയെ കുറയ്ക്കലും */
     async function deletePosBill(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
@@ -1258,10 +1401,17 @@
     }
 
     /* -------------------------------------------------------------
-       മെനു മാനേജ്‌മെന്റ് (ആഡ് & എഡിറ്റ്)
+       മെനു മാനേജ്‌മെന്റ് (സബ്-കാറ്റഗറി സഹിതം)
        ------------------------------------------------------------- */
+    function toggleSubCategoryField() {
+      const cat = document.getElementById('newItemCat').value;
+      const subField = document.getElementById('subCatFormField');
+      subField.style.display = (cat === 'avil_milk') ? 'block' : 'none';
+    }
+
     function openItemsModal() {
       cancelItemEditing();
+      toggleSubCategoryField();
       document.getElementById('itemsModal').style.display = 'flex';
     }
     function closeModal(id) {
@@ -1304,6 +1454,7 @@
       let name = document.getElementById('newItemName').value.trim();
       const price = parseFloat(document.getElementById('newItemPrice').value);
       const category = document.getElementById('newItemCat').value;
+      const subCategory = (category === 'avil_milk') ? document.getElementById('newItemSubCat').value : '';
       const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
 
       if (!name || isNaN(price) || price <= 0) {
@@ -1318,12 +1469,11 @@
           name,
           price,
           category,
+          subCategory,
           icon,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if (pickedItemImageBase64) {
-          updateData.imageUrl = pickedItemImageBase64;
-        }
+        if (pickedItemImageBase64) updateData.imageUrl = pickedItemImageBase64;
 
         db.collection('billing_items').doc(editingItemId).update(updateData).then(() => {
           alert("✅ ഐറ്റം വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!");
@@ -1334,6 +1484,7 @@
           name,
           price,
           category,
+          subCategory,
           icon,
           imageUrl: pickedItemImageBase64 || "",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1353,6 +1504,11 @@
       document.getElementById('newItemPrice').value = it.price;
       document.getElementById('newItemCat').value = it.category;
       document.getElementById('newItemIcon').value = it.icon || '🥤';
+
+      toggleSubCategoryField();
+      if (it.category === 'avil_milk') {
+        document.getElementById('newItemSubCat').value = it.subCategory || 'regular';
+      }
 
       if (it.imageUrl) {
         pickedItemImageBase64 = it.imageUrl;
@@ -1387,6 +1543,7 @@
       btnSave.innerText = '+ Add to Menu';
       btnSave.style.background = 'var(--emerald)';
       document.getElementById('btnCancelEdit').style.display = 'none';
+      toggleSubCategoryField();
     }
 
     function deleteItem(id) {
@@ -1409,7 +1566,9 @@
         <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
           <div style="display:flex; align-items:center; gap:6px;">
             ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">` : `<span>${it.icon || '🥤'}</span>`}
-            <strong>${it.name.replace(/Aval/g, 'Avil')}</strong> - <span style="color:var(--emerald); font-weight:800;">₹${it.price}</span>
+            <strong>${it.name}</strong> 
+            <span style="font-size:0.68rem; color:#64748b;">(${it.subCategory || it.category})</span>
+            - <span style="color:var(--emerald); font-weight:800;">₹${it.price}</span>
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" onclick="loadItemToEdit('${it.id}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
