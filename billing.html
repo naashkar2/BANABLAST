@@ -10,13 +10,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- PDF Engine Libraries (html2canvas & jsPDF for WhatsApp PDF Billing) -->
+  <!-- PDF Engine Libraries (html2canvas & jsPDF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root {
-      --bg: #f8fafc;
+      --bg: #eef2f6; /* മോഡേൺ സോഫ്റ്റ് സ്ലേറ്റ് കാൻവാസ് ബാക്ക്‌ഗ്രൗണ്ട് */
       --card-bg: #ffffff;
       --primary-dark: #0f172a;
       --slate-800: #1e293b;
@@ -24,10 +24,13 @@
       --slate-400: #94a3b8;
       --emerald: #059669;
       --emerald-dark: #047857;
+      --emerald-light: #dcfce7;
       --blue: #2563eb;
+      --blue-light: #eff6ff;
       --red: #ef4444;
-      --border-color: #e2e8f0;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --border-color: #cbd5e1;
+      --card-border: #e2e8f0;
+      --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
       --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
       --shadow-dock: 0 -8px 25px rgba(15, 23, 42, 0.12);
     }
@@ -39,33 +42,33 @@
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
-      padding: 12px 16px;
+      padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
     }
     .pos-brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 1.18rem;
+      gap: 6px;
+      font-size: 1.15rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       color: #ffffff;
     }
     .header-btns {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
     .btn-head {
       background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.18);
       color: #ffffff;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
       font-size: 0.78rem;
       font-weight: 700;
@@ -76,23 +79,23 @@
 
     /* Category Switcher */
     .cat-toggle-wrap {
-      padding: 10px 14px 4px;
+      padding: 8px 10px 4px;
       max-width: 1000px;
       margin: 0 auto;
     }
     .cat-toggle {
       display: flex;
       background: #e2e8f0;
-      padding: 4px;
-      border-radius: 14px;
+      padding: 3px;
+      border-radius: 12px;
       gap: 4px;
     }
     .cat-tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 8px 4px;
       border: none;
-      border-radius: 11px;
-      font-size: 0.88rem;
+      border-radius: 9px;
+      font-size: 0.82rem;
       font-weight: 800;
       color: var(--slate-600);
       background: transparent;
@@ -101,7 +104,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
     }
     .cat-tab-btn.active {
       background: #ffffff;
@@ -109,27 +112,27 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* Items Touch Grid (Sorted Low to High Price) */
+    /* 3-കോളം ഒതുക്കമുള്ള മൊബൈൽ ഗ്രിഡ് (3-Column Elevated Cards) */
     .items-container {
-      padding: 8px 12px 20px;
+      padding: 8px 8px 20px;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(3, 1fr); /* 3 കോളങ്ങൾ */
+      gap: 8px;
     }
-    @media (min-width: 600px) {
-      .items-container { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (min-width: 700px) {
+      .items-container { grid-template-columns: repeat(4, 1fr); gap: 10px; }
     }
-    @media (min-width: 900px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (min-width: 1000px) {
+      .items-container { grid-template-columns: repeat(5, 1fr); gap: 12px; }
     }
 
     .item-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      border: 1.5px solid var(--border-color);
-      padding: 10px 8px;
+      border-radius: 14px;
+      border: 1.5px solid var(--card-border);
+      padding: 8px 5px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -138,51 +141,68 @@
       box-shadow: var(--shadow-sm);
       transition: transform 0.1s ease, border-color 0.15s, box-shadow 0.15s;
     }
+    .item-card:active { transform: scale(0.98); }
     .item-card.in-cart {
       border-color: var(--blue);
-      background: #f8faff;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+      background: var(--blue-light);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.16);
     }
     
+    /* ഇമോജിക്ക് പിന്നിൽ വാം ബാക്ക്‌‌ഡ്രോപ്പ് സർക്കിൾ */
     .item-media-box {
-      width: 54px;
-      height: 54px;
-      border-radius: 12px;
-      background: #f8fafc;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #fef3c7; /* വാം ക്രീം ആക്സെന്റ് */
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
+      border: 1px solid #fde68a;
     }
     .item-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: 50%;
     }
     .item-emoji {
-      font-size: 1.9rem;
+      font-size: 1.45rem;
       line-height: 1;
     }
 
     .item-name {
-      font-size: 0.82rem;
+      font-size: 0.74rem;
       font-weight: 800;
       color: var(--primary-dark);
-      line-height: 1.25;
-      min-height: 32px;
+      line-height: 1.2;
+      min-height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
+      word-break: break-word;
     }
 
-    /* Stepper Bar inside Item Box */
+    /* എലിവേറ്റഡ് പ്രൈസ് ചിപ്പ് */
+    .price-chip {
+      background: var(--emerald-light);
+      color: var(--emerald-dark);
+      font-size: 0.76rem;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    /* Stepper Bar */
     .item-stepper-box {
       width: 100%;
       background: #f1f5f9;
-      border-radius: 20px;
-      padding: 3px;
+      border-radius: 18px;
+      padding: 2px 3px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -194,14 +214,14 @@
     }
 
     .btn-step {
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 900;
       cursor: pointer;
       transition: transform 0.1s;
@@ -211,53 +231,39 @@
     .btn-step-minus {
       background: #ffffff;
       color: var(--slate-600);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     .btn-step-minus.disabled {
-      opacity: 0.35;
+      opacity: 0.3;
       pointer-events: none;
     }
+    .btn-step-plus {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+    }
 
-    .item-price-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      line-height: 1.1;
-    }
-    .price-val {
-      font-size: 0.88rem;
-      font-weight: 900;
-      color: var(--slate-800);
-    }
-    .qty-in-box {
-      font-size: 0.72rem;
+    .item-qty-center {
+      font-size: 0.74rem;
       font-weight: 900;
       color: var(--blue);
     }
 
-    .btn-step-plus {
-      background: var(--blue);
-      color: #ffffff;
-      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
-    }
-
     .item-badge-qty {
       position: absolute;
-      top: 6px;
-      right: 6px;
+      top: 4px;
+      right: 4px;
       background: var(--blue);
       color: white;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 900;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.35);
     }
 
     /* 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് */
@@ -268,14 +274,14 @@
       right: 0;
       background: #ffffff;
       border-top: 1px solid #cbd5e1;
-      padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
       box-shadow: var(--shadow-dock);
       z-index: 99;
       max-width: 1000px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 7px;
     }
 
     .dock-box {
@@ -304,7 +310,7 @@
       height: 100%;
       border: none;
       border-radius: 9px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 900;
       background: transparent;
       color: var(--slate-600);
@@ -344,19 +350,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
       border-radius: 9px;
     }
     .btn-cart-part:active { background: #e2e8f0; }
     .cart-divider {
       width: 1.5px;
-      height: 24px;
+      height: 22px;
       background: #cbd5e1;
-      margin: 0 3px;
+      margin: 0 2px;
     }
     .btn-clear-part {
-      width: 40px;
+      width: 38px;
       height: 100%;
       background: #fee2e2;
       border: none;
@@ -376,7 +382,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0 12px;
+      padding: 0 10px;
       text-align: left;
       align-items: flex-start;
     }
@@ -399,7 +405,7 @@
       background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
       color: #ffffff;
       border: none;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -462,7 +468,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--card-border);
       padding-bottom: 12px;
       margin-bottom: 14px;
     }
@@ -483,7 +489,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px dashed var(--border-color);
+      border-bottom: 1px dashed var(--card-border);
     }
     .cart-row-name { font-weight: 800; font-size: 0.92rem; }
     .cart-row-sub { font-size: 0.78rem; color: var(--slate-600); margin-top: 2px; }
@@ -540,7 +546,7 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid (Sorted Low to High Price) -->
+  <!-- Items Touch Grid (3-കോളം ഒതുക്കമുള്ള രൂപത്തിൽ, വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക്) -->
   <div class="items-container" id="posItemsContainer"></div>
 
   <!-- 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് -->
@@ -604,7 +610,7 @@
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (CLEAN & PROFESSIONAL - EDIT ENABLED) -->
+  <!-- MANAGE ITEMS MODAL (WITH EDIT & UPDATE) -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -662,7 +668,7 @@
     </div>
   </div>
 
-  <!-- RECENT BILLS / REPRINT MODAL -->
+  <!-- RECENT BILLS / REPRINT MODAL (WITH DELETE & LEDGER SYNC) -->
   <div class="modal" id="recentBillsModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -703,11 +709,12 @@
     </div>
   </div>
 
-  <!-- THERMAL RECEIPT SLIP -->
+  <!-- THERMAL RECEIPT SLIP (പുതുക്കിയ ലൊക്കേഷൻ, ഫോൺ നമ്പർ, ലേബൽ) -->
   <div id="receiptPrintArea">
-    <div class="r-center" style="font-size:15px; font-weight:bold;">BANABLAST</div>
-    <div class="r-center">Special Avil Milk & Juices</div>
-    <div class="r-center" id="rBillDate"></div>
+    <div class="r-center" style="font-size:15px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
+    <div class="r-center" style="font-size:10px; font-weight:bold; margin-top:1px;">NELLIPPUZHA, MANNARKKAD</div>
+    <div class="r-center" style="font-size:10px; margin-top:1px;">Mob: +91 90370 10883</div>
+    <div class="r-center" id="rBillDate" style="margin-top:3px;"></div>
     <div class="r-center" id="rBillNo" style="font-weight:bold;"></div>
     <div class="r-line"></div>
     <div class="r-row" style="font-weight:bold;">
@@ -735,8 +742,9 @@
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
-      <p style="font-size:0.8rem; font-weight:700; color:#475569; margin-top:3px;">SPECIAL AVIL MILK & JUICES</p>
-      <div style="font-size:0.75rem; color:#64748b; margin-top:6px; display:flex; justify-content:space-between; font-weight:600;">
+      <p style="font-size:0.82rem; font-weight:800; color:#475569; margin-top:3px;">NELLIPPUZHA, MANNARKKAD</p>
+      <p style="font-size:0.78rem; font-weight:700; color:#2563eb; margin-top:2px;">Mob: +91 90370 10883</p>
+      <div style="font-size:0.75rem; color:#64748b; margin-top:8px; display:flex; justify-content:space-between; font-weight:600;">
         <span id="pdfDateText">Date: -</span>
         <span id="pdfBillNoText">Bill: #-</span>
       </div>
@@ -755,7 +763,7 @@
 
     <div style="border-top:1.5px dashed #0f172a; border-bottom:1.5px dashed #0f172a; padding:10px 0; margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:900;">
-        <span>TOTAL DUE:</span>
+        <span>TOTAL:</span>
         <span id="pdfTotalAmtText">₹0</span>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; font-weight:700; margin-top:4px;">
@@ -830,7 +838,7 @@
     }
 
     /* -------------------------------------------------------------
-       വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് ക്രമീകരിച്ച മെനു (ASCENDING ORDER)
+       വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് ക്രമീകരിച്ച 3-കോളം മെനു
        ------------------------------------------------------------- */
     function renderMenuItems() {
       const container = document.getElementById('posItemsContainer');
@@ -866,13 +874,11 @@
             ${qtyBadge}
             <div class="item-media-box">${mediaHTML}</div>
             <div class="item-name">${displayName}</div>
+            <div class="price-chip">₹${it.price}</div>
             
             <div class="item-stepper-box" onclick="event.stopPropagation()">
               <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
-              <div class="item-price-center">
-                <span class="price-val">₹${it.price}</span>
-                ${qty > 0 ? `<span class="qty-in-box">(${qty} qty)</span>` : ''}
-              </div>
+              <span class="item-qty-center">${qty > 0 ? qty : ''}</span>
               <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
             </div>
           </div>
@@ -965,7 +971,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & തെർമൽ പ്രിന്റ്
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ് (സമയക്രമം 24-Hour ഫോർമാറ്റിൽ)
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -974,7 +980,12 @@
       }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      // കൃത്യമായ സോർട്ടിംഗിനായി സ്റ്റാൻഡേർഡ് 24-മണിക്കൂർ ഫോർമാറ്റ്
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const timeStr = `${hours}:${mins}`;
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       try {
@@ -998,6 +1009,7 @@
             billNo,
             date: todayDate,
             time: timeStr,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             items: cart,
             total,
             mode: currentPayMode,
@@ -1092,7 +1104,8 @@
       }
 
       const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
 
       await generateAndSharePdfBill(billNo, todayDate, timeStr, total, currentPayMode, cart);
@@ -1146,9 +1159,16 @@
       }
     }
 
+    /* -------------------------------------------------------------
+       റീസെന്റ് ബില്ലുകൾ: സമയം പ്രകാരം സോർട്ട് ചെയ്ത് കാണിക്കൽ & ഡിലീറ്റ്
+       ------------------------------------------------------------- */
     function openRecentBillsModal() {
       const container = document.getElementById('recentBillsContainer');
-      const sorted = todayBills.slice().sort((a,b) => (b.time || '').localeCompare(a.time || ''));
+      const sorted = todayBills.slice().sort((a,b) => {
+        const tA = (a.time || '').toLowerCase().replace(/[^0-9:]/g, '');
+        const tB = (b.time || '').toLowerCase().replace(/[^0-9:]/g, '');
+        return tB.localeCompare(tA);
+      });
 
       if (!sorted.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
@@ -1159,15 +1179,36 @@
               <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${b.mode.toUpperCase()}</span></div>
               <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
             </div>
-            <div style="display:flex; gap:6px;">
-              <button type="button" style="background:#25d366; color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillPdf('${b.id}')">💬 PDF</button>
-              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')">🖨️</button>
-              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 10px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')">✏️</button>
+            <div style="display:flex; gap:5px;">
+              <button type="button" style="background:#25d366; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillPdf('${b.id}')" title="WhatsApp PDF">💬</button>
+              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
+              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
+              <button type="button" style="background:#fee2e2; color:#dc2626; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
             </div>
           </div>
         `).join('');
       }
       document.getElementById('recentBillsModal').style.display = 'flex';
+    }
+
+    /* റീസെന്റ് ബില്ല് ഡിലീറ്റ് ചെയ്യലും ലെഡ്ജർ തുക തനിയെ കുറയ്ക്കലും */
+    async function deletePosBill(id) {
+      const b = todayBills.find(x => x.id === id);
+      if (!b) return;
+
+      if (!confirm(`⚠️ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
+        return;
+      }
+
+      try {
+        await db.collection('pos_bills').doc(id).delete();
+        await syncAggregatedLedger(b.date || todayDate, b.mode || 'cash', -b.total);
+        alert(`✅ ബില്ല് #${b.billNo} ഡിലീറ്റ് ചെയ്യുകയും ലെഡ്ജർ തുക വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്യുകയും ചെയ്തു.`);
+        openRecentBillsModal();
+      } catch (err) {
+        console.error("Delete bill error:", err);
+        alert("❌ ബില്ല് ഡിലീറ്റ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
+      }
     }
 
     function shareExistingBillPdf(id) {
@@ -1217,7 +1258,7 @@
     }
 
     /* -------------------------------------------------------------
-       മെനു മാനേജ്‌മെന്റ് (ആഡ് & എഡിറ്റ് സൗകര്യം)
+       മെനു മാനേജ്‌മെന്റ് (ആഡ് & എഡിറ്റ്)
        ------------------------------------------------------------- */
     function openItemsModal() {
       cancelItemEditing();
@@ -1362,7 +1403,6 @@
         return;
       }
 
-      // ലിസ്റ്റിലും വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് സോർട്ട് ചെയ്യുന്നു
       const sorted = menuItems.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
 
       container.innerHTML = sorted.map(it => `
