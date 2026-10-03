@@ -260,9 +260,7 @@
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
     }
 
-    /* -------------------------------------------------------------
-       6 ബോക്സുകൾ ചേർന്ന സിമെട്രിക്കൽ POS കൺട്രോൾ ഡോക്ക് (2x3 GRID)
-       ------------------------------------------------------------- */
+    /* 6 ബോക്സുകൾ ചേർന്ന സിമെട്രിക്കൽ POS കൺട്രോൾ ഡോക്ക് */
     .pos-bottom-dock {
       position: fixed;
       bottom: 0;
@@ -295,7 +293,7 @@
     }
     .dock-box:active { transform: scale(0.98); }
 
-    /* ബോക്സ് 1: CASH / GPAY സ്വിച്ച് */
+    /* ബോക്സ് 1: CASH / GPAY */
     .box-payment {
       background: #e2e8f0;
       padding: 3px;
@@ -329,7 +327,7 @@
       box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
     }
 
-    /* ബോക്സ് 2: ITEMS & DELETE കോംബോ */
+    /* ബോക്സ് 2: ITEMS & DELETE */
     .box-cart-combo {
       background: #f8fafc;
       border-color: #cbd5e1;
@@ -374,7 +372,7 @@
     }
     .btn-clear-part:active { background: #fecaca; }
 
-    /* ബോക്സ് 3: TOTAL DUE തുക ബോക്സ് */
+    /* ബോക്സ് 3: TOTAL DUE */
     .box-total {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -400,7 +398,7 @@
       margin-top: 1px;
     }
 
-    /* ബോക്സ് 4: PRINT ബട്ടൺ ബോക്സ് */
+    /* ബോക്സ് 4: PRINT */
     .box-print {
       background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
       color: #ffffff;
@@ -413,7 +411,7 @@
       gap: 6px;
     }
 
-    /* ബോക്സ് 5: WHATSAPP BILL ബോക്സ് */
+    /* ബോക്സ് 5: WHATSAPP BILL */
     .box-whatsapp {
       background: #25d366;
       color: #064e3b;
@@ -425,7 +423,7 @@
       gap: 6px;
     }
 
-    /* ബോക്സ് 6: RECENT BILLS ബോക്സ് */
+    /* ബോക്സ് 6: RECENT BILLS */
     .box-recent {
       background: var(--slate-800);
       color: #ffffff;
@@ -570,7 +568,7 @@
       </button>
       <div class="cart-divider"></div>
       <button type="button" class="btn-clear-part" onclick="clearCart()" title="കാർട്ട് ഒഴിവാക്കുക">
-        🗑️️
+        🗑
       </button>
     </div>
 
@@ -585,7 +583,7 @@
       🖨️ PRINT
     </button>
 
-    <!-- ബോക്സ് 5: WHATSAPP BILL (PDF ആയി അയക്കും) -->
+    <!-- ബോക്സ് 5: WHATSAPP BILL -->
     <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
       💬 WhatsApp Bill
     </button>
@@ -733,7 +731,7 @@
     <div class="r-center">Visit Again!</div>
   </div>
 
-  <!-- WHATSAPP PDF ബില്ലിനായുള്ള പ്രൊഫഷണൽ കാർഡ് (OFFSCREEN RENDER) -->
+  <!-- WHATSAPP PDF ബില്ലിനായുള്ള പ്രൊഫഷണൽ കാർഡ് -->
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
@@ -796,6 +794,7 @@
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
+      // ഓട്ടോമാറ്റിക് സീഡിംഗ് ഒഴിവാക്കി; ഡിലീറ്റ് ചെയ്തവ ഒരിക്കലും തനിയെ തിരിച്ചു വരില്ല
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => {
@@ -820,12 +819,8 @@
           menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat });
         });
 
-        if (menuItems.length === 0) {
-          seedDefaultItems();
-        } else {
-          renderMenuItems();
-          renderModalItems();
-        }
+        renderMenuItems();
+        renderModalItems();
       });
 
       db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
@@ -833,21 +828,6 @@
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
     };
-
-    function seedDefaultItems() {
-      const defaults = [
-        { name: "Classic Avil Milk", price: 50, category: "avil_milk", icon: "🍌", imageUrl: "" },
-        { name: "Special Dry Fruit Avil Milk", price: 70, category: "avil_milk", icon: "🥜", imageUrl: "" },
-        { name: "Butterscotch Avil Milk", price: 70, category: "avil_milk", icon: "🍨", imageUrl: "" },
-        { name: "Chocolate Avil Milk", price: 80, category: "avil_milk", icon: "🍫", imageUrl: "" },
-        { name: "Sharjah Shake", price: 60, category: "juices", icon: "🥤", imageUrl: "" },
-        { name: "Orange Juice", price: 50, category: "juices", icon: "🍊", imageUrl: "" },
-        { name: "Mango Shake", price: 60, category: "juices", icon: "🥭", imageUrl: "" }
-      ];
-      defaults.forEach(it => {
-        db.collection('billing_items').add({ ...it, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      });
-    }
 
     function switchCategory(cat) {
       currentCategory = cat;
@@ -1104,7 +1084,7 @@
     }
 
     /* -------------------------------------------------------------
-       WHATSAPP PDF ബില്ല് ഷെയറിംഗ് എൻജിൻ (DIRECT PDF DOCUMENT SHARE)
+       WHATSAPP PDF ബില്ല് ഷെയറിംഗ് എൻജിൻ
        ------------------------------------------------------------- */
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
@@ -1120,7 +1100,6 @@
     }
 
     async function generateAndSharePdfBill(billNo, date, time, total, mode, items) {
-      // 1. PDF ടെംപ്ലേറ്റിലേക്ക് വിവരങ്ങൾ നൽകുന്നു
       document.getElementById('pdfDateText').innerText = `${date} ${time}`;
       document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
       document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
@@ -1138,12 +1117,11 @@
       const card = document.getElementById('pdfInvoiceCard');
 
       try {
-        // 2. ഇമേജ് ആക്കി മാറ്റി jsPDF വഴി PDF ക്രിയേറ്റ് ചെയ്യുന്നു
         const canvas = await html2canvas(card, { scale: 2, useCORS: true });
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
         const { jsPDF } = window.jspdf;
-        const pdfWidth = 80; // 80mm സ്ലിപ്പ് വലിപ്പം
+        const pdfWidth = 80;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
         const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
 
@@ -1153,7 +1131,6 @@
         const fileName = `BANABLAST_Bill_${billNo}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-        // 3. Web Share API വഴി നേരിട്ട് WhatsApp-ലേക്ക് PDF ഫയൽ ഷെയർ ചെയ്യുന്നു
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           await navigator.share({
             files: [pdfFile],
@@ -1161,9 +1138,8 @@
             text: `🥤 BANABLAST Bill #${billNo} (₹${total})`
           });
         } else {
-          // ഡെസ്ക്ടോപ്പ് അല്ലെങ്കിൽ സപ്പോർട്ട് ഇല്ലാത്ത ബ്രൗസറുകളിൽ തനിയെ ഡൗൺലോഡ് ആകുന്നു
           pdf.save(fileName);
-          alert(`✅ PDF ബില്ല് ഫോണിൽ ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
+          alert(`✅ PDF ബില്ല് ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
         }
       } catch (err) {
         console.error("PDF Share Error:", err);
