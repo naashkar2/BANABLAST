@@ -26,6 +26,7 @@
       --emerald-dark: #047857;
       --blue: #2563eb;
       --red: #ef4444;
+      --gold: #d97706;
       --border-color: #e2e8f0;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
@@ -260,7 +261,7 @@
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
     }
 
-    /* 6 ബോക്സുകൾ ചേർന്ന സിമെട്രിക്കൽ POS കൺട്രോൾ ഡോക്ക് */
+    /* 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് */
     .pos-bottom-dock {
       position: fixed;
       bottom: 0;
@@ -293,7 +294,6 @@
     }
     .dock-box:active { transform: scale(0.98); }
 
-    /* ബോക്സ് 1: CASH / GPAY */
     .box-payment {
       background: #e2e8f0;
       padding: 3px;
@@ -327,7 +327,6 @@
       box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
     }
 
-    /* ബോക്സ് 2: ITEMS & DELETE */
     .box-cart-combo {
       background: #f8fafc;
       border-color: #cbd5e1;
@@ -372,7 +371,6 @@
     }
     .btn-clear-part:active { background: #fecaca; }
 
-    /* ബോക്സ് 3: TOTAL DUE */
     .box-total {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -398,7 +396,6 @@
       margin-top: 1px;
     }
 
-    /* ബോക്സ് 4: PRINT */
     .box-print {
       background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
       color: #ffffff;
@@ -411,7 +408,6 @@
       gap: 6px;
     }
 
-    /* ബോക്സ് 5: WHATSAPP BILL */
     .box-whatsapp {
       background: #25d366;
       color: #064e3b;
@@ -423,7 +419,6 @@
       gap: 6px;
     }
 
-    /* ബോക്സ് 6: RECENT BILLS */
     .box-recent {
       background: var(--slate-800);
       color: #ffffff;
@@ -434,6 +429,26 @@
       box-shadow: 0 2px 6px rgba(30, 41, 59, 0.25);
       gap: 6px;
     }
+
+    /* Golden Import Button */
+    .btn-golden-import {
+      width: 100%;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 3px 10px rgba(217, 119, 6, 0.3);
+      margin-bottom: 14px;
+    }
+    .btn-golden-import:active { transform: scale(0.98); }
 
     /* Modals & Drawers */
     .modal {
@@ -546,7 +561,7 @@
     </div>
   </div>
 
-  <!-- Items Touch Grid -->
+  <!-- Items Touch Grid (Sorted Low to High Price) -->
   <div class="items-container" id="posItemsContainer"></div>
 
   <!-- 6 ബോക്സുകൾ ചേർന്ന POS കൺട്രോൾ ഡോക്ക് -->
@@ -610,13 +625,18 @@
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL -->
+  <!-- MANAGE ITEMS MODAL (WITH EDIT & 33 ITEMS IMPORT) -->
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">⚙️ Manage Menu Items</div>
+        <div class="modal-title" id="itemModalHeading">⚙️ Manage Menu Items</div>
         <button class="btn-close" onclick="closeModal('itemsModal')">✕</button>
       </div>
+
+      <!-- ഗോൾഡൻ ഒറ്റ-ക്ലിക്ക് ഇംപോർട്ട് ബട്ടൺ -->
+      <button type="button" class="btn-golden-import" onclick="import33AvilMilkItems()">
+        ⚡ Import All 33 Avil Milk Items (ഒറ്റ ക്ലിക്കിൽ ചേർക്കുക)
+      </button>
 
       <div class="form-group">
         <label>Category (വിഭാഗം)</label>
@@ -653,12 +673,18 @@
         </div>
       </div>
 
-      <button type="button" onclick="saveNewItem()" style="width:100%; background:var(--emerald); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer; margin-top:6px;">
-        + Add to Menu
-      </button>
+      <!-- Add / Update Action Buttons -->
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button type="button" id="btnSaveItemAction" onclick="saveOrUpdateItem()" style="flex:1; background:var(--emerald); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;">
+          + Add to Menu
+        </button>
+        <button type="button" id="btnCancelEdit" onclick="cancelItemEditing()" style="display:none; background:#94a3b8; color:white; border:none; padding:12px 16px; border-radius:10px; font-weight:800; cursor:pointer;">
+          ✕ Cancel
+        </button>
+      </div>
 
-      <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ്:</h4>
-      <div id="modalExistingItems" style="max-height:160px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
+      <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ് (വില ക്രമത്തിൽ):</h4>
+      <div id="modalExistingItems" style="max-height:190px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
     </div>
   </div>
 
@@ -789,31 +815,24 @@
     let currentPayMode = 'cash';
     let currentCategory = 'avil_milk';
     let editingBill = null;
+    let editingItemId = null; // എഡിറ്റ് ചെയ്യുന്ന ഐറ്റത്തിന്റെ ഐഡി
     let pickedItemImageBase64 = "";
 
     const todayDate = new Date().toISOString().split('T')[0];
 
     window.onload = function() {
-      // ഓട്ടോമാറ്റിക് സീഡിംഗ് ഒഴിവാക്കി; ഡിലീറ്റ് ചെയ്തവ ഒരിക്കലും തനിയെ തിരിച്ചു വരില്ല
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
         snap.forEach(doc => {
           const data = doc.data();
           let fixedName = data.name || '';
           let fixedCat = data.category || '';
-          let needsUpdate = false;
 
           if (fixedName.includes('Aval')) {
             fixedName = fixedName.replace(/Aval/g, 'Avil');
-            needsUpdate = true;
           }
           if (fixedCat === 'aval_milk') {
             fixedCat = 'avil_milk';
-            needsUpdate = true;
-          }
-
-          if (needsUpdate) {
-            doc.ref.update({ name: fixedName, category: fixedCat });
           }
 
           menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat });
@@ -829,6 +848,71 @@
       });
     };
 
+    /* -------------------------------------------------------------
+       33 അവിൽ മിൽക്ക് ഐറ്റങ്ങൾ ഒറ്റ ക്ലിക്കിൽ ആഡ് ചെയ്യൽ
+       ------------------------------------------------------------- */
+    async function import33AvilMilkItems() {
+      if (!confirm("33 അവിൽ മിൽക്ക് സ്പെഷ്യൽ ഐറ്റങ്ങളും (Normal ₹30 മുതൽ Belgium Chocolate ₹130 വരെ) ഒന്നിച്ച് ചേർക്കണോ?")) {
+        return;
+      }
+
+      const avil33List = [
+        { name: "Normal Avil Milk", price: 30, icon: "🍌" },
+        { name: "Classic Avil Milk", price: 40, icon: "🥤" },
+        { name: "Boost Avil Milk", price: 50, icon: "⚡" },
+        { name: "Horlicks Avil Milk", price: 50, icon: "🥛" },
+        { name: "Special Avil Milk", price: 60, icon: "✨" },
+        { name: "Fruit Avil Milk", price: 60, icon: "🍎" },
+        { name: "Butterscotch Avil Milk", price: 70, icon: "🍨" },
+        { name: "Special Dry Fruit Avil Milk", price: 70, icon: "🥜" },
+        { name: "Mango Avil Milk", price: 70, icon: "🥭" },
+        { name: "Strawberry Avil Milk", price: 70, icon: "🍓" },
+        { name: "Pista Avil Milk", price: 70, icon: "🟢" },
+        { name: "Chocolate Avil Milk", price: 80, icon: "🍫" },
+        { name: "Spanish Delight Avil Milk", price: 80, icon: "🍧" },
+        { name: "Blackcurrant Avil Milk", price: 80, icon: "🍇" },
+        { name: "Tender Coconut Avil Milk", price: 80, icon: "🥥" },
+        { name: "Kesar Badam Avil Milk", price: 80, icon: "🥛" },
+        { name: "Nutella Avil Milk", price: 90, icon: "🌰" },
+        { name: "Oreo Avil Milk", price: 90, icon: "🍪" },
+        { name: "KitKat Avil Milk", price: 90, icon: "🍫" },
+        { name: "Fig & Honey Avil Milk", price: 90, icon: "🍯" },
+        { name: "Snickers Avil Milk", price: 100, icon: "🍫" },
+        { name: "Dry Fruit Royal Avil Milk", price: 100, icon: "🥜" },
+        { name: "Cashew Badam Avil Milk", price: 100, icon: "🌰" },
+        { name: "Malabari Special Avil Milk", price: 100, icon: "🍌" },
+        { name: "Royal Falooda Avil Milk", price: 110, icon: "🍨" },
+        { name: "Exotic Mixed Fruit Avil Milk", price: 110, icon: "🥝" },
+        { name: "Creamy Loaded Avil Milk", price: 110, icon: "🍧" },
+        { name: "Nutty Overload Avil Milk", price: 110, icon: "🥜" },
+        { name: "Lotus Biscoff Avil Milk", price: 120, icon: "🍪" },
+        { name: "Blueberry Special Avil Milk", price: 120, icon: "🫐" },
+        { name: "Roasted Almond Avil Milk", price: 120, icon: "🌰" },
+        { name: "Triple Chocolate Avil Milk", price: 125, icon: "🍫" },
+        { name: "Belgium Chocolate Avil Milk", price: 130, icon: "🍫" }
+      ];
+
+      const batch = db.batch();
+      avil33List.forEach(item => {
+        const ref = db.collection('billing_items').doc();
+        batch.set(ref, {
+          name: item.name,
+          price: item.price,
+          category: 'avil_milk',
+          icon: item.icon,
+          imageUrl: '',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+
+      try {
+        await batch.commit();
+        alert("✅ 33 അവിൽ മിൽക്ക് ഐറ്റങ്ങളും വിജയകരമായി മെനുവിൽ ചേർത്തു!");
+      } catch (err) {
+        alert("❌ ചേർക്കുന്നതിൽ തടസ്സം: " + err.message);
+      }
+    }
+
     function switchCategory(cat) {
       currentCategory = cat;
       document.getElementById('tabAvil').className = 'cat-tab-btn ' + (cat === 'avil_milk' ? 'active' : '');
@@ -836,14 +920,20 @@
       renderMenuItems();
     }
 
+    /* -------------------------------------------------------------
+       വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് ക്രമീകരിച്ച മെനു (ASCENDING ORDER)
+       ------------------------------------------------------------- */
     function renderMenuItems() {
       const container = document.getElementById('posItemsContainer');
-      const items = menuItems.filter(i => {
+      let items = menuItems.filter(i => {
         if (currentCategory === 'avil_milk') {
           return i.category === 'avil_milk' || i.category === 'aval_milk';
         }
         return i.category === currentCategory;
       });
+
+      // വില അടിസ്ഥാനമാക്കി അസെൻഡിംഗ് ഓർഡറിൽ സോർട്ട് ചെയ്യുന്നു (₹30 -> ₹130)
+      items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
 
       if (!items.length) {
         container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
@@ -966,7 +1056,7 @@
     }
 
     /* -------------------------------------------------------------
-       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & തെർമൽ പ്രിന്റ്
+       ഓട്ടോ-ലെഡ്ജർ സിങ്ക് & പ്രിന്റ്
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1217,14 +1307,16 @@
       window.location.href = 'index.html';
     }
 
+    /* -------------------------------------------------------------
+       മെനു മാനേജ്‌മെന്റ് (ആഡ് & എഡിറ്റ് സൗകര്യം)
+       ------------------------------------------------------------- */
     function openItemsModal() {
-      pickedItemImageBase64 = "";
-      document.getElementById('newItemImgPreview').style.display = 'none';
-      document.getElementById('newItemImgPreview').src = '';
+      cancelItemEditing();
       document.getElementById('itemsModal').style.display = 'flex';
     }
     function closeModal(id) {
       document.getElementById(id).style.display = 'none';
+      if (id === 'itemsModal') cancelItemEditing();
     }
 
     function handleItemImagePick(event) {
@@ -1258,7 +1350,7 @@
       reader.readAsDataURL(file);
     }
 
-    function saveNewItem() {
+    function saveOrUpdateItem() {
       let name = document.getElementById('newItemName').value.trim();
       const price = parseFloat(document.getElementById('newItemPrice').value);
       const category = document.getElementById('newItemCat').value;
@@ -1271,20 +1363,83 @@
 
       name = name.replace(/Aval/g, 'Avil');
 
-      db.collection('billing_items').add({
-        name,
-        price,
-        category,
-        icon,
-        imageUrl: pickedItemImageBase64 || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        document.getElementById('newItemName').value = '';
-        document.getElementById('newItemPrice').value = '';
+      if (editingItemId) {
+        // എഡിറ്റ് ചെയ്ത വിവരങ്ങൾ അപ്‌ഡേറ്റ് ചെയ്യുന്നു
+        const updateData = {
+          name,
+          price,
+          category,
+          icon,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (pickedItemImageBase64) {
+          updateData.imageUrl = pickedItemImageBase64;
+        }
+
+        db.collection('billing_items').doc(editingItemId).update(updateData).then(() => {
+          alert("✅ ഐറ്റം വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!");
+          cancelItemEditing();
+        });
+      } else {
+        // പുതിയ ഐറ്റം ചേർക്കുന്നു
+        db.collection('billing_items').add({
+          name,
+          price,
+          category,
+          icon,
+          imageUrl: pickedItemImageBase64 || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("✅ പുതിയ ഐറ്റം മെനുവിൽ ചേർത്തു!");
+          cancelItemEditing();
+        });
+      }
+    }
+
+    function loadItemToEdit(id) {
+      const it = menuItems.find(x => x.id === id);
+      if (!it) return;
+
+      editingItemId = it.id;
+      document.getElementById('newItemName').value = it.name;
+      document.getElementById('newItemPrice').value = it.price;
+      document.getElementById('newItemCat').value = it.category;
+      document.getElementById('newItemIcon').value = it.icon || '🥤';
+
+      if (it.imageUrl) {
+        pickedItemImageBase64 = it.imageUrl;
+        const preview = document.getElementById('newItemImgPreview');
+        preview.src = it.imageUrl;
+        preview.style.display = 'block';
+      } else {
         pickedItemImageBase64 = "";
         document.getElementById('newItemImgPreview').style.display = 'none';
-        alert("✅ പുതിയ ഐറ്റം മെനുവിൽ ചേർത്തു!");
-      });
+      }
+
+      document.getElementById('itemModalHeading').innerText = '✏️ Edit Menu Item';
+      const btnSave = document.getElementById('btnSaveItemAction');
+      btnSave.innerText = '💾 Update Item';
+      btnSave.style.background = 'var(--blue)';
+      document.getElementById('btnCancelEdit').style.display = 'block';
+
+      // മുകളിലേക്ക് സ്ക്രോൾ ചെയ്യുക
+      document.querySelector('#itemsModal .modal-box').scrollTop = 0;
+    }
+
+    function cancelItemEditing() {
+      editingItemId = null;
+      document.getElementById('newItemName').value = '';
+      document.getElementById('newItemPrice').value = '';
+      document.getElementById('newItemIcon').value = '🥤';
+      pickedItemImageBase64 = '';
+      document.getElementById('newItemImgPreview').style.display = 'none';
+      document.getElementById('newItemImgPreview').src = '';
+
+      document.getElementById('itemModalHeading').innerText = '⚙️ Manage Menu Items';
+      const btnSave = document.getElementById('btnSaveItemAction');
+      btnSave.innerText = '+ Add to Menu';
+      btnSave.style.background = 'var(--emerald)';
+      document.getElementById('btnCancelEdit').style.display = 'none';
     }
 
     function deleteItem(id) {
@@ -1300,13 +1455,20 @@
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem;">മെനുവിൽ ഐറ്റങ്ങൾ ഇല്ല</p>';
         return;
       }
-      container.innerHTML = menuItems.map(it => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.82rem;">
+
+      // ലിസ്റ്റിലും വില കുറഞ്ഞതിൽ നിന്ന് കൂടിയതിലേക്ക് സോർട്ട് ചെയ്യുന്നു
+      const sorted = menuItems.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+
+      container.innerHTML = sorted.map(it => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
           <div style="display:flex; align-items:center; gap:6px;">
             ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">` : `<span>${it.icon || '🥤'}</span>`}
-            <strong>${it.name.replace(/Aval/g, 'Avil')}</strong> - ₹${it.price}
+            <strong>${it.name.replace(/Aval/g, 'Avil')}</strong> - <span style="color:var(--emerald); font-weight:800;">₹${it.price}</span>
           </div>
-          <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:4px; padding:3px 6px; cursor:pointer;">🗑️</button>
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="loadItemToEdit('${it.id}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
+            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+          </div>
         </div>
       `).join('');
     }
