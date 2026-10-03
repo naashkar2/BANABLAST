@@ -426,16 +426,18 @@
     .stock-due-tag { font-size: 0.75rem; font-weight: 800; color: var(--accent-red); margin-top: 2px; }
 
     /* Reports & Filters */
-    .report-filter { display: flex; gap: 8px; margin-bottom: 14px; }
+    .report-filter { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+    .report-filter::-webkit-scrollbar { display: none; }
     .filter-btn { 
       flex: 1; 
       padding: 8px; 
       background: white; 
       border: 1px solid var(--border-color); 
       border-radius: 6px; 
-      font-weight: 600; 
-      font-size: 0.8rem; 
+      font-weight: 700; 
+      font-size: 0.78rem; 
       cursor: pointer; 
+      white-space: nowrap;
     }
     .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
     .cat-box { 
@@ -945,15 +947,29 @@
 
     </div>
 
-    <!-- TAB: POS BILLS & ANALYTICS (PARTNERS ONLY) -->
+    <!-- TAB: POS BILLS & ANALYTICS (PARTNERS ONLY) - പുതിയ മൾട്ടി-ഡേറ്റ് ഫിൽട്ടറുകളോടെ -->
     <div id="tab-pos-analytics" class="tab-content">
-      <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Daily Bills</h3>
+      <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Bills</h3>
       
-      <!-- തീയതി തിരഞ്ഞെടുക്കലും 'Today' ക്വിക്ക് ബട്ടണും -->
-      <div style="background:white; border:1px solid var(--border-color); border-radius:10px; padding:12px; margin-bottom:14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-        <label style="font-weight:700; font-size:0.85rem;">തീയതി തിരഞ്ഞെടുക്കുക:</label>
-        <input type="date" id="posAnalyticsDateInput" class="form-control" style="width:auto; padding:6px;" onchange="renderPosAnalyticsTab()">
-        <button type="button" class="btn-auth-small" style="background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="setPosDateToToday()">📅 Today</button>
+      <!-- മൾട്ടി-ഡേറ്റ് ഫിൽട്ടർ ബട്ടണുകൾ (Today, Weekly, Monthly, Custom) -->
+      <div class="report-filter" style="margin-bottom:10px;">
+        <button type="button" class="filter-btn active" id="posFiltToday" onclick="filterPosAnalytics('today')">📅 Today</button>
+        <button type="button" class="filter-btn" id="posFiltWeek" onclick="filterPosAnalytics('week')">🗓️ This Week</button>
+        <button type="button" class="filter-btn" id="posFiltMonth" onclick="filterPosAnalytics('month')">📊 This Month</button>
+        <button type="button" class="filter-btn" id="posFiltCustom" onclick="filterPosAnalytics('custom')">📆 Custom Range</button>
+      </div>
+
+      <!-- കസ്റ്റം ഡേറ്റ് പിക്കർ ബോക്സ് -->
+      <div id="posCustomDateBox" style="display:none; gap:6px; margin-bottom:12px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1; flex-wrap:wrap;">
+        <div style="flex:1; min-width:130px;">
+          <label style="font-size:0.72rem; font-weight:700; color:#475569;">From Date:</label>
+          <input type="date" id="posFromDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        </div>
+        <div style="flex:1; min-width:130px;">
+          <label style="font-size:0.72rem; font-weight:700; color:#475569;">To Date:</label>
+          <input type="date" id="posToDate" class="form-control" style="font-size:0.8rem; padding:6px;">
+        </div>
+        <button type="button" class="filter-btn active" style="align-self:flex-end; padding:8px 14px; flex:0 0 auto;" onclick="applyCustomPosDateFilter()">Apply</button>
       </div>
 
       <!-- Summary Cards -->
@@ -978,7 +994,7 @@
       <!-- Detailed Bills Log for Selected Date (സമയക്രമത്തിൽ പുതിയത് മുകളിൽ) -->
       <div class="cat-box">
         <div class="cat-title">
-          <span>🧾 അന്നത്തെ ബില്ലുകൾ (Individual Bills)</span>
+          <span>🧾 തിരഞ്ഞെടുത്ത കാലയളവിലെ ബില്ലുകൾ</span>
           <span id="posAnaBillsCountTag" style="color:#64748b; font-size:0.8rem;">0 Bills</span>
         </div>
         <div id="posAnaBillsListContainer" style="max-height:350px; overflow-y:auto;"></div>
@@ -989,7 +1005,6 @@
     <div id="tab-stock" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
 
-      <!-- തീയതി ഫിൽട്ടറുകൾ -->
       <div class="report-filter" style="margin-bottom:10px;">
         <button class="filter-btn active" id="stockFiltAll" onclick="filterStockTab('all')">All Time</button>
         <button class="filter-btn" id="stockFiltToday" onclick="filterStockTab('today')">Today</button>
@@ -1010,7 +1025,6 @@
     <div id="tab-suppliers" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
 
-      <!-- തീയതി ഫിൽട്ടറുകൾ -->
       <div class="report-filter" style="margin-bottom:10px;">
         <button class="filter-btn active" id="suppFiltAll" onclick="filterSupplierTab('all')">All Time</button>
         <button class="filter-btn" id="suppFiltToday" onclick="filterSupplierTab('today')">Today</button>
@@ -1118,7 +1132,7 @@
         </div>
       </div>
 
-      <!-- Capital Invested (Net Capital = Investment - Capital Withdrawals) -->
+      <!-- Capital Invested -->
       <div class="cat-box">
         <div class="cat-title">
           <span>💼 Capital Invested (നിക്ഷേപം)</span>
@@ -1438,7 +1452,7 @@
     </div>
   </div>
 
-  <!-- 6. ADD WITHDRAWAL MODAL (WITH PROFIT VS CAPITAL RETURN SELECTION) -->
+  <!-- 6. ADD WITHDRAWAL MODAL -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <h3>Request Profit/Money Withdrawal</h3>
@@ -1453,7 +1467,6 @@
         </select>
       </div>
 
-      <!-- പുതിയ വിത്ത്‌‌ഡ്രോവൽ ടൈപ്പ് സെലക്ഷൻ (Profit Share vs Capital Return) -->
       <div class="form-group">
         <label>Withdrawal Type (പിൻവലിക്കൽ വിഭാഗം)</label>
         <select id="withType" class="form-control" style="font-weight:700;">
@@ -1609,7 +1622,7 @@
     </div>
   </div>
 
-  <!-- 12. FULL POS SALES REPORT MODAL (പുതിയ മോഡൽ) -->
+  <!-- 12. FULL POS SALES REPORT MODAL -->
   <div class="modal" id="fullPosReportModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px;">
@@ -1627,7 +1640,7 @@
 
     let dynamicOcrKey = localStorage.getItem('BANABLAST_OCR_KEY') || localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
 
-    // ഡിഫോൾട്ട് ലോഗിൻ PIN കോഡുകൾ (കൗണ്ടർ സ്റ്റാഫിന് 0000 ഉൾപ്പെടെ)
+    // ഡിഫോൾട്ട് ലോഗിൻ PIN കോഡുകൾ
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
@@ -1671,7 +1684,8 @@
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
-    // പുതിയ തീയതി ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
+    // തീയതി ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
+    let currentPosFilter = 'today';
     let currentStockFilter = 'all';
     let currentSupplierFilter = 'all';
     let posAnaSortedItems = [];
@@ -1847,8 +1861,9 @@
       document.getElementById('sheetToDate').value = today;
       document.getElementById('repFromDate').value = today;
       document.getElementById('repToDate').value = today;
-      if (document.getElementById('posAnalyticsDateInput')) {
-        document.getElementById('posAnalyticsDateInput').value = today;
+      if (document.getElementById('posFromDate')) {
+        document.getElementById('posFromDate').value = today;
+        document.getElementById('posToDate').value = today;
       }
       if (document.getElementById('stockFromDate')) {
         document.getElementById('stockFromDate').value = today;
@@ -1959,33 +1974,91 @@
     }
 
     /* -------------------------------------------------------------
-       3. POS ANALYTICS TAB (പുതിയ സമയക്രമം & പ്രൊഫഷണൽ ടോപ്പ് ഐറ്റംസ്)
+       3. POS ANALYTICS TAB: MULTI-DATE (TODAY, WEEK, MONTH, CUSTOM)
+          + UNIFORM 12-HR AM/PM FORMAT + NEWEST ON TOP
        ------------------------------------------------------------- */
-    function setPosDateToToday() {
-      if (document.getElementById('posAnalyticsDateInput')) {
-        document.getElementById('posAnalyticsDateInput').value = today;
-        renderPosAnalyticsTab();
+    function filterPosAnalytics(mode) {
+      currentPosFilter = mode;
+      document.querySelectorAll('#tab-pos-analytics .report-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      const customBox = document.getElementById('posCustomDateBox');
+
+      if (mode === 'today') document.getElementById('posFiltToday').classList.add('active');
+      if (mode === 'week') document.getElementById('posFiltWeek').classList.add('active');
+      if (mode === 'month') document.getElementById('posFiltMonth').classList.add('active');
+      if (mode === 'custom') {
+        document.getElementById('posFiltCustom').classList.add('active');
+        customBox.style.display = 'flex';
+        return;
+      } else {
+        customBox.style.display = 'none';
       }
+      renderPosAnalyticsTab();
     }
 
-    function parseTimeStringToMinutes(tStr) {
-      if (!tStr) return 0;
-      tStr = tStr.trim().toLowerCase();
-      let isPM = tStr.includes('pm');
-      let isAM = tStr.includes('am');
-      let clean = tStr.replace(/[^\d:]/g, '');
+    function applyCustomPosDateFilter() {
+      renderPosAnalyticsTab();
+    }
+
+    // 12-Hour AM/PM സ്റ്റാൻഡേർഡൈസ് ചെയ്യുന്ന ഫംഗ്ഷൻ
+    function formatTo12HourTime(tStr) {
+      if (!tStr) return '';
+      let clean = tStr.trim();
+      if (/am|pm/i.test(clean)) {
+        return clean.toUpperCase();
+      }
       let parts = clean.split(':');
-      let h = parseInt(parts[0], 10) || 0;
-      let m = parseInt(parts[1], 10) || 0;
+      if (parts.length >= 2) {
+        let h = parseInt(parts[0], 10) || 0;
+        let m = parseInt(parts[1], 10) || 0;
+        let ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12;
+        h = h ? h : 12;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+      }
+      return clean;
+    }
+
+    function parseToTimeMillis(timeStr, dateStr = today) {
+      if (!timeStr) return 0;
+      let clean = timeStr.trim().toLowerCase();
+      let isPM = clean.includes('pm');
+      let isAM = clean.includes('am');
+      clean = clean.replace(/[^\d:]/g, '');
+      let [h, m] = clean.split(':').map(Number);
+      h = h || 0; m = m || 0;
       if (isPM && h < 12) h += 12;
       if (isAM && h === 12) h = 0;
-      return h * 60 + m;
+      const d = new Date(dateStr);
+      d.setHours(h, m, 0, 0);
+      return d.getTime();
     }
 
     function renderPosAnalyticsTab() {
-      const dateInput = document.getElementById('posAnalyticsDateInput');
-      const selectedDate = dateInput ? dateInput.value || today : today;
-      const filtered = posBills.filter(b => b.date === selectedDate);
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+      const fromDate = document.getElementById('posFromDate') ? document.getElementById('posFromDate').value : today;
+      const toDate = document.getElementById('posToDate') ? document.getElementById('posToDate').value : today;
+
+      // മൾട്ടി-ഡേറ്റ് ഫിൽട്ടറിംഗ്
+      const filtered = posBills.filter(b => {
+        if (!b.date) return false;
+        const bDate = new Date(b.date);
+
+        if (currentPosFilter === 'today') {
+          return b.date === curDate;
+        }
+        if (currentPosFilter === 'week') {
+          const diffDays = Math.floor((refDate - bDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        if (currentPosFilter === 'month') {
+          return bDate.getMonth() === refDate.getMonth() && bDate.getFullYear() === refDate.getFullYear();
+        }
+        if (currentPosFilter === 'custom') {
+          return b.date >= fromDate && b.date <= toDate;
+        }
+        return true;
+      });
 
       let totalSales = 0, cashSales = 0, gpaySales = 0;
       let totalGlasses = 0;
@@ -2015,10 +2088,10 @@
       setT('posAnaTotalGlassCount', `${totalGlasses} Glasses Sold`);
       setT('posAnaBillsCountTag', `${filtered.length} Bills`);
 
-      // ഏറ്റവും കൂടുതൽ വിറ്റഴിഞ്ഞത് ക്രമപ്പെടുത്തുന്നു
+      // ബെസ്റ്റ് സെല്ലേഴ്സ് സോർട്ടിംഗ്
       posAnaSortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
 
-      // ടോപ്പ് 5 വിഭവങ്ങൾ മാത്രം പ്രോഗ്രസ്സ് ബാറുകളോടെ കാണിക്കുന്നു
+      // ടോപ്പ് 5 വിഭവങ്ങൾ പ്രോഗ്രസ്സ് ബാറുകളോടെ
       const breakdownContainer = document.getElementById('posAnaItemBreakdownList');
       if (breakdownContainer) {
         if (!posAnaSortedItems.length) {
@@ -2055,35 +2128,39 @@
         }
       }
 
-      // അന്നത്തെ ബില്ലുകൾ കൃത്യമായ സമയക്രമത്തിൽ (പുതിയത് ഏറ്റവും മുകളിൽ)
+      // ബില്ലുകൾ: ഏറ്റവും ഒടുവിൽ അടിച്ച പുതിയ ബില്ല് ഏറ്റവും മുകളിൽ (Newest on Top)
       const billsContainer = document.getElementById('posAnaBillsListContainer');
       if (billsContainer) {
         if (!filtered.length) {
-          billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ തീയതിയിൽ ബില്ലുകൾ ഇല്ല</p>';
+          billsContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:15px;">ഈ കാലയളവിൽ ബില്ലുകൾ ഇല്ല</p>';
         } else {
           const sortedBills = filtered.slice().sort((a, b) => {
-            return parseTimeStringToMinutes(b.time) - parseTimeStringToMinutes(a.time);
+            const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
+            const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
+            return tB - tA; // Newest on Top
           });
 
-          billsContainer.innerHTML = sortedBills.map(b => `
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${b.time || '-'})</span>
-                <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${(b.mode||'').toUpperCase()})</span>
+          billsContainer.innerHTML = sortedBills.map(b => {
+            const displayTime = formatTo12HourTime(b.time);
+            return `
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${displayTime || '-'}) <span style="font-size:0.7rem; color:#64748b; font-weight:normal;">• ${b.date}</span></span>
+                  <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${(b.mode||'').toUpperCase()}</span>
+                </div>
+                <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
+                  ${(b.items || []).map(i => `${(i.name || '').replace(/Aval/g, 'Avil')} (x${i.qty})`).join(', ')}
+                </div>
               </div>
-              <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
-                ${(b.items || []).map(i => `${(i.name || '').replace(/Aval/g, 'Avil')} (x${i.qty})`).join(', ')}
-              </div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
       }
     }
 
     function openFullPosSalesReportModal() {
-      const dateInput = document.getElementById('posAnalyticsDateInput');
-      const selectedDate = dateInput ? dateInput.value || today : today;
-      document.getElementById('fullPosReportDateText').innerText = `Date: ${selectedDate} | ആകെ വിറ്റത്: ${posAnaSortedItems.reduce((acc, x) => acc + x.count, 0)} ഗ്ലാസ്`;
+      const modeLabel = currentPosFilter === 'today' ? 'ഇന്ന് (Today)' : (currentPosFilter === 'week' ? 'ഈ ആഴ്ച (This Week)' : (currentPosFilter === 'month' ? 'ഈ മാസം (This Month)' : 'Custom Range'));
+      document.getElementById('fullPosReportDateText').innerText = `കാലയളവ്: ${modeLabel} | ആകെ വിറ്റത്: ${posAnaSortedItems.reduce((acc, x) => acc + x.count, 0)} ഗ്ലാസ്`;
       
       const listContainer = document.getElementById('fullPosReportItemsList');
       if (!posAnaSortedItems.length) {
@@ -2232,7 +2309,7 @@
 
       const apiKey = (dynamicOcrKey || '').trim();
       if (!apiKey) {
-        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙️️ OCR Key' ബട്ടൺ വഴി നിങ്ങളുടെ OCR.space API Key നൽകുക.");
+        alert("⚠️ ദയവായി ആദ്യം ഹെഡറിലെ '⚙ OCR Key' ബട്ടൺ വഴി നിങ്ങളുടെ OCR.space API Key നൽകുക.");
         openAISettingsModal();
         event.target.value = '';
         return;
@@ -3359,7 +3436,6 @@
       alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
-    // നിക്ഷേപം ഒഴിവാക്കാൻ 3 പാർട്ണർമാരുടെയും അനുമതി നിർബന്ധമാക്കുന്നു
     function requestDeleteInvestment(invId) {
       const inv = investments.find(i => i.id === invId);
       if (!inv) return;
@@ -3411,7 +3487,7 @@
 
     function saveWithdrawal() {
       const partner = document.getElementById('withPartner').value;
-      const type = document.getElementById('withType').value; // profit vs capital
+      const type = document.getElementById('withType').value;
       const amount = parseFloat(document.getElementById('withAmount').value);
       const mode = document.getElementById('withMode').value;
       const date = document.getElementById('withDate').value;
@@ -3463,7 +3539,6 @@
       alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
     }
 
-    // പിൻവലിക്കൽ ഒഴിവാക്കാൻ 3 പാർട്ണർമാരുടെയും അനുമതി നിർബന്ധമാക്കുന്നു
     function requestDeleteWithdrawal(wthId) {
       const w = withdrawals.find(i => i.id === wthId);
       if (!w) return;
@@ -3523,7 +3598,6 @@
       const eachShare = Math.round((totalNetProfit / 3) * 100) / 100;
       document.getElementById('repEachShare').innerText = `₹${eachShare} / partner`;
 
-      // നിക്ഷേപങ്ങൾ കൂട്ടുന്നു
       investments.forEach(inv => {
         if (inv.status === 'verified') {
           totVerInvest += inv.amount;
@@ -3533,15 +3607,12 @@
         }
       });
 
-      // പിൻവലിക്കലുകൾ (Capital vs Profit തരംതിരിച്ച് കണക്കുകൂട്ടൽ)
       withdrawals.forEach(w => {
         if (w.status === 'verified') {
           totVerWith += w.amount;
           if (w.type === 'capital') {
-            // നിക്ഷേപത്തിൽ നിന്ന് നേരിട്ട് കുറയുന്നു
             if (capMap[w.partner] !== undefined) capMap[w.partner] -= w.amount;
           } else {
-            // ലാഭവിഹിതത്തിൽ നിന്ന് കുറയുന്നു
             if (withProfitMap[w.partner] !== undefined) withProfitMap[w.partner] += w.amount;
           }
         } else {
@@ -3568,7 +3639,6 @@
         }
       });
 
-      // Investments Cards & 3-Partner Deletion UI
       let invHTML = '';
       investments.slice().reverse().forEach(inv => {
         const isVer = inv.status === 'verified';
@@ -3636,7 +3706,6 @@
       document.getElementById('invCapAshkar').innerText = '₹' + (Math.round((capMap['ASHKAR ALI'] || 0) * 100) / 100);
       document.getElementById('investListContainer').innerHTML = invHTML || '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">ഇൻവെസ്റ്റ്മെന്റുകൾ ഇല്ല</p>';
 
-      // Withdrawals Cards & 3-Partner Deletion UI
       let withHTML = '';
       withdrawals.slice().reverse().forEach(w => {
         const isVer = w.status === 'verified';
@@ -3681,7 +3750,7 @@
               <div>
                 <span>👤 ${w.partner}</span>
                 <span style="font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px; background:${isCapital ? '#fee2e2' : '#e0f2fe'}; color:${isCapital ? '#b91c1c' : '#0369a1'};">
-                  ${isCapital ? '🏛️ CAPITAL RETURN' : '💰 PROFIT SHARE'}
+                  ${isCapital ? '🏛️️ CAPITAL RETURN' : '💰 PROFIT SHARE'}
                 </span>
               </div>
               <span class="color-red">-₹${w.amount}</span>
@@ -3693,7 +3762,7 @@
               <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
                 ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
               </span>
-              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
