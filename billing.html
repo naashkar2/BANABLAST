@@ -62,15 +62,15 @@
     }
     .header-btns {
       display: flex;
-      gap: 5px;
+      gap: 6px;
     }
     .btn-head {
       background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.18);
       color: #ffffff;
-      padding: 6px 9px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.15s;
@@ -79,10 +79,6 @@
       gap: 4px;
     }
     .btn-head:active { background: rgba(255,255,255,0.25); }
-    .btn-head.connected {
-      background: #059669;
-      border-color: #34d399;
-    }
 
     /* Category Switcher */
     .cat-toggle-wrap {
@@ -562,7 +558,7 @@
     .form-control { width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; }
     .form-control:focus { border-color: var(--blue); }
 
-    /* Thermal Print Area for Fallback */
+    /* Thermal Print Slip Styling */
     #receiptPrintArea { display: none; }
     @media print {
       body * { visibility: hidden; }
@@ -572,12 +568,13 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 58mm;
+        width: 100%;
+        max-width: 58mm;
         font-family: monospace;
-        font-size: 11px;
+        font-size: 12px;
         line-height: 1.3;
         color: #000;
-        padding: 4px;
+        padding: 2px 4px;
       }
       .r-center { text-align: center; }
       .r-row { display: flex; justify-content: space-between; }
@@ -591,9 +588,6 @@
   <header class="pos-header">
     <div class="pos-brand">🥤 BANABLAST</div>
     <div class="header-btns">
-      <button type="button" class="btn-head" id="btnPrinterHeader" onclick="openPrinterModal()">
-        🖨️ <span id="printerHeadStatus">Printer</span>
-      </button>
       <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
       <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
       <button type="button" class="btn-head" onclick="returnToMainApp()">🏠 App</button>
@@ -662,53 +656,6 @@
     <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
       📋 Recent Bills
     </button>
-  </div>
-
-  <!-- PRINTER SETTINGS MODAL -->
-  <div class="modal" id="printerModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title">🖨️ Thermal Printer Settings</div>
-        <button class="btn-close" onclick="closeModal('printerModal')">✕</button>
-      </div>
-
-      <!-- RawBT Status Card -->
-      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
-        <div style="font-size:0.75rem; color:#15803d; font-weight:bold;">RAWBT APP INTEGRATION</div>
-        <div style="display:inline-block; margin-top:5px; padding:4px 12px; border-radius:20px; font-weight:800; font-size:0.85rem; background:#dcfce7; color:#166534;">
-          🟢 Active & Ready (തയ്യാറാണ്)
-        </div>
-        <div style="font-size:0.75rem; color:#475569; margin-top:6px;">
-          RawBT ആപ്പിൽ പ്രിന്റർ കണക്റ്റ് ചെയ്തിട്ടുണ്ടെങ്കിൽ ബില്ല് തനിയെ പ്രിന്റാകും.
-        </div>
-      </div>
-
-      <!-- Test Print Button -->
-      <button type="button" onclick="testThermalPrint()" style="width:100%; background:#10b981; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.9rem; cursor:pointer; margin-bottom:14px; box-shadow:0 2px 6px rgba(16,185,129,0.3);">
-        🧾 Test Print (ടെസ്റ്റ് പ്രിന്റ് അടിക്കുക)
-      </button>
-
-      <!-- Settings Configurations -->
-      <div class="form-group">
-        <label>Printer Mode (പ്രിന്റിംഗ് രീതി)</label>
-        <select id="printerModeSelect" class="form-control" onchange="savePrinterPreferences()">
-          <option value="rawbt">⚡ RawBT Direct (ഡയലോഗ് ഇല്ലാതെ ഒറ്റ ക്ലിക്കിൽ)</option>
-          <option value="system">📄 Default System Print Dialog (സാധാരണ പ്രിന്റ്)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Thermal Paper Size (പേപ്പർ അളവ്)</label>
-        <select id="printerPaperWidthSelect" class="form-control" onchange="savePrinterPreferences()">
-          <option value="58">58mm (2-Inch Standard Mobile Printer)</option>
-          <option value="80">80mm (3-Inch Wide Counter Printer)</option>
-        </select>
-      </div>
-
-      <button type="button" onclick="openRawBtAppDirect()" style="width:100%; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; padding:10px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;">
-        ⚙️ Open RawBT App Settings
-      </button>
-    </div>
   </div>
 
   <!-- CART DRAWER MODAL -->
@@ -836,13 +783,13 @@
     </div>
   </div>
 
-  <!-- THERMAL RECEIPT SLIP (SYSTEM PRINT FALLBACK) -->
+  <!-- THERMAL RECEIPT SLIP (DEFAULT SYSTEM PRINT) -->
   <div id="receiptPrintArea">
-    <div class="r-center" style="font-size:15px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
-    <div class="r-center" style="font-size:10px; font-weight:bold; margin-top:1px;">NELLIPPUZHA, MANNARKKAD</div>
+    <div class="r-center" style="font-size:16px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
+    <div class="r-center" style="font-size:11px; font-weight:bold; margin-top:2px;">NELLIPPUZHA, MANNARKKAD</div>
     <div class="r-center" style="font-size:10px; margin-top:1px;">Mob: +91 90370 10883</div>
-    <div class="r-center" id="rBillDate" style="margin-top:3px;"></div>
-    <div class="r-center" id="rBillNo" style="font-weight:bold;"></div>
+    <div class="r-center" id="rBillDate" style="margin-top:4px; font-size:10px;"></div>
+    <div class="r-center" id="rBillNo" style="font-weight:bold; font-size:11px;"></div>
     <div class="r-line"></div>
     <div class="r-row" style="font-weight:bold;">
       <span>ITEM</span>
@@ -852,11 +799,11 @@
     <div class="r-line"></div>
     <div id="rItemsList"></div>
     <div class="r-line"></div>
-    <div class="r-row" style="font-size:13px; font-weight:bold;">
+    <div class="r-row" style="font-size:14px; font-weight:bold;">
       <span>TOTAL:</span>
       <span id="rTotalAmt">₹0</span>
     </div>
-    <div class="r-row" style="font-size:9px; margin-top:2px;">
+    <div class="r-row" style="font-size:10px; margin-top:2px;">
       <span>PAYMENT:</span>
       <span id="rPayMode">CASH</span>
     </div>
@@ -928,137 +875,6 @@
     let pickedItemImageBase64 = "";
 
     const todayDate = new Date().toISOString().split('T')[0];
-
-    /* -------------------------------------------------------------
-       PRINTER SETTINGS (RAWBT ONE-CLICK INTEGRATION)
-       ------------------------------------------------------------- */
-    let printerSettings = {
-      mode: localStorage.getItem('bb_printer_mode') || 'rawbt',
-      paperWidth: localStorage.getItem('bb_printer_paper') || '58'
-    };
-
-    function openPrinterModal() {
-      document.getElementById('printerModeSelect').value = printerSettings.mode;
-      document.getElementById('printerPaperWidthSelect').value = printerSettings.paperWidth;
-      document.getElementById('printerModal').style.display = 'flex';
-    }
-
-    function savePrinterPreferences() {
-      printerSettings.mode = document.getElementById('printerModeSelect').value;
-      printerSettings.paperWidth = document.getElementById('printerPaperWidthSelect').value;
-      localStorage.setItem('bb_printer_mode', printerSettings.mode);
-      localStorage.setItem('bb_printer_paper', printerSettings.paperWidth);
-    }
-
-    function openRawBtAppDirect() {
-      window.location.href = "rawbt:";
-    }
-
-    /* ESC/POS BUFFER BUILDER */
-    function buildEscPosReceiptBuffer(billNo, date, time, total, mode, items) {
-      const encoder = new TextEncoder();
-      const bytes = [];
-
-      const append = arr => bytes.push(...arr);
-      const appendText = str => append(encoder.encode(str));
-
-      const ESC_INIT = [0x1B, 0x40];
-      const ALIGN_CENTER = [0x1B, 0x61, 0x01];
-      const ALIGN_LEFT = [0x1B, 0x61, 0x00];
-      const BOLD_ON = [0x1B, 0x45, 0x01];
-      const BOLD_OFF = [0x1B, 0x45, 0x00];
-      const DOUBLE_HEIGHT = [0x1D, 0x21, 0x01];
-      const NORMAL_SIZE = [0x1D, 0x21, 0x00];
-      const FEED_LINES = n => [0x1B, 0x64, n];
-
-      const maxChars = printerSettings.paperWidth === '80' ? 48 : 32;
-      const divider = '-'.repeat(maxChars) + '\n';
-
-      append(ESC_INIT);
-      append(ALIGN_CENTER);
-      append(BOLD_ON);
-      append(DOUBLE_HEIGHT);
-      appendText("BANABLAST\n");
-      append(NORMAL_SIZE);
-      append(BOLD_OFF);
-      appendText("NELLIPPUZHA, MANNARKKAD\n");
-      appendText("Mob: +91 90370 10883\n");
-      appendText(`Date: ${date} ${time}\n`);
-      append(BOLD_ON);
-      appendText(`BILL NO: ${billNo}\n`);
-      append(BOLD_OFF);
-
-      append(ALIGN_LEFT);
-      appendText(divider);
-
-      const padRight = (str, len) => (str + ' '.repeat(len)).substring(0, len);
-      const padLeft = (str, len) => (' '.repeat(len) + str).slice(-len);
-
-      if (maxChars === 48) {
-        appendText(padRight("ITEM", 26) + padLeft("QTY", 8) + padLeft("AMT", 14) + "\n");
-      } else {
-        appendText(padRight("ITEM", 16) + padLeft("QTY", 5) + padLeft("AMT", 11) + "\n");
-      }
-      appendText(divider);
-
-      items.forEach(it => {
-        const itemTotal = `Rs.${it.price * it.qty}`;
-        const namePart = it.name.substring(0, maxChars === 48 ? 25 : 15);
-        if (maxChars === 48) {
-          appendText(padRight(namePart, 26) + padLeft(String(it.qty), 8) + padLeft(itemTotal, 14) + "\n");
-        } else {
-          appendText(padRight(namePart, 16) + padLeft(String(it.qty), 5) + padLeft(itemTotal, 11) + "\n");
-        }
-      });
-
-      appendText(divider);
-      append(BOLD_ON);
-      const totalStr = `Rs.${total}`;
-      if (maxChars === 48) {
-        appendText(padRight("TOTAL:", 30) + padLeft(totalStr, 18) + "\n");
-      } else {
-        appendText(padRight("TOTAL:", 18) + padLeft(totalStr, 14) + "\n");
-      }
-      append(BOLD_OFF);
-
-      appendText(`PAYMENT: ${(mode || 'CASH').toUpperCase()}\n`);
-      appendText(divider);
-
-      append(ALIGN_CENTER);
-      appendText("*** THANK YOU ***\n");
-      appendText("Visit Again!\n");
-      append(FEED_LINES(3));
-
-      return new Uint8Array(bytes);
-    }
-
-    /* RawBT വൺ-ക്ലിക്ക് ഡയറക്ട് പ്രിന്റിംഗ് ഫംഗ്ഷൻ */
-    function sendToRawBtPrinter(buf) {
-      let binary = '';
-      const bytes = new Uint8Array(buf);
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64Data = btoa(binary);
-
-      // RawBT ആപ്പിലേക്ക് നേരിട്ട് കമാൻഡ് അയക്കുന്നു
-      window.location.href = "rawbt:data:application/octet-stream;base64," + base64Data;
-    }
-
-    function testThermalPrint() {
-      const sampleItems = [
-        { name: "Normal Avil Milk", qty: 2, price: 30 },
-        { name: "Special Mango", qty: 1, price: 70 }
-      ];
-      const now = get12HourTimeString();
-      const buf = buildEscPosReceiptBuffer("BB-TEST", todayDate, now, 130, "cash", sampleItems);
-      
-      if (printerSettings.mode === 'rawbt') {
-        sendToRawBtPrinter(buf);
-      } else {
-        triggerThermalPrint("BB-TEST", todayDate, now, 130, "cash", sampleItems);
-      }
-    }
 
     // 12-Hour AM/PM Helper
     function get12HourTimeString(dateObj = new Date()) {
@@ -1307,7 +1123,7 @@
     }
 
     /* -------------------------------------------------------------
-       സ്മാർട്ട് പ്രിന്റിംഗ് (RAWBT DIRECT)
+       സേവിംഗ് & ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് എക്സിക്യൂഷൻ
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1353,8 +1169,8 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        // പ്രിന്റിംഗ്
-        dispatchPrintJob(billNo, todayDate, timeStr, total, currentPayMode, cart);
+        // ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് ഡയലോഗ് നേരിട്ട് തുറക്കുന്നു
+        triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
 
         cart = [];
         editingBill = null;
@@ -1368,13 +1184,24 @@
       }
     }
 
-    function dispatchPrintJob(billNo, date, time, total, mode, items) {
-      if (printerSettings.mode === 'rawbt') {
-        const buf = buildEscPosReceiptBuffer(billNo, date, time, total, mode, items);
-        sendToRawBtPrinter(buf);
-      } else {
-        triggerThermalPrint(billNo, date, time, total, mode, items);
-      }
+    function triggerThermalPrint(billNo, date, time, total, mode, items) {
+      document.getElementById('rBillDate').innerText = `${date} ${time}`;
+      document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
+      document.getElementById('rTotalAmt').innerText = `₹${total}`;
+      document.getElementById('rPayMode').innerText = (mode || 'cash').toUpperCase();
+
+      document.getElementById('rItemsList').innerHTML = items.map(i => `
+        <div class="r-row">
+          <span>${i.name.substring(0, 15)}</span>
+          <span>${i.qty}</span>
+          <span>₹${i.price * i.qty}</span>
+        </div>
+      `).join('');
+
+      // ഫോണിന്റെ പ്രിന്റ് ഡയലോഗ് നേരിട്ട് ഓപ്പൺ ചെയ്യുന്നു
+      setTimeout(() => {
+        window.print();
+      }, 50);
     }
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
@@ -1416,23 +1243,6 @@
       }, { merge: true });
 
       await batch.commit();
-    }
-
-    function triggerThermalPrint(billNo, date, time, total, mode, items) {
-      document.getElementById('rBillDate').innerText = `${date} ${time}`;
-      document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
-      document.getElementById('rTotalAmt').innerText = `₹${total}`;
-      document.getElementById('rPayMode').innerText = mode.toUpperCase();
-
-      document.getElementById('rItemsList').innerHTML = items.map(i => `
-        <div class="r-row">
-          <span>${i.name.substring(0, 15)}</span>
-          <span>${i.qty}</span>
-          <span>₹${i.price * i.qty}</span>
-        </div>
-      `).join('');
-
-      window.print();
     }
 
     async function sendWhatsAppBillDirect() {
@@ -1554,7 +1364,7 @@
     function reprintBill(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
-      dispatchPrintJob(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
+      triggerThermalPrint(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
       closeModal('recentBillsModal');
     }
 
@@ -1646,7 +1456,7 @@
       const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
 
       if (!name || isNaN(price) || price <= 0) {
-        alert("⚠️️ സാധുവായ പേരും വിലയും നൽകുക!");
+        alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
         return;
       }
 
