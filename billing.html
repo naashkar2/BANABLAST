@@ -588,6 +588,7 @@
   <header class="pos-header">
     <div class="pos-brand">🥤 BANABLAST</div>
     <div class="header-btns">
+      <button type="button" class="btn-head" id="btnBTStatus" onclick="initBluetoothAutoConnect()">🔌 Printer</button>
       <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
       <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
       <button type="button" class="btn-head" onclick="returnToMainApp()">🏠 App</button>
@@ -874,6 +875,10 @@
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
+    // Bluetooth Thermal Printer Variables
+    let connectedThermalPrinter = null;
+    let isConnectingBT = false;
+
     const todayDate = new Date().toISOString().split('T')[0];
 
     // 12-Hour AM/PM Helper
@@ -911,6 +916,118 @@
       return 'regular';
     }
 
+    /* =============================================================
+       BLUETOOTH DIRECT THERMAL PRINTING ENGINE (CAPACITOR NATIVE)
+       ============================================================= */
+    document.addEventListener('deviceready', () => {
+      initBluetoothAutoConnect();
+    }, false);
+
+    function updateBTStatusUI(isConnected, text) {
+      const btn = document.getElementById('btnBTStatus');
+      if (!btn) return;
+      if (isConnected) {
+        btn.style.background = '#059669';
+        btn.style.borderColor = '#10b981';
+        btn.innerHTML = `🖨️ ${text || 'Ready'}`;
+      } else {
+        btn.style.background = 'rgba(255,255,255,0.12)';
+        btn.style.borderColor = 'rgba(255,255,255,0.18)';
+        btn.innerHTML = `🔌 ${text || 'Printer'}`;
+      }
+    }
+
+    function initBluetoothAutoConnect() {
+      if (typeof bluetoothSerial === 'undefined') {
+        console.log("BluetoothSerial plugin not detected (Standard Browser mode)");
+        updateBTStatusUI(false, "Printer");
+        return;
+      }
+
+      if (isConnectingBT) return;
+      isConnectingBT = true;
+      updateBTStatusUI(false, "Connecting...");
+
+      bluetoothSerial.isEnabled(() => {
+        bluetoothSerial.list((devices) => {
+          isConnectingBT = false;
+          if (!devices || devices.length === 0) {
+            updateBTStatusUI(false, "No Devices");
+            return;
+          }
+
+          // BlueTooth Printer_83F5 അല്ലെങ്കിൽ പേരിൽ Printer ഉള്ളത് കണ്ടെത്തുന്നു
+          const target = devices.find(d => 
+            (d.name && (d.name.includes("83F5") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
+          ) || devices[0];
+
+          if (target) {
+            bluetoothSerial.connect(target.address, () => {
+              connectedThermalPrinter = target;
+              updateBTStatusUI(true, "Ready");
+              console.log("Connected to thermal printer:", target.name);
+            }, (err) => {
+              connectedThermalPrinter = null;
+              updateBTStatusUI(false, "Offline");
+              console.warn("Bluetooth Connection Failed:", err);
+            });
+          }
+        }, (err) => {
+          isConnectingBT = false;
+          updateBTStatusUI(false, "Error");
+        });
+      }, () => {
+        isConnectingBT = false;
+        updateBTStatusUI(false, "BT Off");
+      });
+    }
+
+    // ESC/POS Commands (32 Column Alignment for 58mm Thermal Receipt)
+    function sendEscPosDirectPrint(billNo, date, time, total, mode, items) {
+      const ESC = "\x1B";
+      const GS = "\x1D";
+      const INIT = ESC + "@";
+      const CENTER = ESC + "a\x01";
+      const LEFT = ESC + "a\x00";
+      const BOLD_ON = ESC + "E\x01";
+      const BOLD_OFF = ESC + "E\x00";
+      const DOUBLE_ON = GS + "!\x11";
+      const NORMAL = GS + "!\x00";
+      const FEED = "\n\n\n\n";
+
+      let raw = INIT;
+      raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
+      raw += CENTER + "NELLIPPUZHA, MANNARKKAD\n";
+      raw += CENTER + "Mob: +91 90370 10883\n";
+      raw += CENTER + `${date}  ${time}\n`;
+      raw += CENTER + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
+      raw += "--------------------------------\n";
+      raw += LEFT + "ITEM             QTY         AMT\n";
+      raw += "--------------------------------\n";
+
+      items.forEach(i => {
+        let itemName = (i.name || '').substring(0, 15).padEnd(16, ' ');
+        let qty = String(i.qty).padStart(4, ' ');
+        let amt = ("Rs." + (i.price * i.qty)).padStart(10, ' ');
+        raw += `${itemName} ${qty} ${amt}\n`;
+      });
+
+      raw += "--------------------------------\n";
+      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
+      raw += LEFT + `PAYMENT: ${(mode || 'cash').toUpperCase()}\n`;
+      raw += "--------------------------------\n";
+      raw += CENTER + "*** THANK YOU ***\n";
+      raw += CENTER + "Visit Again!\n";
+      raw += FEED;
+
+      bluetoothSerial.write(raw, () => {
+        console.log("Direct ESC/POS Print Success!");
+      }, (err) => {
+        console.warn("Bluetooth Print write failed, falling back to window.print()", err);
+        window.print();
+      });
+    }
+
     window.onload = function() {
       db.collection('billing_items').onSnapshot(snap => {
         menuItems = [];
@@ -935,6 +1052,8 @@
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
+
+      setTimeout(initBluetoothAutoConnect, 1200);
     };
 
     function switchCategory(cat) {
@@ -1169,7 +1288,7 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        // ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് ഡയലോഗ് നേരിട്ട് തുറക്കുന്നു
+        // നേരിട്ടുള്ള ബ്ലൂടൂത്ത് പ്രിന്റിംഗ് (ബ്ലൂടൂത്ത് ഇല്ലെങ്കിൽ മാത്രം സിസ്റ്റം പ്രിന്റ്)
         triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
 
         cart = [];
@@ -1198,10 +1317,24 @@
         </div>
       `).join('');
 
-      // ഫോണിന്റെ പ്രിന്റ് ഡയലോഗ് നേരിട്ട് ഓപ്പൺ ചെയ്യുന്നു
-      setTimeout(() => {
-        window.print();
-      }, 50);
+      // ബ്ലൂടൂത്ത് നേറ്റീവ് പ്ലഗിൻ ഉണ്ടെങ്കിൽ ഡയറക്ട് ESC/POS വഴി instant പ്രിന്റ് ചെയ്യുന്നു
+      if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
+        sendEscPosDirectPrint(billNo, date, time, total, mode, items);
+      } else if (typeof bluetoothSerial !== 'undefined') {
+        initBluetoothAutoConnect();
+        setTimeout(() => {
+          if (connectedThermalPrinter) {
+            sendEscPosDirectPrint(billNo, date, time, total, mode, items);
+          } else {
+            window.print();
+          }
+        }, 300);
+      } else {
+        // ബ്രൗസർ മോഡിൽ സാധാരണ print
+        setTimeout(() => {
+          window.print();
+        }, 50);
+      }
     }
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
