@@ -1,0 +1,6 @@
+{
+  "appId": "com.banablast.pos",
+  "appName": "BANABLAST POS",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
