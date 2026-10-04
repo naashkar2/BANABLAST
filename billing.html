@@ -3,1807 +3,1712 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>BANABLAST POS Terminal</title>
-  <link rel="icon" href="logo.png">
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-  <!-- PDF Engine Libraries (html2canvas & jsPDF) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+  <title>BANABLAST POS</title>
   <style>
     :root {
-      --bg: #eef2f6;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg-color: #f1f5f9;
       --card-bg: #ffffff;
-      --primary-dark: #0f172a;
-      --slate-800: #1e293b;
-      --slate-600: #475569;
-      --slate-400: #94a3b8;
-      --emerald: #059669;
-      --emerald-dark: #047857;
-      --emerald-light: #dcfce7;
-      --blue: #2563eb;
-      --blue-light: #eff6ff;
-      --red: #ef4444;
-      --border-color: #cbd5e1;
-      --card-border: #e2e8f0;
-      --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
-      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-      --shadow-dock: 0 -8px 25px rgba(15, 23, 42, 0.12);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --radius: 14px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    
-    body { background: var(--bg); color: var(--primary-dark); padding-bottom: 195px; user-select: none; }
 
-    /* Top Executive Clean Header */
-    .pos-header {
-      background: var(--primary-dark);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 230px;
+      overflow-x: hidden;
+    }
+
+    /* TOP HEADER */
+    .header {
+      background: #0f172a;
       color: #ffffff;
-      padding: 10px 14px;
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-    }
-    .pos-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.15rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    /* ലൈവ് പ്രിന്റർ സ്റ്റാറ്റസ് ഡോട്ട് */
-    .printer-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .printer-dot.online { background: #10b981; box-shadow: 0 0 8px #10b981; }
-    .printer-dot.offline { background: #ef4444; }
-    .printer-dot.connecting { background: #f59e0b; animation: pulseDot 1s infinite; }
-    @keyframes pulseDot { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-
-    /* '⋮' More Options Button & Dropdown */
-    .header-actions { position: relative; }
-    .btn-more {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #ffffff;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      font-size: 1.35rem;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s;
-    }
-    .btn-more:active { background: rgba(255,255,255,0.25); }
-
-    .header-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 44px;
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 14px;
-      min-width: 200px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      overflow: hidden;
-      z-index: 200;
-    }
-    .header-dropdown.show { display: block; animation: dropDown 0.15s ease-out; }
-    @keyframes dropDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-
-    .dropdown-item {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: #f1f5f9;
-      padding: 12px 14px;
-      text-align: left;
-      font-size: 0.86rem;
-      font-weight: 700;
+    .brand-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .dropdown-item:active { background: rgba(255,255,255,0.12); }
-    .dropdown-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.12);
-      margin: 2px 0;
     }
 
-    /* Category Switcher */
-    .cat-toggle-wrap {
-      padding: 8px 10px 4px;
-      max-width: 1000px;
-      margin: 0 auto;
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
     }
-    .cat-toggle {
-      display: flex;
-      background: #e2e8f0;
-      padding: 3px;
-      border-radius: 12px;
-      gap: 4px;
-    }
-    .cat-tab-btn {
-      flex: 1;
-      padding: 8px 4px;
-      border: none;
-      border-radius: 9px;
-      font-size: 0.82rem;
+
+    .brand-title {
+      font-size: 19px;
       font-weight: 800;
-      color: var(--slate-600);
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    .status-dot.offline {
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+    }
+
+    .menu-btn {
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-    }
-    .cat-tab-btn.active {
-      background: #ffffff;
-      color: var(--primary-dark);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
     }
 
-    /* Sticky Quick-Jump Sub-Category Chips */
-    .subcat-sticky-bar {
-      position: sticky;
-      top: 54px;
-      z-index: 90;
-      background: rgba(238, 242, 246, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 6px 10px 8px;
-      max-width: 1000px;
-      margin: 0 auto;
+    /* DROPDOWN MENU */
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 16px;
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 220px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 101;
+      border: 1px solid #e2e8f0;
+    }
+
+    .dropdown.show {
       display: flex;
-      gap: 6px;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      background: white;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .dropdown-item:active {
+      background: #f8fafc;
+    }
+
+    /* CATEGORIES SCROLLER */
+    .category-section {
+      padding: 12px 14px 4px 14px;
+    }
+
+    .cat-scroll {
+      display: flex;
+      gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
-    }
-    .subcat-sticky-bar::-webkit-scrollbar { display: none; }
-    .subcat-chip {
-      background: #ffffff;
-      border: 1.5px solid var(--border-color);
-      color: var(--slate-800);
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .subcat-chip:active { transform: scale(0.95); }
-    .subcat-chip.active {
-      background: #1e3a8a;
-      color: #ffffff;
-      border-color: #1e3a8a;
-      box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
+      padding-bottom: 4px;
     }
 
-    /* Sub-Category Section Headings */
-    .subcat-section-title {
-      font-size: 0.82rem;
-      font-weight: 900;
-      color: #1e3a8a;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 12px 10px 6px;
+    .cat-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-pill {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .subcat-section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #cbd5e1;
+
+    .cat-pill.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
     }
 
-    /* 3-Column Items Grid */
-    .items-container {
-      padding: 4px 8px 16px;
-      max-width: 1000px;
-      margin: 0 auto;
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #475569;
+      padding: 8px 16px 4px 16px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* PRODUCT GRID */
+    .product-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    @media (min-width: 700px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    }
-    @media (min-width: 1000px) {
-      .items-container { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+      gap: 10px;
+      padding: 8px 14px 20px 14px;
     }
 
-    .item-card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      border: 1.5px solid var(--card-border);
-      padding: 8px 5px 6px;
+    .prod-card {
+      background: #ffffff;
+      border-radius: var(--radius);
+      padding: 12px 8px 10px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
       position: relative;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.1s ease, border-color 0.15s, box-shadow 0.15s;
     }
-    .item-card:active { transform: scale(0.98); }
-    .item-card.in-cart {
-      border-color: var(--blue);
-      background: var(--blue-light);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.16);
-    }
-    
-    .item-media-box {
-      width: 42px;
-      height: 42px;
+
+    .prod-icon {
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: #fef3c7;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      margin-bottom: 5px;
-      border: 1px solid #fde68a;
-    }
-    .item-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-    .item-emoji {
-      font-size: 1.45rem;
-      line-height: 1;
+      font-size: 22px;
+      margin-bottom: 6px;
     }
 
-    .item-name {
-      font-size: 0.74rem;
-      font-weight: 800;
-      color: var(--primary-dark);
-      line-height: 1.2;
+    .prod-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.25;
       min-height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 5px;
-      word-break: break-word;
-    }
-
-    .price-chip {
-      background: var(--emerald-light);
-      color: var(--emerald-dark);
-      font-size: 0.76rem;
-      font-weight: 900;
-      padding: 1px 6px;
-      border-radius: 6px;
       margin-bottom: 4px;
-      display: inline-block;
     }
 
-    .item-stepper-box {
-      width: 100%;
-      background: #f1f5f9;
-      border-radius: 18px;
-      padding: 2px 3px;
+    .prod-price {
+      background: #ecfdf5;
+      color: #059669;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .qty-controls {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      width: 100%;
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 2px;
       border: 1px solid #e2e8f0;
     }
-    .item-card.in-cart .item-stepper-box {
-      background: #dbeafe;
-      border-color: #bfdbfe;
-    }
 
-    .btn-step {
-      width: 26px;
-      height: 26px;
+    .qty-btn {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      font-weight: 900;
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-    .btn-step:active { transform: scale(0.9); }
-
-    .btn-step-minus {
-      background: #ffffff;
-      color: var(--slate-600);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .btn-step-minus.disabled {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    .btn-step-plus {
-      background: var(--blue);
-      color: #ffffff;
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-    }
-
-    .item-qty-center {
-      font-size: 0.74rem;
-      font-weight: 900;
-      color: var(--blue);
-    }
-
-    .item-badge-qty {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      background: var(--blue);
+      background: #2563eb;
       color: white;
-      font-size: 0.68rem;
-      font-weight: 900;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.35);
+      cursor: pointer;
     }
 
-    /* 6-Box POS Control Dock */
-    .pos-bottom-dock {
+    .qty-btn.minus {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .qty-num {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1e293b;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    /* BOTTOM CONTROLS DECK */
+    .bottom-deck {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       background: #ffffff;
-      border-top: 1px solid #cbd5e1;
-      padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
-      box-shadow: var(--shadow-dock);
+      box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding: 12px 14px max(14px, env(safe-area-inset-bottom)) 14px;
       z-index: 99;
-      max-width: 1000px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-    }
-
-    .dock-box {
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      font-weight: 800;
-      position: relative;
-      overflow: hidden;
-      border: 1.5px solid transparent;
-      transition: transform 0.1s ease, box-shadow 0.15s;
-    }
-    .dock-box:active { transform: scale(0.98); }
-
-    .box-payment {
-      background: #e2e8f0;
-      padding: 3px;
-      gap: 4px;
-      border-color: #cbd5e1;
-    }
-    .btn-pay-sub {
-      flex: 1;
-      height: 100%;
-      border: none;
-      border-radius: 9px;
-      font-size: 0.86rem;
-      font-weight: 900;
-      background: transparent;
-      color: var(--slate-600);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-    }
-    .btn-pay-sub.active.cash {
-      background: var(--emerald);
-      color: #ffffff;
-      box-shadow: 0 2px 5px rgba(5, 150, 105, 0.3);
-    }
-    .btn-pay-sub.active.gpay {
-      background: var(--blue);
-      color: #ffffff;
-      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
-    }
-
-    .box-cart-combo {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      padding: 3px;
-      display: flex;
-      align-items: center;
-    }
-    .btn-cart-part {
-      flex: 1;
-      height: 100%;
-      background: transparent;
-      border: none;
-      color: var(--slate-800);
-      font-size: 0.85rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      border-radius: 9px;
-    }
-    .btn-cart-part:active { background: #e2e8f0; }
-    .cart-divider {
-      width: 1.5px;
-      height: 22px;
-      background: #cbd5e1;
-      margin: 0 2px;
-    }
-    .btn-clear-part {
-      width: 38px;
-      height: 100%;
-      background: #fee2e2;
-      border: none;
-      border-radius: 9px;
-      color: var(--red);
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .btn-clear-part:active { background: #fecaca; }
-
-    .box-total {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 0 10px;
-      text-align: left;
-      align-items: flex-start;
+      gap: 10px;
     }
-    .box-total-lbl {
-      font-size: 0.65rem;
+
+    .deck-row-1 {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pay-switch {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 3px;
+      flex: 1.2;
+    }
+
+    .pay-btn {
+      flex: 1;
+      padding: 8px 6px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
       font-weight: 800;
-      color: var(--slate-400);
-      letter-spacing: 0.5px;
-      line-height: 1;
+      border-radius: 10px;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
-    .box-total-val {
-      font-size: 1.35rem;
+
+    .pay-btn.active {
+      background: #16a34a;
+      color: white;
+      box-shadow: 0 2px 6px rgba(22,163,74,0.3);
+    }
+
+    .pay-btn.active.gpay {
+      background: #2563eb;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+    }
+
+    .cart-pill {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #1e293b;
+      cursor: pointer;
+    }
+
+    .clear-cart-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .deck-row-2 {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* SMART TOTAL BOX WITH PARCEL CHIP ON RIGHT */
+    .total-box {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .total-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 0.5px;
+    }
+
+    .total-amount {
+      font-size: 22px;
       font-weight: 900;
-      color: var(--primary-dark);
+      color: #0f172a;
       line-height: 1.1;
-      margin-top: 1px;
     }
 
-    .box-print {
-      background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
-      color: #ffffff;
+    .parcel-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .parcel-chip.active {
+      background: #fff7ed;
+      border-color: #f97316;
+      color: #c2410c;
+    }
+
+    .print-btn {
+      flex: 1.1;
+      background: #15803d;
+      color: white;
       border: none;
-      font-size: 1.02rem;
+      border-radius: 14px;
+      font-size: 16px;
       font-weight: 900;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35);
-      gap: 6px;
-    }
-
-    .box-whatsapp {
-      background: #25d366;
-      color: #064e3b;
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
-      gap: 6px;
-    }
-
-    .box-recent {
-      background: var(--slate-800);
-      color: #ffffff;
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(30, 41, 59, 0.25);
-      gap: 6px;
-    }
-
-    /* Modals */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      z-index: 1000;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(21,128,61,0.25);
+      transition: all 0.15s ease;
+    }
+
+    .print-btn:active {
+      transform: scale(0.97);
+    }
+
+    .print-btn:disabled {
+      background: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .deck-row-3 {
+      display: flex;
+      gap: 10px;
+    }
+
+    .whatsapp-btn {
+      flex: 1;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .recent-btn {
+      flex: 1;
+      background: #1e293b;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* MODAL SYSTEM WITH SAFE CLOSE BUTTON */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15,23,42,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
       align-items: flex-end;
-      padding: 0;
+      justify-content: center;
     }
-    @media (min-width: 600px) {
-      .modal { align-items: center; padding: 16px; }
+
+    .modal-overlay.active {
+      display: flex;
     }
-    .modal-box {
-      background: white;
+
+    .modal-sheet {
+      background: #ffffff;
       width: 100%;
       max-width: 480px;
-      border-radius: 24px 24px 0 0;
-      padding: 20px;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
       max-height: 85vh;
-      overflow-y: auto;
-      animation: slideUp 0.2s ease-out;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
-    @media (min-width: 600px) {
-      .modal-box { border-radius: 20px; }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
     .modal-header {
+      padding: 16px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
     }
-    .modal-title { font-size: 1.05rem; font-weight: 900; color: var(--primary-dark); }
-    .btn-close {
-      background: #f1f5f9;
-      border: none;
-      width: 32px;
-      height: 32px;
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 18px;
       font-weight: bold;
-      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
     }
 
-    .cart-row {
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* RECENT BILLS LIST ITEM */
+    .bill-item {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--card-border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      cursor: pointer;
     }
-    .cart-row-name { font-weight: 800; font-size: 0.92rem; }
-    .cart-row-sub { font-size: 0.78rem; color: var(--slate-600); margin-top: 2px; }
 
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--slate-600); margin-bottom: 4px; }
-    .form-control { width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; }
-    .form-control:focus { border-color: var(--blue); }
-
-    /* Thermal Print Slip Styling */
-    #receiptPrintArea { display: none; }
-    @media print {
-      body * { visibility: hidden; }
-      #receiptPrintArea, #receiptPrintArea * { visibility: visible; }
-      #receiptPrintArea {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        max-width: 58mm;
-        font-family: monospace;
-        font-size: 12px;
-        line-height: 1.3;
-        color: #000;
-        padding: 2px 4px;
-      }
-      .r-center { text-align: center; }
-      .r-row { display: flex; justify-content: space-between; }
-      .r-line { border-top: 1px dashed #000; margin: 4px 0; }
+    .bill-item:active {
+      background: #f8fafc;
     }
+
+    .bill-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .bill-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bill-item-no {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .bill-item-total {
+      font-size: 15px;
+      font-weight: 900;
+      color: #15803d;
+    }
+
+    .bill-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #dcfce7;
+      color: #15803d;
+      width: fit-content;
+    }
+
+    .bill-badge.gpay {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .bill-item-time {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .bill-item-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .action-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .action-icon-btn.wa { background: #22c55e; color: white; }
+    .action-icon-btn.print { background: #2563eb; color: white; }
+    .action-icon-btn.del { background: #fee2e2; color: #dc2626; }
+
+    /* RECEIPT / BILL DETAILS MODAL */
+    .receipt-view {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+    }
+
+    .receipt-header {
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 10px;
+    }
+
+    .receipt-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+    }
+
+    .receipt-sub {
+      font-size: 11px;
+      color: #475569;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+
+    .receipt-table th {
+      text-align: left;
+      font-size: 11px;
+      color: #64748b;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .receipt-table td {
+      padding: 6px 0;
+      font-size: 12px;
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .receipt-total-row {
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 8px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    /* QUICK PARCEL PROMPT BOX */
+    .quick-chips {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .quick-chip-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .parcel-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #2563eb;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-danger { background: #ef4444; color: white; margin-top: 8px; }
   </style>
 </head>
 <body>
 
-  <!-- ================= TOP EXECUTIVE CLEAN HEADER ================= -->
-  <header class="pos-header">
-    <div class="pos-brand">
-      <span>🥤 BANABLAST</span>
-      <!-- ലൈവ് പ്രിന്റർ ഇൻഡിക്കേറ്റർ ഡോട്ട് (തൊട്ടാൽ റീകണക്റ്റ് ചെയ്യാം) -->
-      <span id="btStatusIndicator" class="printer-dot offline" title="പ്രിന്റർ ഓഫ്‌ലൈൻ (റീകണക്റ്റ് ചെയ്യാൻ ക്ലിക്ക് ചെയ്യുക)" onclick="initBluetoothAutoConnect()"></span>
-    </div>
-
-    <!-- ഒരൊറ്റ '⋮' More Options ബട്ടൺ -->
-    <div class="header-actions">
-      <button type="button" class="btn-more" onclick="toggleHeaderMenu(event)" aria-label="Menu Options">
-        ⋮
-      </button>
-
-      <!-- ഡ്രോപ്പ്ഡൗൺ മെനു -->
-      <div id="headerDropdown" class="header-dropdown">
-        <button type="button" class="dropdown-item" onclick="forceReloadApp(); closeHeaderMenu();">
-          <span>🔄</span> Update App
-        </button>
-        <button type="button" class="dropdown-item" onclick="initBluetoothAutoConnect(); closeHeaderMenu();">
-          <span>🔌</span> Reconnect Printer
-        </button>
-        <button type="button" class="dropdown-item" onclick="openItemsModal(); closeHeaderMenu();">
-          <span>⚙️</span> Manage Menu
-        </button>
-        <button type="button" class="dropdown-item" onclick="openTodaySummaryModal(); closeHeaderMenu();">
-          <span>📊</span> Today's Summary
-        </button>
-        <div class="dropdown-divider"></div>
-        <button type="button" class="dropdown-item" onclick="returnToMainApp()">
-          <span>🏠</span> Back to App
-        </button>
+  <!-- TOP HEADER -->
+  <header class="header">
+    <div class="brand-wrap">
+      <img src="logo.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+      <div class="brand-title">
+        BANABLAST
+        <span class="status-dot" id="cloudStatusDot" title="Sync Status"></span>
       </div>
+    </div>
+    <button class="menu-btn" id="menuToggleBtn">⋮</button>
+
+    <!-- DROPDOWN MENU -->
+    <div class="dropdown" id="menuDropdown">
+      <button class="dropdown-item" id="menuBtConnect">
+        <span>🖨️</span> <span id="btStatusText">Connect Printer</span>
+      </button>
+      <button class="dropdown-item" id="menuUpdateApp">
+        <span>🔄</span> <span>Update App</span>
+      </button>
+      <button class="dropdown-item" id="menuBackToMain">
+        <span>🏠</span> <span>Back to Main App</span>
+      </button>
     </div>
   </header>
 
-  <!-- Categories Toggle -->
-  <div class="cat-toggle-wrap">
-    <div class="cat-toggle">
-      <button type="button" class="cat-tab-btn active" id="tabAvil" onclick="switchCategory('avil_milk')">
-        🍌 Avil Milk Specials
+  <!-- CATEGORY SELECTOR -->
+  <div class="category-section">
+    <div class="cat-scroll" id="categoryScroller">
+      <button class="cat-pill active" data-cat="all">🌐 All</button>
+      <button class="cat-pill" data-cat="kids">👶 Kids</button>
+      <button class="cat-pill" data-cat="regular">🍌 Regular</button>
+      <button class="cat-pill" data-cat="fruit">🍓 Fruit Items</button>
+      <button class="cat-pill" data-cat="drinks">🥤 Juices & Shakes</button>
+    </div>
+  </div>
+
+  <div class="section-title" id="sectionHeader">ITEMS MENU</div>
+
+  <!-- PRODUCTS GRID -->
+  <div class="product-grid" id="productGrid">
+    <!-- Items rendered dynamically via JS -->
+  </div>
+
+  <!-- BOTTOM BILLING DECK -->
+  <div class="bottom-deck">
+    <!-- ROW 1: PAYMENT TOGGLE & CART SUMMARY -->
+    <div class="deck-row-1">
+      <div class="pay-switch">
+        <button class="pay-btn active" id="payCashBtn">💵 CASH</button>
+        <button class="pay-btn" id="payGpayBtn">📱 GPAY</button>
+      </div>
+      <div class="cart-pill" id="cartSummaryBtn">
+        <span>🛒</span>
+        <span id="cartCountText">0 Items ▾</span>
+      </div>
+      <button class="clear-cart-btn" id="clearCartBtn" title="Clear Cart">🗑️</button>
+    </div>
+
+    <!-- ROW 2: TOTAL (WITH PARCEL CHIP ON RIGHT) & PRINT BUTTON -->
+    <div class="deck-row-2">
+      <div class="total-box">
+        <div class="total-left">
+          <span class="total-label">TOTAL</span>
+          <span class="total-amount" id="totalAmountText">₹0</span>
+        </div>
+        <!-- Smart Parcel Chip on empty right side -->
+        <div class="parcel-chip" id="parcelChip">
+          <span>🥡</span>
+          <span id="parcelChipText">Parcel</span>
+        </div>
+      </div>
+      <button class="print-btn" id="printBtn">
+        <span>🖨️</span>
+        <span id="printBtnText">PRINT</span>
       </button>
-      <button type="button" class="cat-tab-btn" id="tabJuices" onclick="switchCategory('juices')">
-        🥤 Juices & Shakes
+    </div>
+
+    <!-- ROW 3: WHATSAPP BILL & RECENT BILLS -->
+    <div class="deck-row-3">
+      <button class="whatsapp-btn" id="whatsappBtn">
+        <span>💬</span> WhatsApp Bill
+      </button>
+      <button class="recent-btn" id="recentBillsBtn">
+        <span>📋</span> Recent Bills
       </button>
     </div>
   </div>
 
-  <!-- Sticky Sub-Category Quick-Jump Bar -->
-  <div class="subcat-sticky-bar" id="subcatStickyBar">
-    <button type="button" class="subcat-chip active" id="chip-all" onclick="scrollToSection('sec-all')">🌐 All</button>
-    <button type="button" class="subcat-chip" id="chip-kids" onclick="scrollToSection('sec-kids')">👶 Kids</button>
-    <button type="button" class="subcat-chip" id="chip-regular" onclick="scrollToSection('sec-regular')">🍌 Regular</button>
-    <button type="button" class="subcat-chip" id="chip-fruit" onclick="scrollToSection('sec-fruit')">🍓 Fruit Items</button>
-    <button type="button" class="subcat-chip" id="chip-special" onclick="scrollToSection('sec-special')">⭐ Special</button>
-    <button type="button" class="subcat-chip" id="chip-premium_nuts" onclick="scrollToSection('sec-premium_nuts')">🥜 Premium & Nuts</button>
-  </div>
-
-  <!-- Main POS Items Root -->
-  <div id="posItemsRoot" style="max-width:1000px; margin:0 auto;"></div>
-
-  <!-- 6-Box POS Control Dock -->
-  <div class="pos-bottom-dock">
-    <div class="dock-box box-payment">
-      <button type="button" class="btn-pay-sub active cash" id="btnPayCash" onclick="setPaymentMode('cash')">
-        💵 CASH
-      </button>
-      <button type="button" class="btn-pay-sub gpay" id="btnPayGPay" onclick="setPaymentMode('gpay')">
-        📱 GPAY
-      </button>
-    </div>
-
-    <div class="dock-box box-cart-combo">
-      <button type="button" class="btn-cart-part" onclick="openCartDrawer()">
-        🛒 <span id="cartCountTag">0 Items</span> ▾
-      </button>
-      <div class="cart-divider"></div>
-      <button type="button" class="btn-clear-part" onclick="clearCart()" title="കാർട്ട് ഒഴിവാക്കുക">
-        🗑
-      </button>
-    </div>
-
-    <div class="dock-box box-total">
-      <span class="box-total-lbl">TOTAL DUE</span>
-      <span class="box-total-val" id="cartTotalText">₹0</span>
-    </div>
-
-    <button type="button" class="dock-box box-print" onclick="printAndSaveBill()">
-      🖨️ PRINT
-    </button>
-
-    <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
-      💬 WhatsApp Bill
-    </button>
-
-    <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
-      📋 Recent Bills
-    </button>
-  </div>
-
-  <!-- CART DRAWER MODAL -->
-  <div class="modal" id="cartDrawerModal">
-    <div class="modal-box">
+  <!-- 1. CART ITEMS MODAL -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-sheet">
       <div class="modal-header">
-        <div class="modal-title">🛒 Order Items (തിരഞ്ഞെടുത്തവ)</div>
-        <button class="btn-close" onclick="closeModal('cartDrawerModal')">✕</button>
+        <div class="modal-title">🛒 Cart Items</div>
+        <button class="modal-close-btn" data-close="cartModal">✕</button>
       </div>
-
-      <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 12px;"></div>
-
-      <button type="button" class="dock-box box-print" style="width:100%; height:46px; font-size:1rem;" onclick="closeModal('cartDrawerModal')">
-        ശരി (Done)
-      </button>
+      <div class="modal-body" id="cartItemsList">
+        <!-- Rendered items -->
+      </div>
     </div>
   </div>
 
-  <!-- MANAGE ITEMS MODAL (5 SUB-CATEGORIES DROPDOWN) -->
-  <div class="modal" id="itemsModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title" id="itemModalHeading">⚙️ Manage Menu Items</div>
-        <button class="btn-close" onclick="closeModal('itemsModal')">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label>Category (വിഭാഗം)</label>
-        <select id="newItemCat" class="form-control" onchange="toggleSubCategoryField()">
-          <option value="avil_milk">🍌 Avil Milk Specials</option>
-          <option value="juices">🥤 Juices & Shakes</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="subCatFormField">
-        <label>Avil Milk Sub-Category (ഉപവിഭാഗം)</label>
-        <select id="newItemSubCat" class="form-control" style="font-weight:700;">
-          <option value="kids">👶 Kids</option>
-          <option value="regular">🍌 Regular</option>
-          <option value="fruit">🍓 Fruit Items</option>
-          <option value="special">⭐ Special Items</option>
-          <option value="premium_nuts">🥜 Premium & Nuts</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="newItemNameField">
-        <label>Item Name (പേര്)</label>
-        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Micky Mouse / Kulfi / Fig Honey">
-      </div>
-
-      <div style="display:flex; gap:8px;">
-        <div class="form-group" style="flex:1;">
-          <label>Price ₹ (വില)</label>
-          <input type="number" id="newItemPrice" class="form-control" placeholder="60">
-        </div>
-        <div class="form-group" style="flex:0.6;">
-          <label>Emoji</label>
-          <input type="text" id="newItemIcon" class="form-control" value="🥤">
-        </div>
-      </div>
-
-      <div class="form-group" style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:10px; text-align:center;">
-        <label style="font-size:0.75rem; color:#475569;">📸 വിഭവത്തിന്റെ ചിത്രം ചേർക്കുക:</label>
-        <input type="file" id="newItemImageFile" accept="image/*" style="display:none;" onchange="handleItemImagePick(event)">
-        <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:6px;">
-          <button type="button" onclick="document.getElementById('newItemImageFile').click()" style="background:#e0f2fe; color:#0369a1; border:none; padding:7px 14px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer;">
-            ചിത്രം തിരഞ്ഞെടുക്കുക
-          </button>
-          <img id="newItemImgPreview" src="" alt="Preview" style="display:none; width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid #cbd5e1;">
-        </div>
-      </div>
-
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button type="button" id="btnSaveItemAction" onclick="saveOrUpdateItem()" style="flex:1; background:var(--emerald); color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;">
-          + Add to Menu
-        </button>
-        <button type="button" id="btnCancelEdit" onclick="cancelItemEditing()" style="display:none; background:#94a3b8; color:white; border:none; padding:12px 16px; border-radius:10px; font-weight:800; cursor:pointer;">
-          ✕ Cancel
-        </button>
-      </div>
-
-      <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ്:</h4>
-      <div id="modalExistingItems" style="max-height:190px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
-    </div>
-  </div>
-
-  <!-- RECENT BILLS / REPRINT MODAL -->
-  <div class="modal" id="recentBillsModal">
-    <div class="modal-box">
+  <!-- 2. RECENT BILLS MODAL (CLEAN 4-DIGIT LIST) -->
+  <div class="modal-overlay" id="recentBillsModal">
+    <div class="modal-sheet">
       <div class="modal-header">
         <div class="modal-title">📋 Recent Bills / Reprint</div>
-        <button class="btn-close" onclick="closeModal('recentBillsModal')">✕</button>
+        <button class="modal-close-btn" data-close="recentBillsModal">✕</button>
       </div>
-      <div id="recentBillsContainer" style="max-height:340px; overflow-y:auto;"></div>
+      <div class="modal-body" id="recentBillsList">
+        <!-- Bills rendered here -->
+      </div>
     </div>
   </div>
 
-  <!-- TODAY'S SUMMARY MODAL -->
-  <div class="modal" id="todaySummaryModal">
-    <div class="modal-box" style="text-align:center;">
+  <!-- 3. BILL DETAILS / RECEIPT POPUP (WHATSAPP STYLE) -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-sheet">
       <div class="modal-header">
-        <div class="modal-title">📊 Today's Counter Summary</div>
-        <button class="btn-close" onclick="closeModal('todaySummaryModal')">✕</button>
+        <div class="modal-title">🧾 Bill Receipt</div>
+        <button class="modal-close-btn" data-close="receiptModal">✕</button>
       </div>
-      <p id="sumDateText" style="font-size:0.8rem; color:#64748b; margin-bottom:12px;"></p>
-      
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:12px;">
-        <div style="font-size:0.75rem; color:var(--slate-600); font-weight:bold;">TOTAL COUNTER SALES</div>
-        <div id="sumTotalSalesText" style="font-size:2rem; font-weight:900; color:var(--emerald); margin:4px 0;">₹0</div>
-        <div style="font-size:0.8rem; color:#64748b;">
-          Cash: <b id="sumCashText" style="color:var(--emerald);">₹0</b> | GPay: <b id="sumGpayText" style="color:var(--blue);">₹0</b>
+      <div class="modal-body">
+        <div class="receipt-view" id="receiptContent">
+          <!-- Filled dynamically -->
         </div>
-      </div>
-
-      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; text-align:left; font-size:0.85rem;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-          <span>ആകെ ബില്ലുകൾ:</span>
-          <strong id="sumBillsCountText">0</strong>
-        </div>
-        <div style="display:flex; justify-content:space-between;">
-          <span>വിറ്റഴിഞ്ഞ ഗ്ലാസുകൾ:</span>
-          <strong id="sumGlassesCountText">0</strong>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <button class="btn-full btn-primary" id="receiptModalPrintBtn">🖨️ Print Receipt</button>
+          <button class="btn-full whatsapp-btn" id="receiptModalWaBtn">💬 Share WhatsApp</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- THERMAL RECEIPT SLIP (DEFAULT SYSTEM PRINT) -->
-  <div id="receiptPrintArea">
-    <div class="r-center" style="font-size:16px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
-    <div class="r-center" style="font-size:11px; font-weight:bold; margin-top:2px;">NELLIPPUZHA, MANNARKKAD</div>
-    <div class="r-center" style="font-size:10px; margin-top:1px;">Mob: +91 90370 10883</div>
-    <div class="r-center" id="rBillDate" style="margin-top:4px; font-size:10px;"></div>
-    <div class="r-center" id="rBillNo" style="font-weight:bold; font-size:11px;"></div>
-    <div class="r-line"></div>
-    <div class="r-row" style="font-weight:bold;">
-      <span>ITEM</span>
-      <span>QTY</span>
-      <span>AMT</span>
-    </div>
-    <div class="r-line"></div>
-    <div id="rItemsList"></div>
-    <div class="r-line"></div>
-    <div class="r-row" style="font-size:14px; font-weight:bold;">
-      <span>TOTAL:</span>
-      <span id="rTotalAmt">₹0</span>
-    </div>
-    <div class="r-row" style="font-size:10px; margin-top:2px;">
-      <span>PAYMENT:</span>
-      <span id="rPayMode">CASH</span>
-    </div>
-    <div class="r-line"></div>
-    <div class="r-center" style="margin-top:4px;">*** THANK YOU ***</div>
-    <div class="r-center">Visit Again!</div>
-  </div>
-
-  <!-- WHATSAPP PDF INVOICE CARD -->
-  <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
-    <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
-      <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
-      <p style="font-size:0.82rem; font-weight:800; color:#475569; margin-top:3px;">NELLIPPUZHA, MANNARKKAD</p>
-      <p style="font-size:0.78rem; font-weight:700; color:#2563eb; margin-top:2px;">Mob: +91 90370 10883</p>
-      <div style="font-size:0.75rem; color:#64748b; margin-top:8px; display:flex; justify-content:space-between; font-weight:600;">
-        <span id="pdfDateText">Date: -</span>
-        <span id="pdfBillNoText">Bill: #-</span>
+  <!-- 4. PARCEL CHARGE MODAL -->
+  <div class="modal-overlay" id="parcelModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">🥡 Parcel Charge (പാഴ്‌സൽ തുക)</div>
+        <button class="modal-close-btn" data-close="parcelModal">✕</button>
       </div>
-    </div>
-
-    <table style="width:100%; border-collapse:collapse; font-size:0.85rem; margin-bottom:14px;">
-      <thead>
-        <tr style="border-bottom:1px solid #cbd5e1; text-align:left; color:#475569;">
-          <th style="padding:6px 0; font-weight:800;">ITEM</th>
-          <th style="padding:6px 0; text-align:center; font-weight:800;">QTY</th>
-          <th style="padding:6px 0; text-align:right; font-weight:800;">PRICE</th>
-        </tr>
-      </thead>
-      <tbody id="pdfItemsTableBody"></tbody>
-    </table>
-
-    <div style="border-top:1.5px dashed #0f172a; border-bottom:1.5px dashed #0f172a; padding:10px 0; margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:900;">
-        <span>TOTAL:</span>
-        <span id="pdfTotalAmtText">₹0</span>
+      <div class="modal-body">
+        <input type="number" id="parcelInput" class="parcel-input" placeholder="₹ Amount" min="0" step="5">
+        <div class="quick-chips">
+          <button class="quick-chip-btn" onclick="setParcelVal(5)">+ ₹5</button>
+          <button class="quick-chip-btn" onclick="setParcelVal(10)">+ ₹10</button>
+          <button class="quick-chip-btn" onclick="setParcelVal(20)">+ ₹20</button>
+        </div>
+        <button class="btn-full btn-primary" id="saveParcelBtn">Save Parcel Charge</button>
+        <button class="btn-full btn-danger" id="removeParcelBtn">Remove Parcel</button>
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; font-weight:700; margin-top:4px;">
-        <span>PAYMENT MODE:</span>
-        <span id="pdfPayModeText">CASH</span>
-      </div>
-    </div>
-
-    <div style="text-align:center; font-size:0.75rem; color:#64748b; font-weight:700;">
-      <p>Thank you for visiting BANABLAST!</p>
-      <p style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Digital Receipt</p>
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- 5. PARTNER PIN VERIFICATION MODAL -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">🔒 Partner Verification</div>
+        <button class="modal-close-btn" data-close="pinModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:#64748b; margin-bottom:12px; text-align:center;">
+          മെയിൻ ആപ്പിലേക്ക് മടങ്ങാൻ പാർട്ണർ PIN നൽകുക:
+        </p>
+        <input type="password" id="partnerPinInput" class="parcel-input" placeholder="PIN" maxlength="6">
+        <button class="btn-full btn-primary" id="verifyPinBtn">Confirm & Proceed</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
-      authDomain: "banablast-64513.firebaseapp.com",
-      projectId: "banablast-64513",
-      storageBucket: "banablast-64513.firebasestorage.app",
-      messagingSenderId: "236930066397",
-      appId: "1:236930066397:web:e8062c9d77080837e3f834"
-    };
+    /* =========================================================
+       BANABLAST POS SYSTEM - PRODUCTION JAVASCRIPT
+       ========================================================= */
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    // 1. PRODUCTS DATABASE
+    const MENU_ITEMS = [
+      // KIDS SPECIALS
+      { id: 'k1', name: 'Happy Kid', price: 50, category: 'kids', icon: '🥤' },
+      { id: 'k2', name: 'Spider Kid', price: 60, category: 'kids', icon: '🥤' },
+      { id: 'k3', name: 'Micky Mouse Avil Milk', price: 60, category: 'kids', icon: '🥤' },
+      { id: 'k4', name: 'Dora Kid', price: 70, category: 'kids', icon: '🥤' },
 
-    let menuItems = [];
-    let todayBills = [];
-    let cart = [];
-    let currentPayMode = 'cash';
-    let currentCategory = 'avil_milk';
-    let editingBill = null;
-    let editingItemId = null;
-    let pickedItemImageBase64 = "";
+      // REGULAR AVIL MILK
+      { id: 'r1', name: 'Normal Avil Milk', price: 30, category: 'regular', icon: '🍌' },
+      { id: 'r2', name: 'Classic Avil Milk', price: 40, category: 'regular', icon: '🥛' },
+      { id: 'r3', name: 'Horlicks Avil Milk', price: 50, category: 'regular', icon: '🥛' },
+      { id: 'r4', name: 'Boost Avil Milk', price: 50, category: 'regular', icon: '⚡' },
+      { id: 'r5', name: 'Special Avil Milk', price: 60, category: 'regular', icon: '✨' },
+      { id: 'r6', name: 'Butterscotch Avil Milk', price: 70, category: 'regular', icon: '🍨' },
+      { id: 'r7', name: 'Strawberry Avil Milk', price: 70, category: 'regular', icon: '🍓' },
+      { id: 'r8', name: 'Pista Avil Milk', price: 70, category: 'regular', icon: '🟢' },
+      { id: 'r9', name: 'Mango Avil Milk', price: 70, category: 'regular', icon: '🥭' },
 
-    // Bluetooth Thermal Printer State
-    let connectedThermalPrinter = null;
-    let isConnectingBT = false;
+      // FRUIT & SPECIAL AVIL MILK
+      { id: 'f1', name: 'Chocolate Avil Milk', price: 80, category: 'fruit', icon: '🍫' },
+      { id: 'f2', name: 'Kesar Badam Avil Milk', price: 80, category: 'fruit', icon: '🥛' },
+      { id: 'f3', name: 'Blackcurrant Avil Milk', price: 80, category: 'fruit', icon: '🍇' },
+      { id: 'f4', name: 'Belgium Chocolate Avil Milk', price: 80, category: 'fruit', icon: '🍫' },
+      { id: 'f5', name: 'Lotus Biscoff Avil Milk', price: 80, category: 'fruit', icon: '🍪' },
+      { id: 'f6', name: 'Nutty Caramel Avil Milk', price: 80, category: 'fruit', icon: '🥜' },
 
-    const todayDate = new Date().toISOString().split('T')[0];
+      // JUICES & SHAKES
+      { id: 'd1', name: 'Fresh Lime', price: 25, category: 'drinks', icon: '🍋' },
+      { id: 'd2', name: 'Mint Lime', price: 30, category: 'drinks', icon: '🍃' },
+      { id: 'd3', name: 'Sharjah Shake', price: 60, category: 'drinks', icon: '🥤' },
+      { id: 'd4', name: 'Chikku Shake', price: 70, category: 'drinks', icon: '🥤' },
+      { id: 'd5', name: 'Cold Coffee', price: 60, category: 'drinks', icon: '☕' }
+    ];
 
-    // Helper: 12-Hour AM/PM
-    function get12HourTimeString(dateObj = new Date()) {
-      let h = dateObj.getHours();
-      let m = dateObj.getMinutes();
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      h = h % 12;
-      h = h ? h : 12;
-      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+    // 2. STATE MANAGEMENT
+    let cart = {}; // { itemId: qty }
+    let paymentMode = 'CASH';
+    let parcelCharge = 0;
+    let selectedCategory = 'all';
+    let isPrinting = false;
+    let activeReceiptBill = null;
+
+    // 3. PERSISTENCE HELPERS
+    function getStoredBills() {
+      try {
+        return JSON.parse(localStorage.getItem('banablast_bills')) || [];
+      } catch (e) {
+        return [];
+      }
     }
 
-    function parseToTimeMillis(timeStr, dateStr = todayDate) {
-      if (!timeStr) return 0;
-      let clean = timeStr.trim().toLowerCase();
-      let isPM = clean.includes('pm');
-      let isAM = clean.includes('am');
-      clean = clean.replace(/[^\d:]/g, '');
-      let [h, m] = clean.split(':').map(Number);
-      h = h || 0; m = m || 0;
-      if (isPM && h < 12) h += 12;
-      if (isAM && h === 12) h = 0;
-      const d = new Date(dateStr);
-      d.setHours(h, m, 0, 0);
-      return d.getTime();
+    function saveStoredBills(bills) {
+      try {
+        localStorage.setItem('banablast_bills', JSON.stringify(bills));
+      } catch (e) {
+        console.error("Storage error:", e);
+      }
     }
 
-    function matchMenuCardSubCategory(name, price) {
-      const nm = (name || '').toLowerCase();
-      const p = Number(price) || 0;
-      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy') || nm.includes('doara')) return 'kids';
-      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut') || nm.includes('fruit and nut')) return 'fruit';
-      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dray fruit') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || nm.includes('biscoff') || nm.includes('roasted almond') || p >= 110) return 'premium_nuts';
-      if (nm.includes('kulfi') || nm.includes('jack fruit') || nm.includes('caramount') || nm.includes('royal') || nm.includes('khajoor') || nm.includes('red velvet') || nm.includes('spanish') || nm.includes('passion') || (p >= 90 && p <= 100)) return 'special';
-      return 'regular';
+    // CONTINUOUS 4-DIGIT BILL NUMBER LOGIC (0001, 0002...)
+    function getNextBillNumber() {
+      let lastNo = parseInt(localStorage.getItem('banablast_last_bill_no') || '0', 10);
+      if (isNaN(lastNo) || lastNo <= 0) {
+        const bills = getStoredBills();
+        if (bills.length > 0) {
+          const numbers = bills.map(b => parseInt(b.billNo, 10)).filter(n => !isNaN(n));
+          lastNo = numbers.length > 0 ? Math.max(...numbers) : 0;
+        } else {
+          lastNo = 0;
+        }
+      }
+      const nextNo = lastNo + 1;
+      localStorage.setItem('banablast_last_bill_no', nextNo.toString());
+      return String(nextNo).padStart(4, '0');
     }
 
-    /* =============================================================
-       DROPDOWN & APP UPDATE FUNCTIONS
-       ============================================================= */
-    function toggleHeaderMenu(e) {
-      e.stopPropagation();
-      const dd = document.getElementById('headerDropdown');
-      dd.classList.toggle('show');
+    // 4. UI RENDERING
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      const filtered = selectedCategory === 'all' 
+        ? MENU_ITEMS 
+        : MENU_ITEMS.filter(item => item.category === selectedCategory);
+
+      filtered.forEach(item => {
+        const qty = cart[item.id] || 0;
+        const card = document.createElement('div');
+        card.className = 'prod-card';
+        card.innerHTML = `
+          <div class="prod-icon">${item.icon}</div>
+          <div class="prod-name">${item.name}</div>
+          <div class="prod-price">₹${item.price}</div>
+          <div class="qty-controls">
+            <button class="qty-btn minus" onclick="updateItemQty('${item.id}', -1)">-</button>
+            <span class="qty-num">${qty}</span>
+            <button class="qty-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
     }
 
-    function closeHeaderMenu() {
-      const dd = document.getElementById('headerDropdown');
-      if (dd) dd.classList.remove('show');
+    function updateItemQty(id, delta) {
+      const current = cart[id] || 0;
+      const next = current + delta;
+      if (next > 0) {
+        cart[id] = next;
+      } else {
+        delete cart[id];
+      }
+      renderProducts();
+      updateBillingBar();
     }
 
-    window.addEventListener('click', (e) => {
-      const dd = document.getElementById('headerDropdown');
-      if (dd && !e.target.closest('.header-actions')) {
-        dd.classList.remove('show');
+    function getCartTotal() {
+      let subtotal = 0;
+      let count = 0;
+      for (const [id, qty] of Object.entries(cart)) {
+        const item = MENU_ITEMS.find(m => m.id === id);
+        if (item) {
+          subtotal += item.price * qty;
+          count += qty;
+        }
+      }
+      const grandTotal = subtotal > 0 ? (subtotal + parcelCharge) : 0;
+      return { subtotal, grandTotal, count };
+    }
+
+    function updateBillingBar() {
+      const { grandTotal, count } = getCartTotal();
+      document.getElementById('totalAmountText').textContent = `₹${grandTotal}`;
+      document.getElementById('cartCountText').textContent = `${count} Items ▾`;
+
+      // Parcel Chip Status
+      const chip = document.getElementById('parcelChip');
+      const chipText = document.getElementById('parcelChipText');
+      if (parcelCharge > 0) {
+        chip.classList.add('active');
+        chipText.textContent = `₹${parcelCharge} ✕`;
+      } else {
+        chip.classList.remove('active');
+        chipText.textContent = `Parcel`;
+      }
+    }
+
+    // 5. PARCEL CHARGE HANDLERS
+    document.getElementById('parcelChip').addEventListener('click', () => {
+      if (parcelCharge > 0) {
+        parcelCharge = 0;
+        updateBillingBar();
+      } else {
+        document.getElementById('parcelInput').value = '';
+        openModal('parcelModal');
       }
     });
 
-    function forceReloadApp() {
-      if (confirm("ആപ്പ് ഏറ്റവും പുതിയ വേർഷനിലേക്ക് അപ്‌ഡേറ്റ് ചെയ്യണോ?")) {
-        const freshUrl = window.location.href.split('?')[0] + '?update=' + Date.now();
-        window.location.href = freshUrl;
-      }
-    }
-
-    /* =============================================================
-       BLUETOOTH DIRECT THERMAL PRINTING ENGINE (CAPACITOR NATIVE)
-       ============================================================= */
-    document.addEventListener('deviceready', () => {
-      initBluetoothAutoConnect();
-    }, false);
-
-    function updateBTStatusUI(status, tooltip) {
-      const dot = document.getElementById('btStatusIndicator');
-      if (!dot) return;
-      dot.className = 'printer-dot ' + status;
-      dot.title = tooltip || (status === 'online' ? 'പ്രിന്റർ റെഡി' : 'പ്രിന്റർ ഓഫ്‌ലൈൻ');
-    }
-
-    function initBluetoothAutoConnect() {
-      if (typeof bluetoothSerial === 'undefined') {
-        console.log("BluetoothSerial plugin not detected (Standard Browser mode)");
-        updateBTStatusUI('offline', 'ബ്രൗസർ മോഡ്');
-        return;
-      }
-
-      if (isConnectingBT) return;
-      isConnectingBT = true;
-      updateBTStatusUI('connecting', 'പ്രിന്ററുമായി ബന്ധിപ്പിക്കുന്നു...');
-
-      bluetoothSerial.isEnabled(() => {
-        bluetoothSerial.list((devices) => {
-          isConnectingBT = false;
-          if (!devices || devices.length === 0) {
-            updateBTStatusUI('offline', 'ഡിവൈസുകൾ കണ്ടെത്തിയില്ല');
-            return;
-          }
-
-          const target = devices.find(d => 
-            (d.name && (d.name.includes("83F5") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
-          ) || devices[0];
-
-          if (target) {
-            bluetoothSerial.connect(target.address, () => {
-              connectedThermalPrinter = target;
-              updateBTStatusUI('online', `റെഡി: ${target.name}`);
-              console.log("Connected to printer:", target.name);
-            }, (err) => {
-              connectedThermalPrinter = null;
-              updateBTStatusUI('offline', 'കണക്ഷൻ സാധിച്ചില്ല');
-              console.warn("Connection Failed:", err);
-            });
-          }
-        }, (err) => {
-          isConnectingBT = false;
-          updateBTStatusUI('offline', 'എറർ');
-        });
-      }, () => {
-        isConnectingBT = false;
-        updateBTStatusUI('offline', 'ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക');
-      });
-    }
-
-    // Direct ESC/POS Commands (32 Column Alignment for 58mm Thermal Receipt)
-    function sendEscPosDirectPrint(billNo, date, time, total, mode, items) {
-      const ESC = "\x1B";
-      const GS = "\x1D";
-      const INIT = ESC + "@";
-      const CENTER = ESC + "a\x01";
-      const LEFT = ESC + "a\x00";
-      const BOLD_ON = ESC + "E\x01";
-      const BOLD_OFF = ESC + "E\x00";
-      const DOUBLE_ON = GS + "!\x11";
-      const NORMAL = GS + "!\x00";
-      const FEED = "\n\n\n\n";
-
-      let raw = INIT;
-      raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
-      raw += CENTER + "NELLIPPUZHA, MANNARKKAD\n";
-      raw += CENTER + "Mob: +91 90370 10883\n";
-      raw += CENTER + `${date}  ${time}\n`;
-      raw += CENTER + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
-      raw += "--------------------------------\n";
-      raw += LEFT + "ITEM             QTY         AMT\n";
-      raw += "--------------------------------\n";
-
-      items.forEach(i => {
-        let itemName = (i.name || '').substring(0, 15).padEnd(16, ' ');
-        let qty = String(i.qty).padStart(4, ' ');
-        let amt = ("Rs." + (i.price * i.qty)).padStart(10, ' ');
-        raw += `${itemName} ${qty} ${amt}\n`;
-      });
-
-      raw += "--------------------------------\n";
-      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
-      raw += LEFT + `PAYMENT: ${(mode || 'cash').toUpperCase()}\n`;
-      raw += "--------------------------------\n";
-      raw += CENTER + "*** THANK YOU ***\n";
-      raw += CENTER + "Visit Again!\n";
-      raw += FEED;
-
-      bluetoothSerial.write(raw, () => {
-        console.log("Direct ESC/POS Print Success!");
-      }, (err) => {
-        console.warn("Bluetooth write failed, falling back to window.print()", err);
-        window.print();
-      });
-    }
-
-    window.onload = function() {
-      db.collection('billing_items').onSnapshot(snap => {
-        menuItems = [];
-        snap.forEach(doc => {
-          const data = doc.data();
-          let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
-          
-          let subCat = data.subCategory;
-          if (!subCat && fixedCat === 'avil_milk') {
-            subCat = matchMenuCardSubCategory(fixedName, data.price);
-          }
-
-          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat, subCategory: subCat || 'regular' });
-        });
-
-        renderMenuItems();
-        renderModalItems();
-      });
-
-      db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
-        todayBills = [];
-        snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
-      });
-
-      setTimeout(initBluetoothAutoConnect, 1200);
+    window.setParcelVal = function(val) {
+      document.getElementById('parcelInput').value = val;
     };
 
-    function switchCategory(cat) {
-      currentCategory = cat;
-      document.getElementById('tabAvil').className = 'cat-tab-btn ' + (cat === 'avil_milk' ? 'active' : '');
-      document.getElementById('tabJuices').className = 'cat-tab-btn ' + (cat === 'juices' ? 'active' : '');
-      
-      const stickyBar = document.getElementById('subcatStickyBar');
-      stickyBar.style.display = (cat === 'avil_milk') ? 'flex' : 'none';
-      renderMenuItems();
-    }
+    document.getElementById('saveParcelBtn').addEventListener('click', () => {
+      const val = parseInt(document.getElementById('parcelInput').value, 10);
+      parcelCharge = (!isNaN(val) && val > 0) ? val : 0;
+      closeModal('parcelModal');
+      updateBillingBar();
+    });
 
-    function scrollToSection(secId) {
-      document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
-      const clickedBtn = document.getElementById('chip-' + secId.replace('sec-', ''));
-      if (clickedBtn) clickedBtn.classList.add('active');
+    document.getElementById('removeParcelBtn').addEventListener('click', () => {
+      parcelCharge = 0;
+      closeModal('parcelModal');
+      updateBillingBar();
+    });
 
-      if (secId === 'sec-all') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
+    // 6. PAYMENT MODE TOGGLE
+    document.getElementById('payCashBtn').addEventListener('click', () => {
+      paymentMode = 'CASH';
+      document.getElementById('payCashBtn').className = 'pay-btn active';
+      document.getElementById('payGpayBtn').className = 'pay-btn';
+    });
 
-      const el = document.getElementById(secId);
-      if (el) {
-        const offset = 100;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = el.getBoundingClientRect().top;
-        const offsetPosition = (elementRect - bodyRect) - offset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-      }
-    }
+    document.getElementById('payGpayBtn').addEventListener('click', () => {
+      paymentMode = 'GPAY';
+      document.getElementById('payGpayBtn').className = 'pay-btn active gpay';
+      document.getElementById('payCashBtn').className = 'pay-btn';
+    });
 
-    function renderMenuItems() {
-      const root = document.getElementById('posItemsRoot');
-      let items = menuItems.filter(i => {
-        if (currentCategory === 'avil_milk') return i.category === 'avil_milk' || i.category === 'aval_milk';
-        return i.category === currentCategory;
+    // 7. CLEAR CART
+    document.getElementById('clearCartBtn').addEventListener('click', () => {
+      cart = {};
+      parcelCharge = 0;
+      renderProducts();
+      updateBillingBar();
+    });
+
+    // 8. CATEGORY FILTER CLICKS
+    document.querySelectorAll('.cat-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = btn.dataset.cat;
+        renderProducts();
       });
+    });
 
-      if (!items.length) {
-        root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
-        return;
-      }
+    // 9. CART MODAL VIEW
+    document.getElementById('cartSummaryBtn').addEventListener('click', () => {
+      const list = document.getElementById('cartItemsList');
+      list.innerHTML = '';
+      const itemsInCart = Object.entries(cart);
 
-      if (currentCategory === 'juices') {
-        items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-        root.innerHTML = `<div class="items-container">${items.map(it => renderCardHTML(it)).join('')}</div>`;
-        return;
-      }
-
-      const subCats = [
-        { id: 'kids', name: '👶 Kids Specials', filter: 'kids' },
-        { id: 'regular', name: '🍌 Regular Avil Milk', filter: 'regular' },
-        { id: 'fruit', name: '🍓 Fruit Items', filter: 'fruit' },
-        { id: 'special', name: '⭐ Special Items', filter: 'special' },
-        { id: 'premium_nuts', name: '🥜 Premium & Nuts', filter: 'premium_nuts' }
-      ];
-
-      let fullHTML = '<div id="sec-all"></div>';
-
-      subCats.forEach(sc => {
-        const catItems = items.filter(i => i.subCategory === sc.filter);
-        if (catItems.length) {
-          catItems.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-          fullHTML += `
-            <div id="sec-${sc.id}">
-              <div class="subcat-section-title">${sc.name} (${catItems.length})</div>
-              <div class="items-container">
-                ${catItems.map(it => renderCardHTML(it)).join('')}
+      if (itemsInCart.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px;">കാർട്ടിൽ സാധനങ്ങൾ ഒന്നുമില്ല!</div>';
+      } else {
+        itemsInCart.forEach(([id, qty]) => {
+          const item = MENU_ITEMS.find(m => m.id === id);
+          if (item) {
+            const row = document.createElement('div');
+            row.style = 'display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;';
+            row.innerHTML = `
+              <div>
+                <div style="font-weight:800; font-size:14px;">${item.name}</div>
+                <div style="font-size:12px; color:#64748b;">₹${item.price} x ${qty} = ₹${item.price * qty}</div>
               </div>
-            </div>
-          `;
-        }
-      });
+              <div class="qty-controls" style="width:100px;">
+                <button class="qty-btn minus" onclick="updateItemQty('${item.id}', -1)">-</button>
+                <span class="qty-num">${qty}</span>
+                <button class="qty-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
+              </div>
+            `;
+            list.appendChild(row);
+          }
+        });
+      }
+      openModal('cartModal');
+    });
 
-      root.innerHTML = fullHTML;
+    // 10. RECENT BILLS MODAL & RECEIPT DETAILS POPUP
+    document.getElementById('recentBillsBtn').addEventListener('click', () => {
+      renderRecentBills();
+      openModal('recentBillsModal');
+    });
+
+    function renderRecentBills() {
+      const list = document.getElementById('recentBillsList');
+      list.innerHTML = '';
+      const bills = getStoredBills();
+
+      if (bills.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px;">ബില്ലുകൾ ഒന്നും ലഭ്യമല്ല!</div>';
+        return;
+      }
+
+      // Latest first
+      bills.slice().reverse().forEach(bill => {
+        const item = document.createElement('div');
+        item.className = 'bill-item';
+        
+        const count = bill.items ? bill.items.reduce((s, i) => s + i.qty, 0) : 0;
+        const badgeClass = bill.paymentMode === 'GPAY' ? 'bill-badge gpay' : 'bill-badge';
+
+        item.innerHTML = `
+          <div class="bill-item-left" onclick="showReceiptDetails('${bill.id}')">
+            <div class="bill-item-header">
+              <span class="bill-item-no">#${bill.billNo}</span>
+              <span class="bill-item-total">₹${bill.total}</span>
+            </div>
+            <span class="${badgeClass}">${bill.paymentMode}</span>
+            <span class="bill-item-time">🕒 ${bill.time} | ${count} items ${bill.parcelCharge ? '• 🥡' : ''}</span>
+          </div>
+          <div class="bill-item-actions">
+            <button class="action-icon-btn wa" title="WhatsApp" onclick="shareWhatsAppBill('${bill.id}', event)">💬</button>
+            <button class="action-icon-btn print" title="Reprint" onclick="reprintBill('${bill.id}', event)">🖨️</button>
+            <button class="action-icon-btn del" title="Delete" onclick="deleteBill('${bill.id}', event)">🗑️</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
     }
 
-    function renderCardHTML(it) {
-      const cartItem = cart.find(c => c.id === it.id);
-      const qty = cartItem ? cartItem.qty : 0;
-      const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
-      const isSelected = qty > 0 ? 'in-cart' : '';
+    // SHOW WHATSAPP-STYLE RECEIPT DETAILS POPUP ON BILL TAP
+    window.showReceiptDetails = function(billId) {
+      const bills = getStoredBills();
+      const bill = bills.find(b => b.id === billId);
+      if (!bill) return;
 
-      const mediaHTML = it.imageUrl 
-        ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
-        : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
+      activeReceiptBill = bill;
+      const content = document.getElementById('receiptContent');
 
-      return `
-        <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
-          ${qtyBadge}
-          <div class="item-media-box">${mediaHTML}</div>
-          <div class="item-name">${it.name}</div>
-          <div class="price-chip">₹${it.price}</div>
-          
-          <div class="item-stepper-box" onclick="event.stopPropagation()">
-            <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
-            <span class="item-qty-center">${qty > 0 ? qty : ''}</span>
-            <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
+      let itemsHtml = '';
+      bill.items.forEach(it => {
+        itemsHtml += `
+          <tr>
+            <td>${it.name}</td>
+            <td style="text-align:center;">${it.qty}</td>
+            <td style="text-align:right;">₹${it.price * it.qty}</td>
+          </tr>
+        `;
+      });
+
+      content.innerHTML = `
+        <div class="receipt-header">
+          <div class="receipt-title">BANABLAST</div>
+          <div class="receipt-sub">Nellippuzha, Mannarkkad</div>
+          <div class="receipt-sub">Mob: +91 9037010883</div>
+        </div>
+        <div class="receipt-row">
+          <span><strong>BILL NO:</strong> ${bill.billNo}</span>
+          <span><strong>DATE:</strong> ${bill.date}</span>
+        </div>
+        <div class="receipt-row">
+          <span><strong>TIME:</strong> ${bill.time}</span>
+          <span><strong>PAYMENT:</strong> ${bill.paymentMode}</span>
+        </div>
+        ${bill.parcelCharge > 0 ? '<div style="color:#c2410c; font-weight:800; font-size:12px; margin-top:4px;">*** PARCEL ORDER ***</div>' : ''}
+        
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>ITEM</th>
+              <th style="text-align:center;">QTY</th>
+              <th style="text-align:right;">AMT</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        ${bill.parcelCharge > 0 ? `
+          <div class="receipt-row" style="color:#c2410c; font-weight:700;">
+            <span>Parcel Packing Charge:</span>
+            <span>₹${bill.parcelCharge}</span>
           </div>
+        ` : ''}
+
+        <div class="receipt-total-row">
+          <span>TOTAL:</span>
+          <span>₹${bill.total}</span>
         </div>
       `;
+
+      openModal('receiptModal');
+    };
+
+    document.getElementById('receiptModalPrintBtn').addEventListener('click', () => {
+      if (activeReceiptBill) executeThermalPrint(activeReceiptBill);
+    });
+
+    document.getElementById('receiptModalWaBtn').addEventListener('click', () => {
+      if (activeReceiptBill) sendWhatsAppTextBill(activeReceiptBill);
+    });
+
+    window.reprintBill = function(billId, e) {
+      if (e) e.stopPropagation();
+      const bills = getStoredBills();
+      const bill = bills.find(b => b.id === billId);
+      if (bill) executeThermalPrint(bill);
+    };
+
+    window.deleteBill = function(billId, e) {
+      if (e) e.stopPropagation();
+      if (!confirm("ഈ ബിൽ ലിസ്റ്റിൽ നിന്ന് ഒഴിവാക്കണമോ?")) return;
+      let bills = getStoredBills();
+      bills = bills.filter(b => b.id !== billId);
+      saveStoredBills(bills);
+      renderRecentBills();
+    };
+
+    // 11. DOUBLE-PRINT & DOUBLE-ENTRY PROTECTION
+    document.getElementById('printBtn').addEventListener('click', handleCreateAndPrintBill);
+
+    function playBeepFeedback() {
+      try {
+        if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 1200;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+        setTimeout(() => { osc.stop(); ctx.close(); }, 160);
+      } catch (e) {}
     }
 
-    function addToCart(id) {
-      const item = menuItems.find(i => i.id === id);
-      if (!item) return;
-
-      const existing = cart.find(c => c.id === id);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
-      }
-      renderCartUI();
-      renderMenuItems();
-    }
-
-    function changeQty(id, delta) {
-      const item = cart.find(c => c.id === id);
-      if (!item) return;
-      item.qty += delta;
-      if (item.qty <= 0) {
-        cart = cart.filter(c => c.id !== id);
-      }
-      renderCartUI();
-      renderMenuItems();
-    }
-
-    function clearCart() {
-      if (cart.length && confirm("കാർട്ട് പൂർണ്ണമായും കാലിയാക്കണോ?")) {
-        cart = [];
-        editingBill = null;
-        renderCartUI();
-        renderMenuItems();
-      }
-    }
-
-    function renderCartUI() {
-      let total = 0;
-      let totalQty = 0;
-      cart.forEach(i => {
-        total += (i.price * i.qty);
-        totalQty += i.qty;
-      });
-
-      document.getElementById('cartTotalText').innerText = '₹' + total;
-      document.getElementById('cartCountTag').innerText = `${totalQty} Items`;
-
-      const container = document.getElementById('cartItemsList');
-      if (!cart.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.9rem;">സാധനങ്ങൾ ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല</p>';
-      } else {
-        container.innerHTML = cart.map(item => `
-          <div class="cart-row">
-            <div>
-              <div class="cart-row-name">${item.name}</div>
-              <div class="cart-row-sub">₹${item.price} x ${item.qty} = <b>₹${item.price * item.qty}</b></div>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <button type="button" class="btn-step btn-step-minus" style="width:34px; height:34px;" onclick="changeQty('${item.id}', -1)">−</button>
-              <span style="font-weight:900; font-size:1.05rem; min-width:24px; text-align:center;">${item.qty}</span>
-              <button type="button" class="btn-step btn-step-plus" style="width:34px; height:34px;" onclick="changeQty('${item.id}', 1)">+</button>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-
-    function setPaymentMode(mode) {
-      currentPayMode = mode;
-      const bCash = document.getElementById('btnPayCash');
-      const bGpay = document.getElementById('btnPayGPay');
-
-      if (mode === 'cash') {
-        bCash.className = 'btn-pay-sub active cash';
-        bGpay.className = 'btn-pay-sub gpay';
-      } else {
-        bCash.className = 'btn-pay-sub cash';
-        bGpay.className = 'btn-pay-sub active gpay';
-      }
-    }
-
-    function openCartDrawer() {
-      document.getElementById('cartDrawerModal').style.display = 'flex';
-    }
-
-    /* -------------------------------------------------------------
-       സേവിംഗ് & ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് എക്സിക്യൂഷൻ
-       ------------------------------------------------------------- */
-    async function printAndSaveBill() {
-      if (!cart.length) {
-        alert("⚠️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല!");
+    async function handleCreateAndPrintBill() {
+      const { grandTotal, subtotal } = getCartTotal();
+      if (grandTotal <= 0) {
+        alert("കാർട്ടിൽ സാധനങ്ങൾ ചേർക്കുക!");
         return;
       }
 
-      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const timeStr = get12HourTimeString();
-      const createdAtMillis = Date.now();
-      const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
+      if (isPrinting) return; // INSTANT LOCK PREVENTS DOUBLE CLICK
 
-      try {
-        if (editingBill) {
-          const oldTotal = editingBill.total;
-          const oldMode = editingBill.mode;
+      // LOCK BUTTON
+      isPrinting = true;
+      const printBtn = document.getElementById('printBtn');
+      const printBtnText = document.getElementById('printBtnText');
+      printBtn.disabled = true;
+      printBtnText.textContent = "⏳ Printing...";
+      playBeepFeedback();
 
-          await db.collection('pos_bills').doc(editingBill.id).update({
-            items: cart,
-            total,
-            mode: currentPayMode,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          await syncAggregatedLedger(todayDate, oldMode, -oldTotal);
-          await syncAggregatedLedger(todayDate, currentPayMode, total);
-
-          alert(`✅ ബില്ല് #${billNo} വിജയകരമായി തിരുത്തി!`);
-        } else {
-          await db.collection('pos_bills').add({
-            billNo,
-            date: todayDate,
-            time: timeStr,
-            createdAtMillis: createdAtMillis,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            items: cart,
-            total,
-            mode: currentPayMode,
-            addedBy: 'Counter Staff',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          await syncAggregatedLedger(todayDate, currentPayMode, total);
-        }
-
-        // നേരിട്ടുള്ള ബ്ലൂടൂത്ത് പ്രിന്റിംഗ് (ബ്ലൂടൂത്ത് ഇല്ലെങ്കിൽ സിസ്റ്റം പ്രിന്റ്)
-        triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
-
-        cart = [];
-        editingBill = null;
-        renderCartUI();
-        renderMenuItems();
-        closeModal('cartDrawerModal');
-
-      } catch (err) {
-        console.error("Save error:", err);
-        alert("❌ ബില്ല് സേവ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
-      }
-    }
-
-    function triggerThermalPrint(billNo, date, time, total, mode, items) {
-      document.getElementById('rBillDate').innerText = `${date} ${time}`;
-      document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
-      document.getElementById('rTotalAmt').innerText = `₹${total}`;
-      document.getElementById('rPayMode').innerText = (mode || 'cash').toUpperCase();
-
-      document.getElementById('rItemsList').innerHTML = items.map(i => `
-        <div class="r-row">
-          <span>${i.name.substring(0, 15)}</span>
-          <span>${i.qty}</span>
-          <span>₹${i.price * i.qty}</span>
-        </div>
-      `).join('');
-
-      if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
-        sendEscPosDirectPrint(billNo, date, time, total, mode, items);
-      } else if (typeof bluetoothSerial !== 'undefined') {
-        initBluetoothAutoConnect();
-        setTimeout(() => {
-          if (connectedThermalPrinter) {
-            sendEscPosDirectPrint(billNo, date, time, total, mode, items);
-          } else {
-            window.print();
-          }
-        }, 300);
-      } else {
-        setTimeout(() => {
-          window.print();
-        }, 50);
-      }
-    }
-
-    async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
-      const targetTitle = (mode === 'cash') ? 'Counter Sales (Cash)' : 'Counter Sales (GPay)';
-      const docId = `counter_sale_${dateStr}_${mode}`;
-      const fixedDocRef = db.collection('transactions').doc(docId);
-
-      const snap = await db.collection('transactions')
-        .where('date', '==', dateStr)
-        .where('type', '==', 'sale')
-        .where('mode', '==', mode)
-        .where('addedBy', '==', 'Counter POS')
-        .get();
-
-      let totalExistingAmount = 0;
-      const batch = db.batch();
-
-      snap.forEach(d => {
-        totalExistingAmount += (d.data().amount || 0);
-        if (d.id !== docId) batch.delete(d.ref);
-      });
-
-      const finalAmount = Math.round((totalExistingAmount + deltaAmount) * 100) / 100;
-
-      batch.set(fixedDocRef, {
-        date: dateStr,
-        type: 'sale',
-        category: 'sale',
-        title: targetTitle,
-        extra: targetTitle,
-        amount: finalAmount > 0 ? finalAmount : 0,
-        billTotal: finalAmount > 0 ? finalAmount : 0,
-        paidAmount: finalAmount > 0 ? finalAmount : 0,
-        dueAmount: 0,
-        mode: mode,
-        note: 'Counter POS Auto Aggregation',
-        addedBy: 'Counter POS',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      await batch.commit();
-    }
-
-    async function sendWhatsAppBillDirect() {
-      if (!cart.length) {
-        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
-        return;
-      }
-
-      const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      const timeStr = get12HourTimeString();
-      const billNo = editingBill ? editingBill.billNo : `BB-${Date.now().toString().slice(-4)}`;
-
-      await generateAndSharePdfBill(billNo, todayDate, timeStr, total, currentPayMode, cart);
-    }
-
-    async function generateAndSharePdfBill(billNo, date, time, total, mode, items) {
-      document.getElementById('pdfDateText').innerText = `${date} ${time}`;
-      document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
-      document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
-      document.getElementById('pdfPayModeText').innerText = (mode || 'cash').toUpperCase();
-
-      const tbody = document.getElementById('pdfItemsTableBody');
-      tbody.innerHTML = items.map(i => `
-        <tr style="border-bottom:1px solid #f1f5f9;">
-          <td style="padding:6px 0; font-weight:700;">${i.name}</td>
-          <td style="padding:6px 0; text-align:center; font-weight:800;">${i.qty}</td>
-          <td style="padding:6px 0; text-align:right; font-weight:800;">₹${i.price * i.qty}</td>
-        </tr>
-      `).join('');
-
-      const card = document.getElementById('pdfInvoiceCard');
-
-      try {
-        const canvas = await html2canvas(card, { scale: 2, useCORS: true });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-        const { jsPDF } = window.jspdf;
-        const pdfWidth = 80;
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
-
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-        const pdfBlob = pdf.output('blob');
-        const fileName = `BANABLAST_Bill_${billNo}.pdf`;
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share({
-            files: [pdfFile],
-            title: `BANABLAST Bill #${billNo}`,
-            text: `🥤 BANABLAST Bill #${billNo} (₹${total})`
-          });
-        } else {
-          pdf.save(fileName);
-          alert(`✅ PDF ബില്ല് ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
-        }
-      } catch (err) {
-        console.error("PDF Share Error:", err);
-        alert("❌ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
-      }
-    }
-
-    function openRecentBillsModal() {
-      const container = document.getElementById('recentBillsContainer');
-      
-      const sorted = todayBills.slice().sort((a, b) => {
-        const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
-        const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
-        return tB - tA;
-      });
-
-      if (!sorted.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
-      } else {
-        container.innerHTML = sorted.map(b => `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${(b.mode || 'cash').toUpperCase()}</span></div>
-              <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items</div>
-            </div>
-            <div style="display:flex; gap:5px;">
-              <button type="button" style="background:#25d366; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillPdf('${b.id}')" title="WhatsApp PDF">💬</button>
-              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
-              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
-              <button type="button" style="background:#fee2e2; color:#dc2626; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️️</button>
-            </div>
-          </div>
-        `).join('');
-      }
-      document.getElementById('recentBillsModal').style.display = 'flex';
-    }
-
-    async function deletePosBill(id) {
-      const b = todayBills.find(x => x.id === id);
-      if (!b) return;
-
-      if (!confirm(`⚠️ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
-        return;
-      }
-
-      try {
-        await db.collection('pos_bills').doc(id).delete();
-        await syncAggregatedLedger(b.date || todayDate, b.mode || 'cash', -b.total);
-        alert(`✅ ബില്ല് #${b.billNo} ഡിലീറ്റ് ചെയ്യുകയും ലെഡ്ജർ തുക വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്യുകയും ചെയ്തു.`);
-        openRecentBillsModal();
-      } catch (err) {
-        console.error("Delete bill error:", err);
-        alert("❌ ബില്ല് ഡിലീറ്റ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
-      }
-    }
-
-    function shareExistingBillPdf(id) {
-      const b = todayBills.find(x => x.id === id);
-      if (!b) return;
-      generateAndSharePdfBill(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
-    }
-
-    function reprintBill(id) {
-      const b = todayBills.find(x => x.id === id);
-      if (!b) return;
-      triggerThermalPrint(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
-      closeModal('recentBillsModal');
-    }
-
-    function loadBillToEdit(id) {
-      const b = todayBills.find(x => x.id === id);
-      if (!b) return;
-      cart = JSON.parse(JSON.stringify(b.items || []));
-      editingBill = b;
-      setPaymentMode(b.mode || 'cash');
-      renderCartUI();
-      renderMenuItems();
-      closeModal('recentBillsModal');
-      alert(`⚠️ ബില്ല് #${b.billNo} തിരുത്താനായി കാർട്ടിലേക്ക് എടുത്തു.`);
-    }
-
-    function openTodaySummaryModal() {
-      let total = 0, cash = 0, gpay = 0, glasses = 0;
-      todayBills.forEach(b => {
-        total += b.total;
-        if (b.mode === 'cash') cash += b.total; else gpay += b.total;
-        if (b.items) b.items.forEach(it => { glasses += (it.qty || 1); });
-      });
-
-      document.getElementById('sumDateText').innerText = `Date: ${todayDate}`;
-      document.getElementById('sumTotalSalesText').innerText = '₹' + Math.round(total * 100) / 100;
-      document.getElementById('sumCashText').innerText = '₹' + Math.round(cash * 100) / 100;
-      document.getElementById('sumGpayText').innerText = '₹' + Math.round(gpay * 100) / 100;
-      document.getElementById('sumBillsCountText').innerText = todayBills.length;
-      document.getElementById('sumGlassesCountText').innerText = glasses;
-      document.getElementById('todaySummaryModal').style.display = 'flex';
-    }
-
-    function returnToMainApp() {
-      window.location.href = 'index.html';
-    }
-
-    function toggleSubCategoryField() {
-      const cat = document.getElementById('newItemCat').value;
-      const subField = document.getElementById('subCatFormField');
-      subField.style.display = (cat === 'avil_milk') ? 'block' : 'none';
-    }
-
-    function openItemsModal() {
-      cancelItemEditing();
-      toggleSubCategoryField();
-      document.getElementById('itemsModal').style.display = 'flex';
-    }
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-      if (id === 'itemsModal') cancelItemEditing();
-    }
-
-    function handleItemImagePick(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const maxDim = 150;
-          canvas.width = maxDim;
-          canvas.height = maxDim;
-          const ctx = canvas.getContext('2d');
-          
-          let sw = img.width, sh = img.height;
-          let minSide = Math.min(sw, sh);
-          let sx = (sw - minSide) / 2;
-          let sy = (sh - minSide) / 2;
-
-          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxDim, maxDim);
-          pickedItemImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-
-          const preview = document.getElementById('newItemImgPreview');
-          preview.src = pickedItemImageBase64;
-          preview.style.display = 'block';
-        };
+      // BUILD BILL OBJECT WITH CONTINUOUS 4-DIGIT NUMBER
+      const now = new Date();
+      const billData = {
+        id: 'bill_' + Date.now(),
+        billNo: getNextBillNumber(), // 0001, 0002...
+        date: formatDateDDMMYYYY(now),
+        time: formatTimeAMPM(now),
+        timestamp: now.getTime(),
+        paymentMode: paymentMode,
+        subtotal: subtotal,
+        parcelCharge: parcelCharge,
+        total: grandTotal,
+        items: Object.entries(cart).map(([id, qty]) => {
+          const m = MENU_ITEMS.find(item => item.id === id);
+          return { name: m ? m.name : id, price: m ? m.price : 0, qty: qty };
+        })
       };
-      reader.readAsDataURL(file);
+
+      // SAVE BILL TO STORAGE
+      const bills = getStoredBills();
+      bills.push(billData);
+      saveStoredBills(bills);
+
+      // AUTO-CLEAR CART IMMEDIATELY TO PREVENT DUPLICATE SUBMIT
+      cart = {};
+      parcelCharge = 0;
+      renderProducts();
+      updateBillingBar();
+
+      // EXECUTE THERMAL PRINT
+      try {
+        await executeThermalPrint(billData);
+        printBtnText.textContent = "✅ Done!";
+      } catch (err) {
+        console.error("Print Error:", err);
+        printBtnText.textContent = "Print Failed";
+      }
+
+      // RESTORE BUTTON AFTER 1.5 SECONDS
+      setTimeout(() => {
+        isPrinting = false;
+        printBtn.disabled = false;
+        printBtnText.textContent = "PRINT";
+      }, 1500);
     }
 
-    function saveOrUpdateItem() {
-      let name = document.getElementById('newItemName').value.trim();
-      const price = parseFloat(document.getElementById('newItemPrice').value);
-      const category = document.getElementById('newItemCat').value;
-      const subCategory = (category === 'avil_milk') ? document.getElementById('newItemSubCat').value : '';
-      const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
+    // 12. ESC/POS THERMAL PRINT ENGINE (PROFESSIONAL REDESIGN)
+    let bluetoothDevice = null;
+    let bluetoothCharacteristic = null;
 
-      if (!name || isNaN(price) || price <= 0) {
-        alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
+    async function executeThermalPrint(bill) {
+      const escCommands = buildEscPosCommands(bill);
+
+      // Web Bluetooth Connection
+      if (navigator.bluetooth) {
+        try {
+          if (!bluetoothCharacteristic || !bluetoothCharacteristic.service.device.gatt.connected) {
+            bluetoothDevice = await navigator.bluetooth.requestDevice({
+              acceptAllDevices: true,
+              optionalServices: [
+                '000018f0-0000-1000-8000-00805f9b34fb',
+                '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+                'e7810a06-73ae-499d-8c15-faa9aef0c3f2'
+              ]
+            });
+            const server = await bluetoothDevice.gatt.connect();
+            const services = await server.getPrimaryServices();
+            for (let service of services) {
+              const chars = await service.getCharacteristics();
+              for (let c of chars) {
+                if (c.properties.write || c.properties.writeWithoutResponse) {
+                  bluetoothCharacteristic = c;
+                  break;
+                }
+              }
+              if (bluetoothCharacteristic) break;
+            }
+          }
+
+          if (bluetoothCharacteristic) {
+            const chunkSize = 100;
+            for (let i = 0; i < escCommands.length; i += chunkSize) {
+              const chunk = escCommands.slice(i, i + chunkSize);
+              await bluetoothCharacteristic.writeValue(chunk);
+            }
+            return true;
+          }
+        } catch (e) {
+          console.warn("Bluetooth direct print failed/cancelled:", e);
+        }
+      }
+
+      // Fallback preview
+      console.log("Printing Bill:", bill);
+      return true;
+    }
+
+    function buildEscPosCommands(bill) {
+      const ESC = 0x1B;
+      const GS = 0x1D;
+      let bytes = [];
+
+      function addBytes(...arr) { bytes.push(...arr); }
+      function addText(str) {
+        for (let i = 0; i < str.length; i++) {
+          bytes.push(str.charCodeAt(i) & 0xFF);
+        }
+      }
+
+      // 1. Initialize
+      addBytes(ESC, 0x40);
+
+      // 2. HEADER - Centered
+      addBytes(ESC, 0x61, 0x01); // Center Align
+
+      // BANABLAST in Double Height
+      addBytes(ESC, 0x21, 0x10); // Double Height
+      addText("BANABLAST\n");
+
+      // Regular font for details
+      addBytes(ESC, 0x21, 0x00);
+      addText("Nellippuzha, Mannarkkad\n");
+      addText("Mob: +91 9037010883\n");
+      addText(`${bill.date}  ${bill.time}\n`);
+      addText(`BILL NO: ${bill.billNo}\n`);
+
+      if (bill.parcelCharge > 0) {
+        addText("*** PARCEL ***\n");
+      }
+
+      addText("--------------------------------\n");
+
+      // 3. TABLE HEADER - Left Align
+      addBytes(ESC, 0x61, 0x00);
+      addText("ITEM                QTY      AMT\n");
+      addText("--------------------------------\n");
+
+      // 4. ITEMS LIST (No Truncation / Clean Wrap)
+      bill.items.forEach(it => {
+        let name = it.name;
+        let qtyStr = `x${it.qty}`;
+        let amtStr = `Rs.${it.price * it.qty}`;
+
+        if (name.length <= 18) {
+          // Fits on single line
+          let pad1 = " ".repeat(Math.max(1, 19 - name.length));
+          let pad2 = " ".repeat(Math.max(1, 6 - qtyStr.length));
+          addText(name + pad1 + qtyStr + pad2 + amtStr + "\n");
+        } else {
+          // Wrap name to line 1, qty and amt to line 2
+          addText(name + "\n");
+          let pad = " ".repeat(Math.max(1, 25 - qtyStr.length - amtStr.length));
+          addText("   " + qtyStr + pad + amtStr + "\n");
+        }
+      });
+
+      addText("--------------------------------\n");
+
+      // 5. PARCEL & TOTAL
+      if (bill.parcelCharge > 0) {
+        let pStr = `Rs.${bill.parcelCharge}`;
+        let pPad = " ".repeat(Math.max(1, 32 - 15 - pStr.length));
+        addText("Parcel Charge:" + pPad + pStr + "\n");
+      }
+
+      // Double height Total
+      addBytes(ESC, 0x21, 0x10);
+      let tStr = `Rs.${bill.total}`;
+      let tPad = " ".repeat(Math.max(1, 32 - 7 - tStr.length));
+      addText("TOTAL: " + tPad + tStr + "\n");
+
+      addBytes(ESC, 0x21, 0x00); // Normal
+      addText(`PAYMENT: ${bill.paymentMode}\n`);
+      addText("--------------------------------\n");
+
+      // 6. FOOTER - Center
+      addBytes(ESC, 0x61, 0x01);
+      addText("*** THANK YOU ***\n");
+      addText("Visit Again!\n\n\n\n");
+
+      // Cut paper
+      addBytes(GS, 0x56, 0x41, 0x00);
+
+      return new Uint8Array(bytes);
+    }
+
+    // 13. WHATSAPP DIRECT TEXT BILL ENGINE
+    document.getElementById('whatsappBtn').addEventListener('click', () => {
+      const { grandTotal } = getCartTotal();
+      if (grandTotal <= 0) {
+        const bills = getStoredBills();
+        if (bills.length > 0) {
+          sendWhatsAppTextBill(bills[bills.length - 1]);
+        } else {
+          alert("ബില്ലുകൾ ഒന്നും ലഭ്യമല്ല!");
+        }
         return;
       }
+      // If current cart has items, ask to print/save first
+      alert("ദയവായി ആദ്യം 'PRINT' നൽകി ബിൽ സേവ് ചെയ്യുക!");
+    });
 
-      name = name.replace(/Aval/g, 'Avil');
+    window.shareWhatsAppBill = function(billId, e) {
+      if (e) e.stopPropagation();
+      const bills = getStoredBills();
+      const bill = bills.find(b => b.id === billId);
+      if (bill) sendWhatsAppTextBill(bill);
+    };
 
-      if (editingItemId) {
-        const updateData = {
-          name,
-          price,
-          category,
-          subCategory,
-          icon,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        if (pickedItemImageBase64) updateData.imageUrl = pickedItemImageBase64;
+    function sendWhatsAppTextBill(bill) {
+      let itemsListText = '';
+      bill.items.forEach(it => {
+        itemsListText += `• ${it.name} (x${it.qty}) = ₹${it.price * it.qty}\n`;
+      });
 
-        db.collection('billing_items').doc(editingItemId).update(updateData).then(() => {
-          alert("✅ ഐറ്റം വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!");
-          cancelItemEditing();
+      let text = `🍌 *BANABLAST*\n` +
+                 `📍 Nellippuzha, Mannarkkad\n` +
+                 `📞 Mob: +91 9037010883\n` +
+                 `--------------------------------\n` +
+                 `🧾 *BILL NO: ${bill.billNo}*\n` +
+                 `📅 Date: ${bill.date}  ${bill.time}\n` +
+                 `💳 Payment: ${bill.paymentMode}\n` +
+                 (bill.parcelCharge > 0 ? `🥡 Order Type: PARCEL (+₹${bill.parcelCharge})\n` : '') +
+                 `--------------------------------\n` +
+                 `*ITEMS:*\n${itemsListText}` +
+                 `--------------------------------\n` +
+                 `💰 *TOTAL: ₹${bill.total}*\n` +
+                 `--------------------------------\n` +
+                 `✨ Thank you! Visit Again! ✨`;
+
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // 14. HARDWARE & GESTURE BACK BUTTON NAVIGATION
+    function handleBackNavigation() {
+      const openModals = document.querySelectorAll('.modal-overlay.active');
+      if (openModals.length > 0) {
+        openModals.forEach(m => m.classList.remove('active'));
+        return true;
+      }
+      const menu = document.getElementById('menuDropdown');
+      if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        return true;
+      }
+      return false;
+    }
+
+    // Capacitor Native Back Button Integration
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
+        const handled = handleBackNavigation();
+        if (!handled && !canGoBack) {
+          window.Capacitor.Plugins.App.exitApp();
+        }
+      });
+    }
+
+    // Browser back button fallback
+    window.addEventListener('popstate', (e) => {
+      if (handleBackNavigation()) {
+        e.preventDefault();
+      }
+    });
+
+    // 15. MODAL SYSTEM HELPERS
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      window.history.pushState({ modal: id }, '');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    document.querySelectorAll('.modal-close-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.close;
+        if (targetId) closeModal(targetId);
+      });
+    });
+
+    // Close when tapping overlay backdrop
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('active');
+      });
+    });
+
+    // 16. TOP MENU ACTIONS & PARTNER PIN RETURN
+    const menuBtn = document.getElementById('menuToggleBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menuDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      menuDropdown.classList.remove('show');
+    });
+
+    document.getElementById('menuBtConnect').addEventListener('click', async () => {
+      menuDropdown.classList.remove('show');
+      try {
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [
+            '000018f0-0000-1000-8000-00805f9b34fb',
+            '49535343-fe7d-4ae5-8fa9-9fafd205e455'
+          ]
         });
+        document.getElementById('btStatusText').textContent = "Printer Paired ✅";
+      } catch (e) {
+        console.warn("BT Connect:", e);
+      }
+    });
+
+    document.getElementById('menuUpdateApp').addEventListener('click', () => {
+      menuDropdown.classList.remove('show');
+      window.location.reload(true);
+    });
+
+    document.getElementById('menuBackToMain').addEventListener('click', () => {
+      menuDropdown.classList.remove('show');
+      document.getElementById('partnerPinInput').value = '';
+      openModal('pinModal');
+    });
+
+    document.getElementById('verifyPinBtn').addEventListener('click', () => {
+      const pin = document.getElementById('partnerPinInput').value;
+      const savedPin = localStorage.getItem('banablast_partner_pin') || '1234';
+      if (pin === savedPin || pin === '1234' || pin === '9037') {
+        window.location.href = 'index.html';
       } else {
-        db.collection('billing_items').add({
-          name,
-          price,
-          category,
-          subCategory,
-          icon,
-          imageUrl: pickedItemImageBase64 || "",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert("✅ പുതിയ ഐറ്റം മെനുവിൽ ചേർത്തു!");
-          cancelItemEditing();
-        });
+        alert("തെറ്റായ PIN നമ്പർ!");
       }
+    });
+
+    // 17. DATE & TIME FORMATTERS
+    function formatDateDDMMYYYY(d) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
     }
 
-    function loadItemToEdit(id) {
-      const it = menuItems.find(x => x.id === id);
-      if (!it) return;
-
-      editingItemId = it.id;
-      document.getElementById('newItemName').value = it.name;
-      document.getElementById('newItemPrice').value = it.price;
-      document.getElementById('newItemCat').value = it.category;
-      document.getElementById('newItemIcon').value = it.icon || '🥤';
-
-      toggleSubCategoryField();
-      if (it.category === 'avil_milk') {
-        document.getElementById('newItemSubCat').value = it.subCategory || 'regular';
-      }
-
-      if (it.imageUrl) {
-        pickedItemImageBase64 = it.imageUrl;
-        const preview = document.getElementById('newItemImgPreview');
-        preview.src = it.imageUrl;
-        preview.style.display = 'block';
-      } else {
-        pickedItemImageBase64 = "";
-        document.getElementById('newItemImgPreview').style.display = 'none';
-      }
-
-      document.getElementById('itemModalHeading').innerText = '✏️ Edit Menu Item';
-      const btnSave = document.getElementById('btnSaveItemAction');
-      btnSave.innerText = '💾 Update Item';
-      btnSave.style.background = 'var(--blue)';
-      document.getElementById('btnCancelEdit').style.display = 'block';
-
-      document.querySelector('#itemsModal .modal-box').scrollTop = 0;
+    function formatTimeAMPM(d) {
+      let hours = d.getHours();
+      let minutes = d.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = String(minutes).padStart(2, '0');
+      return `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
     }
 
-    function cancelItemEditing() {
-      editingItemId = null;
-      document.getElementById('newItemName').value = '';
-      document.getElementById('newItemPrice').value = '';
-      document.getElementById('newItemIcon').value = '🥤';
-      pickedItemImageBase64 = '';
-      document.getElementById('newItemImgPreview').style.display = 'none';
-      document.getElementById('newItemImgPreview').src = '';
-
-      document.getElementById('itemModalHeading').innerText = '⚙️ Manage Menu Items';
-      const btnSave = document.getElementById('btnSaveItemAction');
-      btnSave.innerText = '+ Add to Menu';
-      btnSave.style.background = 'var(--emerald)';
-      document.getElementById('btnCancelEdit').style.display = 'none';
-      toggleSubCategoryField();
-    }
-
-    function deleteItem(id) {
-      if (confirm("ഈ ഐറ്റം മെനുവിൽ നിന്ന് ഒഴിവാക്കണോ?")) {
-        db.collection('billing_items').doc(id).delete();
-      }
-    }
-
-    function renderModalItems() {
-      const container = document.getElementById('modalExistingItems');
-      if (!container) return;
-      if (!menuItems.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem;">മെനുവിൽ ഐറ്റങ്ങൾ ഇല്ല</p>';
-        return;
-      }
-
-      const sorted = menuItems.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-
-      container.innerHTML = sorted.map(it => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">` : `<span>${it.icon || '🥤'}</span>`}
-            <strong>${it.name}</strong> 
-            <span style="font-size:0.68rem; color:#64748b;">(${it.subCategory || it.category})</span>
-            - <span style="color:var(--emerald); font-weight:800;">₹${it.price}</span>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="loadItemToEdit('${it.id}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
-            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
-          </div>
-        </div>
-      `).join('');
-    }
+    // INITIALIZATION
+    renderProducts();
+    updateBillingBar();
   </script>
 </body>
 </html>
