@@ -201,6 +201,26 @@
       display: none; 
     }
 
+    /* 1-TAP COUNTER POS HERO BUTTON */
+    .btn-pos-hero {
+      width: 100%;
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      transition: transform 0.1s ease;
+    }
+    .btn-pos-hero:active {
+      transform: scale(0.98);
+    }
+
     .flatpickr-calendar { 
       border-radius: 16px !important; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; 
@@ -539,7 +559,7 @@
       pointer-events: none;
     }
 
-    /* Modals */
+    /* Modals & Safe Touch Close Button */
     .modal { 
       display: none; 
       position: fixed; 
@@ -560,8 +580,29 @@
       max-height: 85vh; 
       overflow-y: auto; 
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      position: relative;
     }
     @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    
+    .modal-close-safe-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 10;
+    }
+
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; }
@@ -819,8 +860,25 @@
 </head>
 <body>
 
+  <!-- CATEGORY-SPECIFIC SEPARATE DATALISTS -->
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
+  <datalist id="staffList"></datalist>
+  <datalist id="teaList">
+    <option value="Tea / Refreshment">
+    <option value="Milk & Sugar">
+    <option value="Snacks & Biscuits">
+  </datalist>
+  <datalist id="rentList">
+    <option value="Shop Rent (കട വാടക)">
+    <option value="Rent Part Payment">
+  </datalist>
+  <datalist id="miscList">
+    <option value="Electricity Bill">
+    <option value="Water Charges">
+    <option value="Cleaning Materials">
+    <option value="Ice Bar">
+  </datalist>
 
   <!-- ഹെഡർ -->
   <header class="app-header">
@@ -859,6 +917,15 @@
         <span id="holBtnText">Shop Holiday</span>
       </button>
     </div>
+
+    <!-- 1-TAP COUNTER POS HERO BUTTON (DIRECT NAVIGATION WITHOUT LOGOUT) -->
+    <button type="button" class="btn-pos-hero" onclick="window.location.href='billing.html'">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.25rem;">🛒</span>
+        <span style="font-weight:800; font-size:0.88rem;">കൗണ്ടർ ബില്ലിംഗ് (Counter POS)</span>
+      </span>
+      <span style="font-size:0.75rem; background:rgba(255,255,255,0.22); padding:4px 8px; border-radius:6px; font-weight:700;">തുറക്കുക ➔</span>
+    </button>
   </header>
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
@@ -947,11 +1014,10 @@
 
     </div>
 
-    <!-- TAB: POS BILLS & ANALYTICS (PARTNERS ONLY) - പുതിയ മൾട്ടി-ഡേറ്റ് ഫിൽട്ടറുകളോടെ -->
+    <!-- TAB: POS BILLS & ANALYTICS -->
     <div id="tab-pos-analytics" class="tab-content">
       <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Bills</h3>
       
-      <!-- മൾട്ടി-ഡേറ്റ് ഫിൽട്ടർ ബട്ടണുകൾ (Today, Weekly, Monthly, Custom) -->
       <div class="report-filter" style="margin-bottom:10px;">
         <button type="button" class="filter-btn active" id="posFiltToday" onclick="filterPosAnalytics('today')">📅 Today</button>
         <button type="button" class="filter-btn" id="posFiltWeek" onclick="filterPosAnalytics('week')">🗓️ This Week</button>
@@ -959,7 +1025,6 @@
         <button type="button" class="filter-btn" id="posFiltCustom" onclick="filterPosAnalytics('custom')">📆 Custom Range</button>
       </div>
 
-      <!-- കസ്റ്റം ഡേറ്റ് പിക്കർ ബോക്സ് -->
       <div id="posCustomDateBox" style="display:none; gap:6px; margin-bottom:12px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1; flex-wrap:wrap;">
         <div style="flex:1; min-width:130px;">
           <label style="font-size:0.72rem; font-weight:700; color:#475569;">From Date:</label>
@@ -972,14 +1037,12 @@
         <button type="button" class="filter-btn active" style="align-self:flex-end; padding:8px 14px; flex:0 0 auto;" onclick="applyCustomPosDateFilter()">Apply</button>
       </div>
 
-      <!-- Summary Cards -->
       <div class="summary-card" style="grid-template-columns: repeat(3, 1fr);">
         <div class="sum-box"><h4>Counter Total</h4><p id="posAnaTotalSales" class="color-green">₹0</p></div>
         <div class="sum-box"><h4>Cash</h4><p id="posAnaCash" class="color-blue">₹0</p></div>
         <div class="sum-box"><h4>GPay</h4><p id="posAnaGpay" class="color-purple">₹0</p></div>
       </div>
 
-      <!-- Best Sellers & Item Breakdown (Top 5-6 വിഭവങ്ങൾ മാത്രം പ്രൊഫഷണലായി) -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🏆 കൂടുതൽ വിറ്റഴിഞ്ഞ ഐറ്റങ്ങൾ (Top Best Sellers)</span>
@@ -991,7 +1054,6 @@
         </button>
       </div>
 
-      <!-- Detailed Bills Log for Selected Date (സമയക്രമത്തിൽ പുതിയത് മുകളിൽ) -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🧾 തിരഞ്ഞെടുത്ത കാലയളവിലെ ബില്ലുകൾ</span>
@@ -1001,7 +1063,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: STOCK ITEMS (WITH DATE FILTERS) -->
+    <!-- TAB 2: STOCK ITEMS -->
     <div id="tab-stock" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
 
@@ -1021,9 +1083,18 @@
       <div id="stockItemsListContainer"></div>
     </div>
 
-    <!-- TAB 3: SUPPLIER PURCHASES (WITH DATE FILTERS) -->
+    <!-- TAB 3: SUPPLIER PURCHASES (WITH DUE BREAKDOWN BANNER) -->
     <div id="tab-suppliers" class="tab-content">
       <h3 style="font-size:1rem; margin-bottom:12px;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
+
+      <!-- TOTAL OUTSTANDING DUE BANNER (CLICKABLE FILTER) -->
+      <div id="suppTotalDueBanner" class="clickable-row total" style="background: linear-gradient(135deg, #991b1b, #dc2626); color:white; margin-bottom:12px; border-radius:12px; padding:12px 14px; box-shadow: 0 4px 12px rgba(220,38,38,0.25);" onclick="toggleSupplierDuesOnlyFilter()">
+        <div>
+          <div style="font-size:0.8rem; color:#fecaca; font-weight:800;">⚠️ മൊത്തം സപ്ലയർ കുടിശ്ശിക (TOTAL OUTSTANDING DUE)</div>
+          <div id="suppDueFilterNotice" style="font-size:0.7rem; color:#fee2e2; margin-top:2px;">കുടിശ്ശികയുള്ളവരുടെ മാത്രം പട്ടിക കാണാൻ ഇവിടെ ക്ലിക്ക് ചെയ്യുക 🔍</div>
+        </div>
+        <strong id="suppTotalDueDisplay" style="font-size:1.35rem; color:#ffffff !important;">₹0</strong>
+      </div>
 
       <div class="report-filter" style="margin-bottom:10px;">
         <button class="filter-btn active" id="suppFiltAll" onclick="filterSupplierTab('all')">All Time</button>
@@ -1041,7 +1112,7 @@
       <div id="supplierPurchasesListContainer"></div>
     </div>
 
-    <!-- TAB 4: REPORTS -->
+    <!-- TAB 4: REPORTS (WITH CLEAN SMART LEDGER CARDS) -->
     <div id="tab-reports" class="tab-content">
       <div class="report-filter">
         <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
@@ -1067,29 +1138,44 @@
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
       </div>
 
-      <div class="cat-box">
+      <!-- 1. RENT CARD (CLEAN & CLICKABLE) -->
+      <div class="cat-box" style="cursor:pointer;" onclick="openRentDetailsModal()">
         <div class="cat-title">
-          <span>🏠 Rent Payments</span>
+          <span>🏠 Rent Payments (വാടക)</span>
           <span id="repTotalRent" class="color-red">₹0</span>
         </div>
-        <div id="repRentList"></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#475569;">
+          <span>ഈ മാസം നൽകിയത്: <strong id="repRentPaidSub">₹0</strong></span>
+          <span id="repRentDueSub" style="color:#dc2626; font-weight:800;">ബാക്കി: ₹0</span>
+        </div>
+        <div style="font-size:0.72rem; color:#0284c7; font-weight:700; margin-top:6px; text-align:right;">
+          വിശദാംശങ്ങൾ കാണാൻ ഇവിടെ ക്ലിക്ക് ചെയ്യുക ➔
+        </div>
       </div>
 
-      <div class="cat-box">
+      <!-- 2. STAFF SALARY CARD (CLEAN & CLICKABLE) -->
+      <div class="cat-box" style="cursor:pointer;" onclick="openStaffDetailsModal()">
         <div class="cat-title">
-          <span>👥 Staff Salaries</span>
+          <span>👥 Staff Salaries (ശമ്പളം & കൂലി)</span>
           <span id="repTotalSalary" class="color-red">₹0</span>
         </div>
-        <div id="repStaffList"></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#475569;">
+          <span>ആകെ സാലറി നൽകിയത്</span>
+          <span style="color:#0284c7; font-weight:800;">സ്റ്റാഫ് വിവരങ്ങൾ കാണുക ➔</span>
+        </div>
       </div>
 
-      <div class="cat-box">
+      <!-- 3. STOCK & OTHER EXPENSES CARD (CLEAN & CLICKABLE) -->
+      <div class="cat-box" style="cursor:pointer;" onclick="openStockExpensesModal()">
         <div class="cat-title">
           <span>📦 Stock & Other Expenses</span>
           <span id="repTotalOther" class="color-red">₹0</span>
         </div>
         <div class="list-row"><span>Stock Purchases Total:</span><strong id="repStockSum">₹0</strong></div>
         <div class="list-row"><span>Daily Miscellaneous:</span><strong id="repMiscSum">₹0</strong></div>
+        <div style="font-size:0.72rem; color:#0284c7; font-weight:700; margin-top:6px; text-align:right;">
+          തരംതിരിച്ച പട്ടിക കാണുക ➔
+        </div>
       </div>
 
       <div style="display:flex; gap:8px;">
@@ -1189,6 +1275,8 @@
 
   </div>
 
+  <!-- ==================== ALL MODALS ==================== -->
+
   <!-- A4 LIVE PREVIEW MODAL -->
   <div class="a4-preview-modal" id="a4PreviewModal">
     <div class="a4-preview-container">
@@ -1200,7 +1288,6 @@
           <button type="button" class="a4-btn a4-btn-close" onclick="closeA4PreviewModal()">✕</button>
         </div>
       </div>
-
       <div class="a4-sheet" id="a4SheetPaper"></div>
     </div>
   </div>
@@ -1208,11 +1295,12 @@
   <!-- 1. ENTRY MODAL -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('entryModal')">✕</button>
       <h3 id="modalTitle">Add Entry</h3>
       <input type="hidden" id="editEntryId">
       <input type="hidden" id="entryType">
 
-      <div class="form-group" id="expCategoryGroup" style="display:none;">
+      <div class="form-group" id="expCategoryGroup" style="display:none; margin-top:8px;">
         <label>Expense Category (ചിലവിന്റെ ഇനം)</label>
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
           <option value="tea">Tea / Refreshment</option>
@@ -1289,12 +1377,10 @@
   <!-- 2. TODAY'S SALES REPORT MODAL -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
-        <h3 style="color:var(--primary); font-size:1.1rem; margin:0;">📊 Today's Sales Report</h3>
-        <button onclick="closeModal('todayReportModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
-      </div>
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('todayReportModal')">✕</button>
+      <h3 style="color:var(--primary); font-size:1.1rem; margin-bottom:12px;">📊 Today's Sales Report</h3>
 
-      <div style="padding:10px 0;">
+      <div style="padding:4px 0;">
         <div style="text-align:center; margin-bottom:12px;">
           <h4 style="margin:0; font-size:1.2rem; color:var(--primary);">BANABLAST</h4>
           <p id="repModalDateText" style="font-size:0.8rem; color:#64748b; margin-top:2px;">Date: -</p>
@@ -1334,7 +1420,7 @@
         </div>
       </div>
 
-      <div style="margin-top:10px;">
+      <div style="margin-top:12px;">
         <button class="btn-submit" style="background:#2563eb !important; margin-top:0;" onclick="previewTodayA4()">
           📄 VIEW & DOWNLOAD A4 PDF PREVIEW
         </button>
@@ -1345,7 +1431,8 @@
   <!-- 3. UNIVERSAL ITEM / SUPPLIER LEDGER SHEET MODAL -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
-      <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem;">Ledger Sheet</h3>
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('itemSheetModal')">✕</button>
+      <h3 id="sheetItemTitle" style="color:var(--primary); font-size:1.1rem; padding-right:32px;">Ledger Sheet</h3>
       
       <div class="report-filter" style="margin-top:8px;">
         <button class="filter-btn active" id="sheetFiltMonth" onclick="filterItemSheet('month')">This Month</button>
@@ -1389,10 +1476,8 @@
   <!-- 4. RUNNING BREAKDOWN MODAL -->
   <div class="modal" id="runningBreakdownModal">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
-        <h3 id="breakdownTitle" style="color:var(--primary); font-size:1.1rem; margin:0;">Account Breakdown</h3>
-        <button onclick="closeModal('runningBreakdownModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
-      </div>
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('runningBreakdownModal')">✕</button>
+      <h3 id="breakdownTitle" style="color:var(--primary); font-size:1.1rem; padding-right:32px;">Account Breakdown</h3>
 
       <p style="font-size:0.75rem; color:#64748b; margin-top:8px;">തിരഞ്ഞെടുത്ത തീയതി വരെയുള്ള പ്രതിദിന വരവ്-ചിലവ് കണക്കുകൾ:</p>
       <div id="breakdownTableContainer" style="max-height:300px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px;"></div>
@@ -1412,6 +1497,7 @@
   <!-- 5. ADD INVESTMENT MODAL -->
   <div class="modal" id="investModal">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('investModal')">✕</button>
       <h3>Add Capital Investment</h3>
       <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ ഇത് പ്രാബല്യത്തിൽ വരൂ.</p>
 
@@ -1455,6 +1541,7 @@
   <!-- 6. ADD WITHDRAWAL MODAL -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('withdrawModal')">✕</button>
       <h3>Request Profit/Money Withdrawal</h3>
       <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയുകയുള്ളൂ.</p>
 
@@ -1506,8 +1593,9 @@
   <!-- 7. OPENING BALANCE MODAL -->
   <div class="modal" id="openingModal">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('openingModal')">✕</button>
       <h3>Set Initial Opening Balance</h3>
-      <div class="form-group">
+      <div class="form-group" style="margin-top:10px;">
         <label>Counter Cash Box Opening (₹)</label>
         <input type="number" id="openCash" class="form-control" value="0">
       </div>
@@ -1555,6 +1643,7 @@
   <!-- 9. CHANGE PIN MODAL -->
   <div class="modal" id="changePinModal" style="display:none; background: rgba(15, 23, 42, 0.8); z-index: 2100;">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('changePinModal')">✕</button>
       <h3 style="color: var(--primary); margin-bottom: 6px;">🔑 PIN മാറ്റുക (Change PIN)</h3>
       <p id="changePinUserText" style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;"></p>
 
@@ -1576,6 +1665,7 @@
   <!-- 10. FORGOT PIN MODAL -->
   <div class="modal" id="forgotPinModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2200;">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('forgotPinModal')">✕</button>
       <h3 style="color: var(--primary); margin-bottom: 6px;">🔄 Reset PIN</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">Master Security Code നൽകി പുതിയ PIN സെറ്റ് ചെയ്യുക</p>
 
@@ -1607,6 +1697,7 @@
   <!-- 11. OCR.SPACE API SETTINGS MODAL -->
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('aiSettingsModal')">✕</button>
       <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ OCR.space API Key</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
         ocr.space/ocrapi/freekey വഴി ലഭിച്ച സൗജന്യ API Key ഇവിടെ നൽകുക:
@@ -1625,16 +1716,94 @@
   <!-- 12. FULL POS SALES REPORT MODAL -->
   <div class="modal" id="fullPosReportModal">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px;">
-        <h3 style="color:var(--primary); font-size:1.1rem; margin:0;">🏆 മുഴുവൻ സെയിൽസ് റിപ്പോർട്ട്</h3>
-        <button onclick="closeModal('fullPosReportModal')" style="border:none; background:#f1f5f9; border-radius:50%; width:30px; height:30px; font-weight:bold; cursor:pointer;">✕</button>
-      </div>
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('fullPosReportModal')">✕</button>
+      <h3 style="color:var(--primary); font-size:1.1rem; margin-bottom:8px; padding-right:32px;">🏆 മുഴുവൻ സെയിൽസ് റിപ്പോർട്ട്</h3>
       <p id="fullPosReportDateText" style="font-size:0.8rem; color:#64748b; margin-bottom:10px;"></p>
       <div id="fullPosReportItemsList" style="max-height:350px; overflow-y:auto;"></div>
       <button class="btn-cancel" style="margin-top:12px;" onclick="closeModal('fullPosReportModal')">Close</button>
     </div>
   </div>
+
+  <!-- 13. RENT DETAILS & LEDGER MODAL -->
+  <div class="modal" id="rentDetailsModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('rentDetailsModal')">✕</button>
+      <h3 style="color:var(--primary); font-size:1.1rem; padding-right:32px;">🏠 Rent Ledger (വാടക കണക്കുകൾ)</h3>
+      
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin:12px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:700; color:#475569;">പ്രതിമാസ നിശ്ചിത വാടക:</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="number" id="monthlyRentSettingInput" style="width:80px; padding:4px 6px; border:1px solid #cbd5e1; border-radius:6px; font-weight:800; text-align:right;" value="15000">
+            <button type="button" onclick="saveMonthlyRentTarget()" style="background:#1e40af; color:white; border:none; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">Save</button>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.8rem;">
+          <span>ഈ മാസം നൽകിയത്:</span>
+          <strong id="rentModalPaidDisplay" class="color-green">₹0</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:0.8rem;">
+          <span>കൊടുക്കാൻ ബാക്കിയുള്ളത്:</span>
+          <strong id="rentModalDueDisplay" class="color-red">₹0</strong>
+        </div>
+      </div>
+
+      <h4 style="font-size:0.85rem; font-weight:800; color:#1e293b; margin-bottom:8px;">പേയ്‌മെന്റ് ഹിസ്റ്ററി (തീയതി വിവരങ്ങൾ):</h4>
+      <div id="rentModalLogsContainer" style="max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button type="button" class="btn-submit" style="background:#16a34a !important; margin-top:0; flex:1;" onclick="closeModal('rentDetailsModal'); openEntryModal('expense'); document.getElementById('entryCategory').value='rent'; handleCategoryChange();">+ Add Rent Payment</button>
+        <button type="button" class="btn-cancel" style="margin-top:0; flex:0.6;" onclick="closeModal('rentDetailsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. STAFF DETAILS & WAGE MODAL -->
+  <div class="modal" id="staffDetailsModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('staffDetailsModal')">✕</button>
+      <h3 style="color:var(--primary); font-size:1.1rem; padding-right:32px;">👥 Staff Salary & Wage Ledger</h3>
+      <p style="font-size:0.75rem; color:#64748b; margin:6px 0 12px;">സ്റ്റാഫ് തിരിച്ചുള്ള വേതന വിവരങ്ങളും സാലറി സ്ലിപ്പും:</p>
+
+      <div id="staffModalMembersContainer" style="max-height:300px; overflow-y:auto;"></div>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button type="button" class="btn-submit" style="background:#16a34a !important; margin-top:0; flex:1;" onclick="closeModal('staffDetailsModal'); openEntryModal('expense'); document.getElementById('entryCategory').value='salary'; handleCategoryChange();">+ Pay Wage / Salary</button>
+        <button type="button" class="btn-cancel" style="margin-top:0; flex:0.6;" onclick="closeModal('staffDetailsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. STOCK & OTHER EXPENSES BREAKDOWN MODAL -->
+  <div class="modal" id="stockExpensesModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-safe-btn" onclick="closeModal('stockExpensesModal')">✕</button>
+      <h3 style="color:var(--primary); font-size:1.1rem; padding-right:32px;">📦 Stock & Other Expenses Breakdown</h3>
+
+      <div class="report-filter" style="margin-top:10px;">
+        <button class="filter-btn active" id="stkExpFiltMonth" onclick="filterStockExpenseModal('month')">This Month</button>
+        <button class="filter-btn" id="stkExpFiltWeek" onclick="filterStockExpenseModal('week')">This Week</button>
+        <button class="filter-btn" id="stkExpFiltAll" onclick="filterStockExpenseModal('all')">All Time</button>
+      </div>
+
+      <div id="stockExpModalListContainer" style="max-height:280px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; margin-top:10px; padding:6px;"></div>
+
+      <div class="sheet-total-box" style="margin-top:12px;">
+        <span>ആകെ ചിലവ്:</span>
+        <span id="stockExpModalTotal" class="color-red">₹0</span>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button type="button" class="btn-submit" style="background:#22c55e !important; margin-top:0; flex:1;" onclick="shareStockExpensesWhatsApp()">💬 Share on WhatsApp</button>
+        <button type="button" class="btn-cancel" style="margin-top:0; flex:0.6;" onclick="closeModal('stockExpensesModal')">Close</button>
+      </div>
+    </div>
+  </div>
   <script>
+    /* =========================================================
+       BANABLAST BUSINESS LEDGER & POS MANAGEMENT - PRODUCTION JAVASCRIPT
+       ========================================================= */
+
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
@@ -1661,7 +1830,7 @@
       }
     }
 
-    // Firebase Config
+    // Firebase Config (Your Original Active Configuration)
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -1684,10 +1853,13 @@
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
-    // തീയതി ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
+    // തീയതി & ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
     let currentPosFilter = 'today';
     let currentStockFilter = 'all';
     let currentSupplierFilter = 'all';
+    let supplierDuesOnlyFilter = false;
+    let currentStockExpFilter = 'month';
+    let monthlyRentTarget = parseFloat(localStorage.getItem('BANABLAST_MONTHLY_RENT')) || 15000;
     let posAnaSortedItems = [];
 
     let activeSheetKey = '';
@@ -1699,7 +1871,60 @@
     const today = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       1. AUTH, PIN & OCR SETTINGS
+       1. HARDWARE / GESTURE BACK BUTTON SAFE NAVIGATION
+       ------------------------------------------------------------- */
+    function getOpenModals() {
+      const standardModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
+      const a4Modal = document.getElementById('a4PreviewModal');
+      if (a4Modal && a4Modal.style.display === 'flex') {
+        standardModals.push(a4Modal);
+      }
+      return standardModals;
+    }
+
+    function handleBackNavigation() {
+      const openModals = getOpenModals();
+      if (openModals.length > 0) {
+        // ഏറ്റവും ഒടുവിൽ തുറന്ന മോഡൽ മാത്രം ക്ലോസ് ചെയ്യുക
+        openModals[openModals.length - 1].style.display = 'none';
+        return true;
+      }
+      return false;
+    }
+
+    // Android WebView / Capacitor Back Button
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
+        const handled = handleBackNavigation();
+        if (!handled) {
+          if (canGoBack) window.history.back();
+          else window.Capacitor.Plugins.App.exitApp();
+        }
+      });
+    }
+
+    // Browser / Gesture Back Button Handling
+    window.addEventListener('popstate', (e) => {
+      if (handleBackNavigation()) {
+        e.preventDefault();
+      }
+    });
+
+    function openModalWithHistory(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = 'flex';
+        window.history.pushState({ modalOpen: id }, '');
+      }
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    }
+
+    /* -------------------------------------------------------------
+       2. AUTH, PIN & OCR SETTINGS
        ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
@@ -1751,7 +1976,7 @@
       document.getElementById('changePinUserText').innerText = `പാർട്ണർ: ${currentLoggedInUser}`;
       document.getElementById('oldPinInput').value = '';
       document.getElementById('newPinInput').value = '';
-      document.getElementById('changePinModal').style.display = 'flex';
+      openModalWithHistory('changePinModal');
     }
 
     function submitChangePin() {
@@ -1783,7 +2008,7 @@
     function openForgotPinModal() {
       document.getElementById('masterCodeInput').value = '';
       document.getElementById('resetNewPinInput').value = '';
-      document.getElementById('forgotPinModal').style.display = 'flex';
+      openModalWithHistory('forgotPinModal');
     }
 
     function submitResetPin() {
@@ -1815,7 +2040,7 @@
 
     function openAISettingsModal() {
       document.getElementById('aiKeyInput').value = dynamicOcrKey || '';
-      document.getElementById('aiSettingsModal').style.display = 'flex';
+      openModalWithHistory('aiSettingsModal');
     }
 
     function saveAISettingsKey() {
@@ -1828,7 +2053,7 @@
     }
 
     /* -------------------------------------------------------------
-       2. INITIALIZATION & FIRESTORE SYNC
+       3. INITIALIZATION & FIRESTORE SYNC
        ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
@@ -1919,6 +2144,7 @@
           const data = doc.data();
           if (data.opening) opening = data.opening;
           if (data.holidays) holidays = data.holidays;
+          if (data.monthlyRent) monthlyRentTarget = data.monthlyRent;
           if (flatpickrCalendar) flatpickrCalendar.redraw();
           renderAll();
         }
@@ -1969,13 +2195,99 @@
 
       db.collection('settings').doc('general').set({
         opening,
-        holidays
+        holidays,
+        monthlyRent: monthlyRentTarget
       }, { merge: true });
     }
 
     /* -------------------------------------------------------------
-       3. POS ANALYTICS TAB: MULTI-DATE (TODAY, WEEK, MONTH, CUSTOM)
-          + UNIFORM 12-HR AM/PM FORMAT + NEWEST ON TOP
+       4. CATEGORY-SPECIFIC SUGGESTIONS LOGIC (POINT 9)
+       ------------------------------------------------------------- */
+    function updateDatalists() {
+      const suppliers = new Set();
+      const items = new Set();
+      const staff = new Set(["Asif"]); // Default sample staff
+
+      transactions.forEach(t => {
+        if (t.category === 'stock' && t.title) {
+          suppliers.add(t.title.trim());
+        }
+        if (t.category === 'salary' && (t.title || t.extra)) {
+          staff.add((t.title || t.extra).trim());
+        }
+        if (t.items && Array.isArray(t.items)) {
+          t.items.forEach(it => {
+            if (it.name) items.add(it.name.trim());
+          });
+        }
+      });
+
+      const suppDL = document.getElementById('suppliersList');
+      if (suppDL) {
+        suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
+      }
+
+      const itemDL = document.getElementById('itemsList');
+      if (itemDL) {
+        itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
+      }
+
+      const staffDL = document.getElementById('staffList');
+      if (staffDL) {
+        staffDL.innerHTML = Array.from(staff).sort().map(st => `<option value="${st}">`).join('');
+      }
+    }
+
+    function handleCategoryChange() {
+      const type = document.getElementById('entryType').value;
+      const cat = document.getElementById('entryCategory').value;
+      const isStock = (type === 'expense' && cat === 'stock');
+      const titleInput = document.getElementById('entryTitle');
+      const itemNameLabel = document.getElementById('itemNameLabel');
+      const editId = document.getElementById('editEntryId').value;
+
+      document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
+      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
+      document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
+      document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
+
+      // CATEGORY-SPECIFIC SUGGESTIONS: NO MIXING!
+      if (type === 'expense') {
+        if (cat === 'salary') {
+          itemNameLabel.innerText = 'സ്റ്റാഫിന്റെ പേര് (Staff Name)';
+          titleInput.setAttribute('list', 'staffList');
+          titleInput.placeholder = 'സ്റ്റാഫിന്റെ പേര് ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ തിരഞ്ഞെടുക്കുക';
+          if (!editId) titleInput.value = '';
+        } else if (cat === 'stock') {
+          itemNameLabel.innerText = 'സപ്ലയർ / കമ്പനിയുടെ പേര് (Supplier)';
+          titleInput.setAttribute('list', 'suppliersList');
+          titleInput.placeholder = 'സപ്ലയർ അല്ലെങ്കിൽ കമ്പനിയുടെ പേര്';
+          if (!editId) titleInput.value = '';
+        } else if (cat === 'tea') {
+          itemNameLabel.innerText = 'വിവരണം (Tea / Refreshment)';
+          titleInput.setAttribute('list', 'teaList');
+          titleInput.placeholder = 'ഉദാ: Tea';
+          if (!editId) titleInput.value = 'Tea';
+        } else if (cat === 'rent') {
+          itemNameLabel.innerText = 'വാടക വിവരണം (Shop Rent)';
+          titleInput.setAttribute('list', 'rentList');
+          titleInput.placeholder = 'ഉദാ: Shop Rent';
+          if (!editId) titleInput.value = 'Shop Rent';
+        } else {
+          itemNameLabel.innerText = 'ചിലവിന്റെ വിവരണം (Miscellaneous)';
+          titleInput.setAttribute('list', 'miscList');
+          titleInput.placeholder = 'ചിലവിന്റെ വിവരണം ടൈപ്പ് ചെയ്യുക';
+          if (!editId) titleInput.value = '';
+        }
+      } else {
+        itemNameLabel.innerText = 'വിവരണം / Description';
+        titleInput.removeAttribute('list');
+        titleInput.placeholder = 'Sales';
+      }
+    }
+
+    /* -------------------------------------------------------------
+       5. POS ANALYTICS TAB: MULTI-DATE & LEADERBOARD
        ------------------------------------------------------------- */
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
@@ -1999,13 +2311,10 @@
       renderPosAnalyticsTab();
     }
 
-    // 12-Hour AM/PM സ്റ്റാൻഡേർഡൈസ് ചെയ്യുന്ന ഫംഗ്ഷൻ
     function formatTo12HourTime(tStr) {
       if (!tStr) return '';
       let clean = tStr.trim();
-      if (/am|pm/i.test(clean)) {
-        return clean.toUpperCase();
-      }
+      if (/am|pm/i.test(clean)) return clean.toUpperCase();
       let parts = clean.split(':');
       if (parts.length >= 2) {
         let h = parseInt(parts[0], 10) || 0;
@@ -2039,14 +2348,11 @@
       const fromDate = document.getElementById('posFromDate') ? document.getElementById('posFromDate').value : today;
       const toDate = document.getElementById('posToDate') ? document.getElementById('posToDate').value : today;
 
-      // മൾട്ടി-ഡേറ്റ് ഫിൽട്ടറിംഗ്
       const filtered = posBills.filter(b => {
         if (!b.date) return false;
         const bDate = new Date(b.date);
 
-        if (currentPosFilter === 'today') {
-          return b.date === curDate;
-        }
+        if (currentPosFilter === 'today') return b.date === curDate;
         if (currentPosFilter === 'week') {
           const diffDays = Math.floor((refDate - bDate) / (1000 * 60 * 60 * 24));
           return diffDays >= 0 && diffDays <= 7;
@@ -2066,7 +2372,7 @@
 
       filtered.forEach(b => {
         totalSales += (b.total || 0);
-        if (b.mode === 'cash') cashSales += (b.total || 0);
+        if (b.mode === 'cash' || b.paymentMode === 'CASH') cashSales += (b.total || 0);
         else gpaySales += (b.total || 0);
 
         if (b.items && Array.isArray(b.items)) {
@@ -2088,10 +2394,8 @@
       setT('posAnaTotalGlassCount', `${totalGlasses} Glasses Sold`);
       setT('posAnaBillsCountTag', `${filtered.length} Bills`);
 
-      // ബെസ്റ്റ് സെല്ലേഴ്സ് സോർട്ടിംഗ്
       posAnaSortedItems = Object.values(itemFreqMap).sort((a,b) => b.count - a.count);
 
-      // ടോപ്പ് 5 വിഭവങ്ങൾ പ്രോഗ്രസ്സ് ബാറുകളോടെ
       const breakdownContainer = document.getElementById('posAnaItemBreakdownList');
       if (breakdownContainer) {
         if (!posAnaSortedItems.length) {
@@ -2128,7 +2432,6 @@
         }
       }
 
-      // ബില്ലുകൾ: ഏറ്റവും ഒടുവിൽ അടിച്ച പുതിയ ബില്ല് ഏറ്റവും മുകളിൽ (Newest on Top)
       const billsContainer = document.getElementById('posAnaBillsListContainer');
       if (billsContainer) {
         if (!filtered.length) {
@@ -2137,16 +2440,17 @@
           const sortedBills = filtered.slice().sort((a, b) => {
             const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
             const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
-            return tB - tA; // Newest on Top
+            return tB - tA;
           });
 
           billsContainer.innerHTML = sortedBills.map(b => {
             const displayTime = formatTo12HourTime(b.time);
+            const pMode = (b.paymentMode || b.mode || 'CASH').toUpperCase();
             return `
               <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <span style="font-weight:800; color:#1e3a8a;">#${b.billNo} (${displayTime || '-'}) <span style="font-size:0.7rem; color:#64748b; font-weight:normal;">• ${b.date}</span></span>
-                  <span style="font-weight:800;" class="${b.mode === 'cash' ? 'color-green' : 'color-blue'}">₹${b.total} (${(b.mode||'').toUpperCase()}</span>
+                  <span style="font-weight:800;" class="${pMode === 'CASH' ? 'color-green' : 'color-blue'}">₹${b.total} (${pMode})</span>
                 </div>
                 <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
                   ${(b.items || []).map(i => `${(i.name || '').replace(/Aval/g, 'Avil')} (x${i.qty})`).join(', ')}
@@ -2176,35 +2480,12 @@
           </div>
         `).join('');
       }
-      document.getElementById('fullPosReportModal').style.display = 'flex';
+      openModalWithHistory('fullPosReportModal');
     }
 
-    function updateDatalists() {
-      const suppliers = new Set();
-      const items = new Set();
-
-      transactions.forEach(t => {
-        if (t.category === 'stock' && t.title) {
-          suppliers.add(t.title.trim());
-        }
-        if (t.items && Array.isArray(t.items)) {
-          t.items.forEach(it => {
-            if (it.name) items.add(it.name.trim());
-          });
-        }
-      });
-
-      const suppDL = document.getElementById('suppliersList');
-      if (suppDL) {
-        suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
-      }
-
-      const itemDL = document.getElementById('itemsList');
-      if (itemDL) {
-        itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
-      }
-    }
-
+    /* -------------------------------------------------------------
+       6. OCR.SPACE SCANNER & PURCHASE ITEMS
+       ------------------------------------------------------------- */
     function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
       const container = document.getElementById('purchaseItemsListContainer');
       const div = document.createElement('div');
@@ -2265,9 +2546,6 @@
       return items;
     }
 
-    /* -------------------------------------------------------------
-       4. ഇമേജ് കംപ്രഷൻ & OCR.SPACE സ്കാനർ
-       ------------------------------------------------------------- */
     function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2376,7 +2654,6 @@
           const numbers = line.match(/[0-9]+(?:\.[0-9]{1,2})?/g);
           if (numbers && numbers.length > 0) {
             const lastNum = parseFloat(numbers[numbers.length - 1]);
-            
             let itemName = line
               .replace(/^[0-9]+\s*/, '')
               .replace(/[0-9]+(?:\.[0-9]{1,2})?/g, '')
@@ -2426,7 +2703,7 @@
         }
 
         if (hasDoubtfulItems) {
-          alert("⚠️ ശ്രദ്ധിക്കുക: ചില സാധനങ്ങളുടെ വില വ്യക്തമല്ല. ചുവന്ന മാർക്കുള്ള (Red Mark) ബോക്സിൽ ആവശ്യമെങ്കിൽ വില ടൈപ്പ് ചെയ്യുക; അല്ലെങ്കിൽ നേരിട്ട് സേവ് ചെയ്യാം.");
+          alert("⚠️️ ശ്രദ്ധിക്കുക: ചില സാധനങ്ങളുടെ വില വ്യക്തമല്ല. ആവശ്യമെങ്കിൽ വില ടൈപ്പ് ചെയ്യുക; അല്ലെങ്കിൽ നേരിട്ട് സേവ് ചെയ്യാം.");
         } else {
           alert("✅ ബില്ലിലെ വിവരങ്ങൾ കൃത്യമായി എടുത്തു!");
         }
@@ -2436,13 +2713,13 @@
         alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല!\n\nകാരണം: " + err.message);
       } finally {
         loader.style.display = 'none';
-        loader.innerText = '🔄 AI ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
+        loader.innerText = '🔄 OCR വഴി ബില്ല് പരിശോധിക്കുന്നു...';
         event.target.value = '';
       }
     }
 
     /* -------------------------------------------------------------
-       5. ENTRY ACTIONS & TRACKING
+       7. ENTRY ACTIONS & TRACKING
        ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
@@ -2487,34 +2764,7 @@
         }
       }
       handleCategoryChange();
-      document.getElementById('entryModal').style.display = 'flex';
-    }
-
-    function handleCategoryChange() {
-      const type = document.getElementById('entryType').value;
-      const cat = document.getElementById('entryCategory').value;
-      const isStock = (type === 'expense' && cat === 'stock');
-      const titleInput = document.getElementById('entryTitle');
-      const editId = document.getElementById('editEntryId').value;
-
-      document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
-      document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
-
-      document.getElementById('itemNameLabel').innerText = isStock ? 'സപ്ലയർ / കമ്പനിയുടെ പേര്' : 'Item / Description';
-
-      if (!editId && type === 'expense') {
-        if (cat === 'tea') titleInput.value = 'Tea';
-        else if (cat === 'rent') titleInput.value = 'Shop Rent';
-        else if (cat === 'salary') titleInput.value = '';
-        else if (cat === 'stock') titleInput.value = '';
-        else titleInput.value = '';
-      }
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
+      openModalWithHistory('entryModal');
     }
 
     function saveEntry() {
@@ -2535,20 +2785,6 @@
       if (type === 'expense') {
         category = document.getElementById('entryCategory').value;
         if (category === 'stock') {
-          let hasEmptyPrice = false;
-          document.querySelectorAll('.purchase-item-row').forEach(row => {
-            const name = row.querySelector('.p-name').value.trim();
-            const priceVal = row.querySelector('.p-price').value.trim();
-            if (name && (priceVal === '' || parseFloat(priceVal) <= 0)) {
-              hasEmptyPrice = true;
-            }
-          });
-
-          if (hasEmptyPrice) {
-            const proceed = confirm("⚠️ ചില സാധനങ്ങൾക്ക് വില നൽകിയിട്ടില്ല. അവ ഒഴിവാക്കി ബാക്കി വിവരങ്ങൾ സേവ് ചെയ്യണമെന്നുണ്ടോ?");
-            if (!proceed) return;
-          }
-
           items = getCollectedPurchaseItems();
           billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
           paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
@@ -2736,408 +2972,11 @@
       document.getElementById('modalRepBankBal').innerText = document.getElementById('runBankBal').innerText;
       document.getElementById('modalRepTotalBal').innerText = document.getElementById('runTotalBal').innerText;
 
-      document.getElementById('todayReportModal').style.display = 'flex';
+      openModalWithHistory('todayReportModal');
     }
 
     /* -------------------------------------------------------------
-       6. PDF ENGINE (ZERO-BLANK ENGINE & PERFECT FIT)
-       ------------------------------------------------------------- */
-    async function ensurePdfLibraries() {
-      if (typeof html2canvas === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-      if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-    }
-
-    function openA4PreviewModal(htmlContent, title) {
-      currentA4Title = title || "BANABLAST_Report";
-      document.getElementById('a4BarTitle').innerText = title;
-      document.getElementById('a4SheetPaper').innerHTML = htmlContent;
-      document.getElementById('a4PreviewModal').style.display = 'flex';
-    }
-
-    function closeA4PreviewModal() {
-      document.getElementById('a4PreviewModal').style.display = 'none';
-    }
-
-    async function createCleanA4PdfBlob(fileName) {
-      await ensurePdfLibraries();
-
-      const element = document.getElementById('a4SheetPaper');
-      const modal = document.getElementById('a4PreviewModal');
-      if (modal) modal.scrollTop = 0;
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-      const JsPdf = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
-      if (JsPdf) {
-        const pdf = new JsPdf('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const margin = 8;
-        const imgWidth = pdfWidth - (margin * 2);
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let heightLeft = imgHeight;
-        let position = margin;
-
-        pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-        heightLeft -= (pdfHeight - (margin * 2));
-
-        while (heightLeft > 0) {
-          position = position - (pdfHeight - (margin * 2));
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-          heightLeft -= (pdfHeight - (margin * 2));
-        }
-
-        return pdf.output('blob');
-      } else {
-        throw new Error("jsPDF ലൈബ്രറി ലഭ്യമല്ല");
-      }
-    }
-
-    async function printOrSaveCurrentA4() {
-      const btn = document.querySelector('.a4-btn-print');
-      if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
-
-      const fileName = `${currentA4Title}_${today}.pdf`;
-
-      try {
-        const blob = await createCleanA4PdfBlob(fileName);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-
-        setTimeout(() => {
-          if (a.parentNode) document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
-        }, 1000);
-
-        if (btn) {
-          btn.innerText = '✅ Saved!';
-          setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2000);
-        }
-      } catch (err) {
-        console.error("Save error:", err);
-        alert("❌ PDF സേവ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
-        if (btn) btn.innerText = '💾 Download PDF';
-      }
-    }
-
-    async function shareCurrentA4WhatsApp() {
-      const btn = document.querySelector('.a4-btn-wa');
-      if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
-
-      const fileName = `${currentA4Title}_${today}.pdf`;
-
-      try {
-        const blob = await createCleanA4PdfBlob(fileName);
-        const file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: currentA4Title,
-            text: `BANABLAST Statement (${today})`
-          });
-        } else {
-          printOrSaveCurrentA4();
-          alert("✅ PDF ഫയൽ ഡൗൺലോഡ് ആയിട്ടുണ്ട്. ഇനി വാട്സാപ്പിൽ അയക്കാം!");
-        }
-      } catch (err) {
-        console.error("Share error:", err);
-        if (err.name !== 'AbortError') {
-          printOrSaveCurrentA4();
-        }
-      } finally {
-        if (btn) btn.innerText = '💬 WhatsApp';
-      }
-    }
-
-    function previewTodayA4() {
-      closeModal('todayReportModal');
-      const curDate = document.getElementById('selectedDate').value || today;
-      const sales = document.getElementById('sumDailySales').innerText;
-      const sCash = document.getElementById('subSaleCash').innerText;
-      const sGpay = document.getElementById('subSaleGPay').innerText;
-
-      const exp = document.getElementById('sumDailyExp').innerText;
-      const eCash = document.getElementById('subExpCash').innerText;
-      const eGpay = document.getElementById('subExpGPay').innerText;
-
-      const profit = document.getElementById('sumDailyProfit').innerText;
-      const cashBal = document.getElementById('runCashBal').innerText;
-      const bankBal = document.getElementById('runBankBal').innerText;
-      const totBal = document.getElementById('runTotalBal').innerText;
-
-      const todayTrans = transactions.filter(t => t.date === curDate);
-      let transRows = '';
-      todayTrans.forEach(t => {
-        const isSale = t.type === 'sale';
-        transRows += `
-          <div class="a4-row">
-            <span><strong>${t.title || t.extra}</strong> (${t.mode.toUpperCase()}) ${t.note ? '• ' + t.note : ''}</span>
-            <strong style="color:${isSale ? '#16a34a' : '#dc2626'};">${isSale ? '+' : '-'}${t.amount}</strong>
-          </div>
-        `;
-      });
-
-      const html = `
-        <div class="a4-header">
-          <div>
-            <h1>BANABLAST</h1>
-            <p>BUSINESS LEDGER & SALES REPORT</p>
-          </div>
-          <div class="a4-meta-box">
-            <span>STATEMENT DATE</span>
-            <strong>${curDate}</strong>
-          </div>
-        </div>
-
-        <div class="a4-card-grid">
-          <div class="a4-card green">
-            <h5>Total Sales (വരവ്)</h5>
-            <p style="color:#16a34a;">${sales}</p>
-            <span>Cash: ${sCash} | GPay: ${sGpay}</span>
-          </div>
-          <div class="a4-card red">
-            <h5>Total Expense (ചിലവ്)</h5>
-            <p style="color:#dc2626;">${exp}</p>
-            <span>Cash: ${eCash} | GPay: ${eGpay}</span>
-          </div>
-        </div>
-
-        <div class="a4-card blue" style="margin-bottom:14px;">
-          <h5>Daily Net Profit / ബാക്കി</h5>
-          <p style="color:#1e3a8a; font-size:1.6rem;">${profit}</p>
-        </div>
-
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>ഇന്നത്തെ ഇടപാടുകൾ (TODAY'S TRANSACTIONS)</span>
-            <span>AMOUNT (₹)</span>
-          </div>
-          ${transRows || '<div style="text-align:center; color:#94a3b8; padding:10px;">ഇന്ന് ഇടപാടുകൾ ഒന്നും നടന്നിട്ടില്ല</div>'}
-        </div>
-
-        <div class="a4-section-box" style="background:#eff6ff; border-color:#bfdbfe;">
-          <div class="a4-section-title" style="color:#1e3a8a; border-color:#bfdbfe;">
-            <span>റണ്ണിംഗ് ബാലൻസ് (RUNNING BALANCE STATUS)</span>
-            <span>CURRENT</span>
-          </div>
-          <div class="a4-row"><span>Counter Cash Box Balance:</span><strong>${cashBal}</strong></div>
-          <div class="a4-row"><span>Bank / GPay Account Balance:</span><strong>${bankBal}</strong></div>
-          <div class="a4-row" style="border-top:1px dashed #93c5fd; padding-top:6px; font-weight:800; font-size:0.95rem; color:#1e3a8a;">
-            <span>TOTAL CUMULATIVE BALANCE:</span><span>${totBal}</span>
-          </div>
-        </div>
-
-        <div class="a4-footer">
-          <div>BANABLAST Digital Cloud Management • Certified Statement</div>
-          <div class="a4-sign-grid">
-            <div class="a4-sign-col">ASHIF</div>
-            <div class="a4-sign-col">SABITH</div>
-            <div class="a4-sign-col">ASHKAR ALI</div>
-          </div>
-        </div>
-      `;
-
-      openA4PreviewModal(html, `Daily_Report_${curDate}`);
-    }
-
-    function previewLedgerSheetA4() {
-      closeModal('itemSheetModal');
-      const title = document.getElementById('sheetItemTitle').innerText;
-      const bodyRows = document.getElementById('sheetTableBody').innerHTML;
-      const totSum = document.getElementById('sheetTotalSum').innerText;
-
-      const html = `
-        <div class="a4-header">
-          <div>
-            <h1>BANABLAST</h1>
-            <p>ACCOUNT STATEMENT & LEDGER SHEET</p>
-          </div>
-          <div class="a4-meta-box">
-            <span>GENERATED DATE</span>
-            <strong>${today}</strong>
-          </div>
-        </div>
-
-        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
-
-        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
-          <thead>
-            <tr style="background:#f1f5f9; text-align:left;">
-              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Date</th>
-              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Details & Items</th>
-              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Mode</th>
-              <th style="padding:8px; border-bottom:1px solid #cbd5e1; text-align:right;">Paid / Due</th>
-            </tr>
-          </thead>
-          <tbody>${bodyRows}</tbody>
-        </table>
-
-        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
-          <span>TOTAL AMOUNT / CUMULATIVE:</span>
-          <span>${totSum}</span>
-        </div>
-
-        <div class="a4-footer">
-          <div>BANABLAST Business Ledger • Automated Record</div>
-          <div class="a4-sign-grid">
-            <div class="a4-sign-col">ASHIF</div>
-            <div class="a4-sign-col">SABITH</div>
-            <div class="a4-sign-col">ASHKAR ALI</div>
-          </div>
-        </div>
-      `;
-
-      openA4PreviewModal(html, `Ledger_${activeSheetKey}`);
-    }
-
-    function previewBreakdownA4() {
-      closeModal('runningBreakdownModal');
-      const title = document.getElementById('breakdownTitle').innerText;
-      const tableContent = document.getElementById('breakdownTableContainer').innerHTML;
-      const tot = document.getElementById('breakdownTotalSum').innerText;
-
-      const html = `
-        <div class="a4-header">
-          <div>
-            <h1>BANABLAST</h1>
-            <p>CUMULATIVE AUDIT BREAKDOWN</p>
-          </div>
-          <div class="a4-meta-box">
-            <span>DATE</span>
-            <strong>${today}</strong>
-          </div>
-        </div>
-
-        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
-        ${tableContent}
-
-        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
-          <span>CUMULATIVE BALANCE:</span>
-          <span style="color:#0284c7;">${tot}</span>
-        </div>
-
-        <div class="a4-footer">
-          <div>BANABLAST Financial Summary</div>
-          <div class="a4-sign-grid">
-            <div class="a4-sign-col">ASHIF</div>
-            <div class="a4-sign-col">SABITH</div>
-            <div class="a4-sign-col">ASHKAR ALI</div>
-          </div>
-        </div>
-      `;
-
-      openA4PreviewModal(html, `Balance_Breakdown`);
-    }
-
-    function previewReportsA4() {
-      const sales = document.getElementById('repSales').innerText;
-      const exp = document.getElementById('repExp').innerText;
-      const profit = document.getElementById('repProfit').innerText;
-      const rent = document.getElementById('repTotalRent').innerText;
-      const rentList = document.getElementById('repRentList').innerHTML;
-      const sal = document.getElementById('repTotalSalary').innerText;
-      const salList = document.getElementById('repStaffList').innerHTML;
-      const stock = document.getElementById('repStockSum').innerText;
-      const misc = document.getElementById('repMiscSum').innerText;
-
-      const html = `
-        <div class="a4-header">
-          <div>
-            <h1>BANABLAST</h1>
-            <p>FINANCIAL STATEMENTS & REPORT</p>
-          </div>
-          <div class="a4-meta-box">
-            <span>PERIOD</span>
-            <strong>${currentReportFilter.toUpperCase()}</strong>
-          </div>
-        </div>
-
-        <div class="a4-card-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="a4-card green">
-            <h5>Total Sales</h5>
-            <p style="color:#16a34a; font-size:1.2rem;">${sales}</p>
-          </div>
-          <div class="a4-card red">
-            <h5>Total Expense</h5>
-            <p style="color:#dc2626; font-size:1.2rem;">${exp}</p>
-          </div>
-          <div class="a4-card blue">
-            <h5>Net Profit</h5>
-            <p style="color:#1e3a8a; font-size:1.2rem;">${profit}</p>
-          </div>
-        </div>
-
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>🏠 Rent Payments (വാടക ചിലവുകൾ)</span>
-            <span style="color:#dc2626;">${rent}</span>
-          </div>
-          ${rentList}
-        </div>
-
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>👥 Staff Salaries (സ്റ്റാഫ് ശമ്പളം)</span>
-            <span style="color:#dc2626;">${sal}</span>
-          </div>
-          ${salList}
-        </div>
-
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>📦 Other Purchases & Miscellaneous</span>
-          </div>
-          <div class="a4-row"><span>Stock Purchases Total:</span><strong>${stock}</strong></div>
-          <div class="a4-row"><span>Daily Miscellaneous:</span><strong>${misc}</strong></div>
-        </div>
-
-        <div class="a4-footer">
-          <div>BANABLAST Business Analytics • Auto Verified</div>
-          <div class="a4-sign-grid">
-            <div class="a4-sign-col">ASHIF</div>
-            <div class="a4-sign-col">SABITH</div>
-            <div class="a4-sign-col">ASHKAR ALI</div>
-          </div>
-        </div>
-      `;
-
-      openA4PreviewModal(html, `Monthly_Report`);
-    }
-
-    /* -------------------------------------------------------------
-       7. STOCK & SUPPLIERS TAB (തീയതി ഫിൽട്ടറുകളോടെ)
+       8. STOCK & SUPPLIERS TAB WITH DUE TOGGLE (POINT 10)
        ------------------------------------------------------------- */
     function filterStockTab(period) {
       currentStockFilter = period;
@@ -3216,6 +3055,17 @@
       container.innerHTML = html;
     }
 
+    function toggleSupplierDuesOnlyFilter() {
+      supplierDuesOnlyFilter = !supplierDuesOnlyFilter;
+      const notice = document.getElementById('suppDueFilterNotice');
+      if (supplierDuesOnlyFilter) {
+        notice.innerText = "🛑 കുടിശ്ശികയുള്ളവരുടെ ലിസ്റ്റ് മാത്രമാണ് കാണുന്നത് (ക്ലിക്ക് ചെയ്താൽ സാധാരണ ലിസ്റ്റിലേക്ക്)";
+      } else {
+        notice.innerText = "കുടിശ്ശികയുള്ളവരുടെ മാത്രം പട്ടിക കാണാൻ ഇവിടെ ക്ലിക്ക് ചെയ്യുക 🔍";
+      }
+      renderSupplierPurchasesTab();
+    }
+
     function filterSupplierTab(period) {
       currentSupplierFilter = period;
       document.querySelectorAll('#tab-suppliers .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3251,11 +3101,8 @@
         return true;
       });
 
-      if (!suppTrans.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല</p>';
-        return;
-      }
-
+      // Calculate Total Outstanding Dues across all suppliers
+      let totalAllDues = 0;
       const grouped = {};
       suppTrans.forEach(t => {
         const name = (t.title || t.extra || 'Unknown').trim();
@@ -3269,8 +3116,25 @@
         if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
       });
 
+      Object.values(grouped).forEach(g => {
+        totalAllDues += g.totalDue;
+      });
+
+      const dueDisp = document.getElementById('suppTotalDueDisplay');
+      if (dueDisp) dueDisp.innerText = '₹' + (Math.round(totalAllDues * 100) / 100);
+
+      let keys = Object.keys(grouped);
+      if (supplierDuesOnlyFilter) {
+        keys = keys.filter(k => grouped[k].totalDue > 0);
+      }
+
+      if (!keys.length) {
+        container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:20px;">${supplierDuesOnlyFilter ? 'കുടിശ്ശികയുള്ള സപ്ലയർമാർ ആരും തന്നെയില്ല! 🎉' : 'സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല'}</p>`;
+        return;
+      }
+
       let html = '';
-      Object.keys(grouped).forEach(k => {
+      keys.forEach(k => {
         const item = grouped[k];
         const totDue = Math.round(item.totalDue * 100) / 100;
         const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
@@ -3293,6 +3157,203 @@
       container.innerHTML = html;
     }
 
+    /* -------------------------------------------------------------
+       9. SMART RENT LEDGER LOGIC (POINT 11)
+       ------------------------------------------------------------- */
+    function openRentDetailsModal() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+
+      // Rent logs for current month
+      const rentLogs = transactions.filter(t => {
+        if (t.category !== 'rent') return false;
+        const d = new Date(t.date);
+        return d.getMonth() === refDate.getMonth() && d.getFullYear() === refDate.getFullYear();
+      });
+
+      let totalPaid = 0;
+      let logsHTML = '';
+      rentLogs.slice().reverse().forEach(log => {
+        totalPaid += log.amount;
+        logsHTML += `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed #e2e8f0; font-size:0.8rem;">
+            <div>
+              <strong>📅 ${log.date}</strong> (${log.mode.toUpperCase()})
+              <div style="color:#64748b; font-size:0.72rem;">${log.note || log.title || 'Rent payment'}</div>
+            </div>
+            <strong class="color-red">₹${log.amount}</strong>
+          </div>
+        `;
+      });
+
+      const due = Math.max(0, monthlyRentTarget - totalPaid);
+      document.getElementById('monthlyRentSettingInput').value = monthlyRentTarget;
+      document.getElementById('rentModalPaidDisplay').innerText = `₹${totalPaid}`;
+      document.getElementById('rentModalDueDisplay').innerText = `₹${due}`;
+      document.getElementById('rentModalLogsContainer').innerHTML = logsHTML || '<div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:12px;">ഈ മാസം വാടക പേയ്‌‌മെന്റുകൾ നൽകിയിട്ടില്ല</div>';
+
+      openModalWithHistory('rentDetailsModal');
+    }
+
+    function saveMonthlyRentTarget() {
+      const val = parseFloat(document.getElementById('monthlyRentSettingInput').value);
+      if (!isNaN(val) && val > 0) {
+        monthlyRentTarget = val;
+        localStorage.setItem('BANABLAST_MONTHLY_RENT', val);
+        db.collection('settings').doc('general').set({
+          monthlyRent: val
+        }, { merge: true });
+        alert("✅ പ്രതിമാസ വാടക തുക അപ്‌ഡേറ്റ് ചെയ്തു!");
+        renderReportsTab();
+        openRentDetailsModal();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       10. STAFF SALARIES & WAGES LEDGER (POINT 12)
+       ------------------------------------------------------------- */
+    function openStaffDetailsModal() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+
+      const staffTrans = transactions.filter(t => {
+        if (t.category !== 'salary') return false;
+        const d = new Date(t.date);
+        return d.getMonth() === refDate.getMonth() && d.getFullYear() === refDate.getFullYear();
+      });
+
+      const staffMap = {};
+      staffTrans.forEach(t => {
+        const name = (t.title || t.extra || 'Staff').trim();
+        if (!staffMap[name]) staffMap[name] = { totalPaid: 0, entries: [] };
+        staffMap[name].totalPaid += t.amount;
+        staffMap[name].entries.push(t);
+      });
+
+      const container = document.getElementById('staffModalMembersContainer');
+      const names = Object.keys(staffMap);
+
+      if (!names.length) {
+        container.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">ഈ മാസം സ്റ്റാഫ് സാലറി നൽകിയ എൻട്രികൾ ഇല്ല</div>';
+      } else {
+        container.innerHTML = names.map(name => {
+          const item = staffMap[name];
+          return `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <strong style="color:#0f172a; font-size:0.95rem;">👤 ${name}</strong>
+                  <div style="font-size:0.75rem; color:#64748b;">ഈ മാസം ആകെ കൂലി: <b style="color:#1e3a8a;">₹${item.totalPaid}</b></div>
+                </div>
+                <button type="button" onclick="shareStaffSalaryWhatsApp('${name}', ${item.totalPaid})" style="background:#22c55e; color:white; border:none; padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">
+                  💬 സ്ലിപ്പ് അയക്കുക
+                </button>
+              </div>
+              <div style="margin-top:8px; border-top:1px dashed #cbd5e1; padding-top:6px;">
+                ${item.entries.map(e => `
+                  <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#475569; padding:2px 0;">
+                    <span>• ${e.date} (${e.mode.toUpperCase()}) ${e.note ? '- ' + e.note : ''}</span>
+                    <strong class="color-red">₹${e.amount}</strong>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      openModalWithHistory('staffDetailsModal');
+    }
+
+    function shareStaffSalaryWhatsApp(name, amount) {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const text = `🍌 *BANABLAST SALARY VOUCHER*\n` +
+                   `📍 Nellippuzha, Mannarkkad\n` +
+                   `Staff Name: *${name}*\n` +
+                   `Date: ${curDate}\n` +
+                   `--------------------------------\n` +
+                   `💰 *Total Wage Paid This Month: ₹${amount}*\n` +
+                   `--------------------------------\n` +
+                   `✨ Certified Statement ✨`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    /* -------------------------------------------------------------
+       11. STOCK & EXPENSES BREAKDOWN LOGIC (POINT 13)
+       ------------------------------------------------------------- */
+    function openStockExpensesModal() {
+      currentStockExpFilter = 'month';
+      document.querySelectorAll('#stockExpensesModal .filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('stkExpFiltMonth').classList.add('active');
+      renderStockExpenseModalList();
+      openModalWithHistory('stockExpensesModal');
+    }
+
+    function filterStockExpenseModal(period) {
+      currentStockExpFilter = period;
+      document.querySelectorAll('#stockExpensesModal .filter-btn').forEach(b => b.classList.remove('active'));
+      if (period === 'month') document.getElementById('stkExpFiltMonth').classList.add('active');
+      if (period === 'week') document.getElementById('stkExpFiltWeek').classList.add('active');
+      if (period === 'all') document.getElementById('stkExpFiltAll').classList.add('active');
+      renderStockExpenseModalList();
+    }
+
+    function renderStockExpenseModalList() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const refDate = new Date(curDate);
+
+      const items = transactions.filter(t => {
+        if (t.type !== 'expense') return false;
+        if (t.category === 'rent' || t.category === 'salary') return false; // Stock & Misc only
+        const tDate = new Date(t.date);
+        if (currentStockExpFilter === 'month') {
+          return tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear();
+        }
+        if (currentStockExpFilter === 'week') {
+          const diffDays = Math.floor((refDate - tDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 7;
+        }
+        return true;
+      });
+
+      let total = 0;
+      const container = document.getElementById('stockExpModalListContainer');
+      if (!items.length) {
+        container.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:16px;">ചിലവുകൾ ഒന്നും കണ്ടെത്തിയില്ല</div>';
+      } else {
+        container.innerHTML = items.slice().reverse().map(it => {
+          total += it.amount;
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed #e2e8f0; font-size:0.8rem;">
+              <div>
+                <strong>${it.title || it.extra}</strong>
+                <div style="font-size:0.72rem; color:#64748b;">📅 ${it.date} • ${it.category.toUpperCase()} (${it.mode.toUpperCase()})</div>
+              </div>
+              <strong class="color-red">₹${it.amount}</strong>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('stockExpModalTotal').innerText = `₹${Math.round(total * 100) / 100}`;
+    }
+
+    function shareStockExpensesWhatsApp() {
+      const curDate = document.getElementById('selectedDate').value || today;
+      const total = document.getElementById('stockExpModalTotal').innerText;
+      const text = `📦 *BANABLAST STOCK & EXPENSES REPORT*\n` +
+                   `📍 Nellippuzha, Mannarkkad\n` +
+                   `Date: ${curDate} | Filter: ${currentStockExpFilter.toUpperCase()}\n` +
+                   `--------------------------------\n` +
+                   `Total Stock & Other Expenses: *${total}*\n` +
+                   `--------------------------------\n` +
+                   `✨ Banablast Ledger Engine ✨`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    /* -------------------------------------------------------------
+       12. REPORTS TAB SUMMARY RENDERING
+       ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3329,8 +3390,6 @@
       });
 
       let sales = 0, exp = 0, rent = 0, salary = 0, stock = 0, misc = 0;
-      let rentListHTML = '';
-      let staffGroup = {};
 
       filteredTrans.forEach(t => {
         if (t.type === 'sale') {
@@ -3339,11 +3398,8 @@
           exp += t.amount;
           if (t.category === 'rent') {
             rent += t.amount;
-            rentListHTML += `<div class="list-row"><span>${t.date} (${t.mode.toUpperCase()})</span><strong>₹${t.amount}</strong></div>`;
           } else if (t.category === 'salary') {
             salary += t.amount;
-            const staff = t.title || t.extra || 'Unknown';
-            staffGroup[staff] = (staffGroup[staff] || 0) + t.amount;
           } else if (t.category === 'stock') {
             stock += t.amount;
           } else {
@@ -3360,28 +3416,25 @@
       document.getElementById('repExp').innerText = '₹' + exp;
       document.getElementById('repProfit').innerText = '₹' + netProfit;
 
+      // Clean Rent Card Sub-indicators
       document.getElementById('repTotalRent').innerText = '₹' + (Math.round(rent * 100) / 100);
-      document.getElementById('repRentList').innerHTML = rentListHTML || '<p style="font-size:0.8rem; color:#94a3b8;">വാടക നൽകിയ വിവരങ്ങൾ ഇല്ല</p>';
+      document.getElementById('repRentPaidSub').innerText = '₹' + (Math.round(rent * 100) / 100);
+      const rentDue = Math.max(0, monthlyRentTarget - rent);
+      document.getElementById('repRentDueSub').innerText = rentDue > 0 ? `ബാക്കി: ₹${rentDue}` : `പൂർത്തിയായി ✅`;
 
       document.getElementById('repTotalSalary').innerText = '₹' + (Math.round(salary * 100) / 100);
-      let staffHTML = '';
-      Object.keys(staffGroup).forEach(staff => {
-        staffHTML += `<div class="list-row"><span>👤 ${staff}</span><strong class="color-red">₹${Math.round(staffGroup[staff] * 100) / 100}</strong></div>`;
-      });
-      document.getElementById('repStaffList').innerHTML = staffHTML || '<p style="font-size:0.8rem; color:#94a3b8;">സാലറി വിവരങ്ങൾ ഇല്ല</p>';
-
       document.getElementById('repStockSum').innerText = '₹' + (Math.round(stock * 100) / 100);
       document.getElementById('repMiscSum').innerText = '₹' + (Math.round(misc * 100) / 100);
       document.getElementById('repTotalOther').innerText = '₹' + (Math.round((stock + misc) * 100) / 100);
     }
 
     /* -------------------------------------------------------------
-       8. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION FOR DELETE & CAPITAL RETURN)
+       13. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION)
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
-      document.getElementById('investModal').style.display = 'flex';
+      openModalWithHistory('investModal');
     }
 
     function saveInvestment() {
@@ -3440,7 +3493,7 @@
       const inv = investments.find(i => i.id === invId);
       if (!inv) return;
 
-      if (!confirm(`⚠️ ഈ നിക്ഷേപം (+₹${inv.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും (Ashif, Sabith, Ashkar Ali) തങ്ങളുടെ ലോഗിനിൽ നിന്ന് അംഗീകരിച്ചാൽ മാത്രമേ ഇത് അക്കൗണ്ടിൽ നിന്ന് ഒഴിവാകൂ.`)) {
+      if (!confirm(`⚠️️ ഈ നിക്ഷേപം (+₹${inv.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും തങ്ങളുടെ ലോഗിനിൽ നിന്ന് അംഗീകരിച്ചാൽ മാത്രമേ ഇത് അക്കൗണ്ടിൽ നിന്ന് ഒഴിവാകൂ.`)) {
         return;
       }
 
@@ -3482,7 +3535,7 @@
     function openWithdrawModal() {
       document.getElementById('withAmount').value = '';
       document.getElementById('withNote').value = '';
-      document.getElementById('withdrawModal').style.display = 'flex';
+      openModalWithHistory('withdrawModal');
     }
 
     function saveWithdrawal() {
@@ -3750,7 +3803,7 @@
               <div>
                 <span>👤 ${w.partner}</span>
                 <span style="font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px; background:${isCapital ? '#fee2e2' : '#e0f2fe'}; color:${isCapital ? '#b91c1c' : '#0369a1'};">
-                  ${isCapital ? '🏛️️ CAPITAL RETURN' : '💰 PROFIT SHARE'}
+                  ${isCapital ? '🏛 CAPITAL RETURN' : '💰 PROFIT SHARE'}
                 </span>
               </div>
               <span class="color-red">-₹${w.amount}</span>
@@ -3762,7 +3815,7 @@
               <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
                 ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
               </span>
-              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️️</button>` : ''}
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
@@ -3783,7 +3836,7 @@
     }
 
     /* -------------------------------------------------------------
-       9. UNIVERSAL LEDGER SHEET
+       14. UNIVERSAL LEDGER SHEET & MODALS
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -3795,7 +3848,7 @@
       document.getElementById('sheetFiltMonth').classList.add('active');
 
       renderItemSheetContent(category);
-      document.getElementById('itemSheetModal').style.display = 'flex';
+      openModalWithHistory('itemSheetModal');
     }
 
     function filterItemSheet(period) {
@@ -3937,11 +3990,10 @@
     }
 
     /* -------------------------------------------------------------
-       10. RUNNING BREAKDOWN & OPENING BALANCE
+       15. RUNNING BREAKDOWN & OPENING BALANCE
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
-      const modal = document.getElementById('runningBreakdownModal');
       const titleElem = document.getElementById('breakdownTitle');
       const tableContainer = document.getElementById('breakdownTableContainer');
       const curDate = document.getElementById('selectedDate').value || today;
@@ -4019,13 +4071,13 @@
       document.getElementById('breakdownTotalSum').innerText = '₹' + currentBal;
       document.getElementById('breakdownTotalSum').className = currentBal >= 0 ? 'color-blue' : 'color-red';
 
-      modal.style.display = 'flex';
+      openModalWithHistory('runningBreakdownModal');
     }
 
     function openOpeningModal() {
       document.getElementById('openCash').value = opening.cash || 0;
       document.getElementById('openBank').value = opening.bank || 0;
-      document.getElementById('openingModal').style.display = 'flex';
+      openModalWithHistory('openingModal');
     }
 
     function saveOpeningBalance() {
@@ -4034,10 +4086,425 @@
 
       db.collection('settings').doc('general').set({
         opening,
-        holidays
+        holidays,
+        monthlyRent: monthlyRentTarget
       }, { merge: true });
 
       closeModal('openingModal');
+    }
+
+    /* -------------------------------------------------------------
+       16. A4 PREVIEW, PDF DOWNLOAD & WHATSAPP ENGINE
+       ------------------------------------------------------------- */
+    async function ensurePdfLibraries() {
+      if (typeof html2canvas === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+      if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+    }
+
+    function openA4PreviewModal(htmlContent, title) {
+      currentA4Title = title || "BANABLAST_Report";
+      document.getElementById('a4BarTitle').innerText = title;
+      document.getElementById('a4SheetPaper').innerHTML = htmlContent;
+      const m = document.getElementById('a4PreviewModal');
+      m.style.display = 'flex';
+      window.history.pushState({ modalOpen: 'a4PreviewModal' }, '');
+    }
+
+    function closeA4PreviewModal() {
+      document.getElementById('a4PreviewModal').style.display = 'none';
+    }
+
+    async function createCleanA4PdfBlob(fileName) {
+      await ensurePdfLibraries();
+
+      const element = document.getElementById('a4SheetPaper');
+      const modal = document.getElementById('a4PreviewModal');
+      if (modal) modal.scrollTop = 0;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      const JsPdf = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
+      if (JsPdf) {
+        const pdf = new JsPdf('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const imgWidth = pdfWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pdfHeight - (margin * 2));
+
+        while (heightLeft > 0) {
+          position = position - (pdfHeight - (margin * 2));
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+          heightLeft -= (pdfHeight - (margin * 2));
+        }
+
+        return pdf.output('blob');
+      } else {
+        throw new Error("jsPDF ലൈബ്രറി ലഭ്യമല്ല");
+      }
+    }
+
+    async function printOrSaveCurrentA4() {
+      const btn = document.querySelector('.a4-btn-print');
+      if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
+
+      const fileName = `${currentA4Title}_${today}.pdf`;
+
+      try {
+        const blob = await createCleanA4PdfBlob(fileName);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+          if (a.parentNode) document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }, 1000);
+
+        if (btn) {
+          btn.innerText = '✅ Saved!';
+          setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2000);
+        }
+      } catch (err) {
+        console.error("Save error:", err);
+        alert("❌ PDF സേവ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
+        if (btn) btn.innerText = '💾 Download PDF';
+      }
+    }
+
+    async function shareCurrentA4WhatsApp() {
+      const btn = document.querySelector('.a4-btn-wa');
+      if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
+
+      const fileName = `${currentA4Title}_${today}.pdf`;
+
+      try {
+        const blob = await createCleanA4PdfBlob(fileName);
+        const file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: currentA4Title,
+            text: `BANABLAST Statement (${today})`
+          });
+        } else {
+          // Native share fallback: direct text summary
+          const curDate = document.getElementById('selectedDate').value || today;
+          const sales = document.getElementById('sumDailySales').innerText;
+          const exp = document.getElementById('sumDailyExp').innerText;
+          const profit = document.getElementById('sumDailyProfit').innerText;
+          const totBal = document.getElementById('runTotalBal').innerText;
+
+          const text = `🍌 *BANABLAST STATEMENT SUMMARY*\n` +
+                       `📍 Nellippuzha, Mannarkkad\n` +
+                       `📅 Date: *${curDate}*\n` +
+                       `--------------------------------\n` +
+                       `💰 *Total Sales:* ${sales}\n` +
+                       `💸 *Total Expense:* ${exp}\n` +
+                       `📊 *Net Daily Profit:* ${profit}\n` +
+                       `🏦 *Cumulative Balance:* ${totBal}\n` +
+                       `--------------------------------\n` +
+                       `✨ Banablast Business Ledger ✨`;
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+      } catch (err) {
+        console.error("Share error:", err);
+        if (err.name !== 'AbortError') {
+          printOrSaveCurrentA4();
+        }
+      } finally {
+        if (btn) btn.innerText = '💬 WhatsApp';
+      }
+    }
+
+    function previewTodayA4() {
+      closeModal('todayReportModal');
+      const curDate = document.getElementById('selectedDate').value || today;
+      const sales = document.getElementById('sumDailySales').innerText;
+      const sCash = document.getElementById('subSaleCash').innerText;
+      const sGpay = document.getElementById('subSaleGPay').innerText;
+
+      const exp = document.getElementById('sumDailyExp').innerText;
+      const eCash = document.getElementById('subExpCash').innerText;
+      const eGpay = document.getElementById('subExpGPay').innerText;
+
+      const profit = document.getElementById('sumDailyProfit').innerText;
+      const cashBal = document.getElementById('runCashBal').innerText;
+      const bankBal = document.getElementById('runBankBal').innerText;
+      const totBal = document.getElementById('runTotalBal').innerText;
+
+      const todayTrans = transactions.filter(t => t.date === curDate);
+      let transRows = '';
+      todayTrans.forEach(t => {
+        const isSale = t.type === 'sale';
+        transRows += `
+          <div class="a4-row">
+            <span><strong>${t.title || t.extra}</strong> (${t.mode.toUpperCase()}) ${t.note ? '• ' + t.note : ''}</span>
+            <strong style="color:${isSale ? '#16a34a' : '#dc2626'};">${isSale ? '+' : '-'}${t.amount}</strong>
+          </div>
+        `;
+      });
+
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>BUSINESS LEDGER & SALES REPORT</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>STATEMENT DATE</span>
+            <strong>${curDate}</strong>
+          </div>
+        </div>
+
+        <div class="a4-card-grid">
+          <div class="a4-card green">
+            <h5>Total Sales (വരവ്)</h5>
+            <p style="color:#16a34a;">${sales}</p>
+            <span>Cash: ${sCash} | GPay: ${sGpay}</span>
+          </div>
+          <div class="a4-card red">
+            <h5>Total Expense (ചിലവ്)</h5>
+            <p style="color:#dc2626;">${exp}</p>
+            <span>Cash: ${eCash} | GPay: ${eGpay}</span>
+          </div>
+        </div>
+
+        <div class="a4-card blue" style="margin-bottom:14px;">
+          <h5>Daily Net Profit / ബാക്കി</h5>
+          <p style="color:#1e3a8a; font-size:1.6rem;">${profit}</p>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>ഇന്നത്തെ ഇടപാടുകൾ (TODAY'S TRANSACTIONS)</span>
+            <span>AMOUNT (₹)</span>
+          </div>
+          ${transRows || '<div style="text-align:center; color:#94a3b8; padding:10px;">ഇന്ന് ഇടപാടുകൾ ഒന്നും നടന്നിട്ടില്ല</div>'}
+        </div>
+
+        <div class="a4-section-box" style="background:#eff6ff; border-color:#bfdbfe;">
+          <div class="a4-section-title" style="color:#1e3a8a; border-color:#bfdbfe;">
+            <span>റണ്ണിംഗ് ബാലൻസ് (RUNNING BALANCE STATUS)</span>
+            <span>CURRENT</span>
+          </div>
+          <div class="a4-row"><span>Counter Cash Box Balance:</span><strong>${cashBal}</strong></div>
+          <div class="a4-row"><span>Bank / GPay Account Balance:</span><strong>${bankBal}</strong></div>
+          <div class="a4-row" style="border-top:1px dashed #93c5fd; padding-top:6px; font-weight:800; font-size:0.95rem; color:#1e3a8a;">
+            <span>TOTAL CUMULATIVE BALANCE:</span><span>${totBal}</span>
+          </div>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Digital Cloud Management • Certified Statement</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
+        </div>
+      `;
+
+      openA4PreviewModal(html, `Daily_Report_${curDate}`);
+    }
+
+    function previewLedgerSheetA4() {
+      closeModal('itemSheetModal');
+      const title = document.getElementById('sheetItemTitle').innerText;
+      const bodyRows = document.getElementById('sheetTableBody').innerHTML;
+      const totSum = document.getElementById('sheetTotalSum').innerText;
+
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>ACCOUNT STATEMENT & LEDGER SHEET</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>GENERATED DATE</span>
+            <strong>${today}</strong>
+          </div>
+        </div>
+
+        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
+
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
+          <thead>
+            <tr style="background:#f1f5f9; text-align:left;">
+              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Date</th>
+              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Details & Items</th>
+              <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Mode</th>
+              <th style="padding:8px; border-bottom:1px solid #cbd5e1; text-align:right;">Paid / Due</th>
+            </tr>
+          </thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+
+        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
+          <span>TOTAL AMOUNT / CUMULATIVE:</span>
+          <span>${totSum}</span>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Business Ledger • Automated Record</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
+        </div>
+      `;
+
+      openA4PreviewModal(html, `Ledger_${activeSheetKey}`);
+    }
+
+    function previewBreakdownA4() {
+      closeModal('runningBreakdownModal');
+      const title = document.getElementById('breakdownTitle').innerText;
+      const tableContent = document.getElementById('breakdownTableContainer').innerHTML;
+      const tot = document.getElementById('breakdownTotalSum').innerText;
+
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>CUMULATIVE AUDIT BREAKDOWN</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>DATE</span>
+            <strong>${today}</strong>
+          </div>
+        </div>
+
+        <h3 style="color:#1e3a8a; font-size:1.1rem; margin-bottom:12px;">${title}</h3>
+        ${tableContent}
+
+        <div class="sheet-total-box" style="margin-top:14px; font-size:1rem;">
+          <span>CUMULATIVE BALANCE:</span>
+          <span style="color:#0284c7;">${tot}</span>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Financial Summary</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
+        </div>
+      `;
+
+      openA4PreviewModal(html, `Balance_Breakdown`);
+    }
+
+    function previewReportsA4() {
+      const sales = document.getElementById('repSales').innerText;
+      const exp = document.getElementById('repExp').innerText;
+      const profit = document.getElementById('repProfit').innerText;
+      const rent = document.getElementById('repTotalRent').innerText;
+      const sal = document.getElementById('repTotalSalary').innerText;
+      const stock = document.getElementById('repStockSum').innerText;
+      const misc = document.getElementById('repMiscSum').innerText;
+
+      const html = `
+        <div class="a4-header">
+          <div>
+            <h1>BANABLAST</h1>
+            <p>FINANCIAL STATEMENTS & REPORT</p>
+          </div>
+          <div class="a4-meta-box">
+            <span>PERIOD</span>
+            <strong>${currentReportFilter.toUpperCase()}</strong>
+          </div>
+        </div>
+
+        <div class="a4-card-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="a4-card green">
+            <h5>Total Sales</h5>
+            <p style="color:#16a34a; font-size:1.2rem;">${sales}</p>
+          </div>
+          <div class="a4-card red">
+            <h5>Total Expense</h5>
+            <p style="color:#dc2626; font-size:1.2rem;">${exp}</p>
+          </div>
+          <div class="a4-card blue">
+            <h5>Net Profit</h5>
+            <p style="color:#1e3a8a; font-size:1.2rem;">${profit}</p>
+          </div>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>🏠 Rent Payments (വാടക ചിലവുകൾ)</span>
+            <span style="color:#dc2626;">${rent}</span>
+          </div>
+          <div class="a4-row"><span>Monthly Target Rent:</span><strong>₹${monthlyRentTarget}</strong></div>
+          <div class="a4-row"><span>Total Paid This Period:</span><strong>${rent}</strong></div>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>👥 Staff Salaries (സ്റ്റാഫ് ശമ്പളം)</span>
+            <span style="color:#dc2626;">${sal}</span>
+          </div>
+          <div class="a4-row"><span>Total Wages Paid:</span><strong>${sal}</strong></div>
+        </div>
+
+        <div class="a4-section-box">
+          <div class="a4-section-title">
+            <span>📦 Other Purchases & Miscellaneous</span>
+          </div>
+          <div class="a4-row"><span>Stock Purchases Total:</span><strong>${stock}</strong></div>
+          <div class="a4-row"><span>Daily Miscellaneous:</span><strong>${misc}</strong></div>
+        </div>
+
+        <div class="a4-footer">
+          <div>BANABLAST Business Analytics • Auto Verified</div>
+          <div class="a4-sign-grid">
+            <div class="a4-sign-col">ASHIF</div>
+            <div class="a4-sign-col">SABITH</div>
+            <div class="a4-sign-col">ASHKAR ALI</div>
+          </div>
+        </div>
+      `;
+
+      openA4PreviewModal(html, `Monthly_Report`);
     }
 
     if ('serviceWorker' in navigator) {
