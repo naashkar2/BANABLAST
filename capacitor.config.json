@@ -2,5 +2,9 @@
   "appId": "com.banablast.pos",
   "appName": "BANABLAST POS",
   "webDir": ".",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://naashkar2.github.io/BANABLAST/billing.html",
+    "cleartext": true
+  }
 }
