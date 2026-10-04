@@ -62,20 +62,27 @@
     }
     .header-btns {
       display: flex;
-      gap: 6px;
+      gap: 5px;
     }
     .btn-head {
       background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.18);
       color: #ffffff;
-      padding: 6px 10px;
+      padding: 6px 9px;
       border-radius: 8px;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .btn-head:active { background: rgba(255,255,255,0.25); }
+    .btn-head.connected {
+      background: #059669;
+      border-color: #34d399;
+    }
 
     /* Category Switcher */
     .cat-toggle-wrap {
@@ -112,7 +119,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* Sticky Quick-Jump Sub-Category Chips (പുതിയ ക്രമം: Kids -> Regular -> Fruit -> Special -> Premium) */
+    /* Sticky Quick-Jump Sub-Category Chips */
     .subcat-sticky-bar {
       position: sticky;
       top: 54px;
@@ -555,7 +562,7 @@
     .form-control { width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; }
     .form-control:focus { border-color: var(--blue); }
 
-    /* Thermal Print Area */
+    /* Thermal Print Area for Fallback */
     #receiptPrintArea { display: none; }
     @media print {
       body * { visibility: hidden; }
@@ -584,6 +591,9 @@
   <header class="pos-header">
     <div class="pos-brand">🥤 BANABLAST</div>
     <div class="header-btns">
+      <button type="button" class="btn-head" id="btnPrinterHeader" onclick="openPrinterModal()">
+        🖨️ <span id="printerHeadStatus">Printer</span>
+      </button>
       <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
       <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
       <button type="button" class="btn-head" onclick="returnToMainApp()">🏠 App</button>
@@ -602,7 +612,7 @@
     </div>
   </div>
 
-  <!-- Sticky Sub-Category Quick-Jump Bar (യഥാർത്ഥ മെനു കാർഡ് ക്രമം) -->
+  <!-- Sticky Sub-Category Quick-Jump Bar -->
   <div class="subcat-sticky-bar" id="subcatStickyBar">
     <button type="button" class="subcat-chip active" id="chip-all" onclick="scrollToSection('sec-all')">🌐 All</button>
     <button type="button" class="subcat-chip" id="chip-kids" onclick="scrollToSection('sec-kids')">👶 Kids</button>
@@ -654,6 +664,61 @@
     </button>
   </div>
 
+  <!-- PRINTER SETTINGS MODAL (BLUETOOTH DIRECT ESC/POS) -->
+  <div class="modal" id="printerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🖨️ Bluetooth Thermal Printer Settings</div>
+        <button class="btn-close" onclick="closeModal('printerModal')">✕</button>
+      </div>
+
+      <!-- Live Status Card -->
+      <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
+        <div style="font-size:0.75rem; color:#64748b; font-weight:bold;">CONNECTION STATUS</div>
+        <div id="blePrinterStatusBadge" style="display:inline-block; margin-top:5px; padding:4px 12px; border-radius:20px; font-weight:800; font-size:0.85rem; background:#fee2e2; color:#dc2626;">
+          🔴 Disconnected (കണക്റ്റല്ല)
+        </div>
+        <div id="bleConnectedDeviceName" style="font-size:0.8rem; font-weight:800; color:#1e293b; margin-top:4px;">Device: None</div>
+      </div>
+
+      <!-- Connect / Disconnect Buttons -->
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <button type="button" onclick="connectBluetoothThermalPrinter()" style="flex:1; background:#2563eb; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer;">
+          🔍 Scan & Connect
+        </button>
+        <button type="button" onclick="disconnectBluetoothPrinter()" style="background:#f1f5f9; color:#dc2626; border:1px solid #cbd5e1; padding:12px 16px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer;">
+          🔌 Disconnect
+        </button>
+      </div>
+
+      <!-- Test Print Button -->
+      <button type="button" onclick="testThermalPrint()" style="width:100%; background:#10b981; color:white; border:none; padding:11px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer; margin-bottom:14px;">
+        🧾 Test Print (ടെസ്റ്റ് പ്രിന്റ് അടിക്കുക)
+      </button>
+
+      <!-- Settings Configurations -->
+      <div class="form-group">
+        <label>Printer Mode (പ്രിന്റിംഗ് രീതി)</label>
+        <select id="printerModeSelect" class="form-control" onchange="savePrinterPreferences()">
+          <option value="bluetooth">⚡ Direct Bluetooth ESC/POS (ഡയലോഗ് ഇല്ലാതെ വേഗത്തിൽ)</option>
+          <option value="system">📄 Default System Print Dialog (സാധാരണ രീതി)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Thermal Paper Size (പേപ്പർ അളവ്)</label>
+        <select id="printerPaperWidthSelect" class="form-control" onchange="savePrinterPreferences()">
+          <option value="58">58mm (2-Inch Standard Mobile Printer)</option>
+          <option value="80">80mm (3-Inch Wide Counter Printer)</option>
+        </select>
+      </div>
+
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; font-size:0.75rem; color:#1e3a8a; line-height:1.4;">
+        💡 <b>സഹായക്കുറിപ്പ്:</b> പ്രിന്റർ ഓണാക്കി ഫോണിന്റെ ബ്ലൂടൂത്ത് സെറ്റിംഗ്സിൽ ആദ്യം ഒരു തവണ പെയർ ചെയ്യുക. തുടർന്ന് ഇവിടെ 'Scan & Connect' അമർത്തി പ്രിന്ററിന്റെ പേര് തിരഞ്ഞെടുക്കുക.
+      </div>
+    </div>
+  </div>
+
   <!-- CART DRAWER MODAL -->
   <div class="modal" id="cartDrawerModal">
     <div class="modal-box">
@@ -686,7 +751,6 @@
         </select>
       </div>
 
-      <!-- 5 സബ്-കാറ്റഗറികളുള്ള ഡ്രോപ്പ്ഡൗൺ -->
       <div class="form-group" id="subCatFormField">
         <label>Avil Milk Sub-Category (ഉപവിഭാഗം)</label>
         <select id="newItemSubCat" class="form-control" style="font-weight:700;">
@@ -780,7 +844,7 @@
     </div>
   </div>
 
-  <!-- THERMAL RECEIPT SLIP -->
+  <!-- THERMAL RECEIPT SLIP (SYSTEM PRINT FALLBACK) -->
   <div id="receiptPrintArea">
     <div class="r-center" style="font-size:15px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
     <div class="r-center" style="font-size:10px; font-weight:bold; margin-top:1px;">NELLIPPUZHA, MANNARKKAD</div>
@@ -873,6 +937,264 @@
 
     const todayDate = new Date().toISOString().split('T')[0];
 
+    /* -------------------------------------------------------------
+       WEB BLUETOOTH ESC/POS THERMAL PRINTER ENGINE
+       ------------------------------------------------------------- */
+    let bleDevice = null;
+    let bleServer = null;
+    let bleCharacteristic = null;
+
+    let printerSettings = {
+      mode: localStorage.getItem('bb_printer_mode') || 'bluetooth',
+      paperWidth: localStorage.getItem('bb_printer_paper') || '58'
+    };
+
+    const COMMON_PRINTER_SERVICES = [
+      '000018f0-0000-1000-8000-00805f9b34fb',
+      'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+      '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+      '0000af30-0000-1000-8000-00805f9b34fb'
+    ];
+
+    function openPrinterModal() {
+      document.getElementById('printerModeSelect').value = printerSettings.mode;
+      document.getElementById('printerPaperWidthSelect').value = printerSettings.paperWidth;
+      updatePrinterUIStatus();
+      document.getElementById('printerModal').style.display = 'flex';
+    }
+
+    function savePrinterPreferences() {
+      printerSettings.mode = document.getElementById('printerModeSelect').value;
+      printerSettings.paperWidth = document.getElementById('printerPaperWidthSelect').value;
+      localStorage.setItem('bb_printer_mode', printerSettings.mode);
+      localStorage.setItem('bb_printer_paper', printerSettings.paperWidth);
+    }
+
+    function updatePrinterUIStatus() {
+      const isConnected = !!(bleCharacteristic && bleServer && bleServer.connected);
+      const badge = document.getElementById('blePrinterStatusBadge');
+      const devName = document.getElementById('bleConnectedDeviceName');
+      const headBtn = document.getElementById('btnPrinterHeader');
+      const headTxt = document.getElementById('printerHeadStatus');
+
+      if (isConnected) {
+        badge.innerHTML = '🟢 Connected (കണക്റ്റാണ്)';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#15803d';
+        devName.innerText = `Device: ${bleDevice ? bleDevice.name : 'Thermal Printer'}`;
+        headBtn.className = 'btn-head connected';
+        headTxt.innerText = 'Connected';
+      } else {
+        badge.innerHTML = '🔴 Disconnected (കണക്റ്റല്ല)';
+        badge.style.background = '#fee2e2';
+        badge.style.color = '#dc2626';
+        devName.innerText = 'Device: None';
+        headBtn.className = 'btn-head';
+        headTxt.innerText = 'Printer';
+      }
+    }
+
+    async function connectBluetoothThermalPrinter() {
+      if (!navigator.bluetooth) {
+        alert("⚠️ നിങ്ങളുടെ ബ്രൗസറിൽ Web Bluetooth ലഭ്യമല്ല. ദയവായി Google Chrome മൊബൈൽ ബ്രൗസർ ഉപയോഗിക്കുക.");
+        return;
+      }
+
+      try {
+        badgeConnectingUI(true);
+
+        bleDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: COMMON_PRINTER_SERVICES
+        });
+
+        bleDevice.addEventListener('gattserverdisconnected', onPrinterDisconnected);
+
+        bleServer = await bleDevice.gatt.connect();
+
+        let foundChar = null;
+        for (const sUuid of COMMON_PRINTER_SERVICES) {
+          try {
+            const service = await bleServer.getPrimaryService(sUuid);
+            const chars = await service.getCharacteristics();
+            for (const ch of chars) {
+              if (ch.properties.write || ch.properties.writeWithoutResponse) {
+                foundChar = ch;
+                break;
+              }
+            }
+            if (foundChar) break;
+          } catch (e) {}
+        }
+
+        if (!foundChar) {
+          const services = await bleServer.getPrimaryServices();
+          for (const s of services) {
+            const chars = await s.getCharacteristics();
+            for (const ch of chars) {
+              if (ch.properties.write || ch.properties.writeWithoutResponse) {
+                foundChar = ch;
+                break;
+              }
+            }
+            if (foundChar) break;
+          }
+        }
+
+        if (!foundChar) {
+          throw new Error("പ്രിന്ററിന്റെ റൈറ്റ് സർവീസ് കണ്ടെത്താൻ കഴിഞ്ഞില്ല.");
+        }
+
+        bleCharacteristic = foundChar;
+        updatePrinterUIStatus();
+        alert(`✅ പ്രിന്റർ വിജയകരമായി കണക്റ്റായി: ${bleDevice.name || 'Thermal Printer'}`);
+      } catch (err) {
+        console.error("BLE Connect Error:", err);
+        updatePrinterUIStatus();
+        if (err.name !== 'NotFoundError') {
+          alert("❌ പ്രിന്റർ കണക്റ്റ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
+        }
+      }
+    }
+
+    function badgeConnectingUI(isConnecting) {
+      const badge = document.getElementById('blePrinterStatusBadge');
+      if (isConnecting) {
+        badge.innerHTML = '⏳ Scanning / Connecting...';
+        badge.style.background = '#fef3c7';
+        badge.style.color = '#b45309';
+      }
+    }
+
+    function onPrinterDisconnected() {
+      bleCharacteristic = null;
+      updatePrinterUIStatus();
+      console.log("Printer disconnected.");
+    }
+
+    function disconnectBluetoothPrinter() {
+      if (bleDevice && bleDevice.gatt.connected) {
+        bleDevice.gatt.disconnect();
+      }
+      bleCharacteristic = null;
+      bleServer = null;
+      bleDevice = null;
+      updatePrinterUIStatus();
+      alert("🔌 പ്രിന്റർ വിച്ഛേദിച്ചു (Disconnected).");
+    }
+
+    async function sendRawEscPosData(uint8Array) {
+      if (!bleCharacteristic) {
+        throw new Error("ബ്ലൂടൂത്ത് പ്രിന്റർ കണക്റ്റല്ല.");
+      }
+      const CHUNK_SIZE = 64;
+      for (let i = 0; i < uint8Array.length; i += CHUNK_SIZE) {
+        const chunk = uint8Array.slice(i, i + CHUNK_SIZE);
+        if (bleCharacteristic.properties.writeWithoutResponse) {
+          await bleCharacteristic.writeValueWithoutResponse(chunk);
+        } else {
+          await bleCharacteristic.writeValue(chunk);
+        }
+        await new Promise(r => setTimeout(r, 20));
+      }
+    }
+
+    function buildEscPosReceiptBuffer(billNo, date, time, total, mode, items) {
+      const encoder = new TextEncoder();
+      const bytes = [];
+
+      const append = arr => bytes.push(...arr);
+      const appendText = str => append(encoder.encode(str));
+
+      const ESC_INIT = [0x1B, 0x40];
+      const ALIGN_CENTER = [0x1B, 0x61, 0x01];
+      const ALIGN_LEFT = [0x1B, 0x61, 0x00];
+      const BOLD_ON = [0x1B, 0x45, 0x01];
+      const BOLD_OFF = [0x1B, 0x45, 0x00];
+      const DOUBLE_HEIGHT = [0x1D, 0x21, 0x01];
+      const NORMAL_SIZE = [0x1D, 0x21, 0x00];
+      const FEED_LINES = n => [0x1B, 0x64, n];
+
+      const maxChars = printerSettings.paperWidth === '80' ? 48 : 32;
+      const divider = '-'.repeat(maxChars) + '\n';
+
+      append(ESC_INIT);
+      append(ALIGN_CENTER);
+      append(BOLD_ON);
+      append(DOUBLE_HEIGHT);
+      appendText("BANABLAST\n");
+      append(NORMAL_SIZE);
+      append(BOLD_OFF);
+      appendText("NELLIPPUZHA, MANNARKKAD\n");
+      appendText("Mob: +91 90370 10883\n");
+      appendText(`Date: ${date} ${time}\n`);
+      append(BOLD_ON);
+      appendText(`BILL NO: ${billNo}\n`);
+      append(BOLD_OFF);
+
+      append(ALIGN_LEFT);
+      appendText(divider);
+
+      const padRight = (str, len) => (str + ' '.repeat(len)).substring(0, len);
+      const padLeft = (str, len) => (' '.repeat(len) + str).slice(-len);
+
+      if (maxChars === 48) {
+        appendText(padRight("ITEM", 26) + padLeft("QTY", 8) + padLeft("AMT", 14) + "\n");
+      } else {
+        appendText(padRight("ITEM", 16) + padLeft("QTY", 5) + padLeft("AMT", 11) + "\n");
+      }
+      appendText(divider);
+
+      items.forEach(it => {
+        const itemTotal = `Rs.${it.price * it.qty}`;
+        const namePart = it.name.substring(0, maxChars === 48 ? 25 : 15);
+        if (maxChars === 48) {
+          appendText(padRight(namePart, 26) + padLeft(String(it.qty), 8) + padLeft(itemTotal, 14) + "\n");
+        } else {
+          appendText(padRight(namePart, 16) + padLeft(String(it.qty), 5) + padLeft(itemTotal, 11) + "\n");
+        }
+      });
+
+      appendText(divider);
+      append(BOLD_ON);
+      const totalStr = `Rs.${total}`;
+      if (maxChars === 48) {
+        appendText(padRight("TOTAL:", 30) + padLeft(totalStr, 18) + "\n");
+      } else {
+        appendText(padRight("TOTAL:", 18) + padLeft(totalStr, 14) + "\n");
+      }
+      append(BOLD_OFF);
+
+      appendText(`PAYMENT: ${(mode || 'CASH').toUpperCase()}\n`);
+      appendText(divider);
+
+      append(ALIGN_CENTER);
+      appendText("*** THANK YOU ***\n");
+      appendText("Visit Again!\n");
+      append(FEED_LINES(3));
+
+      return new Uint8Array(bytes);
+    }
+
+    async function testThermalPrint() {
+      if (!bleCharacteristic) {
+        alert("⚠️ പ്രിന്റർ കണക്റ്റല്ല. ആദ്യം 'Scan & Connect' അമർത്തുക.");
+        return;
+      }
+      try {
+        const sampleItems = [
+          { name: "Normal Avil Milk", qty: 2, price: 30 },
+          { name: "Special Mango", qty: 1, price: 70 }
+        ];
+        const now = get12HourTimeString();
+        const buf = buildEscPosReceiptBuffer("BB-TEST", todayDate, now, 130, "cash", sampleItems);
+        await sendRawEscPosData(buf);
+        alert("✅ ടെസ്റ്റ് പ്രിന്റ് അയച്ചു!");
+      } catch (err) {
+        alert("❌ പ്രിന്റ് എറർ: " + err.message);
+      }
+    }
+
     // 12-Hour AM/PM Helper
     function get12HourTimeString(dateObj = new Date()) {
       let h = dateObj.getHours();
@@ -898,28 +1220,13 @@
       return d.getTime();
     }
 
-    // നിങ്ങളുടെ യഥാർത്ഥ മെനു കാർഡ് അടിസ്ഥാനമാക്കിയുള്ള സ്മാർട്ട് ഓട്ടോ-മാപ്പിംഗ്
     function matchMenuCardSubCategory(name, price) {
       const nm = (name || '').toLowerCase();
       const p = Number(price) || 0;
-
-      // 1. Kids
-      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy') || nm.includes('doara')) {
-        return 'kids';
-      }
-      // 2. Fruit Items
-      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut') || nm.includes('fruit and nut')) {
-        return 'fruit';
-      }
-      // 3. Premium & Nuts
-      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dray fruit') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || nm.includes('biscoff') || nm.includes('roasted almond') || p >= 110) {
-        return 'premium_nuts';
-      }
-      // 4. Special Items
-      if (nm.includes('kulfi') || nm.includes('jack fruit') || nm.includes('caramount') || nm.includes('royal') || nm.includes('khajoor') || nm.includes('red velvet') || nm.includes('spanish') || nm.includes('passion') || (p >= 90 && p <= 100)) {
-        return 'special';
-      }
-      // 5. Regular
+      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy') || nm.includes('doara')) return 'kids';
+      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut') || nm.includes('fruit and nut')) return 'fruit';
+      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dray fruit') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || nm.includes('biscoff') || nm.includes('roasted almond') || p >= 110) return 'premium_nuts';
+      if (nm.includes('kulfi') || nm.includes('jack fruit') || nm.includes('caramount') || nm.includes('royal') || nm.includes('khajoor') || nm.includes('red velvet') || nm.includes('spanish') || nm.includes('passion') || (p >= 90 && p <= 100)) return 'special';
       return 'regular';
     }
 
@@ -947,6 +1254,8 @@
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
+
+      updatePrinterUIStatus();
     };
 
     function switchCategory(cat) {
@@ -955,12 +1264,7 @@
       document.getElementById('tabJuices').className = 'cat-tab-btn ' + (cat === 'juices' ? 'active' : '');
       
       const stickyBar = document.getElementById('subcatStickyBar');
-      if (cat === 'avil_milk') {
-        stickyBar.style.display = 'flex';
-      } else {
-        stickyBar.style.display = 'none';
-      }
-
+      stickyBar.style.display = (cat === 'avil_milk') ? 'flex' : 'none';
       renderMenuItems();
     }
 
@@ -984,10 +1288,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       മെനു റെൻഡറിംഗ്: ആവശ്യപ്പെട്ട കൃത്യമായ 5 ഉപവിഭാഗങ്ങളുടെ ക്രമം
-       (1. Kids -> 2. Regular -> 3. Fruit Items -> 4. Special -> 5. Premium & Nuts)
-       ------------------------------------------------------------- */
     function renderMenuItems() {
       const root = document.getElementById('posItemsRoot');
       let items = menuItems.filter(i => {
@@ -1006,7 +1306,6 @@
         return;
       }
 
-      // ഉപവിഭാഗങ്ങളുടെ കൃത്യമായ ക്രമം
       const subCats = [
         { id: 'kids', name: '👶 Kids Specials', filter: 'kids' },
         { id: 'regular', name: '🍌 Regular Avil Milk', filter: 'regular' },
@@ -1145,7 +1444,7 @@
     }
 
     /* -------------------------------------------------------------
-       ബില്ല് സേവിംഗ് & പ്രിന്റ് (12-Hour AM/PM & കൃത്യമായ ടൈംസ്റ്റാമ്പ്)
+       സ്മാർട്ട് പ്രിന്റിംഗ്: ബ്ലൂടൂത്ത് ഉണ്ടെങ്കിൽ ഡയറക്ട് പ്രിന്റ്, അല്ലെങ്കിൽ സിസ്റ്റം
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1191,7 +1490,8 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
+        // പ്രിന്റിംഗ് എക്സിക്യൂഷൻ
+        await dispatchPrintJob(billNo, todayDate, timeStr, total, currentPayMode, cart);
 
         cart = [];
         editingBill = null;
@@ -1203,6 +1503,20 @@
         console.error("Save error:", err);
         alert("❌ ബില്ല് സേവ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
       }
+    }
+
+    async function dispatchPrintJob(billNo, date, time, total, mode, items) {
+      if (printerSettings.mode === 'bluetooth' && bleCharacteristic && bleServer && bleServer.connected) {
+        try {
+          const buf = buildEscPosReceiptBuffer(billNo, date, time, total, mode, items);
+          await sendRawEscPosData(buf);
+          return;
+        } catch (e) {
+          console.warn("Direct BLE failed, falling back to system print:", e);
+        }
+      }
+      // ഫോൾബാക്ക്: സിസ്റ്റം പ്രിന്റ്
+      triggerThermalPrint(billNo, date, time, total, mode, items);
     }
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
@@ -1324,9 +1638,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       റീസെന്റ് ബില്ലുകൾ: ടൈംസ്റ്റാമ്പ് പ്രകാരം ഏറ്റവും പുതിയത് മുകളിൽ (#1)
-       ------------------------------------------------------------- */
     function openRecentBillsModal() {
       const container = document.getElementById('recentBillsContainer');
       
@@ -1385,7 +1696,7 @@
     function reprintBill(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
-      triggerThermalPrint(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
+      dispatchPrintJob(b.billNo, b.date, b.time || '', b.total, b.mode, b.items || []);
       closeModal('recentBillsModal');
     }
 
@@ -1422,9 +1733,6 @@
       window.location.href = 'index.html';
     }
 
-    /* -------------------------------------------------------------
-       മെനു മാനേജ്‌മെന്റ് (5 ഉപവിഭാഗങ്ങൾ സഹിതം)
-       ------------------------------------------------------------- */
     function toggleSubCategoryField() {
       const cat = document.getElementById('newItemCat').value;
       const subField = document.getElementById('subCatFormField');
