@@ -664,35 +664,27 @@
     </button>
   </div>
 
-  <!-- PRINTER SETTINGS MODAL (BLUETOOTH DIRECT ESC/POS) -->
+  <!-- PRINTER SETTINGS MODAL -->
   <div class="modal" id="printerModal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">🖨️ Bluetooth Thermal Printer Settings</div>
+        <div class="modal-title">🖨️ Thermal Printer Settings</div>
         <button class="btn-close" onclick="closeModal('printerModal')">✕</button>
       </div>
 
-      <!-- Live Status Card -->
-      <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
-        <div style="font-size:0.75rem; color:#64748b; font-weight:bold;">CONNECTION STATUS</div>
-        <div id="blePrinterStatusBadge" style="display:inline-block; margin-top:5px; padding:4px 12px; border-radius:20px; font-weight:800; font-size:0.85rem; background:#fee2e2; color:#dc2626;">
-          🔴 Disconnected (കണക്റ്റല്ല)
+      <!-- RawBT Status Card -->
+      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
+        <div style="font-size:0.75rem; color:#15803d; font-weight:bold;">RAWBT APP INTEGRATION</div>
+        <div style="display:inline-block; margin-top:5px; padding:4px 12px; border-radius:20px; font-weight:800; font-size:0.85rem; background:#dcfce7; color:#166534;">
+          🟢 Active & Ready (തയ്യാറാണ്)
         </div>
-        <div id="bleConnectedDeviceName" style="font-size:0.8rem; font-weight:800; color:#1e293b; margin-top:4px;">Device: None</div>
-      </div>
-
-      <!-- Connect / Disconnect Buttons -->
-      <div style="display:flex; gap:8px; margin-bottom:14px;">
-        <button type="button" onclick="connectBluetoothThermalPrinter()" style="flex:1; background:#2563eb; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer;">
-          🔍 Scan & Connect
-        </button>
-        <button type="button" onclick="disconnectBluetoothPrinter()" style="background:#f1f5f9; color:#dc2626; border:1px solid #cbd5e1; padding:12px 16px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer;">
-          🔌 Disconnect
-        </button>
+        <div style="font-size:0.75rem; color:#475569; margin-top:6px;">
+          RawBT ആപ്പിൽ പ്രിന്റർ കണക്റ്റ് ചെയ്തിട്ടുണ്ടെങ്കിൽ ബില്ല് തനിയെ പ്രിന്റാകും.
+        </div>
       </div>
 
       <!-- Test Print Button -->
-      <button type="button" onclick="testThermalPrint()" style="width:100%; background:#10b981; color:white; border:none; padding:11px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer; margin-bottom:14px;">
+      <button type="button" onclick="testThermalPrint()" style="width:100%; background:#10b981; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.9rem; cursor:pointer; margin-bottom:14px; box-shadow:0 2px 6px rgba(16,185,129,0.3);">
         🧾 Test Print (ടെസ്റ്റ് പ്രിന്റ് അടിക്കുക)
       </button>
 
@@ -700,8 +692,8 @@
       <div class="form-group">
         <label>Printer Mode (പ്രിന്റിംഗ് രീതി)</label>
         <select id="printerModeSelect" class="form-control" onchange="savePrinterPreferences()">
-          <option value="bluetooth">⚡ Direct Bluetooth ESC/POS (ഡയലോഗ് ഇല്ലാതെ വേഗത്തിൽ)</option>
-          <option value="system">📄 Default System Print Dialog (സാധാരണ രീതി)</option>
+          <option value="rawbt">⚡ RawBT Direct (ഡയലോഗ് ഇല്ലാതെ ഒറ്റ ക്ലിക്കിൽ)</option>
+          <option value="system">📄 Default System Print Dialog (സാധാരണ പ്രിന്റ്)</option>
         </select>
       </div>
 
@@ -713,9 +705,9 @@
         </select>
       </div>
 
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; font-size:0.75rem; color:#1e3a8a; line-height:1.4;">
-        💡 <b>സഹായക്കുറിപ്പ്:</b> പ്രിന്റർ ഓണാക്കി ഫോണിന്റെ ബ്ലൂടൂത്ത് സെറ്റിംഗ്സിൽ ആദ്യം ഒരു തവണ പെയർ ചെയ്യുക. തുടർന്ന് ഇവിടെ 'Scan & Connect' അമർത്തി പ്രിന്ററിന്റെ പേര് തിരഞ്ഞെടുക്കുക.
-      </div>
+      <button type="button" onclick="openRawBtAppDirect()" style="width:100%; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; padding:10px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;">
+        ⚙️ Open RawBT App Settings
+      </button>
     </div>
   </div>
 
@@ -938,28 +930,16 @@
     const todayDate = new Date().toISOString().split('T')[0];
 
     /* -------------------------------------------------------------
-       WEB BLUETOOTH ESC/POS THERMAL PRINTER ENGINE
+       PRINTER SETTINGS (RAWBT ONE-CLICK INTEGRATION)
        ------------------------------------------------------------- */
-    let bleDevice = null;
-    let bleServer = null;
-    let bleCharacteristic = null;
-
     let printerSettings = {
-      mode: localStorage.getItem('bb_printer_mode') || 'bluetooth',
+      mode: localStorage.getItem('bb_printer_mode') || 'rawbt',
       paperWidth: localStorage.getItem('bb_printer_paper') || '58'
     };
-
-    const COMMON_PRINTER_SERVICES = [
-      '000018f0-0000-1000-8000-00805f9b34fb',
-      'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
-      '49535343-fe7d-4ae5-8fa9-9fafd205e455',
-      '0000af30-0000-1000-8000-00805f9b34fb'
-    ];
 
     function openPrinterModal() {
       document.getElementById('printerModeSelect').value = printerSettings.mode;
       document.getElementById('printerPaperWidthSelect').value = printerSettings.paperWidth;
-      updatePrinterUIStatus();
       document.getElementById('printerModal').style.display = 'flex';
     }
 
@@ -970,135 +950,11 @@
       localStorage.setItem('bb_printer_paper', printerSettings.paperWidth);
     }
 
-    function updatePrinterUIStatus() {
-      const isConnected = !!(bleCharacteristic && bleServer && bleServer.connected);
-      const badge = document.getElementById('blePrinterStatusBadge');
-      const devName = document.getElementById('bleConnectedDeviceName');
-      const headBtn = document.getElementById('btnPrinterHeader');
-      const headTxt = document.getElementById('printerHeadStatus');
-
-      if (isConnected) {
-        badge.innerHTML = '🟢 Connected (കണക്റ്റാണ്)';
-        badge.style.background = '#dcfce7';
-        badge.style.color = '#15803d';
-        devName.innerText = `Device: ${bleDevice ? bleDevice.name : 'Thermal Printer'}`;
-        headBtn.className = 'btn-head connected';
-        headTxt.innerText = 'Connected';
-      } else {
-        badge.innerHTML = '🔴 Disconnected (കണക്റ്റല്ല)';
-        badge.style.background = '#fee2e2';
-        badge.style.color = '#dc2626';
-        devName.innerText = 'Device: None';
-        headBtn.className = 'btn-head';
-        headTxt.innerText = 'Printer';
-      }
+    function openRawBtAppDirect() {
+      window.location.href = "rawbt:";
     }
 
-    async function connectBluetoothThermalPrinter() {
-      if (!navigator.bluetooth) {
-        alert("⚠️ നിങ്ങളുടെ ബ്രൗസറിൽ Web Bluetooth ലഭ്യമല്ല. ദയവായി Google Chrome മൊബൈൽ ബ്രൗസർ ഉപയോഗിക്കുക.");
-        return;
-      }
-
-      try {
-        badgeConnectingUI(true);
-
-        bleDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: COMMON_PRINTER_SERVICES
-        });
-
-        bleDevice.addEventListener('gattserverdisconnected', onPrinterDisconnected);
-
-        bleServer = await bleDevice.gatt.connect();
-
-        let foundChar = null;
-        for (const sUuid of COMMON_PRINTER_SERVICES) {
-          try {
-            const service = await bleServer.getPrimaryService(sUuid);
-            const chars = await service.getCharacteristics();
-            for (const ch of chars) {
-              if (ch.properties.write || ch.properties.writeWithoutResponse) {
-                foundChar = ch;
-                break;
-              }
-            }
-            if (foundChar) break;
-          } catch (e) {}
-        }
-
-        if (!foundChar) {
-          const services = await bleServer.getPrimaryServices();
-          for (const s of services) {
-            const chars = await s.getCharacteristics();
-            for (const ch of chars) {
-              if (ch.properties.write || ch.properties.writeWithoutResponse) {
-                foundChar = ch;
-                break;
-              }
-            }
-            if (foundChar) break;
-          }
-        }
-
-        if (!foundChar) {
-          throw new Error("പ്രിന്ററിന്റെ റൈറ്റ് സർവീസ് കണ്ടെത്താൻ കഴിഞ്ഞില്ല.");
-        }
-
-        bleCharacteristic = foundChar;
-        updatePrinterUIStatus();
-        alert(`✅ പ്രിന്റർ വിജയകരമായി കണക്റ്റായി: ${bleDevice.name || 'Thermal Printer'}`);
-      } catch (err) {
-        console.error("BLE Connect Error:", err);
-        updatePrinterUIStatus();
-        if (err.name !== 'NotFoundError') {
-          alert("❌ പ്രിന്റർ കണക്റ്റ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
-        }
-      }
-    }
-
-    function badgeConnectingUI(isConnecting) {
-      const badge = document.getElementById('blePrinterStatusBadge');
-      if (isConnecting) {
-        badge.innerHTML = '⏳ Scanning / Connecting...';
-        badge.style.background = '#fef3c7';
-        badge.style.color = '#b45309';
-      }
-    }
-
-    function onPrinterDisconnected() {
-      bleCharacteristic = null;
-      updatePrinterUIStatus();
-      console.log("Printer disconnected.");
-    }
-
-    function disconnectBluetoothPrinter() {
-      if (bleDevice && bleDevice.gatt.connected) {
-        bleDevice.gatt.disconnect();
-      }
-      bleCharacteristic = null;
-      bleServer = null;
-      bleDevice = null;
-      updatePrinterUIStatus();
-      alert("🔌 പ്രിന്റർ വിച്ഛേദിച്ചു (Disconnected).");
-    }
-
-    async function sendRawEscPosData(uint8Array) {
-      if (!bleCharacteristic) {
-        throw new Error("ബ്ലൂടൂത്ത് പ്രിന്റർ കണക്റ്റല്ല.");
-      }
-      const CHUNK_SIZE = 64;
-      for (let i = 0; i < uint8Array.length; i += CHUNK_SIZE) {
-        const chunk = uint8Array.slice(i, i + CHUNK_SIZE);
-        if (bleCharacteristic.properties.writeWithoutResponse) {
-          await bleCharacteristic.writeValueWithoutResponse(chunk);
-        } else {
-          await bleCharacteristic.writeValue(chunk);
-        }
-        await new Promise(r => setTimeout(r, 20));
-      }
-    }
-
+    /* ESC/POS BUFFER BUILDER */
     function buildEscPosReceiptBuffer(billNo, date, time, total, mode, items) {
       const encoder = new TextEncoder();
       const bytes = [];
@@ -1176,22 +1032,31 @@
       return new Uint8Array(bytes);
     }
 
-    async function testThermalPrint() {
-      if (!bleCharacteristic) {
-        alert("⚠️ പ്രിന്റർ കണക്റ്റല്ല. ആദ്യം 'Scan & Connect' അമർത്തുക.");
-        return;
+    /* RawBT വൺ-ക്ലിക്ക് ഡയറക്ട് പ്രിന്റിംഗ് ഫംഗ്ഷൻ */
+    function sendToRawBtPrinter(buf) {
+      let binary = '';
+      const bytes = new Uint8Array(buf);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
       }
-      try {
-        const sampleItems = [
-          { name: "Normal Avil Milk", qty: 2, price: 30 },
-          { name: "Special Mango", qty: 1, price: 70 }
-        ];
-        const now = get12HourTimeString();
-        const buf = buildEscPosReceiptBuffer("BB-TEST", todayDate, now, 130, "cash", sampleItems);
-        await sendRawEscPosData(buf);
-        alert("✅ ടെസ്റ്റ് പ്രിന്റ് അയച്ചു!");
-      } catch (err) {
-        alert("❌ പ്രിന്റ് എറർ: " + err.message);
+      const base64Data = btoa(binary);
+
+      // RawBT ആപ്പിലേക്ക് നേരിട്ട് കമാൻഡ് അയക്കുന്നു
+      window.location.href = "rawbt:data:application/octet-stream;base64," + base64Data;
+    }
+
+    function testThermalPrint() {
+      const sampleItems = [
+        { name: "Normal Avil Milk", qty: 2, price: 30 },
+        { name: "Special Mango", qty: 1, price: 70 }
+      ];
+      const now = get12HourTimeString();
+      const buf = buildEscPosReceiptBuffer("BB-TEST", todayDate, now, 130, "cash", sampleItems);
+      
+      if (printerSettings.mode === 'rawbt') {
+        sendToRawBtPrinter(buf);
+      } else {
+        triggerThermalPrint("BB-TEST", todayDate, now, 130, "cash", sampleItems);
       }
     }
 
@@ -1254,8 +1119,6 @@
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
-
-      updatePrinterUIStatus();
     };
 
     function switchCategory(cat) {
@@ -1444,7 +1307,7 @@
     }
 
     /* -------------------------------------------------------------
-       സ്മാർട്ട് പ്രിന്റിംഗ്: ബ്ലൂടൂത്ത് ഉണ്ടെങ്കിൽ ഡയറക്ട് പ്രിന്റ്, അല്ലെങ്കിൽ സിസ്റ്റം
+       സ്മാർട്ട് പ്രിന്റിംഗ് (RAWBT DIRECT)
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1490,8 +1353,8 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        // പ്രിന്റിംഗ് എക്സിക്യൂഷൻ
-        await dispatchPrintJob(billNo, todayDate, timeStr, total, currentPayMode, cart);
+        // പ്രിന്റിംഗ്
+        dispatchPrintJob(billNo, todayDate, timeStr, total, currentPayMode, cart);
 
         cart = [];
         editingBill = null;
@@ -1505,18 +1368,13 @@
       }
     }
 
-    async function dispatchPrintJob(billNo, date, time, total, mode, items) {
-      if (printerSettings.mode === 'bluetooth' && bleCharacteristic && bleServer && bleServer.connected) {
-        try {
-          const buf = buildEscPosReceiptBuffer(billNo, date, time, total, mode, items);
-          await sendRawEscPosData(buf);
-          return;
-        } catch (e) {
-          console.warn("Direct BLE failed, falling back to system print:", e);
-        }
+    function dispatchPrintJob(billNo, date, time, total, mode, items) {
+      if (printerSettings.mode === 'rawbt') {
+        const buf = buildEscPosReceiptBuffer(billNo, date, time, total, mode, items);
+        sendToRawBtPrinter(buf);
+      } else {
+        triggerThermalPrint(billNo, date, time, total, mode, items);
       }
-      // ഫോൾബാക്ക്: സിസ്റ്റം പ്രിന്റ്
-      triggerThermalPrint(billNo, date, time, total, mode, items);
     }
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
@@ -1788,7 +1646,7 @@
       const icon = document.getElementById('newItemIcon').value.trim() || '🥤';
 
       if (!name || isNaN(price) || price <= 0) {
-        alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
+        alert("⚠️️ സാധുവായ പേരും വിലയും നൽകുക!");
         return;
       }
 
