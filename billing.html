@@ -38,11 +38,11 @@
     
     body { background: var(--bg); color: var(--primary-dark); padding-bottom: 195px; user-select: none; }
 
-    /* Top Executive Header */
+    /* Top Executive Clean Header */
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
-      padding: 12px 14px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -54,31 +54,83 @@
     .pos-brand {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       font-size: 1.15rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       color: #ffffff;
     }
-    .header-btns {
-      display: flex;
-      gap: 6px;
-    }
-    .btn-head {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #ffffff;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 0.78rem;
-      font-weight: 700;
+
+    /* ലൈവ് പ്രിന്റർ സ്റ്റാറ്റസ് ഡോട്ട് */
+    .printer-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.2s ease;
+    }
+    .printer-dot.online { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .printer-dot.offline { background: #ef4444; }
+    .printer-dot.connecting { background: #f59e0b; animation: pulseDot 1s infinite; }
+    @keyframes pulseDot { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+    /* '⋮' More Options Button & Dropdown */
+    .header-actions { position: relative; }
+    .btn-more {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-size: 1.35rem;
+      font-weight: 900;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      transition: background 0.15s;
     }
-    .btn-head:active { background: rgba(255,255,255,0.25); }
+    .btn-more:active { background: rgba(255,255,255,0.25); }
+
+    .header-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 44px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      min-width: 200px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      overflow: hidden;
+      z-index: 200;
+    }
+    .header-dropdown.show { display: block; animation: dropDown 0.15s ease-out; }
+    @keyframes dropDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .dropdown-item {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #f1f5f9;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.86rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dropdown-item:active { background: rgba(255,255,255,0.12); }
+    .dropdown-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 2px 0;
+    }
 
     /* Category Switcher */
     .cat-toggle-wrap {
@@ -584,14 +636,39 @@
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- ================= TOP EXECUTIVE CLEAN HEADER ================= -->
   <header class="pos-header">
-    <div class="pos-brand">🥤 BANABLAST</div>
-    <div class="header-btns">
-      <button type="button" class="btn-head" id="btnBTStatus" onclick="initBluetoothAutoConnect()">🔌 Printer</button>
-      <button type="button" class="btn-head" onclick="openItemsModal()">⚙️ Menu</button>
-      <button type="button" class="btn-head" onclick="openTodaySummaryModal()">📊 Today</button>
-      <button type="button" class="btn-head" onclick="returnToMainApp()">🏠 App</button>
+    <div class="pos-brand">
+      <span>🥤 BANABLAST</span>
+      <!-- ലൈവ് പ്രിന്റർ ഇൻഡിക്കേറ്റർ ഡോട്ട് (തൊട്ടാൽ റീകണക്റ്റ് ചെയ്യാം) -->
+      <span id="btStatusIndicator" class="printer-dot offline" title="പ്രിന്റർ ഓഫ്‌ലൈൻ (റീകണക്റ്റ് ചെയ്യാൻ ക്ലിക്ക് ചെയ്യുക)" onclick="initBluetoothAutoConnect()"></span>
+    </div>
+
+    <!-- ഒരൊറ്റ '⋮' More Options ബട്ടൺ -->
+    <div class="header-actions">
+      <button type="button" class="btn-more" onclick="toggleHeaderMenu(event)" aria-label="Menu Options">
+        ⋮
+      </button>
+
+      <!-- ഡ്രോപ്പ്ഡൗൺ മെനു -->
+      <div id="headerDropdown" class="header-dropdown">
+        <button type="button" class="dropdown-item" onclick="forceReloadApp(); closeHeaderMenu();">
+          <span>🔄</span> Update App
+        </button>
+        <button type="button" class="dropdown-item" onclick="initBluetoothAutoConnect(); closeHeaderMenu();">
+          <span>🔌</span> Reconnect Printer
+        </button>
+        <button type="button" class="dropdown-item" onclick="openItemsModal(); closeHeaderMenu();">
+          <span>⚙️</span> Manage Menu
+        </button>
+        <button type="button" class="dropdown-item" onclick="openTodaySummaryModal(); closeHeaderMenu();">
+          <span>📊</span> Today's Summary
+        </button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" onclick="returnToMainApp()">
+          <span>🏠</span> Back to App
+        </button>
+      </div>
     </div>
   </header>
 
@@ -702,7 +779,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="newItemNameField">
         <label>Item Name (പേര്)</label>
         <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Micky Mouse / Kulfi / Fig Honey">
       </div>
@@ -853,6 +930,7 @@
     </div>
   </div>
 
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
@@ -875,13 +953,13 @@
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
-    // Bluetooth Thermal Printer Variables
+    // Bluetooth Thermal Printer State
     let connectedThermalPrinter = null;
     let isConnectingBT = false;
 
     const todayDate = new Date().toISOString().split('T')[0];
 
-    // 12-Hour AM/PM Helper
+    // Helper: 12-Hour AM/PM
     function get12HourTimeString(dateObj = new Date()) {
       let h = dateObj.getHours();
       let m = dateObj.getMinutes();
@@ -917,46 +995,66 @@
     }
 
     /* =============================================================
+       DROPDOWN & APP UPDATE FUNCTIONS
+       ============================================================= */
+    function toggleHeaderMenu(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('headerDropdown');
+      dd.classList.toggle('show');
+    }
+
+    function closeHeaderMenu() {
+      const dd = document.getElementById('headerDropdown');
+      if (dd) dd.classList.remove('show');
+    }
+
+    window.addEventListener('click', (e) => {
+      const dd = document.getElementById('headerDropdown');
+      if (dd && !e.target.closest('.header-actions')) {
+        dd.classList.remove('show');
+      }
+    });
+
+    function forceReloadApp() {
+      if (confirm("ആപ്പ് ഏറ്റവും പുതിയ വേർഷനിലേക്ക് അപ്‌ഡേറ്റ് ചെയ്യണോ?")) {
+        const freshUrl = window.location.href.split('?')[0] + '?update=' + Date.now();
+        window.location.href = freshUrl;
+      }
+    }
+
+    /* =============================================================
        BLUETOOTH DIRECT THERMAL PRINTING ENGINE (CAPACITOR NATIVE)
        ============================================================= */
     document.addEventListener('deviceready', () => {
       initBluetoothAutoConnect();
     }, false);
 
-    function updateBTStatusUI(isConnected, text) {
-      const btn = document.getElementById('btnBTStatus');
-      if (!btn) return;
-      if (isConnected) {
-        btn.style.background = '#059669';
-        btn.style.borderColor = '#10b981';
-        btn.innerHTML = `🖨️ ${text || 'Ready'}`;
-      } else {
-        btn.style.background = 'rgba(255,255,255,0.12)';
-        btn.style.borderColor = 'rgba(255,255,255,0.18)';
-        btn.innerHTML = `🔌 ${text || 'Printer'}`;
-      }
+    function updateBTStatusUI(status, tooltip) {
+      const dot = document.getElementById('btStatusIndicator');
+      if (!dot) return;
+      dot.className = 'printer-dot ' + status;
+      dot.title = tooltip || (status === 'online' ? 'പ്രിന്റർ റെഡി' : 'പ്രിന്റർ ഓഫ്‌ലൈൻ');
     }
 
     function initBluetoothAutoConnect() {
       if (typeof bluetoothSerial === 'undefined') {
         console.log("BluetoothSerial plugin not detected (Standard Browser mode)");
-        updateBTStatusUI(false, "Printer");
+        updateBTStatusUI('offline', 'ബ്രൗസർ മോഡ്');
         return;
       }
 
       if (isConnectingBT) return;
       isConnectingBT = true;
-      updateBTStatusUI(false, "Connecting...");
+      updateBTStatusUI('connecting', 'പ്രിന്ററുമായി ബന്ധിപ്പിക്കുന്നു...');
 
       bluetoothSerial.isEnabled(() => {
         bluetoothSerial.list((devices) => {
           isConnectingBT = false;
           if (!devices || devices.length === 0) {
-            updateBTStatusUI(false, "No Devices");
+            updateBTStatusUI('offline', 'ഡിവൈസുകൾ കണ്ടെത്തിയില്ല');
             return;
           }
 
-          // BlueTooth Printer_83F5 അല്ലെങ്കിൽ പേരിൽ Printer ഉള്ളത് കണ്ടെത്തുന്നു
           const target = devices.find(d => 
             (d.name && (d.name.includes("83F5") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
           ) || devices[0];
@@ -964,25 +1062,25 @@
           if (target) {
             bluetoothSerial.connect(target.address, () => {
               connectedThermalPrinter = target;
-              updateBTStatusUI(true, "Ready");
-              console.log("Connected to thermal printer:", target.name);
+              updateBTStatusUI('online', `റെഡി: ${target.name}`);
+              console.log("Connected to printer:", target.name);
             }, (err) => {
               connectedThermalPrinter = null;
-              updateBTStatusUI(false, "Offline");
-              console.warn("Bluetooth Connection Failed:", err);
+              updateBTStatusUI('offline', 'കണക്ഷൻ സാധിച്ചില്ല');
+              console.warn("Connection Failed:", err);
             });
           }
         }, (err) => {
           isConnectingBT = false;
-          updateBTStatusUI(false, "Error");
+          updateBTStatusUI('offline', 'എറർ');
         });
       }, () => {
         isConnectingBT = false;
-        updateBTStatusUI(false, "BT Off");
+        updateBTStatusUI('offline', 'ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക');
       });
     }
 
-    // ESC/POS Commands (32 Column Alignment for 58mm Thermal Receipt)
+    // Direct ESC/POS Commands (32 Column Alignment for 58mm Thermal Receipt)
     function sendEscPosDirectPrint(billNo, date, time, total, mode, items) {
       const ESC = "\x1B";
       const GS = "\x1D";
@@ -1023,7 +1121,7 @@
       bluetoothSerial.write(raw, () => {
         console.log("Direct ESC/POS Print Success!");
       }, (err) => {
-        console.warn("Bluetooth Print write failed, falling back to window.print()", err);
+        console.warn("Bluetooth write failed, falling back to window.print()", err);
         window.print();
       });
     }
@@ -1288,7 +1386,7 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        // നേരിട്ടുള്ള ബ്ലൂടൂത്ത് പ്രിന്റിംഗ് (ബ്ലൂടൂത്ത് ഇല്ലെങ്കിൽ മാത്രം സിസ്റ്റം പ്രിന്റ്)
+        // നേരിട്ടുള്ള ബ്ലൂടൂത്ത് പ്രിന്റിംഗ് (ബ്ലൂടൂത്ത് ഇല്ലെങ്കിൽ സിസ്റ്റം പ്രിന്റ്)
         triggerThermalPrint(billNo, todayDate, timeStr, total, currentPayMode, cart);
 
         cart = [];
@@ -1317,7 +1415,6 @@
         </div>
       `).join('');
 
-      // ബ്ലൂടൂത്ത് നേറ്റീവ് പ്ലഗിൻ ഉണ്ടെങ്കിൽ ഡയറക്ട് ESC/POS വഴി instant പ്രിന്റ് ചെയ്യുന്നു
       if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
         sendEscPosDirectPrint(billNo, date, time, total, mode, items);
       } else if (typeof bluetoothSerial !== 'undefined') {
@@ -1330,7 +1427,6 @@
           }
         }, 300);
       } else {
-        // ബ്രൗസർ മോഡിൽ സാധാരണ print
         setTimeout(() => {
           window.print();
         }, 50);
@@ -1461,7 +1557,7 @@
               <button type="button" style="background:#25d366; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillPdf('${b.id}')" title="WhatsApp PDF">💬</button>
               <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
               <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
-              <button type="button" style="background:#fee2e2; color:#dc2626; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+              <button type="button" style="background:#fee2e2; color:#dc2626; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️️</button>
             </div>
           </div>
         `).join('');
