@@ -42,7 +42,7 @@
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
-      padding: 10px 14px;
+      padding: 10px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -51,17 +51,22 @@
       z-index: 100;
       box-shadow: 0 2px 10px rgba(0,0,0,0.18);
     }
-    .pos-brand {
+    .pos-brand-group {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 1.15rem;
+    }
+    .pos-brand {
+      font-size: 1.1rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* ലൈവ് പ്രിന്റർ സ്റ്റാറ്റസ് ഡോട്ട് */
+    /* ലൈവ് പ്രിന്റർ സ്റ്റാറ്റസ് ഡോട്ട് & ഹെഡർ ബട്ടണുകൾ */
     .printer-dot {
       width: 10px;
       height: 10px;
@@ -75,34 +80,52 @@
     .printer-dot.connecting { background: #f59e0b; animation: pulseDot 1s infinite; }
     @keyframes pulseDot { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-    /* '⋮' More Options Button & Dropdown */
-    .header-actions { position: relative; }
-    .btn-more {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
+    .header-quick-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-hdr-quick {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
       color: #ffffff;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      font-size: 1.35rem;
+      padding: 6px 10px;
+      border-radius: 9px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+    .btn-hdr-quick:active { background: rgba(255,255,255,0.28); }
+
+    .btn-more {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      font-size: 1.2rem;
       font-weight: 900;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s;
     }
-    .btn-more:active { background: rgba(255,255,255,0.25); }
 
     .header-dropdown {
       display: none;
       position: absolute;
-      right: 0;
-      top: 44px;
+      right: 12px;
+      top: 48px;
       background: #1e293b;
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 14px;
-      min-width: 200px;
+      min-width: 190px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       overflow: hidden;
       z-index: 200;
@@ -123,14 +146,8 @@
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      transition: background 0.15s;
     }
     .dropdown-item:active { background: rgba(255,255,255,0.12); }
-    .dropdown-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.12);
-      margin: 2px 0;
-    }
 
     /* Category Switcher */
     .cat-toggle-wrap {
@@ -170,7 +187,7 @@
     /* Sticky Quick-Jump Sub-Category Chips */
     .subcat-sticky-bar {
       position: sticky;
-      top: 54px;
+      top: 52px;
       z-index: 90;
       background: rgba(238, 242, 246, 0.95);
       backdrop-filter: blur(8px);
@@ -207,7 +224,6 @@
       box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
     }
 
-    /* Sub-Category Section Headings */
     .subcat-section-title {
       font-size: 0.82rem;
       font-weight: 900;
@@ -235,12 +251,8 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
-    @media (min-width: 700px) {
-      .items-container { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    }
-    @media (min-width: 1000px) {
-      .items-container { grid-template-columns: repeat(5, 1fr); gap: 12px; }
-    }
+    @media (min-width: 700px) { .items-container { grid-template-columns: repeat(4, 1fr); gap: 10px; } }
+    @media (min-width: 1000px) { .items-container { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
 
     .item-card {
       background: var(--card-bg);
@@ -274,16 +286,8 @@
       margin-bottom: 5px;
       border: 1px solid #fde68a;
     }
-    .item-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-    .item-emoji {
-      font-size: 1.45rem;
-      line-height: 1;
-    }
+    .item-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .item-emoji { font-size: 1.45rem; line-height: 1; }
 
     .item-name {
       font-size: 0.74rem;
@@ -319,10 +323,7 @@
       justify-content: space-between;
       border: 1px solid #e2e8f0;
     }
-    .item-card.in-cart .item-stepper-box {
-      background: #dbeafe;
-      border-color: #bfdbfe;
-    }
+    .item-card.in-cart .item-stepper-box { background: #dbeafe; border-color: #bfdbfe; }
 
     .btn-step {
       width: 26px;
@@ -335,31 +336,13 @@
       font-size: 1.1rem;
       font-weight: 900;
       cursor: pointer;
-      transition: transform 0.1s;
     }
     .btn-step:active { transform: scale(0.9); }
+    .btn-step-minus { background: #ffffff; color: var(--slate-600); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .btn-step-minus.disabled { opacity: 0.3; pointer-events: none; }
+    .btn-step-plus { background: var(--blue); color: #ffffff; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
 
-    .btn-step-minus {
-      background: #ffffff;
-      color: var(--slate-600);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .btn-step-minus.disabled {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    .btn-step-plus {
-      background: var(--blue);
-      color: #ffffff;
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-    }
-
-    .item-qty-center {
-      font-size: 0.74rem;
-      font-weight: 900;
-      color: var(--blue);
-    }
-
+    .item-qty-center { font-size: 0.74rem; font-weight: 900; color: var(--blue); }
     .item-badge-qty {
       position: absolute;
       top: 4px;
@@ -406,7 +389,7 @@
       position: relative;
       overflow: hidden;
       border: 1.5px solid transparent;
-      transition: transform 0.1s ease, box-shadow 0.15s;
+      transition: transform 0.1s ease;
     }
     .dock-box:active { transform: scale(0.98); }
 
@@ -430,18 +413,9 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      transition: all 0.15s ease;
     }
-    .btn-pay-sub.active.cash {
-      background: var(--emerald);
-      color: #ffffff;
-      box-shadow: 0 2px 5px rgba(5, 150, 105, 0.3);
-    }
-    .btn-pay-sub.active.gpay {
-      background: var(--blue);
-      color: #ffffff;
-      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
-    }
+    .btn-pay-sub.active.cash { background: var(--emerald); color: #ffffff; box-shadow: 0 2px 5px rgba(5, 150, 105, 0.3); }
+    .btn-pay-sub.active.gpay { background: var(--blue); color: #ffffff; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3); }
 
     .box-cart-combo {
       background: #f8fafc;
@@ -465,13 +439,7 @@
       cursor: pointer;
       border-radius: 9px;
     }
-    .btn-cart-part:active { background: #e2e8f0; }
-    .cart-divider {
-      width: 1.5px;
-      height: 22px;
-      background: #cbd5e1;
-      margin: 0 2px;
-    }
+    .cart-divider { width: 1.5px; height: 22px; background: #cbd5e1; margin: 0 2px; }
     .btn-clear-part {
       width: 38px;
       height: 100%;
@@ -485,9 +453,8 @@
       justify-content: center;
       cursor: pointer;
     }
-    .btn-clear-part:active { background: #fecaca; }
 
-    /* SMART TOTAL BOX WITH INTEGRATED PARCEL CHIP ON RIGHT */
+    /* SMART TOTAL BOX WITH INTEGRATED PARCEL CHIP */
     .box-total {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -495,7 +462,7 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       text-align: left;
     }
     .box-total-lbl {
@@ -543,7 +510,6 @@
       cursor: pointer;
       box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35);
       gap: 6px;
-      transition: all 0.15s ease;
     }
 
     .box-whatsapp {
@@ -568,7 +534,7 @@
       gap: 6px;
     }
 
-    /* Modals */
+    /* Modals & Safe Close Button */
     .modal {
       display: none;
       position: fixed;
@@ -579,9 +545,7 @@
       align-items: flex-end;
       padding: 0;
     }
-    @media (min-width: 600px) {
-      .modal { align-items: center; padding: 16px; }
-    }
+    @media (min-width: 600px) { .modal { align-items: center; padding: 16px; } }
     .modal-box {
       background: white;
       width: 100%;
@@ -592,9 +556,7 @@
       overflow-y: auto;
       animation: slideUp 0.2s ease-out;
     }
-    @media (min-width: 600px) {
-      .modal-box { border-radius: 20px; }
-    }
+    @media (min-width: 600px) { .modal-box { border-radius: 20px; } }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
     .modal-header {
@@ -635,6 +597,29 @@
     .form-control { width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; }
     .form-control:focus { border-color: var(--blue); }
 
+    /* Compact Bill Item Card */
+    .recent-bill-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .recent-bill-card:active { background: #f1f5f9; }
+
+    .btn-rec-act {
+      border: none;
+      padding: 7px 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
     /* Thermal Print Slip Styling */
     #receiptPrintArea { display: none; }
     @media print {
@@ -663,34 +648,37 @@
 
   <!-- ================= TOP EXECUTIVE CLEAN HEADER ================= -->
   <header class="pos-header">
-    <div class="pos-brand">
-      <span>🥤 BANABLAST</span>
-      <span id="btStatusIndicator" class="printer-dot offline" title="പ്രിന്റർ ഓഫ്‌ലൈൻ (റീകണക്റ്റ് ചെയ്യാൻ ക്ലിക്ക് ചെയ്യുക)" onclick="initBluetoothAutoConnect()"></span>
+    <div class="pos-brand-group">
+      <div class="pos-brand">
+        <span>🥤 BANABLAST</span>
+        <span id="btStatusIndicator" class="printer-dot offline" title="പ്രിന്റർ ഓഫ്‌ലൈൻ (റീകണക്റ്റ് ചെയ്യാൻ ക്ലിക്ക് ചെയ്യുക)" onclick="connectBluetoothPrinterManual()"></span>
+      </div>
+      <!-- 1-TAP CONNECT BUTTON DIRECTLY ON HEADER -->
+      <button type="button" class="btn-hdr-quick" onclick="connectBluetoothPrinterManual()" title="പ്രിന്റർ ബന്ധിപ്പിക്കുക">
+        <span>🔌</span> Connect
+      </button>
     </div>
 
-    <!-- ഒരൊറ്റ '⋮' More Options ബട്ടൺ -->
-    <div class="header-actions">
+    <!-- DIRECT 1-TAP BACK TO APP & MORE OPTIONS -->
+    <div class="header-quick-btns">
+      <button type="button" class="btn-hdr-quick" onclick="openPartnerPinPromptModal()" style="background:#1e40af; border-color:#3b82f6;">
+        <span>🏠</span> Back
+      </button>
+
       <button type="button" class="btn-more" onclick="toggleHeaderMenu(event)" aria-label="Menu Options">
         ⋮
       </button>
 
-      <!-- ഡ്രോപ്പ്ഡൗൺ മെനു -->
+      <!-- DROPDOWN MENU -->
       <div id="headerDropdown" class="header-dropdown">
         <button type="button" class="dropdown-item" onclick="forceReloadApp(); closeHeaderMenu();">
           <span>🔄</span> Update App
-        </button>
-        <button type="button" class="dropdown-item" onclick="initBluetoothAutoConnect(); closeHeaderMenu();">
-          <span>🔌</span> Reconnect Printer
         </button>
         <button type="button" class="dropdown-item" onclick="openItemsModal(); closeHeaderMenu();">
           <span>⚙️</span> Manage Menu
         </button>
         <button type="button" class="dropdown-item" onclick="openTodaySummaryModal(); closeHeaderMenu();">
           <span>📊</span> Today's Summary
-        </button>
-        <div class="dropdown-divider"></div>
-        <button type="button" class="dropdown-item" onclick="promptPartnerPinForMainApp()">
-          <span>🏠</span> Back to App
         </button>
       </div>
     </div>
@@ -742,7 +730,7 @@
       </button>
     </div>
 
-    <!-- SMART TOTAL BOX WITH PARCEL CHIP ON RIGHT -->
+    <!-- SMART TOTAL BOX WITH INTEGRATED PARCEL CHIP -->
     <div class="dock-box box-total">
       <div style="display:flex; flex-direction:column; justify-content:center;">
         <span class="box-total-lbl">TOTAL</span>
@@ -802,7 +790,7 @@
     </div>
   </div>
 
-  <!-- 3. BILL RECEIPT DETAILS MODAL (WHATSAPP STYLE ON TAP) -->
+  <!-- 3. BILL RECEIPT DETAILS MODAL (OPENED ON RECENT BILL TAP) -->
   <div class="modal" id="billReceiptModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -817,16 +805,30 @@
     </div>
   </div>
 
-  <!-- 4. PARTNER PIN PROMPT FOR BACK TO APP -->
+  <!-- 4. PARTNER PIN PROMPT WITH PARTNER SELECTION (BACK TO APP) -->
   <div class="modal" id="partnerPinPromptModal">
-    <div class="modal-box" style="text-align:center;">
+    <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">🔒 Partner Verification</div>
         <button type="button" class="btn-close" onclick="closeModal('partnerPinPromptModal')">✕</button>
       </div>
-      <p style="font-size:0.8rem; color:#64748b; margin:6px 0 12px;">മെയിൻ ആപ്പിലേക്ക് മടങ്ങാൻ പാർട്ണർ PIN നൽകുക:</p>
-      <input type="password" id="inputBackPartnerPin" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric" style="text-align:center; font-size:1.3rem; font-weight:900; letter-spacing:4px; margin-bottom:14px;">
-      <button type="button" class="dock-box box-print" style="width:100%; height:44px;" onclick="verifyAndReturnToMainApp()">Confirm & Open App</button>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom:12px;">മെയിൻ ആപ്പിലേക്ക് മടങ്ങാൻ പാർട്ണറെ തിരഞ്ഞെടുത്തു PIN നൽകുക:</p>
+
+      <div class="form-group">
+        <label>Partner (ആരുടെ അക്കൗണ്ടിലേക്കാണ് പോകേണ്ടത്?)</label>
+        <select id="backPartnerSelect" class="form-control" style="font-weight:800;">
+          <option value="ASHKAR ALI">ASHKAR ALI</option>
+          <option value="ASHIF">ASHIF</option>
+          <option value="SABITH">SABITH</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Secret PIN</label>
+        <input type="password" id="inputBackPartnerPin" class="form-control" placeholder="••••" maxlength="6" inputmode="numeric" style="text-align:center; font-size:1.3rem; font-weight:900; letter-spacing:4px;">
+      </div>
+
+      <button type="button" class="dock-box box-print" style="width:100%; height:44px; margin-top:6px;" onclick="verifyAndReturnToMainApp()">Confirm & Open App</button>
     </div>
   </div>
 
@@ -973,7 +975,7 @@
     <div class="r-center">Visit Again!</div>
   </div>
 
-  <!-- WHATSAPP PDF INVOICE CARD -->
+  <!-- WHATSAPP PDF INVOICE CARD (PERFECT GRAPHICAL RENDER) -->
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
@@ -1041,7 +1043,6 @@
     let editingBill = null;
     let editingItemId = null;
     let pickedItemImageBase64 = "";
-    let activeReceiptBillObj = null;
 
     // Partner PINs
     let partnerPins = {
@@ -1147,7 +1148,6 @@
        ============================================================= */
     function openParcelModal() {
       if (parcelCharge > 0) {
-        // If already set, clicking can prompt to edit or directly open modal
         document.getElementById('parcelAmtInput').value = parcelCharge;
       } else {
         document.getElementById('parcelAmtInput').value = '';
@@ -1173,16 +1173,28 @@
     }
 
     /* =============================================================
-       CONTINUOUS 4-DIGIT BILL NUMBER GENERATOR (POINT 1)
+       CONTINUOUS 4-DIGIT BILL NUMBER GENERATOR (POINT 1 - 0001 START)
        ============================================================= */
     function getNextSequentialBillNo() {
       let lastStored = parseInt(localStorage.getItem('BANABLAST_LAST_BILL_NUM') || '0', 10);
+      
+      // If previous garbage random number like 9941 is stored, reset it to start 0001
+      if (lastStored > 3000) {
+        lastStored = 0;
+      }
+
       if (todayBills && todayBills.length > 0) {
         todayBills.forEach(b => {
-          let num = parseInt(String(b.billNo).replace(/\D/g, ''), 10);
-          if (!isNaN(num) && num > lastStored) lastStored = num;
+          let raw = String(b.billNo || '').trim();
+          if (/^\d{4}$/.test(raw)) {
+            let num = parseInt(raw, 10);
+            if (!isNaN(num) && num > lastStored && num < 3000) {
+              lastStored = num;
+            }
+          }
         });
       }
+
       const nextNo = lastStored + 1;
       localStorage.setItem('BANABLAST_LAST_BILL_NUM', nextNo.toString());
       return String(nextNo).padStart(4, '0');
@@ -1204,7 +1216,7 @@
 
     window.addEventListener('click', (e) => {
       const dd = document.getElementById('headerDropdown');
-      if (dd && !e.target.closest('.header-actions')) {
+      if (dd && !e.target.closest('.header-quick-btns')) {
         dd.classList.remove('show');
       }
     });
@@ -1216,24 +1228,31 @@
       }
     }
 
-    function promptPartnerPinForMainApp() {
-      closeHeaderMenu();
+    /* =============================================================
+       BACK TO MAIN APP WITH STRICT PARTNER SELECT & PIN
+       ============================================================= */
+    function openPartnerPinPromptModal() {
       document.getElementById('inputBackPartnerPin').value = '';
       openModalWithHistory('partnerPinPromptModal');
     }
 
     function verifyAndReturnToMainApp() {
+      const selectedPartner = document.getElementById('backPartnerSelect').value;
       const enteredPin = document.getElementById('inputBackPartnerPin').value.trim();
-      const validPins = Object.values(partnerPins);
-      if (validPins.includes(enteredPin) || enteredPin === '3333' || enteredPin === '9999') {
+
+      const requiredPin = partnerPins[selectedPartner] || (selectedPartner === 'ASHKAR ALI' ? '3333' : (selectedPartner === 'SABITH' ? '2222' : '1111'));
+
+      if (enteredPin === requiredPin || enteredPin === '9999') {
+        // Save the chosen partner in localStorage so main app opens dashboard directly!
+        localStorage.setItem('BANABLAST_USER', selectedPartner);
         window.location.href = 'index.html';
       } else {
-        alert("❌ തെറ്റായ PIN! പാർട്ണർമാർക്ക് മാത്രമേ മെയിൻ അക്കൗണ്ടിലേക്ക് പ്രവേശനമുള്ളൂ.");
+        alert(`❌ തെറ്റായ PIN! ${selectedPartner}-ന്റെ ശരിയായ PIN നൽകുക.`);
       }
     }
 
     /* =============================================================
-       BLUETOOTH DIRECT THERMAL PRINTING ENGINE (CAPACITOR NATIVE)
+       BLUETOOTH DIRECT THERMAL PRINTING ENGINE (1-TAP CONNECT)
        ============================================================= */
     document.addEventListener('deviceready', () => {
       initBluetoothAutoConnect();
@@ -1253,6 +1272,35 @@
         return;
       }
 
+      bluetoothSerial.isEnabled(() => {
+        bluetoothSerial.list((devices) => {
+          if (!devices || devices.length === 0) return;
+          const target = devices.find(d => 
+            (d.name && (d.name.includes("BlueTooth") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
+          ) || devices[0];
+
+          if (target) {
+            bluetoothSerial.connect(target.address, () => {
+              connectedThermalPrinter = target;
+              updateBTStatusUI('online', `റെഡി: ${target.name}`);
+            }, () => {
+              connectedThermalPrinter = null;
+              updateBTStatusUI('offline', 'കണക്ഷൻ സാധിച്ചില്ല');
+            });
+          }
+        });
+      }, () => {
+        updateBTStatusUI('offline', 'ബ്ലൂടൂത്ത് ഓഫ് ആണ്');
+      });
+    }
+
+    function connectBluetoothPrinterManual() {
+      if (typeof bluetoothSerial === 'undefined') {
+        alert("⚠️ BluetoothSerial plugin ലഭ്യമല്ല (Browser Mode). പ്രിന്റ് കമാൻഡ് വഴി പ്രിന്റർ തിരഞ്ഞെടുക്കാവുന്നതാണ്.");
+        updateBTStatusUI('offline', 'ബ്രൗസർ മോഡ്');
+        return;
+      }
+
       if (isConnectingBT) return;
       isConnectingBT = true;
       updateBTStatusUI('connecting', 'പ്രിന്ററുമായി ബന്ധിപ്പിക്കുന്നു...');
@@ -1261,36 +1309,41 @@
         bluetoothSerial.list((devices) => {
           isConnectingBT = false;
           if (!devices || devices.length === 0) {
-            updateBTStatusUI('offline', 'ഡിവൈസുകൾ കണ്ടെത്തിയില്ല');
+            alert("⚠️ പെയർ ചെയ്ത ബ്ലൂടൂത്ത് ഡിവൈസുകൾ കണ്ടെത്തിയില്ല! ഫോൺ സെറ്റിംഗ്സിൽ 'BlueTooth Printer' പെയർ ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പുവരുത്തുക.");
+            updateBTStatusUI('offline', 'ഡിവൈസുകൾ ഇല്ല');
             return;
           }
 
           const target = devices.find(d => 
-            (d.name && (d.name.includes("83F5") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
+            (d.name && (d.name.includes("BlueTooth") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
           ) || devices[0];
 
           if (target) {
             bluetoothSerial.connect(target.address, () => {
               connectedThermalPrinter = target;
               updateBTStatusUI('online', `റെഡി: ${target.name}`);
-              console.log("Connected to printer:", target.name);
+              alert(`✅ പ്രിന്ററുമായി കണക്റ്റായി: ${target.name}`);
             }, (err) => {
               connectedThermalPrinter = null;
               updateBTStatusUI('offline', 'കണക്ഷൻ സാധിച്ചില്ല');
-              console.warn("Connection Failed:", err);
+              alert("❌ പ്രിന്ററുമായി കണക്റ്റ് ചെയ്യാൻ കഴിഞ്ഞില്ല. പ്രിന്റർ ഓൺ ആണെന്ന് ഉറപ്പാക്കുക.");
             });
           }
-        }, (err) => {
+        }, () => {
           isConnectingBT = false;
           updateBTStatusUI('offline', 'എറർ');
         });
       }, () => {
         isConnectingBT = false;
-        updateBTStatusUI('offline', 'ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക');
+        bluetoothSerial.enable(() => {
+          connectBluetoothPrinterManual();
+        }, () => {
+          updateBTStatusUI('offline', 'ബ്ലൂടൂത്ത് ഓഫ് ആണ്');
+          alert("ദയവായി ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക!");
+        });
       });
     }
 
-    // Direct ESC/POS Commands (Point 3 - Redesigned Layout)
     function sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge = 0) {
       const ESC = "\x1B";
       const GS = "\x1D";
@@ -1304,7 +1357,6 @@
       const FEED = "\n\n\n\n";
 
       let raw = INIT;
-      // BANABLAST in Double Height
       raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
       raw += CENTER + "Nellippuzha, Mannarkkad\n";
       raw += CENTER + "Mob: +91 9037010883\n";
@@ -1342,8 +1394,7 @@
 
       bluetoothSerial.write(raw, () => {
         console.log("Direct ESC/POS Print Success!");
-      }, (err) => {
-        console.warn("Bluetooth write failed, falling back to window.print()", err);
+      }, () => {
         window.print();
       });
     }
@@ -1532,7 +1583,6 @@
       document.getElementById('cartTotalText').innerText = '₹' + grandTotal;
       document.getElementById('cartCountTag').innerText = `${totalQty} Items`;
 
-      // Parcel Chip UI Update
       const pChip = document.getElementById('btnParcelToggle');
       const pLabel = document.getElementById('parcelLabelText');
       if (parcelCharge > 0) {
@@ -1593,7 +1643,7 @@
     }
 
     /* -------------------------------------------------------------
-       സേവിംഗ് & ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് എക്സിക്യൂഷൻ (ഡബിൾ എൻട്രി ലോക്കോടെ)
+       സേവിംഗ് & ഡിഫോൾട്ട് സിസ്റ്റം പ്രിന്റ് (ഡബിൾ പ്രിന്റ് ലോക്കോടെ)
        ------------------------------------------------------------- */
     async function printAndSaveBill() {
       if (!cart.length) {
@@ -1603,7 +1653,6 @@
 
       if (isPrintingBill) return; // INSTANT LOCK
 
-      // LOCK BUTTON & FEEDBACK
       isPrintingBill = true;
       const btnPrint = document.getElementById('btnMainPrintAction');
       btnPrint.style.pointerEvents = 'none';
@@ -1653,10 +1702,8 @@
           await syncAggregatedLedger(todayDate, currentPayMode, total);
         }
 
-        // നേരിട്ടുള്ള ബ്ലൂടൂത്ത് പ്രിന്റിംഗ് (ബ്ലൂടൂത്ത് ഇല്ലെങ്കിൽ സിസ്റ്റം പ്രിന്റ്)
         triggerThermalPrint(billNo, dateFormatted, timeStr, total, currentPayMode, cart, parcelCharge);
 
-        // ഉടൻ കാർട്ട് ക്ലിയർ ചെയ്യുക
         cart = [];
         parcelCharge = 0;
         editingBill = null;
@@ -1707,7 +1754,7 @@
       if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
         sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge);
       } else if (typeof bluetoothSerial !== 'undefined') {
-        initBluetoothAutoConnect();
+        connectBluetoothPrinterManual();
         setTimeout(() => {
           if (connectedThermalPrinter) {
             sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge);
@@ -1764,9 +1811,9 @@
     }
 
     /* -------------------------------------------------------------
-       WHATSAPP BILL - DIRECT TEXT (NO DOWNLOAD ERRORS)
+       WHATSAPP BILL - DIRECT PDF FILE GENERATION & SHARING
        ------------------------------------------------------------- */
-    function sendWhatsAppBillDirect() {
+    async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
@@ -1776,34 +1823,70 @@
       const total = subtotal + parcelCharge;
       const timeStr = get12HourTimeString();
       const dateFormatted = formatDateDDMMYYYY();
-      const billNo = editingBill ? editingBill.billNo : "New Order";
+      const billNo = editingBill ? editingBill.billNo : getNextSequentialBillNo();
 
-      sendWhatsAppDirectText(billNo, dateFormatted, timeStr, total, currentPayMode, cart, parcelCharge);
+      await generateAndSharePdfBill(billNo, dateFormatted, timeStr, total, currentPayMode, cart, parcelCharge);
     }
 
-    function sendWhatsAppDirectText(billNo, date, time, total, mode, items, pCharge = 0) {
-      let itemsText = items.map(i => `• ${i.name} (x${i.qty}) = ₹${i.price * i.qty}`).join('\n');
-      let text = `🍌 *BANABLAST*\n` +
-                 `📍 Nellippuzha, Mannarkkad\n` +
-                 `📞 Mob: +91 9037010883\n` +
-                 `--------------------------------\n` +
-                 `🧾 *BILL NO: ${billNo}*\n` +
-                 `📅 Date: ${date}  ${time}\n` +
-                 `💳 Payment: ${(mode || 'CASH').toUpperCase()}\n` +
-                 (pCharge > 0 ? `🥡 Order Type: PARCEL (+₹${pCharge})\n` : '') +
-                 `--------------------------------\n` +
-                 `*ITEMS:*\n${itemsText}\n` +
-                 (pCharge > 0 ? `Parcel Charge: ₹${pCharge}\n` : '') +
-                 `--------------------------------\n` +
-                 `💰 *TOTAL: ₹${total}*\n` +
-                 `--------------------------------\n` +
-                 `✨ Thank you! Visit Again! ✨`;
+    async function generateAndSharePdfBill(billNo, date, time, total, mode, items, pCharge = 0) {
+      document.getElementById('pdfDateText').innerText = `${date}  ${time}`;
+      document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
+      document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
+      document.getElementById('pdfPayModeText').innerText = (mode || 'cash').toUpperCase();
 
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      const pRow = document.getElementById('pdfParcelRow');
+      const pVal = document.getElementById('pdfParcelVal');
+      if (pCharge > 0) {
+        pRow.style.display = 'flex';
+        pVal.innerText = `+₹${pCharge}`;
+      } else {
+        pRow.style.display = 'none';
+      }
+
+      const tbody = document.getElementById('pdfItemsTableBody');
+      tbody.innerHTML = items.map(i => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+          <td style="padding:6px 0; font-weight:700;">${i.name}</td>
+          <td style="padding:6px 0; text-align:center; font-weight:800;">${i.qty}</td>
+          <td style="padding:6px 0; text-align:right; font-weight:800;">₹${i.price * i.qty}</td>
+        </tr>
+      `).join('');
+
+      const card = document.getElementById('pdfInvoiceCard');
+
+      try {
+        const canvas = await html2canvas(card, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        const { jsPDF } = window.jspdf;
+        const pdfWidth = 80;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+        const pdfBlob = pdf.output('blob');
+        const fileName = `BANABLAST_Bill_${billNo}.pdf`;
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({
+            files: [pdfFile],
+            title: `BANABLAST Bill #${billNo}`,
+            text: `🥤 BANABLAST Bill #${billNo} (₹${total})`
+          });
+        } else {
+          pdf.save(fileName);
+          alert(`✅ PDF ബില്ല് ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
+        }
+      } catch (err) {
+        console.error("PDF Share Error:", err);
+        alert("❌ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
+      }
     }
 
     /* -------------------------------------------------------------
-       RECENT BILLS & DETAILS POPUP (POINT 2)
+       RECENT BILLS - COMPACT CARDS & DETAILED POPUP ON TAP
        ------------------------------------------------------------- */
     function openRecentBillsModal() {
       const container = document.getElementById('recentBillsContainer');
@@ -1817,20 +1900,32 @@
       if (!sorted.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
       } else {
-        container.innerHTML = sorted.map(b => `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="showBillReceiptDetails('${b.id}')">
-            <div>
-              <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">#${b.billNo} - ₹${b.total} <span style="font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:800; background:${b.mode === 'cash' ? '#dcfce7' : '#e0f2fe'}; color:${b.mode === 'cash' ? '#059669' : '#0284c7'};">${(b.mode || 'cash').toUpperCase()}</span></div>
-              <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">🕒 ${b.time || '-'} | ${b.items ? b.items.length : 0} items ${b.parcelCharge ? '• 🥡' : ''}</div>
+        container.innerHTML = sorted.map(b => {
+          const totalQty = (b.items || []).reduce((sum, it) => sum + (it.qty || 1), 0);
+          const isCash = (b.mode || 'cash').toLowerCase() === 'cash';
+
+          return `
+            <div class="recent-bill-card" onclick="showBillReceiptDetails('${b.id}')">
+              <div>
+                <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">
+                  #${b.billNo} • ₹${b.total} 
+                  <span style="font-size:0.68rem; padding:2px 7px; border-radius:6px; font-weight:800; background:${isCash ? '#dcfce7' : '#e0f2fe'}; color:${isCash ? '#059669' : '#0284c7'};">
+                    ${(b.mode || 'cash').toUpperCase()}
+                  </span>
+                </div>
+                <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
+                  🕒 ${b.time || '-'} • ${totalQty} Items ${b.parcelCharge ? '• 🥡' : ''}
+                </div>
+              </div>
+              <div style="display:flex; gap:5px;" onclick="event.stopPropagation()">
+                <button type="button" class="btn-rec-act" style="background:#25d366; color:white;" onclick="shareExistingBillPdf('${b.id}')" title="WhatsApp PDF">💬</button>
+                <button type="button" class="btn-rec-act" style="background:var(--blue); color:white;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
+                <button type="button" class="btn-rec-act" style="background:#f59e0b; color:white;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
+                <button type="button" class="btn-rec-act" style="background:#fee2e2; color:#dc2626;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑</button>
+              </div>
             </div>
-            <div style="display:flex; gap:5px;" onclick="event.stopPropagation()">
-              <button type="button" style="background:#25d366; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="shareExistingBillWhatsAppText('${b.id}')" title="WhatsApp">💬</button>
-              <button type="button" style="background:var(--blue); color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
-              <button type="button" style="background:#f59e0b; color:white; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
-              <button type="button" style="background:#fee2e2; color:#dc2626; border:none; padding:7px 9px; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑</button>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
       openModalWithHistory('recentBillsModal');
     }
@@ -1838,7 +1933,6 @@
     function showBillReceiptDetails(billId) {
       const b = todayBills.find(x => x.id === billId);
       if (!b) return;
-      activeReceiptBillObj = b;
 
       const content = document.getElementById('billReceiptPopupContent');
       let itemsRows = (b.items || []).map(it => `
@@ -1867,7 +1961,7 @@
           <span>₹${b.total}</span>
         </div>
         <div style="font-size:0.75rem; color:#64748b; margin-top:4px; text-align:right;">
-          Mode: <b>${(b.mode || 'CASH').toUpperCase()}</b>
+          Payment: <b>${(b.mode || 'CASH').toUpperCase()}</b>
         </div>
       `;
 
@@ -1875,16 +1969,16 @@
         reprintBill(b.id);
       };
       document.getElementById('btnReceiptModalWa').onclick = () => {
-        shareExistingBillWhatsAppText(b.id);
+        shareExistingBillPdf(b.id);
       };
 
       openModalWithHistory('billReceiptModal');
     }
 
-    function shareExistingBillWhatsAppText(id) {
+    function shareExistingBillPdf(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
-      sendWhatsAppDirectText(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.mode, b.items || [], b.parcelCharge || 0);
+      generateAndSharePdfBill(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.mode, b.items || [], b.parcelCharge || 0);
     }
 
     async function deletePosBill(id) {
@@ -1924,7 +2018,8 @@
       renderCartUI();
       renderMenuItems();
       closeModal('recentBillsModal');
-      alert(`⚠️ ബില്ല് #${b.billNo} തിരുത്താനായി കാർട്ടിലേക്ക് എടുത്തു.`);
+      closeModal('billReceiptModal');
+      alert(`⚠️️ ബില്ല് #${b.billNo} തിരുത്താനായി കാർട്ടിലേക്ക് എടുത്തു.`);
     }
 
     function openTodaySummaryModal() {
