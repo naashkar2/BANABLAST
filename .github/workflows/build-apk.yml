@@ -16,8 +16,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Dependencies
+      - name: Prepare Web Assets & Install Dependencies
         run: |
+          mkdir -p www
+          cp billing.html index.html logo.png manifest.json www/ 2>/dev/null || true
           npm install
           npx cap add android
 
