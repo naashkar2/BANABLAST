@@ -24,7 +24,6 @@ jobs:
           mkdir -p www
           cp billing.html index.html logo.png manifest.json www/ 2>/dev/null || true
           npm install
-          npm install @capacitor/app @capacitor/share @capacitor/filesystem --legacy-peer-deps
           npx cap add android || true
           npx cap sync android
 
@@ -81,7 +80,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK File
         uses: actions/upload-artifact@v4
