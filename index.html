@@ -7,6 +7,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="logo.png">
 
+  <!-- Cordova & Capacitor Native Bridge Injection -->
+  <script src="cordova.js"></script>
+  <script src="capacitor.js"></script>
+
   <!-- Flatpickr -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -2065,7 +2069,8 @@
 
       const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
       if (openModals.length > 0) {
-        openModals[openModals.length - 1].style.display = 'none';
+        const topModal = openModals[openModals.length - 1];
+        topModal.style.display = 'none';
         return true;
       }
 
@@ -2469,7 +2474,7 @@
       const name = document.getElementById('newSupplierNameInput').value.trim();
       const phone = document.getElementById('newSupplierPhoneInput').value.trim();
       if (!name) {
-        alert("⚠️️ സപ്ലയറുടെ പേര് നൽകുക!");
+        alert("⚠️ സപ്ലയറുടെ പേര് നൽകുക!");
         return;
       }
       db.collection('master_suppliers').add({
@@ -4139,7 +4144,7 @@
               <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
                 ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
               </span>
-              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
