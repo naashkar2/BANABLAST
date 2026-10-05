@@ -24,6 +24,7 @@ jobs:
           mkdir -p www
           cp billing.html index.html logo.png manifest.json www/ 2>/dev/null || true
           npm install
+          npm install @capacitor/app@^6.0.0 @capacitor/share@^6.0.0 @capacitor/filesystem@^6.0.0 --legacy-peer-deps
           npx cap add android || true
           npx cap sync android
 
