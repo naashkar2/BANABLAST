@@ -176,7 +176,7 @@
     .dropdown-item:last-child { border-bottom: none; }
     .dropdown-item:active { background: rgba(255,255,255,0.12); }
 
-    /* ഡേറ്റ് & ഹോളിഡേ കോംപാക്റ്റ് ബാർ */
+    /* കോംപാക്റ്റ് ഡേറ്റ് & ഹോളിഡേ ബാർ */
     .calendar-bar {
       display: flex;
       align-items: center;
@@ -237,7 +237,7 @@
       display: none; 
     }
 
-    /* സ്ലിം പ്രൊഫഷണൽ കൗണ്ടർ POS ഹീറോ ബാർ */
+    /* സ്ലിം കൗണ്ടർ POS ബാർ */
     .btn-pos-hero {
       width: 100%;
       height: 38px;
@@ -254,9 +254,7 @@
       margin-top: 7px;
       transition: transform 0.1s ease;
     }
-    .btn-pos-hero:active {
-      transform: scale(0.98);
-    }
+    .btn-pos-hero:active { transform: scale(0.98); }
 
     .flatpickr-calendar { 
       border-radius: 16px !important; 
@@ -907,6 +905,32 @@
       font-weight: 700;
       font-size: 0.65rem;
       color: #334155;
+    }
+
+    /* Android System Print to PDF Styling */
+    @media print {
+      body * { visibility: hidden !important; }
+      #a4SheetPaper, #a4SheetPaper * { visibility: visible !important; }
+      #a4PreviewModal {
+        position: absolute !important;
+        inset: 0 !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      .a4-action-bar { display: none !important; }
+      #a4SheetPaper {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10mm !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
   </style>
 </head>
@@ -1771,7 +1795,7 @@
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('aiSettingsModal')">✕</button>
-      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️️ OCR.space API Key</h3>
+      <h3 style="color: var(--primary); margin-bottom: 6px;">⚙️ OCR.space API Key</h3>
       <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">
         ocr.space/ocrapi/freekey വഴി ലഭിച്ച സൗജന്യ API Key ഇവിടെ നൽകുക:
       </p>
@@ -1878,7 +1902,7 @@
     </div>
   </div>
 
-  <!-- 16. NEW: ADD STOCK ITEM MODAL (MASTER ITEM REGISTRATION) -->
+  <!-- 16. ADD STOCK ITEM MODAL (MASTER ITEM REGISTRATION) -->
   <div class="modal" id="addStockItemModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addStockItemModal')">✕</button>
@@ -1899,7 +1923,7 @@
     </div>
   </div>
 
-  <!-- 17. NEW: ADD SUPPLIER MODAL (MASTER SUPPLIER REGISTRATION) -->
+  <!-- 17. ADD SUPPLIER MODAL (MASTER SUPPLIER REGISTRATION) -->
   <div class="modal" id="addSupplierModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addSupplierModal')">✕</button>
@@ -1920,7 +1944,7 @@
     </div>
   </div>
 
-  <!-- 18. NEW: ADD STAFF MODAL (MASTER STAFF REGISTRATION) -->
+  <!-- 18. ADD STAFF MODAL (MASTER STAFF REGISTRATION) -->
   <div class="modal" id="addStaffModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addStaffModal')">✕</button>
@@ -1941,7 +1965,7 @@
     </div>
   </div>
 
-  <!-- 19. NEW: POS BILL RECEIPT DETAILS MODAL (POPUP ON BILL TAP) -->
+  <!-- 19. POS BILL RECEIPT DETAILS MODAL (POPUP ON BILL TAP) -->
   <div class="modal" id="posBillDetailsModal" style="z-index: 1200;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('posBillDetailsModal')">✕</button>
@@ -1953,7 +1977,7 @@
   <!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
   <script>
     /* =========================================================
-       BANABLAST BUSINESS LEDGER & POS MANAGEMENT - PRODUCTION ENGINE
+       BANABLAST BUSINESS LEDGER & POS MANAGEMENT - ZERO-ERROR ENGINE
        ========================================================= */
 
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
@@ -1961,7 +1985,6 @@
 
     let dynamicOcrKey = localStorage.getItem('BANABLAST_OCR_KEY') || localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
 
-    // ഡിഫോൾട്ട് ലോഗിൻ PIN കോഡുകൾ
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
@@ -1982,7 +2005,6 @@
       }
     }
 
-    // Firebase Config (Your Original Active Configuration)
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -2005,12 +2027,10 @@
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
-    // മാസ്റ്റർ ലിസ്റ്റുകൾ (മാസ്റ്റർ രജിസ്ട്രേഷനുകൾക്കായി)
     let masterItemsList = [];
     let masterSuppliersList = [];
     let masterStaffList = [];
 
-    // തീയതി & ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
     let currentPosFilter = 'today';
     let currentStockFilter = 'all';
     let currentSupplierFilter = 'all';
@@ -2027,50 +2047,61 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    /* -------------------------------------------------------------
-       1. HARDWARE / GESTURE BACK BUTTON SAFE NAVIGATION
-       ------------------------------------------------------------- */
-    function getOpenModals() {
-      const standardModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
-      const a4Modal = document.getElementById('a4PreviewModal');
-      if (a4Modal && a4Modal.style.display === 'flex') {
-        standardModals.push(a4Modal);
-      }
-      return standardModals;
-    }
-
-    function handleBackNavigation() {
+    /* =============================================================
+       1. UNIVERSAL HARDWARE & GESTURE BACK BUTTON INTERCEPTOR
+       ============================================================= */
+    function closeTopmostModalOrDropdown() {
       const dd = document.getElementById('mainHeaderDropdown');
       if (dd && dd.classList.contains('show')) {
         dd.classList.remove('show');
         return true;
       }
 
-      const openModals = getOpenModals();
+      const a4 = document.getElementById('a4PreviewModal');
+      if (a4 && a4.style.display === 'flex') {
+        a4.style.display = 'none';
+        return true;
+      }
+
+      const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
       if (openModals.length > 0) {
-        // ഏറ്റവും ഒടുവിൽ തുറന്ന മോഡൽ മാത്രം ക്ലോസ് ചെയ്യുക
         openModals[openModals.length - 1].style.display = 'none';
         return true;
       }
+
       return false;
     }
 
-    // Android WebView / Capacitor Back Button
+    document.addEventListener('backbutton', function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const handled = closeTopmostModalOrDropdown();
+      if (!handled) {
+        if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+          if (navigator.app && navigator.app.exitApp) {
+            navigator.app.exitApp();
+          } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+            window.Capacitor.Plugins.App.exitApp();
+          }
+        }
+      }
+    }, false);
+
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
       window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
-        const handled = handleBackNavigation();
+        const handled = closeTopmostModalOrDropdown();
         if (!handled) {
-          if (canGoBack) window.history.back();
-          else window.Capacitor.Plugins.App.exitApp();
+          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+            window.Capacitor.Plugins.App.exitApp();
+          }
         }
       });
     }
 
-    // Browser / Gesture Back Button Handling
     window.addEventListener('popstate', (e) => {
-      if (handleBackNavigation()) {
-        e.preventDefault();
-      }
+      closeTopmostModalOrDropdown();
     });
 
     function openModalWithHistory(id) {
@@ -2298,7 +2329,6 @@
         }
       });
 
-      // Master Lists Snapshots
       db.collection('master_items').onSnapshot(snap => {
         masterItemsList = [];
         snap.forEach(d => masterItemsList.push(d.data().name));
@@ -2439,7 +2469,7 @@
       const name = document.getElementById('newSupplierNameInput').value.trim();
       const phone = document.getElementById('newSupplierPhoneInput').value.trim();
       if (!name) {
-        alert("⚠️ സപ്ലയറുടെ പേര് നൽകുക!");
+        alert("⚠️️ സപ്ലയറുടെ പേര് നൽകുക!");
         return;
       }
       db.collection('master_suppliers').add({
@@ -2475,9 +2505,6 @@
       });
     }
 
-    /* -------------------------------------------------------------
-       6. CATEGORY-SPECIFIC SUGGESTIONS LOGIC
-       ------------------------------------------------------------- */
     function updateDatalists() {
       const suppliers = new Set(masterSuppliersList);
       const items = new Set(masterItemsList);
@@ -2498,19 +2525,13 @@
       });
 
       const suppDL = document.getElementById('suppliersList');
-      if (suppDL) {
-        suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
-      }
+      if (suppDL) suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
 
       const itemDL = document.getElementById('itemsList');
-      if (itemDL) {
-        itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
-      }
+      if (itemDL) itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
 
       const staffDL = document.getElementById('staffList');
-      if (staffDL) {
-        staffDL.innerHTML = Array.from(staff).sort().map(st => `<option value="${st}">`).join('');
-      }
+      if (staffDL) staffDL.innerHTML = Array.from(staff).sort().map(st => `<option value="${st}">`).join('');
     }
 
     function handleCategoryChange() {
@@ -2561,7 +2582,7 @@
     }
 
     /* -------------------------------------------------------------
-       7. POS ANALYTICS TAB & BILL RECEIPT POPUP
+       6. POS ANALYTICS & BILL RECEIPT POPUP
        ------------------------------------------------------------- */
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
@@ -2805,7 +2826,7 @@
     }
 
     /* -------------------------------------------------------------
-       8. OCR.SPACE SCANNER & PURCHASE ITEMS
+       7. OCR SCANNER & ENTRY ACTIONS
        ------------------------------------------------------------- */
     function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
       const container = document.getElementById('purchaseItemsListContainer');
@@ -3039,9 +3060,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       9. ENTRY ACTIONS & TRACKING
-       ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -3215,7 +3233,7 @@
             </div>
             <div class="entry-right">
               <span class="entry-amt ${isSale ? 'color-green' : 'color-red'}">
-                ${isSale ? '+' : '-'}₹${t.amount}
+                ${isSale ? '+' : '-'}${t.amount}
               </span>
               <div class="entry-actions">
                 <button class="btn-icon" onclick="openEntryModal('${t.type}', '${t.id}')">✏️</button>
@@ -3297,7 +3315,7 @@
     }
 
     /* -------------------------------------------------------------
-       10. STOCK & SUPPLIERS TAB WITH DUE TOGGLE
+       8. STOCK, SUPPLIERS & REPORTS TAB
        ------------------------------------------------------------- */
     function filterStockTab(period) {
       currentStockFilter = period;
@@ -3477,9 +3495,6 @@
       container.innerHTML = html;
     }
 
-    /* -------------------------------------------------------------
-       11. SMART RENT LEDGER LOGIC
-       ------------------------------------------------------------- */
     function openRentDetailsModal() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -3528,9 +3543,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       12. STAFF SALARIES & WAGES LEDGER
-       ------------------------------------------------------------- */
     function openStaffDetailsModal() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -3597,9 +3609,6 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    /* -------------------------------------------------------------
-       13. STOCK & EXPENSES BREAKDOWN LOGIC
-       ------------------------------------------------------------- */
     function openStockExpensesModal() {
       currentStockExpFilter = 'month';
       document.querySelectorAll('#stockExpensesModal .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3670,9 +3679,6 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    /* -------------------------------------------------------------
-       14. REPORTS TAB SUMMARY RENDERING
-       ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3747,7 +3753,7 @@
     }
 
     /* -------------------------------------------------------------
-       15. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION)
+       9. INVESTMENTS & WITHDRAWALS
        ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
@@ -4154,7 +4160,7 @@
     }
 
     /* -------------------------------------------------------------
-       16. UNIVERSAL LEDGER SHEET & MODALS
+       10. UNIVERSAL LEDGER SHEET & MODALS
        ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
@@ -4308,7 +4314,7 @@
     }
 
     /* -------------------------------------------------------------
-       17. RUNNING BREAKDOWN & OPENING BALANCE
+       11. RUNNING BREAKDOWN & OPENING BALANCE
        ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
@@ -4411,30 +4417,9 @@
       closeModal('openingModal');
     }
 
-    /* -------------------------------------------------------------
-       18. A4 PREVIEW, ZERO-BLANK PDF DOWNLOAD & WHATSAPP ENGINE
-       ------------------------------------------------------------- */
-    async function ensurePdfLibraries() {
-      if (typeof html2canvas === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-      if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-    }
-
+    /* =============================================================
+       12. ROBUST A4 PDF PREVIEW, DIRECT DOWNLOAD & WHATSAPP PDF SHARING
+       ============================================================= */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
@@ -4446,124 +4431,93 @@
 
     function closeA4PreviewModal() {
       document.getElementById('a4PreviewModal').style.display = 'none';
+      if (window.history.state && window.history.state.modalOpen === 'a4PreviewModal') {
+        window.history.back();
+      }
     }
 
-    async function createCleanA4PdfBlob(fileName) {
-      await ensurePdfLibraries();
-
+    async function generateA4PdfDoc() {
       const element = document.getElementById('a4SheetPaper');
-      const modal = document.getElementById('a4PreviewModal');
-      if (modal) modal.scrollTop = 0;
-
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
-        allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 6;
+      const imgWidth = pdfWidth - (margin * 2);
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      const JsPdf = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
-      if (JsPdf) {
-        const pdf = new JsPdf('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const margin = 8;
-        const imgWidth = pdfWidth - (margin * 2);
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let heightLeft = imgHeight;
-        let position = margin;
-
-        pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-        heightLeft -= (pdfHeight - (margin * 2));
-
-        while (heightLeft > 0) {
-          position = position - (pdfHeight - (margin * 2));
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-          heightLeft -= (pdfHeight - (margin * 2));
-        }
-
-        return pdf.output('blob');
-      } else {
-        throw new Error("jsPDF ലൈബ്രറി ലഭ്യമല്ല");
-      }
+      pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+      return pdf;
     }
 
     async function printOrSaveCurrentA4() {
       const btn = document.querySelector('.a4-btn-print');
-      if (btn) btn.innerText = '⏳ സേവ് ചെയ്യുന്നു...';
+      if (btn) btn.innerText = '⏳ ഡൗൺലോഡ് ചെയ്യുന്നു...';
 
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        const blob = await createCleanA4PdfBlob(fileName);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-
-        setTimeout(() => {
-          if (a.parentNode) document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
-        }, 1000);
+        const pdf = await generateA4PdfDoc();
+        pdf.save(fileName);
 
         if (btn) {
           btn.innerText = '✅ Saved!';
           setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2000);
         }
       } catch (err) {
-        console.error("Save error:", err);
-        alert("❌ PDF സേവ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
+        console.error("PDF download error, fallback to print:", err);
+        window.print();
         if (btn) btn.innerText = '💾 Download PDF';
       }
     }
 
     async function shareCurrentA4WhatsApp() {
       const btn = document.querySelector('.a4-btn-wa');
-      if (btn) btn.innerText = '⏳ തുറക്കുന്നു...';
+      if (btn) btn.innerText = '⏳ PDF തയ്യാറാക്കുന്നു...';
 
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        const blob = await createCleanA4PdfBlob(fileName);
+        const pdf = await generateA4PdfDoc();
+        const blob = pdf.output('blob');
         const file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
 
+        // 1. Cordova/Capacitor Native Social Sharing Plugin (Direct Attachment to WhatsApp)
+        if (window.plugins && window.plugins.socialsharing) {
+          window.plugins.socialsharing.share(
+            null,
+            fileName,
+            pdf.output('datauristring'),
+            null
+          );
+          if (btn) btn.innerText = '💬 WhatsApp';
+          return;
+        }
+
+        // 2. Android Web Share API (Pass ONLY files to prevent WhatsApp text conversion)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
-            files: [file],
-            title: currentA4Title
+            files: [file]
           });
-        } else {
-          // Native share fallback
-          const curDate = document.getElementById('selectedDate').value || today;
-          const sales = document.getElementById('sumDailySales').innerText;
-          const exp = document.getElementById('sumDailyExp').innerText;
-          const profit = document.getElementById('sumDailyProfit').innerText;
-          const totBal = document.getElementById('runTotalBal').innerText;
-
-          const text = `🍌 *BANABLAST STATEMENT SUMMARY*\n` +
-                       `📍 Nellippuzha, Mannarkkad\n` +
-                       `📅 Date: *${curDate}*\n` +
-                       `--------------------------------\n` +
-                       `💰 *Total Sales:* ${sales}\n` +
-                       `💸 *Total Expense:* ${exp}\n` +
-                       `📊 *Net Daily Profit:* ${profit}\n` +
-                       `🏦 *Cumulative Balance:* ${totBal}\n` +
-                       `--------------------------------\n` +
-                       `✨ Banablast Business Ledger ✨`;
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+          if (btn) btn.innerText = '💬 WhatsApp';
+          return;
         }
+
+        // 3. Fallback: Save PDF file directly to device storage & notify user
+        pdf.save(fileName);
+        alert(`✅ PDF ബില്ല് ഫോണിലേക്ക് ഡൗൺലോഡ് ആയിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ Document ആയി അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
       } catch (err) {
-        console.error("Share error:", err);
+        console.error("WhatsApp share error:", err);
         if (err.name !== 'AbortError') {
-          printOrSaveCurrentA4();
+          alert("⚠️ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം: " + err.message);
         }
       } finally {
         if (btn) btn.innerText = '💬 WhatsApp';
@@ -4751,77 +4705,82 @@
     }
 
     function previewReportsA4() {
-      const sales = document.getElementById('repSales').innerText;
-      const exp = document.getElementById('repExp').innerText;
-      const profit = document.getElementById('repProfit').innerText;
-      const rent = document.getElementById('repTotalRent').innerText;
-      const sal = document.getElementById('repTotalSalary').innerText;
-      const stock = document.getElementById('repStockSum').innerText;
-      const misc = document.getElementById('repMiscSum').innerText;
+      try {
+        const sales = document.getElementById('repSales').innerText;
+        const exp = document.getElementById('repExp').innerText;
+        const profit = document.getElementById('repProfit').innerText;
+        const rent = document.getElementById('repTotalRent').innerText;
+        const sal = document.getElementById('repTotalSalary').innerText;
+        const stock = document.getElementById('repStockSum').innerText;
+        const misc = document.getElementById('repMiscSum').innerText;
 
-      const html = `
-        <div class="a4-header">
-          <div>
-            <h1>BANABLAST</h1>
-            <p>FINANCIAL STATEMENTS & REPORT</p>
+        const html = `
+          <div class="a4-header">
+            <div>
+              <h1>BANABLAST</h1>
+              <p>FINANCIAL STATEMENTS & REPORT</p>
+            </div>
+            <div class="a4-meta-box">
+              <span>PERIOD</span>
+              <strong>${currentReportFilter.toUpperCase()}</strong>
+            </div>
           </div>
-          <div class="a4-meta-box">
-            <span>PERIOD</span>
-            <strong>${currentReportFilter.toUpperCase()}</strong>
-          </div>
-        </div>
 
-        <div class="a4-card-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="a4-card green">
-            <h5>Total Sales</h5>
-            <p style="color:#16a34a; font-size:1.2rem;">${sales}</p>
+          <div class="a4-card-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="a4-card green">
+              <h5>Total Sales</h5>
+              <p style="color:#16a34a; font-size:1.2rem;">${sales}</p>
+            </div>
+            <div class="a4-card red">
+              <h5>Total Expense</h5>
+              <p style="color:#dc2626; font-size:1.2rem;">${exp}</p>
+            </div>
+            <div class="a4-card blue">
+              <h5>Net Profit</h5>
+              <p style="color:#1e3a8a; font-size:1.2rem;">${profit}</p>
+            </div>
           </div>
-          <div class="a4-card red">
-            <h5>Total Expense</h5>
-            <p style="color:#dc2626; font-size:1.2rem;">${exp}</p>
-          </div>
-          <div class="a4-card blue">
-            <h5>Net Profit</h5>
-            <p style="color:#1e3a8a; font-size:1.2rem;">${profit}</p>
-          </div>
-        </div>
 
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>🏠 Rent Payments (വാടക ചിലവുകൾ)</span>
-            <span style="color:#dc2626;">${rent}</span>
+          <div class="a4-section-box">
+            <div class="a4-section-title">
+              <span>🏠 Rent Payments (വാടക ചിലവുകൾ)</span>
+              <span style="color:#dc2626;">${rent}</span>
+            </div>
+            <div class="a4-row"><span>Monthly Target Rent:</span><strong>₹${monthlyRentTarget}</strong></div>
+            <div class="a4-row"><span>Total Paid This Period:</span><strong>${rent}</strong></div>
           </div>
-          <div class="a4-row"><span>Monthly Target Rent:</span><strong>₹${monthlyRentTarget}</strong></div>
-          <div class="a4-row"><span>Total Paid This Period:</span><strong>${rent}</strong></div>
-        </div>
 
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>👥 Staff Salaries (സ്റ്റാഫ് ശമ്പളം)</span>
-            <span style="color:#dc2626;">${sal}</span>
+          <div class="a4-section-box">
+            <div class="a4-section-title">
+              <span>👥 Staff Salaries (സ്റ്റാഫ് ശമ്പളം)</span>
+              <span style="color:#dc2626;">${sal}</span>
+            </div>
+            <div class="a4-row"><span>Total Wages Paid:</span><strong>${sal}</strong></div>
           </div>
-          <div class="a4-row"><span>Total Wages Paid:</span><strong>${sal}</strong></div>
-        </div>
 
-        <div class="a4-section-box">
-          <div class="a4-section-title">
-            <span>📦 Other Purchases & Miscellaneous</span>
+          <div class="a4-section-box">
+            <div class="a4-section-title">
+              <span>📦 Other Purchases & Miscellaneous</span>
+            </div>
+            <div class="a4-row"><span>Stock Purchases Total:</span><strong>${stock}</strong></div>
+            <div class="a4-row"><span>Daily Miscellaneous:</span><strong>${misc}</strong></div>
           </div>
-          <div class="a4-row"><span>Stock Purchases Total:</span><strong>${stock}</strong></div>
-          <div class="a4-row"><span>Daily Miscellaneous:</span><strong>${misc}</strong></div>
-        </div>
 
-        <div class="a4-footer">
-          <div>BANABLAST Business Analytics • Auto Verified</div>
-          <div class="a4-sign-grid">
-            <div class="a4-sign-col">ASHIF</div>
-            <div class="a4-sign-col">SABITH</div>
-            <div class="a4-sign-col">ASHKAR ALI</div>
+          <div class="a4-footer">
+            <div>BANABLAST Business Analytics • Auto Verified</div>
+            <div class="a4-sign-grid">
+              <div class="a4-sign-col">ASHIF</div>
+              <div class="a4-sign-col">SABITH</div>
+              <div class="a4-sign-col">ASHKAR ALI</div>
+            </div>
           </div>
-        </div>
-      `;
+        `;
 
-      openA4PreviewModal(html, `Monthly_Report`);
+        openA4PreviewModal(html, `Monthly_Report`);
+      } catch (err) {
+        console.error("Preview error:", err);
+        alert("റിപ്പോർട്ട് പ്രിവ്യൂ ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
+      }
     }
 
     if ('serviceWorker' in navigator) {
