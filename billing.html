@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ml">
 <head>
@@ -39,11 +38,11 @@
     
     body { background: var(--bg); color: var(--primary-dark); padding-bottom: 195px; user-select: none; }
 
-    /* Top Executive Clean Header */
+    /* Top Executive Clean Header (Zero Overflow / Perfect Fit) */
     .pos-header {
       background: var(--primary-dark);
       color: #ffffff;
-      padding: 10px 14px;
+      padding: 10px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -51,89 +50,78 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      width: 100%;
     }
     .pos-brand-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      flex-shrink: 0;
     }
     .pos-brand {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 900;
       letter-spacing: 0.5px;
       color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      white-space: nowrap;
     }
 
-    /* ലൈവ് പ്രിന്റർ സ്റ്റാറ്റസ് പിൽ (ആവശ്യത്തിന് ഗ്യാപ്പും വൃത്തിയുള്ള ലുക്കും) */
-    .printer-status-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 9px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      cursor: pointer;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.16);
-      color: #94a3b8;
-      transition: all 0.2s ease;
-    }
-    .printer-status-pill.online {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: #34d399;
-    }
-    .printer-status-pill.offline {
-      background: rgba(239, 68, 68, 0.12);
-      border-color: rgba(239, 68, 68, 0.35);
-      color: #f87171;
-    }
-
-    .printer-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      transition: all 0.2s ease;
-    }
-    .printer-dot.online { background: #10b981; box-shadow: 0 0 8px #10b981; }
-    .printer-dot.offline { background: #ef4444; }
-    .printer-dot.connecting { background: #f59e0b; animation: pulseDot 1s infinite; }
-    @keyframes pulseDot { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-
-    /* ഹെഡർ ആക്ഷൻ ബട്ടണുകൾ (യൂണിഫോം പ്രീമിയം ഡാർക്ക് സ്ലേറ്റ് ഡിസൈൻ) */
+    /* ഹെഡർ ആക്ഷൻ ബട്ടണുകൾ (യൂണിഫോം പ്രീമിയം ഡിസൈൻ) */
     .header-quick-btns {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
-    .btn-hdr-action {
-      height: 34px;
-      padding: 0 11px;
-      border-radius: 9px;
-      font-size: 0.76rem;
+    /* സ്മാർട്ട് കണക്റ്റ് ബട്ടൺ (സ്റ്റാറ്റസും ബട്ടണും ഒരുമിച്ച്) */
+    .btn-smart-connect {
+      height: 32px;
+      padding: 0 9px;
+      border-radius: 8px;
+      font-size: 0.74rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 5px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f87171;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-smart-connect.online {
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .btn-smart-connect.connecting {
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .btn-hdr-action {
+      height: 32px;
+      padding: 0 9px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
       color: #ffffff;
       background: #1e293b;
       border: 1px solid #334155;
-      transition: all 0.15s ease;
+      white-space: nowrap;
     }
     .btn-hdr-action:active { background: #334155; transform: scale(0.96); }
 
     .btn-hdr-more {
-      height: 34px;
-      width: 34px;
-      border-radius: 9px;
-      font-size: 1.25rem;
+      height: 32px;
+      width: 32px;
+      border-radius: 8px;
+      font-size: 1.2rem;
       font-weight: 900;
       cursor: pointer;
       display: flex;
@@ -142,15 +130,13 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #ffffff;
-      transition: all 0.15s ease;
     }
-    .btn-hdr-more:active { background: #334155; }
 
     .header-dropdown {
       display: none;
       position: absolute;
-      right: 14px;
-      top: 50px;
+      right: 12px;
+      top: 48px;
       background: #1e293b;
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 14px;
@@ -216,7 +202,7 @@
     /* Sticky Quick-Jump Sub-Category Chips */
     .subcat-sticky-bar {
       position: sticky;
-      top: 54px;
+      top: 52px;
       z-index: 90;
       background: rgba(238, 242, 246, 0.95);
       backdrop-filter: blur(8px);
@@ -686,23 +672,19 @@
 </head>
 <body>
 
-  <!-- ================= TOP EXECUTIVE CLEAN HEADER ================= -->
+  <!-- ================= TOP EXECUTIVE COMPACT HEADER ================= -->
   <header class="pos-header">
     <div class="pos-brand-group">
       <div class="pos-brand">
         <span>🥤 BANABLAST</span>
       </div>
-      <!-- പ്രിന്റർ സ്റ്റാറ്റസ് പിൽ (വ്യക്തമായ അകലത്തോടെ) -->
-      <div id="btStatusPill" class="printer-status-pill offline" onclick="connectBluetoothPrinterUniversal()" title="പ്രിന്റർ ബന്ധിപ്പിക്കുക">
-        <span id="btStatusIndicator" class="printer-dot offline"></span>
-        <span id="btStatusText">Offline</span>
-      </div>
     </div>
 
-    <!-- 1-TAP MATCHING QUICK ACTION BUTTONS -->
+    <!-- 1-TAP UNIFORM COMPACT ACTION BUTTONS -->
     <div class="header-quick-btns">
-      <button type="button" class="btn-hdr-action" onclick="connectBluetoothPrinterUniversal()" title="പ്രിന്റർ ബന്ധിപ്പിക്കുക">
-        <span>🔌</span> Connect
+      <!-- 1 സ്മാർട്ട് ബട്ടൺ: സ്റ്റാറ്റസും കണക്റ്റും ഒരുമിച്ച് (Zero Overflow) -->
+      <button type="button" id="btnSmartBT" class="btn-smart-connect" onclick="connectBluetoothPrinterUniversal()" title="പ്രിന്റർ ബന്ധിപ്പിക്കുക">
+        <span id="btDotIcon">🔴</span> <span id="btTextLabel">Connect</span>
       </button>
 
       <button type="button" class="btn-hdr-action" onclick="openPartnerPinPromptModal()" title="മെയിൻ ആപ്പിലേക്ക് മടങ്ങുക">
@@ -835,7 +817,7 @@
     </div>
   </div>
 
-  <!-- 3. BILL RECEIPT DETAILS MODAL (LAYERED CLEANLY ON TOP WITH Z-INDEX 1200) -->
+  <!-- 3. BILL RECEIPT DETAILS MODAL (LAYERED WITH Z-INDEX 1200) -->
   <div class="modal" id="billReceiptModal" style="z-index: 1200;">
     <div class="modal-box">
       <div class="modal-header">
@@ -877,7 +859,7 @@
     </div>
   </div>
 
-  <!-- 5. BLUETOOTH PRINTER DEVICE SELECTOR MODAL -->
+  <!-- 5. BLUETOOTH PRINTER DEVICE SELECTOR MODAL (Z-INDEX 1300) -->
   <div class="modal" id="printerSelectModal" style="z-index: 1300;">
     <div class="modal-box">
       <div class="modal-header">
@@ -1035,7 +1017,7 @@
     <div class="r-center">Visit Again!</div>
   </div>
 
-  <!-- WHATSAPP PDF INVOICE CARD (GENUINE RENDER BOX) -->
+  <!-- WHATSAPP PDF INVOICE CARD -->
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
@@ -1339,7 +1321,7 @@
        ============================================================= */
     function getNextSequentialBillNo() {
       let lastStored = parseInt(localStorage.getItem('BANABLAST_LAST_BILL_NUM') || '0', 10);
-      if (lastStored > 3000) lastStored = 0; // Clear legacy timestamps
+      if (lastStored > 3000) lastStored = 0;
 
       if (todayBills && todayBills.length > 0) {
         todayBills.forEach(b => {
@@ -1411,26 +1393,34 @@
     }
 
     /* =============================================================
-       UNIVERSAL BLUETOOTH THERMAL PRINTER ENGINE & DEVICE SELECTOR
+       UNIVERSAL BLUETOOTH THERMAL PRINTER (WITH PERMISSION HANDLING)
        ============================================================= */
     document.addEventListener('deviceready', () => {
       initBluetoothAutoConnect();
     }, false);
 
     function updateBTStatusUI(status, label) {
-      const pill = document.getElementById('btStatusPill');
-      const dot = document.getElementById('btStatusIndicator');
-      const txt = document.getElementById('btStatusText');
-      if (!pill || !dot || !txt) return;
+      const btn = document.getElementById('btnSmartBT');
+      const dot = document.getElementById('btDotIcon');
+      const txt = document.getElementById('btTextLabel');
+      if (!btn || !dot || !txt) return;
 
-      pill.className = 'printer-status-pill ' + status;
-      dot.className = 'printer-dot ' + status;
-      txt.innerText = label || (status === 'online' ? 'Online' : (status === 'connecting' ? 'Connecting...' : 'Offline'));
+      btn.className = 'btn-smart-connect ' + status;
+      if (status === 'online') {
+        dot.innerText = '🟢';
+        txt.innerText = label || 'Ready';
+      } else if (status === 'connecting') {
+        dot.innerText = '🟡';
+        txt.innerText = label || 'Connecting...';
+      } else {
+        dot.innerText = '🔴';
+        txt.innerText = label || 'Connect';
+      }
     }
 
     function initBluetoothAutoConnect() {
       if (typeof bluetoothSerial === 'undefined') {
-        updateBTStatusUI('offline', 'Offline');
+        updateBTStatusUI('offline', 'Connect');
         return;
       }
 
@@ -1447,23 +1437,23 @@
             bluetoothSerial.connect(target.address, () => {
               connectedThermalPrinter = target;
               localStorage.setItem('BANABLAST_BT_MAC', target.address);
-              updateBTStatusUI('online', 'Online');
+              updateBTStatusUI('online', 'Ready');
             }, () => {
               connectedThermalPrinter = null;
-              updateBTStatusUI('offline', 'Offline');
+              updateBTStatusUI('offline', 'Connect');
             });
           }
         });
       }, () => {
-        updateBTStatusUI('offline', 'BT Off');
+        updateBTStatusUI('offline', 'Connect');
       });
     }
 
     function connectBluetoothPrinterUniversal() {
       playTickSound();
       if (typeof bluetoothSerial === 'undefined') {
-        alert("⚠️️ BluetoothSerial plugin ലഭ്യമല്ല (Browser Mode). സാധാരണ പ്രിന്റ് കമാൻഡ് വഴി പ്രിന്റർ തിരഞ്ഞെടുക്കാവുന്നതാണ്.");
-        updateBTStatusUI('offline', 'Offline');
+        alert("⚠️ BluetoothSerial plugin ലഭ്യമല്ല (Browser Mode). സാധാരണ പ്രിന്റ് കമാൻഡ് വഴി പ്രിന്റർ തിരഞ്ഞെടുക്കാവുന്നതാണ്.");
+        updateBTStatusUI('offline', 'Connect');
         return;
       }
 
@@ -1475,7 +1465,7 @@
         }, () => {
           playWarningSound();
           alert("ദയവായി ഫോണിലെ ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക!");
-          updateBTStatusUI('offline', 'BT Off');
+          updateBTStatusUI('offline', 'Connect');
         });
       });
     }
@@ -1503,8 +1493,13 @@
 
         openModalWithHistory('printerSelectModal');
       }, (err) => {
-        updateBTStatusUI('offline', 'Error');
-        alert("ഡിവൈസുകൾ സ്കാൻ ചെയ്യുന്നതിൽ തടസ്സം: " + err);
+        updateBTStatusUI('offline', 'Connect');
+        const errStr = String(err || '');
+        if (errStr.includes('BLUETOOTH_CONNECT') || errStr.includes('permission')) {
+          alert("⚠️ ഫോണിൽ ബ്ലൂടൂത്ത് അനുമതി (Nearby Devices Permission) ആവശ്യമാണ്!\n\nദയവായി ഫോൺ Settings ➔ Apps ➔ BANABLAST ➔ Permissions ➔ 'Nearby devices' (സമീപ ഉപകരണങ്ങൾ) എന്നത് Allow (അനുവദിക്കുക) നൽകുക.");
+        } else {
+          alert("ഡിവൈസുകൾ സ്കാൻ ചെയ്യുന്നതിൽ തടസ്സം: " + errStr);
+        }
       });
     }
 
@@ -1516,12 +1511,12 @@
       bluetoothSerial.connect(address, () => {
         connectedThermalPrinter = { address, name };
         localStorage.setItem('BANABLAST_BT_MAC', address);
-        updateBTStatusUI('online', 'Online');
+        updateBTStatusUI('online', 'Ready');
         playSuccessSound();
         alert(`✅ പ്രിന്ററുമായി ബന്ധിപ്പിച്ചു: ${name}`);
       }, (err) => {
         connectedThermalPrinter = null;
-        updateBTStatusUI('offline', 'Offline');
+        updateBTStatusUI('offline', 'Connect');
         playWarningSound();
         alert(`❌ പ്രിന്ററുമായി കണക്റ്റ് ചെയ്യാൻ കഴിഞ്ഞില്ല (${name}). പ്രിന്റർ ഓൺ ആണെന്ന് ഉറപ്പാക്കുക.`);
       });
@@ -1835,7 +1830,7 @@
         return;
       }
 
-      if (isPrintingBill) return; // INSTANT DOUBLE-PRINT LOCK
+      if (isPrintingBill) return;
 
       isPrintingBill = true;
       const btnPrint = document.getElementById('btnMainPrintAction');
@@ -1997,7 +1992,7 @@
     }
 
     /* -------------------------------------------------------------
-       WHATSAPP BILL - GENUINE PDF ATTACHMENT SHARING (ZERO TEXT BUG)
+       WHATSAPP BILL - NATIVE APP LAUNCH & PDF RENDER
        ------------------------------------------------------------- */
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
@@ -2064,7 +2059,18 @@
         const fileName = `BANABLAST_Bill_${billNo}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-        // IMPORTANT: Omit 'text' to prevent WhatsApp from converting it into a plain text message!
+        // Cordova / Native Social Sharing Plugin
+        if (window.plugins && window.plugins.socialsharing) {
+          window.plugins.socialsharing.share(
+            `🥤 BANABLAST Bill #${billNo} (₹${total})`,
+            `BANABLAST Bill #${billNo}`,
+            pdf.output('datauristring'),
+            null
+          );
+          return;
+        }
+
+        // Standard Web Share API
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           try {
             await navigator.share({
@@ -2072,14 +2078,13 @@
               title: `BANABLAST Bill #${billNo}`
             });
             return;
-          } catch(e) {
-            console.warn("Share was aborted or not supported", e);
-          }
+          } catch(e) {}
         }
 
-        // Direct Download Fallback
+        // Direct Download & Auto-Open WhatsApp
         pdf.save(fileName);
-        alert(`✅ PDF ബില്ല് ഫോണിലേക്ക് സേവ് ചെയ്തിട്ടുണ്ട് (${fileName}). വാട്സാപ്പിൽ അറ്റാച്ച് ചെയ്ത് അയക്കാവുന്നതാണ്.`);
+        const waMsg = encodeURIComponent(`🥤 *BANABLAST BILL #${billNo}*\n📅 ${date} ${time}\n💵 Total: ₹${total} (${(mode||'CASH').toUpperCase()})\n\n_PDF ബില്ല് ഫോണിലേക്ക് സേവ് ചെയ്തിട്ടുണ്ട്._`);
+        window.open(`whatsapp://send?text=${waMsg}`, '_blank');
       } catch (err) {
         console.error("PDF Share Error:", err);
         playWarningSound();
@@ -2187,7 +2192,7 @@
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
 
-      if (!confirm(`⚠️ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
+      if (!confirm(`⚠️️ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
         return;
       }
 
