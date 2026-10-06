@@ -199,7 +199,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* Sticky Quick-Jump Sub-Category Chips */
+    /* Sticky Quick-Jump Sub-Category Chips (2-Row Grid Layout) */
     .subcat-sticky-bar {
       position: sticky;
       top: 52px;
@@ -209,26 +209,25 @@
       padding: 6px 10px 8px;
       max-width: 1000px;
       margin: 0 auto;
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
     }
-    .subcat-sticky-bar::-webkit-scrollbar { display: none; }
     .subcat-chip {
       background: #ffffff;
       border: 1.5px solid var(--border-color);
       color: var(--slate-800);
-      padding: 5px 12px;
-      border-radius: 20px;
+      padding: 7px 8px;
+      border-radius: 10px;
       font-size: 0.74rem;
       font-weight: 800;
       cursor: pointer;
-      white-space: nowrap;
+      text-align: center;
       box-shadow: var(--shadow-sm);
       transition: all 0.15s ease;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
     }
     .subcat-chip:active { transform: scale(0.95); }
@@ -1214,11 +1213,12 @@
     }
 
     /* =============================================================
-       HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION
+       HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION (LIFO)
        ============================================================= */
     function handleBackNavigation() {
       const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
       if (openModals.length > 0) {
+        // LIFO (Last In First Out) - Close the topmost active modal safely
         openModals[openModals.length - 1].style.display = 'none';
         return true;
       }
@@ -1548,13 +1548,24 @@
       raw += "--------------------------------\n";
 
       items.forEach(i => {
-        let name = (i.name || '');
+        let name = (i.name || '').trim();
         let qty = String(i.qty);
         let amt = "Rs." + (i.price * i.qty);
+        // Word-wrapping logic for thermal printer width (32 chars per line)
         if (name.length <= 15) {
           raw += name.padEnd(16, ' ') + qty.padStart(4, ' ') + amt.padStart(11, ' ') + "\n";
         } else {
-          raw += name + "\n";
+          let words = name.split(' ');
+          let currentLine = '';
+          words.forEach(word => {
+            if ((currentLine + word).length <= 15) {
+              currentLine += (currentLine ? ' ' : '') + word;
+            } else {
+              if (currentLine) raw += currentLine + "\n";
+              currentLine = word;
+            }
+          });
+          if (currentLine) raw += currentLine + "\n";
           raw += " ".repeat(16) + qty.padStart(4, ' ') + amt.padStart(11, ' ') + "\n";
         }
       });
@@ -1618,7 +1629,7 @@
       document.getElementById('tabJuices').className = 'cat-tab-btn ' + (cat === 'juices' ? 'active' : '');
       
       const stickyBar = document.getElementById('subcatStickyBar');
-      stickyBar.style.display = (cat === 'avil_milk') ? 'flex' : 'none';
+      stickyBar.style.display = (cat === 'avil_milk') ? 'grid' : 'none';
       renderMenuItems();
     }
 
@@ -1997,7 +2008,7 @@
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         playWarningSound();
-        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
@@ -2192,7 +2203,7 @@
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
 
-      if (!confirm(`⚠️️ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
+      if (!confirm(`⚠ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
         return;
       }
 
@@ -2377,7 +2388,7 @@
       document.getElementById('newItemImgPreview').style.display = 'none';
       document.getElementById('newItemImgPreview').src = '';
 
-      document.getElementById('itemModalHeading').innerText = '⚙️ Manage Menu Items';
+      document.getElementById('itemModalHeading').innerText = '⚙️️ Manage Menu Items';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '+ Add to Menu';
       btnSave.style.background = 'var(--emerald)';
