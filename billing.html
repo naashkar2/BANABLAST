@@ -1074,6 +1074,14 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // Enable Offline Persistence so app works without internet
+    db.enablePersistence({ synchronizeTabs: true })
+      .catch((err) => {
+        if (err.code == 'unimplemented') {
+          console.warn('The current browser does not support all of the features required to enable persistence');
+        }
+      });
+
     let menuItems = [];
     let todayBills = [];
     let cart = [];
@@ -1590,12 +1598,12 @@
     }
 
     window.onload = function() {
-      db.collection('billing_items').onSnapshot(snap => {
+      db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
         menuItems = [];
         snap.forEach(doc => {
           const data = doc.data();
           let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
           
           let subCat = data.subCategory;
           if (!subCat && fixedCat === 'avil_milk') {
@@ -1607,6 +1615,8 @@
 
         renderMenuItems();
         renderModalItems();
+      }, (error) => {
+        console.log("Using offline cache for menu items:", error);
       });
 
       db.collection('settings').doc('security').onSnapshot(doc => {
@@ -1838,7 +1848,7 @@
         playWarningSound();
         const pBox = document.getElementById('paymentModeContainer');
         pBox.classList.add('shake-alert');
-        alert("⚠️ ദയവായി CASH അല്ലെങ്കിൽ GPAY തിരഞ്ഞെടുക്കുക!");
+        alert("⚠️️ ദയവായി CASH അല്ലെങ്കിൽ GPAY തിരഞ്ഞെടുക്കുക!");
         return;
       }
 
