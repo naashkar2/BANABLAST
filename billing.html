@@ -800,7 +800,7 @@
   <div class="modal" id="parcelChargeModal">
     <div class="modal-box" style="text-align:center;">
       <div class="modal-header">
-        <div class="modal-title">🥡 Parcel Charge (പാഴ്‌‌സൽ തുക)</div>
+        <div class="modal-title">🥡 Parcel Charge (പാഴ്‌സൽ തുക)</div>
         <button type="button" class="btn-close" onclick="closeModal('parcelChargeModal')">✕</button>
       </div>
       <div class="form-group" style="margin:12px 0;">
@@ -877,7 +877,7 @@
   <div class="modal" id="itemsModal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title" id="itemModalHeading">⚙️ Manage Menu Items</div>
+        <div class="modal-title" id="itemModalHeading">⚙️️ Manage Menu Items</div>
         <button class="btn-close" onclick="closeModal('itemsModal')">✕</button>
       </div>
 
@@ -1548,8 +1548,8 @@
       raw += CENTER + "Nellippuzha, Mannarkkad\n";
       raw += CENTER + "Mob: +91 9037010883\n";
       raw += CENTER + "--------------------------------\n";
-      raw += CENTER + `Date: ${date}  Time: ${time}\n`;
-      raw += CENTER + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
+      raw += LEFT + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
+      raw += LEFT + `Date: ${date}  Time: ${time}\n`;
       raw += CENTER + "--------------------------------\n";
       raw += LEFT + "ITEM                QTY     AMT\n";
       raw += LEFT + "--------------------------------\n";
@@ -1557,20 +1557,20 @@
       items.forEach(i => {
         let fullName = (i.name || '').trim();
         let qty = String(i.qty);
-        let amt = "Rs." + (i.price * i.qty);
+        let amt = String(i.price * i.qty); // Removed 'Rs.'
         let name = fullName.length > 20 ? fullName.substring(0, 20) : fullName;
         raw += name.padEnd(20, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
       });
 
       if (pCharge > 0) {
         let pName = "Parcel Charge".padEnd(20, ' ');
-        let pQty = "1".padStart(4, ' ');
-        let pAmt = ("Rs." + pCharge).padStart(8, ' ');
+        let pQty = "".padStart(4, ' '); // No quantity for parcel
+        let pAmt = String(pCharge).padStart(8, ' '); // Removed 'Rs.'
         raw += pName + pQty + pAmt + "\n";
       }
 
       raw += LEFT + "--------------------------------\n";
-      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
+      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF; // Rs. kept in Total
       raw += LEFT + `PAYMENT: ${(mode || 'cash').toUpperCase()}\n`;
       raw += LEFT + "--------------------------------\n";
       raw += CENTER + "*** THANK YOU ***\n";
@@ -1937,7 +1937,7 @@
         let name = (i.name || '').trim();
         let displayName = name.length > 20 ? name.substring(0, 20) : name;
         let qty = String(i.qty);
-        let amt = "Rs." + (i.price * i.qty);
+        let amt = String(i.price * i.qty);
         return `<div class="r-row" style="font-family:monospace; white-space:pre;">${displayName.padEnd(20, ' ')}${qty.padStart(4, ' ')}${amt.padStart(8, ' ')}</div>`;
       }).join('');
 
