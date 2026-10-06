@@ -800,7 +800,7 @@
   <div class="modal" id="parcelChargeModal">
     <div class="modal-box" style="text-align:center;">
       <div class="modal-header">
-        <div class="modal-title">🥡 Parcel Charge (പാഴ്‌സൽ തുക)</div>
+        <div class="modal-title">🥡 Parcel Charge (പാഴ്‌‌സൽ തുക)</div>
         <button type="button" class="btn-close" onclick="closeModal('parcelChargeModal')">✕</button>
       </div>
       <div class="form-group" style="margin:12px 0;">
@@ -1547,15 +1547,13 @@
       raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
       raw += CENTER + "Nellippuzha, Mannarkkad\n";
       raw += CENTER + "Mob: +91 9037010883\n";
-      raw += "--------------------------------\n";
-      raw += CENTER + `${date} ${time}\n`;
+      raw += CENTER + "--------------------------------\n";
+      raw += CENTER + `Date: ${date}  Time: ${time}\n`;
       raw += CENTER + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
-      if (pCharge > 0) {
-        raw += CENTER + BOLD_ON + "*** PARCEL ***\n" + BOLD_OFF;
-      }
-      raw += "--------------------------------\n";
-      raw += LEFT + "ITEM QTY AMT\n";
-      raw += "--------------------------------\n";
+      raw += CENTER + "--------------------------------\n";
+      raw += LEFT + "ITEM                QTY     AMT\n";
+      raw += LEFT + "--------------------------------\n";
+
       items.forEach(i => {
         let fullName = (i.name || '').trim();
         let qty = String(i.qty);
@@ -1564,13 +1562,17 @@
         raw += name.padEnd(20, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
       });
 
-      raw += "--------------------------------\n";
       if (pCharge > 0) {
-        raw += LEFT + "Parcel Charge:".padEnd(20, ' ') + ("Rs." + pCharge).padStart(11, ' ') + "\n";
+        let pName = "Parcel Charge".padEnd(20, ' ');
+        let pQty = "1".padStart(4, ' ');
+        let pAmt = ("Rs." + pCharge).padStart(8, ' ');
+        raw += pName + pQty + pAmt + "\n";
       }
+
+      raw += LEFT + "--------------------------------\n";
       raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
       raw += LEFT + `PAYMENT: ${(mode || 'cash').toUpperCase()}\n`;
-      raw += "--------------------------------\n";
+      raw += LEFT + "--------------------------------\n";
       raw += CENTER + "*** THANK YOU ***\n";
       raw += CENTER + "Visit Again!\n";
       raw += FEED;
@@ -2004,7 +2006,7 @@
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         playWarningSound();
-        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
