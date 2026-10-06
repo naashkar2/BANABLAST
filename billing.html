@@ -1213,12 +1213,13 @@
     }
 
     /* =============================================================
-       HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION (LIFO)
+       HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION (LIFO & EXIT FIX)
        ============================================================= */
     function handleBackNavigation() {
-      const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
+      const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => {
+        return m.style.display === 'flex' || window.getComputedStyle(m).display === 'flex';
+      });
       if (openModals.length > 0) {
-        // LIFO (Last In First Out) - Close the topmost active modal safely
         openModals[openModals.length - 1].style.display = 'none';
         return true;
       }
@@ -1234,8 +1235,9 @@
       window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
         const handled = handleBackNavigation();
         if (!handled) {
-          if (canGoBack) window.history.back();
-          else window.Capacitor.Plugins.App.exitApp();
+          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+            window.Capacitor.Plugins.App.exitApp();
+          }
         }
       });
     }
@@ -1551,7 +1553,6 @@
         let name = (i.name || '').trim();
         let qty = String(i.qty);
         let amt = "Rs." + (i.price * i.qty);
-        // Word-wrapping logic for thermal printer width (32 chars per line)
         if (name.length <= 15) {
           raw += name.padEnd(16, ' ') + qty.padStart(4, ' ') + amt.padStart(11, ' ') + "\n";
         } else {
@@ -2008,7 +2009,7 @@
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         playWarningSound();
-        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
@@ -2054,9 +2055,12 @@
       `).join('');
 
       const card = document.getElementById('pdfInvoiceCard');
+      card.style.left = '0px';
+      card.style.zIndex = '99999';
 
       try {
-        const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const canvas = await html2canvas(card, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', scrollY: -window.scrollY });
+        card.style.left = '-9999px';
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
         const { jsPDF } = window.jspdf;
@@ -2070,7 +2074,6 @@
         const fileName = `BANABLAST_Bill_${billNo}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-        // Cordova / Native Social Sharing Plugin
         if (window.plugins && window.plugins.socialsharing) {
           window.plugins.socialsharing.share(
             `🥤 BANABLAST Bill #${billNo} (₹${total})`,
@@ -2081,25 +2084,37 @@
           return;
         }
 
-        // Standard Web Share API
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           try {
             await navigator.share({
               files: [pdfFile],
-              title: `BANABLAST Bill #${billNo}`
+              title: `BANABLAST Bill #${billNo}`,
+              text: `🥤 BANABLAST Bill #${billNo} - ₹${total}`
             });
             return;
           } catch(e) {}
         }
 
-        // Direct Download & Auto-Open WhatsApp
         pdf.save(fileName);
-        const waMsg = encodeURIComponent(`🥤 *BANABLAST BILL #${billNo}*\n📅 ${date} ${time}\n💵 Total: ₹${total} (${(mode||'CASH').toUpperCase()})\n\n_PDF ബില്ല് ഫോണിലേക്ക് സേവ് ചെയ്തിട്ടുണ്ട്._`);
-        window.open(`whatsapp://send?text=${waMsg}`, '_blank');
+        alert(`✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു!`);
       } catch (err) {
-        console.error("PDF Share Error:", err);
-        playWarningSound();
+        console.error("PDF Render Error:", err);
+        card.style.left = '-9999px';
         alert("❌ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം: " + err.message);
+      }
+    }
+
+    function sharePdfViaWhatsApp(pdfDataUri, billNo, total) {
+      if (window.plugins && window.plugins.socialsharing) {
+        window.plugins.socialsharing.shareViaWhatsApp(
+          `🥤 BANABLAST Bill #${billNo} (Total: ₹${total})`,
+          pdfDataUri,
+          null,
+          () => {},
+          (err) => { alert("WhatsApp Share Error: " + err); }
+        );
+      } else {
+        alert("WhatsApp direct sharing plugin not available on browser.");
       }
     }
 
@@ -2388,7 +2403,7 @@
       document.getElementById('newItemImgPreview').style.display = 'none';
       document.getElementById('newItemImgPreview').src = '';
 
-      document.getElementById('itemModalHeading').innerText = '⚙️️ Manage Menu Items';
+      document.getElementById('itemModalHeading').innerText = '⚙ Manage Menu Items';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '+ Add to Menu';
       btnSave.style.background = 'var(--emerald)';
