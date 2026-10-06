@@ -1549,14 +1549,18 @@
       raw += CENTER + "Mob:+919037010883\n";
       raw += CENTER + "--------------------------------\n";
       
-      let billPart = `BILL NO:${billNo}`;
-      let dateTimePart = `${date} ${time}`;
-      let headerSpaceCount = 32 - (billPart.length + dateTimePart.length);
-      if (headerSpaceCount < 1) headerSpaceCount = 1;
-      raw += LEFT + BOLD_ON + billPart + " ".repeat(headerSpaceCount) + dateTimePart + "\n" + BOLD_OFF;
+      // Line 1: Bill No on Left
+      raw += LEFT + BOLD_ON + `BILL NO:${billNo}\n` + BOLD_OFF;
+      
+      // Line 2: Time on Left, Date on Right
+      let timePart = `${time}`;
+      let datePart = `${date}`;
+      let spaceCount = 32 - (timePart.length + datePart.length);
+      if (spaceCount < 1) spaceCount = 1;
+      raw += LEFT + timePart + " ".repeat(spaceCount) + datePart + "\n";
       
       raw += CENTER + "--------------------------------\n";
-      raw += LEFT + "ITEM              QTY   AMT\n";
+      raw += LEFT + "ITEM                QTY     AMT\n";
       raw += LEFT + "--------------------------------\n";
 
       items.forEach(i => {
@@ -1565,14 +1569,14 @@
         let amt = String(i.price * i.qty);
         let name = fullName.length > 18 ? fullName.substring(0, 18) : fullName;
         
-        // Exact 28-width alignment: Item(18) + Qty(4) + Amt(6) = 28 chars
-        raw += name.padEnd(18, ' ') + qty.padStart(4, ' ') + amt.padStart(6, ' ') + "\n";
+        // Exact 30-width alignment: Item(18) + Qty(4) + Amt(8) = 30 chars
+        raw += name.padEnd(18, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
       });
 
       if (pCharge > 0) {
         let pName = "Parcel Charge".padEnd(18, ' ');
         let pQty = "".padStart(4, ' ');
-        let pAmt = String(pCharge).padStart(6, ' ');
+        let pAmt = String(pCharge).padStart(8, ' ');
         raw += pName + pQty + pAmt + "\n";
       }
 
@@ -2407,7 +2411,7 @@
       document.getElementById('newItemImgPreview').style.display = 'none';
       document.getElementById('newItemImgPreview').src = '';
 
-      document.getElementById('itemModalHeading').innerText = '⚙️️ Manage Menu Items';
+      document.getElementById('itemModalHeading').innerText = '⚙️ Manage Menu Items';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '+ Add to Menu';
       btnSave.style.background = 'var(--emerald)';
