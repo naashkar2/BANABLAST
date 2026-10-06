@@ -700,7 +700,7 @@
           <span>🔄</span> Update App
         </button>
         <button type="button" class="dropdown-item" onclick="openItemsModal(); closeHeaderMenu();">
-          <span>⚙️</span> Manage Menu
+          <span>⚙️️</span> Manage Menu
         </button>
         <button type="button" class="dropdown-item" onclick="openTodaySummaryModal(); closeHeaderMenu();">
           <span>📊</span> Today's Summary
@@ -987,14 +987,13 @@
     <div class="r-center" style="font-size:18px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
     <div class="r-center" style="font-size:11px; font-weight:bold; margin-top:2px;">Nellippuzha, Mannarkkad</div>
     <div class="r-center" style="font-size:11px; margin-top:1px;">Mob: +91 9037010883</div>
+    <div class="r-line"></div>
     <div class="r-center" id="rBillDate" style="margin-top:4px; font-size:10px;"></div>
     <div class="r-center" id="rBillNo" style="font-weight:bold; font-size:12px;"></div>
     <div class="r-center" id="rParcelTag" style="font-weight:bold; font-size:11px; display:none;">*** PARCEL ***</div>
     <div class="r-line"></div>
     <div class="r-row" style="font-weight:bold;">
-      <span>ITEM</span>
-      <span>QTY</span>
-      <span>AMT</span>
+      <span>ITEM QTY AMT</span>
     </div>
     <div class="r-line"></div>
     <div id="rItemsList"></div>
@@ -1548,35 +1547,21 @@
       raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
       raw += CENTER + "Nellippuzha, Mannarkkad\n";
       raw += CENTER + "Mob: +91 9037010883\n";
-      raw += CENTER + `${date}  ${time}\n`;
+      raw += "--------------------------------\n";
+      raw += CENTER + `${date} ${time}\n`;
       raw += CENTER + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
       if (pCharge > 0) {
         raw += CENTER + BOLD_ON + "*** PARCEL ***\n" + BOLD_OFF;
       }
       raw += "--------------------------------\n";
-      raw += LEFT + "ITEM             QTY         AMT\n";
+      raw += LEFT + "ITEM QTY AMT\n";
       raw += "--------------------------------\n";
-
       items.forEach(i => {
-        let name = (i.name || '').trim();
+        let fullName = (i.name || '').trim();
         let qty = String(i.qty);
         let amt = "Rs." + (i.price * i.qty);
-        if (name.length <= 15) {
-          raw += name.padEnd(16, ' ') + qty.padStart(4, ' ') + amt.padStart(11, ' ') + "\n";
-        } else {
-          let words = name.split(' ');
-          let currentLine = '';
-          words.forEach(word => {
-            if ((currentLine + word).length <= 15) {
-              currentLine += (currentLine ? ' ' : '') + word;
-            } else {
-              if (currentLine) raw += currentLine + "\n";
-              currentLine = word;
-            }
-          });
-          if (currentLine) raw += currentLine + "\n";
-          raw += " ".repeat(16) + qty.padStart(4, ' ') + amt.padStart(11, ' ') + "\n";
-        }
+        let name = fullName.length > 20 ? fullName.substring(0, 20) : fullName;
+        raw += name.padEnd(20, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
       });
 
       raw += "--------------------------------\n";
@@ -1603,7 +1588,7 @@
         snap.forEach(doc => {
           const data = doc.data();
           let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
           
           let subCat = data.subCategory;
           if (!subCat && fixedCat === 'avil_milk') {
@@ -1848,7 +1833,7 @@
         playWarningSound();
         const pBox = document.getElementById('paymentModeContainer');
         pBox.classList.add('shake-alert');
-        alert("⚠️️ ദയവായി CASH അല്ലെങ്കിൽ GPAY തിരഞ്ഞെടുക്കുക!");
+        alert("⚠ ദയവായി CASH അല്ലെങ്കിൽ GPAY തിരഞ്ഞെടുക്കുക!");
         return;
       }
 
@@ -1946,13 +1931,13 @@
         pRow.style.display = 'none';
       }
 
-      document.getElementById('rItemsList').innerHTML = items.map(i => `
-        <div class="r-row">
-          <span>${i.name.substring(0, 15)}</span>
-          <span>${i.qty}</span>
-          <span>₹${i.price * i.qty}</span>
-        </div>
-      `).join('');
+      document.getElementById('rItemsList').innerHTML = items.map(i => {
+        let name = (i.name || '').trim();
+        let displayName = name.length > 20 ? name.substring(0, 20) : name;
+        let qty = String(i.qty);
+        let amt = "Rs." + (i.price * i.qty);
+        return `<div class="r-row" style="font-family:monospace; white-space:pre;">${displayName.padEnd(20, ' ')}${qty.padStart(4, ' ')}${amt.padStart(8, ' ')}</div>`;
+      }).join('');
 
       if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
         sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge);
@@ -2395,7 +2380,7 @@
         document.getElementById('newItemImgPreview').style.display = 'none';
       }
 
-      document.getElementById('itemModalHeading').innerText = '✏️ Edit Menu Item';
+      document.getElementById('itemModalHeading').innerText = '✏️️ Edit Menu Item';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '💾 Update Item';
       btnSave.style.background = 'var(--blue)';
