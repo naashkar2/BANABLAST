@@ -700,7 +700,7 @@
           <span>🔄</span> Update App
         </button>
         <button type="button" class="dropdown-item" onclick="openItemsModal(); closeHeaderMenu();">
-          <span>⚙️️</span> Manage Menu
+          <span>⚙️</span> Manage Menu
         </button>
         <button type="button" class="dropdown-item" onclick="openTodaySummaryModal(); closeHeaderMenu();">
           <span>📊</span> Today's Summary
@@ -1588,7 +1588,7 @@
         snap.forEach(doc => {
           const data = doc.data();
           let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
           
           let subCat = data.subCategory;
           if (!subCat && fixedCat === 'avil_milk') {
@@ -2004,7 +2004,7 @@
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         playWarningSound();
-        alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
+        alert("⚠️️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
 
@@ -2380,7 +2380,7 @@
         document.getElementById('newItemImgPreview').style.display = 'none';
       }
 
-      document.getElementById('itemModalHeading').innerText = '✏️️ Edit Menu Item';
+      document.getElementById('itemModalHeading').innerText = '✏️ Edit Menu Item';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '💾 Update Item';
       btnSave.style.background = 'var(--blue)';
@@ -2398,7 +2398,7 @@
       document.getElementById('newItemImgPreview').style.display = 'none';
       document.getElementById('newItemImgPreview').src = '';
 
-      document.getElementById('itemModalHeading').innerText = '⚙ Manage Menu Items';
+      document.getElementById('itemModalHeading').innerText = '⚙️ Manage Menu Items';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '+ Add to Menu';
       btnSave.style.background = 'var(--emerald)';
