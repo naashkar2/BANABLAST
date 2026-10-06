@@ -1548,9 +1548,9 @@
       raw += CENTER + "Nellippuzha, Mannarkkad\n";
       raw += CENTER + "Mob: +91 9037010883\n";
       raw += CENTER + "--------------------------------\n";
-      // Fixed BILL NO tracking & Date/Time spacing
-      raw += LEFT + BOLD_ON + `BILL NO: ${billNo}\n` + BOLD_OFF;
-      raw += LEFT + `Date: ${date}  Time: ${time}\n`;
+      // Fixed extra spaces in BILL NO, Date, and Time
+      raw += LEFT + BOLD_ON + `BILL NO:${billNo}\n` + BOLD_OFF;
+      raw += LEFT + `Date:${date} Time:${time}\n`;
       raw += CENTER + "--------------------------------\n";
       raw += LEFT + "ITEM              QTY     AMT\n";
       raw += LEFT + "--------------------------------\n";
@@ -1559,14 +1559,14 @@
         let fullName = (i.name || '').trim();
         let qty = String(i.qty);
         let amt = String(i.price * i.qty);
-        let name = fullName.length > 18 ? fullName.substring(0, 18) : fullName;
-        // Adjusted Qty position closer to AMT for perfect alignment
-        raw += name.padEnd(18, ' ') + qty.padStart(4, ' ') + amt.padStart(10, ' ') + "\n";
+        let name = fullName.length > 17 ? fullName.substring(0, 17) : fullName;
+        // Strict 32-width alignment: Item(16) + Qty(6) + Amt(10) = 32 chars
+        raw += name.padEnd(16, ' ') + qty.padStart(6, ' ') + amt.padStart(10, ' ') + "\n";
       });
 
       if (pCharge > 0) {
-        let pName = "Parcel Charge".padEnd(18, ' ');
-        let pQty = "".padStart(4, ' ');
+        let pName = "Parcel Charge".padEnd(16, ' ');
+        let pQty = "".padStart(6, ' ');
         let pAmt = String(pCharge).padStart(10, ' ');
         raw += pName + pQty + pAmt + "\n";
       }
@@ -1829,7 +1829,7 @@
     async function printAndSaveBill() {
       if (!cart.length) {
         playWarningSound();
-        alert("⚠️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല!");
+        alert("⚠️️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല!");
         return;
       }
 
