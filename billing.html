@@ -1545,7 +1545,7 @@
 
       let raw = INIT;
       raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
-      raw += CENTER + "Nellippuzha,Mannarkkad\n";
+      raw += CENTER + "NELLIPPUZHA, MANNARKKAD\n";
       raw += CENTER + "Mob:+919037010883\n";
       raw += CENTER + "--------------------------------\n";
       
@@ -1560,24 +1560,26 @@
       raw += LEFT + datePart + " ".repeat(spaceCount) + timePart + "\n";
       
       raw += CENTER + "--------------------------------\n";
-      raw += LEFT + "ITEM                QTY     AMT\n";
+      raw += LEFT + "NO ITEM           QTY     AMT\n";
       raw += LEFT + "--------------------------------\n";
 
-      items.forEach(i => {
+      items.forEach((i, index) => {
+        let slNo = String(index + 1).padStart(2, ' ') + " ";
         let fullName = (i.name || '').trim();
         let qty = String(i.qty);
         let amt = String(i.price * i.qty);
-        let name = fullName.length > 18 ? fullName.substring(0, 18) : fullName;
+        let name = fullName.length > 15 ? fullName.substring(0, 15) : fullName;
         
-        // Exact 30-width alignment: Item(18) + Qty(4) + Amt(8) = 30 chars
-        raw += name.padEnd(18, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
+        // Alignment: SlNo(3) + Item(15) + Qty(4) + Amt(8) = 30 chars
+        raw += slNo + name.padEnd(15, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
       });
 
       if (pCharge > 0) {
-        let pName = "Parcel Charge".padEnd(18, ' ');
+        let pSlNo = "   ";
+        let pName = "Parcel Charge".padEnd(15, ' ');
         let pQty = "".padStart(4, ' ');
         let pAmt = String(pCharge).padStart(8, ' ');
-        raw += pName + pQty + pAmt + "\n";
+        raw += pSlNo + pName + pQty + pAmt + "\n";
       }
 
       raw += LEFT + "--------------------------------\n";
@@ -2445,7 +2447,7 @@
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" onclick="loadItemToEdit('${it.id}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
-            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️️</button>
+            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
           </div>
         </div>
       `).join('');
