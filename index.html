@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-  <!-- html2canvas & jsPDF Libraries (Zero-Blank Engine) -->
+  <!-- html2canvas & jsPDF Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -47,7 +47,6 @@
       user-select: none;
     }
 
-    /* എക്സിക്യൂട്ടീവ് കോംപാക്റ്റ് ഹെഡർ */
     .app-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
       padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
@@ -81,26 +80,11 @@
       overflow: hidden;
       flex-shrink: 0;
     }
-    .brand-logo { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-    }
-    .brand-logo-fallback { 
-      font-size: 1.1rem; 
-      display: none; 
-    }
+    .brand-logo { width: 100%; height: 100%; object-fit: cover; }
+    .brand-logo-fallback { font-size: 1.1rem; display: none; }
     
-    .brand-text-box { 
-      display: flex; 
-      flex-direction: column; 
-      line-height: 1.1; 
-    }
-    .brand-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .brand-text-box { display: flex; flex-direction: column; line-height: 1.1; }
+    .brand-title-wrap { display: flex; align-items: center; gap: 6px; }
     .brand-title {
       font-size: 1.1rem;
       font-weight: 900;
@@ -118,13 +102,7 @@
       gap: 4px;
     }
 
-    /* 3-DOTS HEADER BUTTON & DROPDOWN */
-    .header-action-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      position: relative;
-    }
+    .header-action-group { display: flex; align-items: center; gap: 6px; position: relative; }
     .btn-header-more {
       width: 34px;
       height: 34px;
@@ -173,7 +151,6 @@
     }
     .dropdown-item:last-child { border-bottom: none; }
 
-    /* കോംപാക്റ്റ് ഡേറ്റ് & ഹോളിഡേ ബാർ */
     .calendar-bar {
       display: flex;
       align-items: center;
@@ -207,11 +184,7 @@
       cursor: pointer; 
       white-space: nowrap; 
     }
-    .holiday-pill-btn.active { 
-      background: var(--accent-red); 
-      color: white; 
-      border-color: #f87171; 
-    }
+    .holiday-pill-btn.active { background: var(--accent-red); color: white; border-color: #f87171; }
 
     .holiday-banner { 
       background: #fee2e2; 
@@ -224,7 +197,6 @@
       display: none; 
     }
 
-    /* സ്ലിം കൗണ്ടർ POS ബാർ */
     .btn-pos-hero {
       width: 100%;
       height: 38px;
@@ -242,27 +214,10 @@
     }
     .btn-pos-hero:active { transform: scale(0.98); }
 
-    .flatpickr-calendar { 
-      border-radius: 16px !important; 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; 
-      border: none !important; 
-    }
-    .flatpickr-day.today {
-      background: #2563eb !important;
-      border-color: #2563eb !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      border-radius: 50% !important;
-    }
-    .flatpickr-day.shop-holiday-day {
-      background: #ef4444 !important;
-      border-color: #ef4444 !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      border-radius: 50% !important;
-    }
+    .flatpickr-calendar { border-radius: 16px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; border: none !important; }
+    .flatpickr-day.today { background: #2563eb !important; border-color: #2563eb !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 50% !important; }
+    .flatpickr-day.shop-holiday-day { background: #ef4444 !important; border-color: #ef4444 !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 50% !important; }
 
-    /* Navigation Tabs */
     .nav-tabs { 
       display: flex; 
       background: white; 
@@ -285,17 +240,12 @@
       color: var(--text-muted); 
       cursor: pointer; 
     }
-    .tab-btn.active { 
-      background: var(--primary); 
-      color: white; 
-      border-color: var(--primary); 
-    }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
     .content-area { padding: 14px; max-width: 600px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Summary Card */
     .summary-card { 
       background: var(--primary-dark); 
       color: white; 
@@ -393,7 +343,6 @@
     .entry-actions { display: flex; gap: 4px; }
     .btn-icon { background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 4px; }
 
-    /* Running Balance Card */
     .running-card { 
       background: #eff6ff; 
       border: 2px solid #bfdbfe; 
@@ -440,7 +389,6 @@
     .stock-amt-box { text-align: right; }
     .stock-due-tag { font-size: 0.75rem; font-weight: 800; color: var(--accent-red); margin-top: 2px; }
 
-    /* Compact POS Bill Cards */
     .pos-bill-compact-card {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -453,7 +401,6 @@
       cursor: pointer;
     }
 
-    /* Reports & Filters */
     .report-filter { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
     .report-filter::-webkit-scrollbar { display: none; }
     .filter-btn { 
@@ -491,7 +438,6 @@
       font-size: 0.85rem; 
     }
 
-    /* Leaderboard Analytics Styling */
     .top-rank-badge {
       display: inline-flex;
       align-items: center;
@@ -539,7 +485,6 @@
     .btn-verify { flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; }
     .btn-verify.done { background: #dcfce7; border-color: #86efac; color: #166534; pointer-events: none; }
 
-    /* 3-Partner Delete Verification UI */
     .delete-approval-box {
       margin-top: 8px;
       padding: 8px 10px;
@@ -567,7 +512,6 @@
       pointer-events: none;
     }
 
-    /* Modals & Safe Touch Close Button */
     .modal { 
       display: none; 
       position: fixed; 
@@ -643,7 +587,6 @@
     .sheet-table th { background: #f8fafc; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; }
     .sheet-total-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 12px; display: flex; justify-content: space-between; font-weight: 800; }
 
-    /* Scan Banner & Items */
     .scan-btn { 
       background: #0284c7; 
       color: white; 
@@ -682,7 +625,6 @@
       border: 1px solid #e2e8f0; 
     }
 
-    /* A4 Preview Modal */
     .a4-preview-modal {
       display: none;
       position: fixed;
@@ -815,7 +757,6 @@
       color: #334155;
     }
 
-    /* Android System Print to PDF Styling */
     @media print {
       body * { visibility: hidden !important; }
       #a4SheetPaper, #a4SheetPaper * { visibility: visible !important; }
@@ -844,7 +785,6 @@
 </head>
 <body>
 
-  <!-- CATEGORY-SPECIFIC SEPARATE DATALISTS -->
   <datalist id="suppliersList"></datalist>
   <datalist id="itemsList"></datalist>
   <datalist id="staffList"></datalist>
@@ -864,7 +804,6 @@
     <option value="Ice Bar">
   </datalist>
 
-  <!-- ================= എക്സിക്യൂട്ടീവ് കോംപാക്റ്റ് ഹെഡർ ================= -->
   <header class="app-header">
     <div class="header-top-row">
       <div class="brand-box">
@@ -881,7 +820,6 @@
         </div>
       </div>
       
-      <!-- 3-DOTS MENU BUTTON & DROPDOWN -->
       <div class="header-action-group">
         <button type="button" class="btn-header-more" onclick="toggleMainHeaderDropdown(event)" aria-label="More Options">
           ⋮
@@ -904,7 +842,6 @@
       </div>
     </div>
 
-    <!-- കോംപാക്റ്റ് ഡേറ്റ് & ഹോളിഡേ ബാർ -->
     <div class="calendar-bar">
       <div class="cal-input-wrap">
         <span>📅</span>
@@ -915,7 +852,6 @@
       </button>
     </div>
 
-    <!-- സ്ലിം കൗണ്ടർ POS ബാർ -->
     <button type="button" class="btn-pos-hero" onclick="window.location.href='billing.html'">
       <span style="display:flex; align-items:center; gap:6px;">
         <span style="font-size:1.1rem;">🛒</span>
@@ -927,7 +863,6 @@
 
   <div id="holidayBanner" class="holiday-banner">🛑 SHOP HOLIDAY / കട അവധിയാണ്</div>
 
-  <!-- നാവിഗേഷൻ ടാബുകൾ -->
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('daily', this)">Daily Accounts</button>
     <button class="tab-btn" onclick="switchTab('pos-analytics', this)">📊 POS Bills & Analytics</button>
@@ -939,10 +874,7 @@
 
   <div class="content-area">
 
-    <!-- TAB 1: DAILY ACCOUNTS -->
     <div id="tab-daily" class="tab-content active">
-      
-      <!-- Top Summary -->
       <div class="summary-card">
         <div class="sum-box">
           <h4>Sales</h4>
@@ -962,7 +894,6 @@
         📊 TODAY'S SALES REPORT (ഇന്നത്തെ കണക്ക്)
       </button>
 
-      <!-- 1. SALES SECTION -->
       <button class="section-header-btn btn-sale-top" onclick="openEntryModal('sale')">
         + ADD SALE IN (വരവ് ചേർക്കുക)
       </button>
@@ -974,7 +905,6 @@
         <div class="entry-list" id="salesEntriesList"></div>
       </div>
 
-      <!-- 2. EXPENSES SECTION -->
       <button class="section-header-btn btn-exp-top" onclick="openEntryModal('expense')">
         - ADD EXPENSE (ചിലവ് ചേർക്കുക)
       </button>
@@ -986,7 +916,6 @@
         <div class="entry-list" id="expenseEntriesList"></div>
       </div>
 
-      <!-- 3. RUNNING BALANCES (CUMULATIVE) -->
       <div class="running-card">
         <div class="running-header">
           <span class="running-title">RUNNING BALANCES (CUMULATIVE)</span>
@@ -1008,10 +937,8 @@
           <strong id="runTotalBal">₹0</strong>
         </div>
       </div>
-
     </div>
 
-    <!-- TAB: POS BILLS & ANALYTICS -->
     <div id="tab-pos-analytics" class="tab-content">
       <h3 style="font-size:1.05rem; margin-bottom:10px; color:var(--primary);">📊 Counter Sales Analytics & Bills</h3>
       
@@ -1051,7 +978,6 @@
         </button>
       </div>
 
-      <!-- ഒതുക്കമുള്ള റീസെന്റ് ബിൽസ് കാർഡുകൾ -->
       <div class="cat-box">
         <div class="cat-title">
           <span>🧾 തിരഞ്ഞെടുത്ത കാലയളവിലെ ബില്ലുകൾ</span>
@@ -1061,7 +987,6 @@
       </div>
     </div>
 
-    <!-- TAB 2: STOCK ITEMS (+ ADD ITEM) -->
     <div id="tab-stock" class="tab-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <h4 style="font-size:0.9rem; font-weight:800; color:#1e293b; margin:0;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h4>
@@ -1087,7 +1012,6 @@
       <div id="stockItemsListContainer"></div>
     </div>
 
-    <!-- TAB 3: SUPPLIER PURCHASES (+ ADD SUPPLIER) -->
     <div id="tab-suppliers" class="tab-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <h4 style="font-size:0.9rem; font-weight:800; color:#1e293b; margin:0;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ</h4>
@@ -1097,7 +1021,6 @@
         </div>
       </div>
 
-      <!-- TOTAL OUTSTANDING DUE BANNER (CLICKABLE FILTER) -->
       <div id="suppTotalDueBanner" class="clickable-row total" style="background: linear-gradient(135deg, #991b1b, #dc2626); color:white; margin-bottom:12px; border-radius:12px; padding:12px 14px; box-shadow: 0 4px 12px rgba(220,38,38,0.25);" onclick="toggleSupplierDuesOnlyFilter()">
         <div>
           <div style="font-size:0.8rem; color:#fecaca; font-weight:800;">⚠️ മൊത്തം സപ്ലയർ കുടിശ്ശിക (TOTAL OUTSTANDING DUE)</div>
@@ -1122,7 +1045,6 @@
       <div id="supplierPurchasesListContainer"></div>
     </div>
 
-    <!-- TAB 4: REPORTS (WITH CLEAN SMART LEDGER CARDS) -->
     <div id="tab-reports" class="tab-content">
       <div class="report-filter">
         <button class="filter-btn active" id="btnFiltMonth" onclick="filterReport('month')">This Month</button>
@@ -1148,7 +1070,6 @@
         <div class="sum-box"><h4>Net Profit</h4><p id="repProfit" class="color-blue">₹0</p></div>
       </div>
 
-      <!-- 1. RENT CARD (CLEAN & CLICKABLE) -->
       <div class="cat-box" style="cursor:pointer;" onclick="openRentDetailsModal()">
         <div class="cat-title">
           <span>🏠 Rent Payments (വാടക)</span>
@@ -1163,7 +1084,6 @@
         </div>
       </div>
 
-      <!-- 2. STAFF SALARY CARD (CLEAN & CLICKABLE) -->
       <div class="cat-box" style="cursor:pointer;" onclick="openStaffDetailsModal()">
         <div class="cat-title">
           <span>👥 Staff Salaries (ശമ്പളം & കൂലി)</span>
@@ -1175,7 +1095,6 @@
         </div>
       </div>
 
-      <!-- 3. STOCK & OTHER EXPENSES CARD (CLEAN & CLICKABLE) -->
       <div class="cat-box" style="cursor:pointer;" onclick="openStockExpensesModal()">
         <div class="cat-title">
           <span>📦 Stock & Other Expenses</span>
@@ -1193,14 +1112,12 @@
       </div>
     </div>
 
-    <!-- TAB 5: INVESTMENTS & WITHDRAWALS -->
     <div id="tab-invest" class="tab-content">
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="section-header-btn" style="background:var(--accent-purple); border-radius:8px;" onclick="openInvestModal()">+ ADD INVESTMENT</button>
         <button class="section-header-btn" style="background:#b91c1c; border-radius:8px;" onclick="openWithdrawModal()">- WITHDRAW MONEY</button>
       </div>
 
-      <!-- PARTNERS PROFIT SPLIT -->
       <div class="cat-box" style="border: 2px solid #bfdbfe; background: #f0f7ff;">
         <div class="cat-title">
           <span style="color:var(--primary);">🤝 Partners Profit Split (1/3 Each)</span>
@@ -1228,7 +1145,6 @@
         </div>
       </div>
 
-      <!-- Capital Invested -->
       <div class="cat-box">
         <div class="cat-title">
           <span>💼 Capital Invested (നിക്ഷേപം)</span>
@@ -1250,7 +1166,6 @@
         </div>
       </div>
 
-      <!-- Profit Withdrawn -->
       <div class="cat-box">
         <div class="cat-title">
           <span>💸 Profit Withdrawn (ലാഭം പിൻവലിച്ചത്)</span>
@@ -1285,9 +1200,6 @@
 
   </div>
 
-  <!-- ==================== ALL MODALS ==================== -->
-
-  <!-- A4 LIVE PREVIEW MODAL -->
   <div class="a4-preview-modal" id="a4PreviewModal">
     <div class="a4-preview-container">
       <div class="a4-action-bar">
@@ -1302,7 +1214,6 @@
     </div>
   </div>
 
-  <!-- 1. ENTRY MODAL -->
   <div class="modal" id="entryModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('entryModal')">✕</button>
@@ -1384,7 +1295,6 @@
     </div>
   </div>
 
-  <!-- 2. TODAY'S SALES REPORT MODAL -->
   <div class="modal" id="todayReportModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('todayReportModal')">✕</button>
@@ -1438,7 +1348,6 @@
     </div>
   </div>
 
-  <!-- 3. UNIVERSAL ITEM / SUPPLIER LEDGER SHEET MODAL -->
   <div class="modal" id="itemSheetModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('itemSheetModal')">✕</button>
@@ -1483,7 +1392,6 @@
     </div>
   </div>
 
-  <!-- 4. RUNNING BREAKDOWN MODAL -->
   <div class="modal" id="runningBreakdownModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('runningBreakdownModal')">✕</button>
@@ -1504,7 +1412,6 @@
     </div>
   </div>
 
-  <!-- 5. ADD INVESTMENT MODAL -->
   <div class="modal" id="investModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('investModal')">✕</button>
@@ -1548,7 +1455,6 @@
     </div>
   </div>
 
-  <!-- 6. ADD WITHDRAWAL MODAL -->
   <div class="modal" id="withdrawModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('withdrawModal')">✕</button>
@@ -1600,7 +1506,6 @@
     </div>
   </div>
 
-  <!-- 7. OPENING BALANCE MODAL -->
   <div class="modal" id="openingModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('openingModal')">✕</button>
@@ -1618,7 +1523,6 @@
     </div>
   </div>
 
-  <!-- 8. PARTNER LOGIN MODAL -->
   <div class="modal" id="loginModal" style="display:none; background: rgba(15, 23, 42, 0.88); z-index: 2000;">
     <div class="modal-box" style="text-align: center;">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">🔐</div>
@@ -1650,7 +1554,6 @@
     </div>
   </div>
 
-  <!-- 9. CHANGE PIN MODAL -->
   <div class="modal" id="changePinModal" style="display:none; background: rgba(15, 23, 42, 0.8); z-index: 2100;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('changePinModal')">✕</button>
@@ -1672,7 +1575,6 @@
     </div>
   </div>
 
-  <!-- 10. FORGOT PIN MODAL -->
   <div class="modal" id="forgotPinModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2200;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('forgotPinModal')">✕</button>
@@ -1704,7 +1606,6 @@
     </div>
   </div>
 
-  <!-- 11. OCR.SPACE API SETTINGS MODAL -->
   <div class="modal" id="aiSettingsModal" style="display:none; background: rgba(15, 23, 42, 0.85); z-index: 2300;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('aiSettingsModal')">✕</button>
@@ -1723,7 +1624,6 @@
     </div>
   </div>
 
-  <!-- 12. FULL POS SALES REPORT MODAL -->
   <div class="modal" id="fullPosReportModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('fullPosReportModal')">✕</button>
@@ -1734,7 +1634,6 @@
     </div>
   </div>
 
-  <!-- 13. RENT DETAILS & LEDGER MODAL -->
   <div class="modal" id="rentDetailsModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('rentDetailsModal')">✕</button>
@@ -1768,7 +1667,6 @@
     </div>
   </div>
 
-  <!-- 14. STAFF DETAILS & WAGE MODAL (+ ADD STAFF ബട്ടണോടെ) -->
   <div class="modal" id="staffDetailsModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('staffDetailsModal')">✕</button>
@@ -1789,7 +1687,6 @@
     </div>
   </div>
 
-  <!-- 15. STOCK & OTHER EXPENSES BREAKDOWN MODAL -->
   <div class="modal" id="stockExpensesModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('stockExpensesModal')">✕</button>
@@ -1815,7 +1712,6 @@
     </div>
   </div>
 
-  <!-- 16. ADD STOCK ITEM MODAL (MASTER ITEM REGISTRATION) -->
   <div class="modal" id="addStockItemModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addStockItemModal')">✕</button>
@@ -1836,7 +1732,6 @@
     </div>
   </div>
 
-  <!-- 17. ADD SUPPLIER MODAL (MASTER SUPPLIER REGISTRATION) -->
   <div class="modal" id="addSupplierModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addSupplierModal')">✕</button>
@@ -1857,7 +1752,6 @@
     </div>
   </div>
 
-  <!-- 18. ADD STAFF MODAL (MASTER STAFF REGISTRATION) -->
   <div class="modal" id="addStaffModal">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('addStaffModal')">✕</button>
@@ -1878,7 +1772,6 @@
     </div>
   </div>
 
-  <!-- 19. POS BILL RECEIPT DETAILS MODAL (POPUP ON BILL TAP) -->
   <div class="modal" id="posBillDetailsModal" style="z-index: 1200;">
     <div class="modal-box">
       <button type="button" class="modal-close-safe-btn" onclick="closeModal('posBillDetailsModal')">✕</button>
@@ -1888,7 +1781,6 @@
     </div>
   </div>
 
-  <!-- 20. STOCK VIEW MODAL (POPUP FOR STOCK ITEMS LIST) -->
   <div id="stockViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; width:90%; max-width:400px; border-radius:12px; padding:16px; max-height:80vh; overflow-y:auto; position:relative;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -1899,7 +1791,6 @@
     </div>
   </div>
 
-  <!-- 21. SUPPLIER VIEW MODAL (POPUP FOR SUPPLIERS LIST) -->
   <div id="supplierViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; width:90%; max-width:400px; border-radius:12px; padding:16px; max-height:80vh; overflow-y:auto; position:relative;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -1910,12 +1801,7 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    /* =========================================================
-       BANABLAST BUSINESS LEDGER & POS MANAGEMENT - COMPLETE PRODUCTION ENGINE
-       ========================================================= */
-
     const PARTNERS = ["ASHIF", "SABITH", "ASHKAR ALI"];
     const MASTER_SECURITY_KEY = "9999";
 
@@ -1983,41 +1869,14 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Preset Item Codes Map (1 to 33) - Lowercased for robust matching
     const presetItemCodes = {
-      "happy kid": "1",
-      "spider kid": "2",
-      "micky mouse": "3",
-      "dora kid": "4",
-      "normal": "5",
-      "sp vanila": "6",
-      "bana boost": "7",
-      "strawberry": "8",
-      "pistachio": "9",
-      "mango": "10",
-      "chocolate": "11",
-      "coffee": "12",
-      "butterscotch": "13",
-      "nuts banana": "14",
-      "dates": "15",
-      "chocochip": "16",
-      "fruit mix": "17",
-      "sp fruit": "18",
-      "fruit & nut": "19",
-      "jack fruit": "20",
-      "catamount": "21",
-      "royal": "22",
-      "kulfi": "23",
-      "arabian khajoor": "24",
-      "sanish": "25",
-      "red velvet": "26",
-      "passion fruit": "27",
-      "caramel nuts": "28",
-      "tender coconut": "29",
-      "sp nuts": "30",
-      "dry fruit": "31",
-      "fig honey": "32",
-      "belgium chocolate": "33"
+      "happy kid": "1", "spider kid": "2", "micky mouse": "3", "dora kid": "4", "normal": "5",
+      "sp vanila": "6", "bana boost": "7", "strawberry": "8", "pistachio": "9", "mango": "10",
+      "chocolate": "11", "coffee": "12", "butterscotch": "13", "nuts banana": "14", "dates": "15",
+      "chocochip": "16", "fruit mix": "17", "sp fruit": "18", "fruit & nut": "19", "jack fruit": "20",
+      "catamount": "21", "royal": "22", "kulfi": "23", "arabian khajoor": "24", "sanish": "25",
+      "red velvet": "26", "passion fruit": "27", "caramel nuts": "28", "tender coconut": "29",
+      "sp nuts": "30", "dry fruit": "31", "fig honey": "32", "belgium chocolate": "33"
     };
 
     async function autoAssignPresetCodesToFirebase() {
@@ -2035,10 +1894,6 @@
         });
         if (updatedCount > 0) {
           await batch.commit();
-          alert("✅ മെനു കോഡുകൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!");
-          location.reload();
-        } else {
-          alert("ℹ️ പുതിയ കോഡുകൾ ഒന്നും അപ്ഡേറ്റ് ചെയ്യാനില്ല.");
         }
       } catch (err) {
         console.error("Auto assign error: ", err);
@@ -2049,9 +1904,6 @@
       setTimeout(autoAssignPresetCodesToFirebase, 2000);
     });
 
-    /* =============================================================
-       1. UNIVERSAL HARDWARE & GESTURE BACK BUTTON INTERCEPTOR
-       ============================================================= */
     function closeTopmostModalOrDropdown() {
       const stockModal = document.getElementById('stockViewModal');
       if (stockModal && stockModal.style.display === 'flex') {
@@ -2088,10 +1940,10 @@
     }
 
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-      window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
+      window.Capacitor.Plugins.App.addListener('backButton', () => {
         const handled = closeTopmostModalOrDropdown();
         if (!handled) {
-          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ?")) {
             window.Capacitor.Plugins.App.exitApp();
           }
         }
@@ -2105,7 +1957,7 @@
       }
       const handled = closeTopmostModalOrDropdown();
       if (!handled) {
-        if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+        if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ?")) {
           if (navigator.app && navigator.app.exitApp) {
             navigator.app.exitApp();
           } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
@@ -2115,7 +1967,7 @@
       }
     }, false);
 
-    window.addEventListener('popstate', (e) => {
+    window.addEventListener('popstate', () => {
       closeTopmostModalOrDropdown();
     });
 
@@ -2132,9 +1984,6 @@
       if (el) el.style.display = 'none';
     }
 
-    /* -------------------------------------------------------------
-       2. HEADER 3-DOTS DROPDOWN LOGIC
-       ------------------------------------------------------------- */
     function toggleMainHeaderDropdown(e) {
       e.stopPropagation();
       const dd = document.getElementById('mainHeaderDropdown');
@@ -2153,9 +2002,6 @@
       }
     });
 
-    /* -------------------------------------------------------------
-       3. AUTH, PIN & OCR SETTINGS
-       ------------------------------------------------------------- */
     function checkUserLogin() {
       if (!currentLoggedInUser) {
         document.getElementById('loginModal').style.display = 'flex';
@@ -2282,9 +2128,6 @@
       closeModal('aiSettingsModal');
     }
 
-    /* -------------------------------------------------------------
-       4. INITIALIZATION & FIRESTORE SYNC
-       ------------------------------------------------------------- */
     function initFlatpickrCalendar() {
       flatpickrCalendar = flatpickr("#selectedDate", {
         dateFormat: "Y-m-d",
@@ -2344,21 +2187,18 @@
         }
       });
 
-      // Master Items sync
       db.collection('master_items').onSnapshot(snap => {
         masterItems = [];
         snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
         updateMasterSuggestions();
       });
 
-      // Master Suppliers sync
       db.collection('master_suppliers').onSnapshot(snap => {
         masterSuppliers = [];
         snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
         updateMasterSuggestions();
       });
 
-      // Master Staff sync
       db.collection('master_staff').onSnapshot(snap => {
         masterStaff = [];
         snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
@@ -2370,25 +2210,25 @@
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
         updateMasterSuggestions();
         renderAll();
-      }, err => console.error("Trans sync err:", err));
+      });
 
       db.collection('pos_bills').onSnapshot(snap => {
         posBills = [];
         snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
         renderPosAnalyticsTab();
-      }, err => console.error("POS bills sync err:", err));
+      });
 
       db.collection('withdrawals').onSnapshot(snap => {
         withdrawals = [];
         snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
         renderAll();
-      }, err => console.error("Withdraw sync err:", err));
+      });
 
       db.collection('investments').onSnapshot(snap => {
         investments = [];
         snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
         renderAll();
-      }, err => console.error("Invest sync err:", err));
+      });
 
       db.collection('settings').doc('general').onSnapshot(doc => {
         if (doc.exists) {
@@ -2399,7 +2239,7 @@
           if (flatpickrCalendar) flatpickrCalendar.redraw();
           renderAll();
         }
-      }, err => console.error("Settings sync err:", err));
+      });
     };
 
     function renderAll() {
@@ -2451,9 +2291,6 @@
       }, { merge: true });
     }
 
-    /* -------------------------------------------------------------
-       5. MASTER VIEW MODALS & SUGGESTIONS
-       ------------------------------------------------------------- */
     function openStockViewModal() {
       const container = document.getElementById('masterStockItemsModalContainer');
       if (!masterItems || !masterItems.length) {
@@ -2663,9 +2500,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       6. POS ANALYTICS TAB & BILL DETAILS POPUP
-       ------------------------------------------------------------- */
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
       document.querySelectorAll('#tab-pos-analytics .report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -2729,7 +2563,10 @@
         if (!b.date) return false;
         const bDate = new Date(b.date);
 
-        if (currentPosFilter === 'today') return b.date === curDate;
+        if (currentPosFilter === 'today') {
+          const billDateStr = (b.date || '').split('T')[0];
+          return billDateStr === curDate;
+        }
         if (currentPosFilter === 'week') {
           const diffDays = Math.floor((refDate - bDate) / (1000 * 60 * 60 * 24));
           return diffDays >= 0 && diffDays <= 7;
@@ -2838,11 +2675,25 @@
                     🕒 ${displayTime || '-'} • ${b.date} • ${totalQty} Items ${b.parcelCharge ? '• 🥡' : ''}
                   </div>
                 </div>
-                <span style="font-size:0.75rem; color:#0284c7; font-weight:800;">വിശദാംശങ്ങൾ ➔</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:0.75rem; color:#0284c7; font-weight:800;">വിശദാംശങ്ങൾ ➔</span>
+                  <button type="button" onclick="event.stopPropagation(); deleteBillCompletely('${b.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ബിൽ ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+                </div>
               </div>
             `;
           }).join('');
         }
+      }
+    }
+
+    async function deleteBillCompletely(billId) {
+      if (!confirm("തീർച്ചയായും ഈ ബിൽ ഡിലീറ്റ് ചെയ്യണോ? ഇത് അനലിറ്റിക്സ് കണക്കുകളിൽ നിന്നും പൂർണ്ണമായി ഒഴിവാക്കപ്പെടും.")) return;
+      try {
+        await db.collection('pos_bills').doc(billId).delete();
+        alert("✅ ബിൽ ഡാറ്റാബേസിൽ നിന്നും പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു!");
+      } catch (error) {
+        console.error("Error deleting bill: ", error);
+        alert("❌ ബിൽ ഡിലീറ്റ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
       }
     }
 
@@ -2907,9 +2758,6 @@
       openModalWithHistory('fullPosReportModal');
     }
 
-    /* -------------------------------------------------------------
-       7. OCR.SPACE SCANNER & PURCHASE ITEMS
-       ------------------------------------------------------------- */
     function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
       const container = document.getElementById('purchaseItemsListContainer');
       const div = document.createElement('div');
@@ -3142,9 +2990,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       8. ENTRY ACTIONS & TRACKING
-       ------------------------------------------------------------- */
     function openEntryModal(type, editId = null) {
       document.getElementById('editEntryId').value = editId || '';
       document.getElementById('entryType').value = type;
@@ -3399,9 +3244,6 @@
       openModalWithHistory('todayReportModal');
     }
 
-    /* -------------------------------------------------------------
-       9. STOCK & SUPPLIERS TAB WITH DUE TOGGLE
-       ------------------------------------------------------------- */
     function filterStockTab(period) {
       currentStockFilter = period;
       document.querySelectorAll('#tab-stock .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3580,9 +3422,6 @@
       container.innerHTML = html;
     }
 
-    /* -------------------------------------------------------------
-       10. SMART RENT LEDGER LOGIC
-       ------------------------------------------------------------- */
     function openRentDetailsModal() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -3631,9 +3470,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       11. STAFF SALARIES & WAGES LEDGER
-       ------------------------------------------------------------- */
     function openStaffDetailsModal() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -3700,9 +3536,6 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    /* -------------------------------------------------------------
-       12. STOCK & EXPENSES BREAKDOWN LOGIC
-       ------------------------------------------------------------- */
     function openStockExpensesModal() {
       currentStockExpFilter = 'month';
       document.querySelectorAll('#stockExpensesModal .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3773,9 +3606,6 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    /* -------------------------------------------------------------
-       13. REPORTS TAB SUMMARY RENDERING
-       ------------------------------------------------------------- */
     function filterReport(period) {
       currentReportFilter = period;
       document.querySelectorAll('.report-filter .filter-btn').forEach(b => b.classList.remove('active'));
@@ -3849,9 +3679,6 @@
       document.getElementById('repTotalOther').innerText = '₹' + (Math.round((stock + misc) * 100) / 100);
     }
 
-    /* -------------------------------------------------------------
-       14. INVESTMENTS & WITHDRAWALS (3-PARTNER VERIFICATION)
-       ------------------------------------------------------------- */
     function openInvestModal() {
       document.getElementById('invAmount').value = '';
       document.getElementById('invNote').value = '';
@@ -3884,12 +3711,12 @@
       });
 
       closeModal('investModal');
-      alert('Investment added! മറ്റ് 2 പാർട്ണർമാരും വെരിഫൈ ചെയ്യുമ്പോൾ ഇത് അംഗീകരിക്കപ്പെടും.');
+      alert('Investment added!');
     }
 
     function verifyInvestment(invId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ!`);
         return;
       }
 
@@ -3907,28 +3734,26 @@
         approvals: currentApprovals,
         status: isVerified ? 'verified' : 'pending'
       });
-      alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
+      alert(`✅ ${partnerName} വെരിഫൈ ചെയ്തു!`);
     }
 
     function requestDeleteInvestment(invId) {
       const inv = investments.find(i => i.id === invId);
       if (!inv) return;
 
-      if (!confirm(`⚠️ ഈ നിക്ഷേപം (+₹${inv.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും തങ്ങളുടെ ലോഗിനിൽ നിന്ന് അംഗീകരിച്ചാൽ മാത്രമേ ഇത് അക്കൗണ്ടിൽ നിന്ന് ഒഴിവാകൂ.`)) {
-        return;
-      }
+      if (!confirm(`⚠️ ഈ നിക്ഷേപം (+₹${inv.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?`)) return;
 
       db.collection('investments').doc(invId).update({
         deleteRequested: true,
         deleteApprovals: [currentLoggedInUser]
       }).then(() => {
-        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു. ബാക്കി പാർട്ണർമാർ ലോഗിൻ ചെയ്ത് അംഗീകരിക്കേണ്ടതുണ്ട്.`);
+        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു.`);
       });
     }
 
     function approveDeleteInvestment(invId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്. ലോഗിൻ മാറ്റുക.`);
+        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്.`);
         return;
       }
 
@@ -3942,13 +3767,13 @@
 
       if (PARTNERS.every(p => delApprovals.includes(p))) {
         db.collection('investments').doc(invId).delete().then(() => {
-          alert("🗑️ 3 പങ്കാളികളും അംഗീകരിച്ചതിനാൽ നിക്ഷേപം പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
+          alert("🗑️ നിക്ഷേപം പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
         });
       } else {
         db.collection('investments').doc(invId).update({
           deleteApprovals: delApprovals
         }).then(() => {
-          alert(`✅ ഡിലീറ്റ് ചെയ്യാൻ ${partnerName} അനുമതി നൽകി (${delApprovals.length}/3).`);
+          alert(`✅ അനുമതി നൽകി (${delApprovals.length}/3).`);
         });
       }
     }
@@ -3987,12 +3812,12 @@
       });
 
       closeModal('withdrawModal');
-      alert(`Withdrawal request added (${type === 'capital' ? 'നിക്ഷേപത്തിൽ നിന്ന്' : 'ലാഭത്തിൽ നിന്ന്'})! 3 പാർട്ണർമാരും വെരിഫൈ ചെയ്താൽ മാത്രമേ റണ്ണിംഗ് ബാലൻസിൽ നിന്ന് തുക കുറയൂ.`);
+      alert('Withdrawal request added!');
     }
 
     function verifyWithdrawal(wthId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ! ഇത് ${partnerName}-ന്റെ അനുമതിയാണ്.`);
+        alert(`⚠️ നിങ്ങൾക്ക് സ്വന്തം അക്കൗണ്ട് (${currentLoggedInUser}) മാത്രമേ വെരിഫൈ ചെയ്യാൻ അനുവാദമുള്ളൂ!`);
         return;
       }
 
@@ -4010,28 +3835,26 @@
         approvals: currentApprovals,
         status: isVerified ? 'verified' : 'pending'
       });
-      alert(`✅ ${partnerName} വിജയകരമായി വെരിഫൈ ചെയ്തു!`);
+      alert(`✅ ${partnerName} വെരിഫൈ ചെയ്തു!`);
     }
 
     function requestDeleteWithdrawal(wthId) {
       const w = withdrawals.find(i => i.id === wthId);
       if (!w) return;
 
-      if (!confirm(`⚠️ ഈ പിൻവലിക്കൽ (-₹${w.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?\n\n3 പാർട്ണർമാരും അംഗീകരിച്ചാൽ മാത്രമേ തുക തിരികെ അക്കൗണ്ടിലേക്ക് വരികയും റെക്കോർഡ് ഒഴിവാകുകയും ചെയ്യൂ.`)) {
-        return;
-      }
+      if (!confirm(`⚠️ ഈ പിൻവലിക്കൽ (-₹${w.amount}) ഒഴിവാക്കാനായി ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിക്കണോ?`)) return;
 
       db.collection('withdrawals').doc(wthId).update({
         deleteRequested: true,
         deleteApprovals: [currentLoggedInUser]
       }).then(() => {
-        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു. ബാക്കി പാർട്ണർമാർ ലോഗിൻ ചെയ്ത് അംഗീകരിക്കേണ്ടതുണ്ട്.`);
+        alert(`✅ ഡിലീറ്റ് റിക്വസ്റ്റ് സമർപ്പിച്ചു.`);
       });
     }
 
     function approveDeleteWithdrawal(wthId, partnerName) {
       if (currentLoggedInUser !== partnerName) {
-        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്. ലോഗിൻ മാറ്റുക.`);
+        alert(`⚠️ ഇത് ${partnerName}-ന്റെ അംഗീകാരമാണ്.`);
         return;
       }
 
@@ -4045,13 +3868,13 @@
 
       if (PARTNERS.every(p => delApprovals.includes(p))) {
         db.collection('withdrawals').doc(wthId).delete().then(() => {
-          alert("🗑️ 3 പങ്കാളികളും അംഗീകരിച്ചതിനാൽ പിൻവലിക്കൽ എൻട്രി പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
+          alert("🗑️ പിൻവലിക്കൽ എൻട്രി പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്തു.");
         });
       } else {
         db.collection('withdrawals').doc(wthId).update({
           deleteApprovals: delApprovals
         }).then(() => {
-          alert(`✅ ഡിലീറ്റ് ചെയ്യാൻ ${partnerName} അനുമതി നൽകി (${delApprovals.length}/3).`);
+          alert(`✅ അനുമതി നൽകി (${delApprovals.length}/3).`);
         });
       }
     }
@@ -4163,7 +3986,7 @@
               <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
                 ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(inv.approvals || []).length}/3 Verified)`)}
               </span>
-              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteInvestment('${inv.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteInvestment('${inv.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
@@ -4234,9 +4057,9 @@
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
               <span class="inv-status ${isDelReq ? 'status-delete-req' : (isVer ? 'status-verified' : 'status-pending')}">
-                ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED (Deducted)' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
+                ${isDelReq ? `🗑️ DELETE REQUESTED (${delApprovals.length}/3)` : (isVer ? '🟢 100% VERIFIED' : `🟡 PENDING (${(w.approvals || []).length}/3 Verified)`)}
               </span>
-              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യാൻ റിക്വസ്റ്റ് നൽകുക">🗑️</button>` : ''}
+              ${!isDelReq ? `<button class="btn-icon" onclick="requestDeleteWithdrawal('${w.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>` : ''}
             </div>
             <div class="verify-box">
               <div style="font-weight:700; color:#475569;">3-Partner Verification:</div>
@@ -4256,9 +4079,6 @@
       document.getElementById('pendingAlertBox').style.display = hasPending ? 'block' : 'none';
     }
 
-    /* -------------------------------------------------------------
-       15. UNIVERSAL LEDGER SHEET & MODALS
-       ------------------------------------------------------------- */
     function openItemHistorySheet(itemName, category) {
       activeSheetKey = itemName.trim().toLowerCase();
       document.getElementById('sheetItemTitle').innerText = `${itemName.toUpperCase()} - Complete Ledger Sheet`;
@@ -4410,9 +4230,6 @@
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
     }
 
-    /* -------------------------------------------------------------
-       16. RUNNING BREAKDOWN & OPENING BALANCE
-       ------------------------------------------------------------- */
     function openRunningBreakdown(mode) {
       currentBreakdownMode = mode;
       const titleElem = document.getElementById('breakdownTitle');
@@ -4514,9 +4331,6 @@
       closeModal('openingModal');
     }
 
-    /* -------------------------------------------------------------
-       17. ROBUST A4 PDF PREVIEW, DIRECT DOWNLOAD & NATIVE WHATSAPP SHARE
-       ------------------------------------------------------------- */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
@@ -4533,33 +4347,6 @@
       }
     }
 
-    async function downloadAndSharePDF(elementId, filename) {
-      const element = document.getElementById(elementId);
-      const opt = {
-        margin: 5,
-        filename: filename || 'report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().from(element).set(opt).outputPdf('blob').then((pdfBlob) => {
-        const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: 'Business Report',
-            text: 'ഇന്നത്തെ ബിസിനസ്സ് റിപ്പോർട്ട് PDF ആയി അയക്കുന്നു.'
-          }).catch(err => console.log('Share error:', err));
-        } else {
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = filename;
-          link.click();
-          alert('✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു!');
-        }
-      });
-    }
-
     async function generateCleanPdfArtifact() {
       const element = document.getElementById('a4SheetPaper');
       const canvas = await html2canvas(element, {
@@ -4573,7 +4360,6 @@
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
       const margin = 5;
       const imgWidth = pdfWidth - (margin * 2);
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
