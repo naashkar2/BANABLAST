@@ -1466,14 +1466,12 @@
       currentPayMode = 'Split';
       document.getElementById('splitLongPressModal').style.display = 'none';
 
-      // Visual indicator on cash button for split mode
+      // Cash button-ൽ സ്പ്ലിറ്റ് തുക കാണിക്കാൻ
       const bCash = document.getElementById('btnPayCash');
       const bGpay = document.getElementById('btnPayGPay');
       bCash.className = 'btn-pay-sub active cash';
       bGpay.className = 'btn-pay-sub';
       bCash.innerHTML = `🔀 SPLIT (C:₹${cashVal} G:₹${gpayVal})`;
-
-      printAndSaveBill();
     }
 
     function closeSplitLongPressModal() {
@@ -2009,8 +2007,12 @@
         cart = [];
         parcelCharge = 0;
         editingBill = null;
-        currentBillSplit = null;
-        resetPaymentModeSelection();
+        currentBillSplit = null; // സ്പ്ലിറ്റ് ഡാറ്റ ക്ലിയർ ചെയ്യുന്നു
+        resetPaymentModeSelection(); // ക്യാഷ് ബട്ടൺ ഡിസൈൻ പഴയതുപോലെ ആക്കാൻ
+        const bCash = document.getElementById('btnPayCash');
+        if (bCash) {
+          bCash.innerHTML = '💵 CASH';
+        }
         renderCartUI();
         renderMenuItems();
         closeModal('cartDrawerModal');
