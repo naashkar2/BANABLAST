@@ -894,6 +894,9 @@
           <button type="button" class="dropdown-item" onclick="openAISettingsModal(); closeMainHeaderDropdown();">
             <span>⚙️</span> OCR Key Settings
           </button>
+          <button type="button" class="dropdown-item" onclick="autoAssignPresetCodesToFirebase(); closeMainHeaderDropdown();">
+            <span>⚡</span> Auto-Assign 1-33 Codes
+          </button>
           <button type="button" class="dropdown-item" onclick="logoutPartner(); closeMainHeaderDropdown();" style="color:#f87171;">
             <span>🚪</span> Logout / Switch
           </button>
@@ -1060,15 +1063,11 @@
 
     <!-- TAB 2: STOCK ITEMS (+ ADD ITEM) -->
     <div id="tab-stock" class="tab-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="font-size:0.95rem; margin:0; color:#0f172a;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
-        <div>
-          <button type="button" onclick="openAddStockItemModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
-            + Add Item
-          </button>
-          <button type="button" onclick="openStockViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer; margin-left:4px;">
-            📋 View List
-          </button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="font-size:0.9rem; font-weight:800; color:#1e293b; margin:0;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h4>
+        <div style="display:flex; gap:6px;">
+          <button type="button" onclick="openStockViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">📋 View List</button>
+          <button type="button" onclick="openAddStockItemModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">+ Add Item</button>
         </div>
       </div>
 
@@ -1090,15 +1089,11 @@
 
     <!-- TAB 3: SUPPLIER PURCHASES (+ ADD SUPPLIER) -->
     <div id="tab-suppliers" class="tab-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="font-size:0.95rem; margin:0; color:#0f172a;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
-        <div>
-          <button type="button" onclick="openAddSupplierModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
-            + Add Supplier
-          </button>
-          <button type="button" onclick="openSupplierViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer; margin-left:4px;">
-            📋 View Suppliers
-          </button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="font-size:0.9rem; font-weight:800; color:#1e293b; margin:0;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ</h4>
+        <div style="display:flex; gap:6px;">
+          <button type="button" onclick="openSupplierViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">📋 View List</button>
+          <button type="button" onclick="openAddSupplierModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">+ Add Supplier</button>
         </div>
       </div>
 
@@ -1988,41 +1983,41 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Preset Item Codes Map (1 to 33)
+    // Preset Item Codes Map (1 to 33) - Lowercased for robust matching
     const presetItemCodes = {
-      "Happy Kid": "1",
-      "Spider Kid": "2",
-      "Micky Mouse": "3",
-      "Dora Kid": "4",
-      "Normal": "5",
-      "Sp Vanila": "6",
-      "Bana Boost": "7",
-      "Strawberry": "8",
-      "Pistachio": "9",
-      "Mango": "10",
-      "Chocolate": "11",
-      "Coffee": "12",
-      "Butterscotch": "13",
-      "Nuts Banana": "14",
-      "Dates": "15",
-      "Chocochip": "16",
-      "Fruit Mix": "17",
-      "Sp Fruit": "18",
-      "Fruit & Nut": "19",
-      "Jack Fruit": "20",
-      "Catamount": "21",
-      "Royal": "22",
-      "Kulfi": "23",
-      "Arabian Khajoor": "24",
-      "Sanish": "25",
-      "Red Velvet": "26",
-      "Passion Fruit": "27",
-      "Caramel Nuts": "28",
-      "Tender Coconut": "29",
-      "Sp Nuts": "30",
-      "Dry Fruit": "31",
-      "Fig Honey": "32",
-      "Belgium Chocolate": "33"
+      "happy kid": "1",
+      "spider kid": "2",
+      "micky mouse": "3",
+      "dora kid": "4",
+      "normal": "5",
+      "sp vanila": "6",
+      "bana boost": "7",
+      "strawberry": "8",
+      "pistachio": "9",
+      "mango": "10",
+      "chocolate": "11",
+      "coffee": "12",
+      "butterscotch": "13",
+      "nuts banana": "14",
+      "dates": "15",
+      "chocochip": "16",
+      "fruit mix": "17",
+      "sp fruit": "18",
+      "fruit & nut": "19",
+      "jack fruit": "20",
+      "catamount": "21",
+      "royal": "22",
+      "kulfi": "23",
+      "arabian khajoor": "24",
+      "sanish": "25",
+      "red velvet": "26",
+      "passion fruit": "27",
+      "caramel nuts": "28",
+      "tender coconut": "29",
+      "sp nuts": "30",
+      "dry fruit": "31",
+      "fig honey": "32",
+      "belgium chocolate": "33"
     };
 
     async function autoAssignPresetCodesToFirebase() {
@@ -2032,7 +2027,7 @@
         let updatedCount = 0;
         snapshot.forEach(doc => {
           const data = doc.data();
-          const cleanName = (data.name || '').trim();
+          const cleanName = (data.name || '').trim().toLowerCase();
           if (presetItemCodes[cleanName] && data.code !== presetItemCodes[cleanName]) {
             batch.update(doc.ref, { code: presetItemCodes[cleanName] });
             updatedCount++;
@@ -2040,7 +2035,10 @@
         });
         if (updatedCount > 0) {
           await batch.commit();
-          console.log("✅ Menu codes updated successfully!");
+          alert("✅ മെനു കോഡുകൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!");
+          location.reload();
+        } else {
+          alert("ℹ️ പുതിയ കോഡുകൾ ഒന്നും അപ്ഡേറ്റ് ചെയ്യാനില്ല.");
         }
       } catch (err) {
         console.error("Auto assign error: ", err);
@@ -4516,9 +4514,9 @@
       closeModal('openingModal');
     }
 
-    /* =============================================================
+    /* -------------------------------------------------------------
        17. ROBUST A4 PDF PREVIEW, DIRECT DOWNLOAD & NATIVE WHATSAPP SHARE
-       ============================================================= */
+       ------------------------------------------------------------- */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
