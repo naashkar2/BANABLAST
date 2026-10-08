@@ -721,12 +721,11 @@
     </div>
   </div>
 
-  <!-- Item Code / Quick Search Box with Datalist Suggestions -->
+  <!-- Item Code / Quick Search Box (Visibility Fixed & No Datalist Hang) -->
   <div style="padding: 4px 10px 8px; max-width: 1000px; margin: 0 auto;">
     <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
       <span style="font-size: 1.1rem;">⚡</span>
-      <input type="text" id="quickItemCodeInput" list="posQuickSuggestions" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.95rem; font-weight: 800; outline: none; color: #0f172a; background: transparent;" onkeydown="handleQuickCodeInput(event)">
-      <datalist id="posQuickSuggestions"></datalist>
+      <input type="text" id="quickItemCodeInput" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.95rem; font-weight: 800; outline: none; color: #0f172a; background: transparent;" onkeydown="handleQuickCodeInput(event)">
       <button type="button" onclick="addQuickCodeItem()" style="background: var(--blue); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">Add</button>
     </div>
   </div>
@@ -1153,15 +1152,13 @@
       try {
         const snapshot = await db.collection('billing_items').get();
         const batch = db.batch();
-        
         snapshot.forEach(doc => {
           const data = doc.data();
           const cleanName = (data.name || '').trim();
-          if (presetItemCodes[cleanName]) {
+          if (presetItemCodes[cleanName] && !data.code) {
             batch.update(doc.ref, { code: presetItemCodes[cleanName] });
           }
         });
-
         await batch.commit();
       } catch (err) {
         console.error("Auto assign error: ", err);
@@ -1680,7 +1677,7 @@
       }, 1000);
 
       // ഫയർബേസിലെ ഐറ്റങ്ങൾക്ക് 1-33 കോഡുകൾ ഓട്ടോമാറ്റിക്കായി സെറ്റ് ചെയ്യാൻ
-      setTimeout(autoAssignPresetCodesToFirebase, 2000);
+      setTimeout(autoAssignPresetCodesToFirebase, 1500);
 
       db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
         menuItems = [];
@@ -1699,7 +1696,6 @@
 
         renderMenuItems();
         renderModalItems();
-        updatePosSuggestions();
       }, (error) => {
         console.log("Using offline cache for menu items:", error);
       });
@@ -1765,13 +1761,11 @@
 
       if (!items.length) {
         root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
-        updatePosSuggestions();
         return;
       }
 
       if (currentCategory === 'juices') {
         root.innerHTML = `<div class="items-container">${items.map(it => renderCardHTML(it)).join('')}</div>`;
-        updatePosSuggestions();
         return;
       }
 
@@ -1800,7 +1794,6 @@
       });
 
       root.innerHTML = fullHTML;
-      updatePosSuggestions();
     }
 
     function renderCardHTML(it) {
@@ -2546,13 +2539,6 @@
     }
 
     // Quick Code / Suggestions Functions
-    function updatePosSuggestions() {
-      const dl = document.getElementById('posQuickSuggestions');
-      if (dl) {
-        dl.innerHTML = menuItems.map(i => `<option value="${i.code ? i.code + ' - ' : ''}${i.name}">`).join('');
-      }
-    }
-
     function handleQuickCodeInput(event) {
       if (event.key === 'Enter') {
         addQuickCodeItem();
@@ -2561,11 +2547,8 @@
 
     function addQuickCodeItem() {
       const input = document.getElementById('quickItemCodeInput');
-      let val = input.value.trim();
+      const val = input.value.trim();
       if (!val) return;
-      if (val.includes(' - ')) {
-        val = val.split(' - ')[0].trim();
-      }
       const targetItem = menuItems.find(i => String(i.code) === val || i.name.toLowerCase() === val.toLowerCase());
       if (targetItem) {
         playTickSound();
