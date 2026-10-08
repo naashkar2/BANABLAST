@@ -721,11 +721,12 @@
     </div>
   </div>
 
-  <!-- Item Code Quick-Add Box -->
+  <!-- Item Code / Quick Search Box with Datalist Suggestions -->
   <div style="padding: 4px 10px 8px; max-width: 1000px; margin: 0 auto;">
     <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
       <span style="font-size: 1.1rem;">⚡</span>
-      <input type="number" id="quickItemCodeInput" class="form-control" placeholder="Item Code നമ്പർ നൽകി Enter അടിക്കുക (ഉദാ: 1, 2...)" style="border: none; padding: 4px; font-size: 0.9rem; font-weight: 800; outline: none;" onkeydown="handleQuickCodeInput(event)">
+      <input type="text" id="quickItemCodeInput" list="posQuickSuggestions" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.9rem; font-weight: 800; outline: none;" onkeydown="handleQuickCodeInput(event)">
+      <datalist id="posQuickSuggestions"></datalist>
       <button type="button" onclick="addQuickCodeItem()" style="background: var(--blue); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">Add</button>
     </div>
   </div>
@@ -909,9 +910,15 @@
         </select>
       </div>
 
-      <div class="form-group" id="newItemNameField">
-        <label>Item Name (പേര്)</label>
-        <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Micky Mouse / Kulfi / Fig Honey">
+      <div style="display:flex; gap:8px;">
+        <div class="form-group" style="flex:0.8;">
+          <label>Item Code (നമ്പർ)</label>
+          <input type="text" id="newItemCode" class="form-control" placeholder="1-33">
+        </div>
+        <div class="form-group" style="flex:2;" id="newItemNameField">
+          <label>Item Name (പേര്)</label>
+          <input type="text" id="newItemName" class="form-control" placeholder="ഉദാ: Micky Mouse">
+        </div>
       </div>
 
       <div style="display:flex; gap:8px;">
@@ -944,6 +951,10 @@
           ✕ Cancel
         </button>
       </div>
+
+      <button type="button" onclick="autoAssignPresetCodesToFirebase()" style="width:100%; margin-top:10px; background:#2563eb; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; font-size:0.8rem;">
+        ⚡ Auto-Assign 1-33 Item Codes
+      </button>
 
       <h4 style="margin:14px 0 6px; font-size:0.8rem; color:#64748b;">നിലവിലുള്ള മെനു ലിസ്റ്റ്:</h4>
       <div id="modalExistingItems" style="max-height:190px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px;"></div>
@@ -994,8 +1005,8 @@
   <!-- THERMAL RECEIPT SLIP -->
   <div id="receiptPrintArea">
     <div class="r-center" style="font-size:18px; font-weight:900; letter-spacing:0.5px;">BANABLAST</div>
-    <div class="r-center" style="font-size:11px; font-weight:bold; margin-top:2px;">Nellippuzha, Mannarkkad</div>
-    <div class="r-center" style="font-size:11px; margin-top:1px;">Mob: +91 9037010883</div>
+    <div class="r-center" style="font-size:11px; font-weight:bold; margin-top:2px;">NELLIPPUZHA, MANNARKKAD</div>
+    <div class="r-center" style="font-size:11px; margin-top:1px;">Mob:+919037010883</div>
     <div class="r-line"></div>
     <div class="r-center" id="rBillDate" style="margin-top:4px; font-size:10px;"></div>
     <div class="r-center" id="rBillNo" style="font-weight:bold; font-size:12px;"></div>
@@ -1028,8 +1039,8 @@
   <div id="pdfInvoiceCard" style="position:fixed; left:-9999px; top:0; width:380px; background:#ffffff; color:#0f172a; padding:24px 20px; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-sizing:border-box;">
     <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:12px;">
       <h2 style="font-size:1.6rem; font-weight:900; margin:0; letter-spacing:1px; color:#0f172a;">BANABLAST</h2>
-      <p style="font-size:0.82rem; font-weight:800; color:#475569; margin-top:3px;">Nellippuzha, Mannarkkad</p>
-      <p style="font-size:0.78rem; font-weight:700; color:#2563eb; margin-top:2px;">Mob: +91 9037010883</p>
+      <p style="font-size:0.82rem; font-weight:800; color:#475569; margin-top:3px;">NELLIPPUZHA, MANNARKKAD</p>
+      <p style="font-size:0.78rem; font-weight:700; color:#2563eb; margin-top:2px;">Mob:+919037010883</p>
       <div style="font-size:0.75rem; color:#64748b; margin-top:8px; display:flex; justify-content:space-between; font-weight:600;">
         <span id="pdfDateText">Date: -</span>
         <span id="pdfBillNoText">Bill: #-</span>
@@ -1100,6 +1111,63 @@
     let editingBill = null;
     let editingItemId = null;
     let pickedItemImageBase64 = "";
+
+    // Preset Item Codes Map
+    const presetItemCodes = {
+      "Happy Kid": "1",
+      "Spider Kid": "2",
+      "Micky Mouse": "3",
+      "Dora Kid": "4",
+      "Normal": "5",
+      "Sp Vanila": "6",
+      "Bana Boost": "7",
+      "Strawberry": "8",
+      "Pistachio": "9",
+      "Mango": "10",
+      "Chocolate": "11",
+      "Coffee": "12",
+      "Butterscotch": "13",
+      "Nuts Banana": "14",
+      "Dates": "15",
+      "Chocochip": "16",
+      "Fruit Mix": "17",
+      "Sp Fruit": "18",
+      "Fruit & Nut": "19",
+      "Jack Fruit": "20",
+      "Catamount": "21",
+      "Royal": "22",
+      "Kulfi": "23",
+      "Arabian Khajoor": "24",
+      "Sanish": "25",
+      "Red Velvet": "26",
+      "Passion Fruit": "27",
+      "Caramel Nuts": "28",
+      "Tender Coconut": "29",
+      "Sp Nuts": "30",
+      "Dry Fruit": "31",
+      "Fig Honey": "32",
+      "Belgium Chocolate": "33"
+    };
+
+    async function autoAssignPresetCodesToFirebase() {
+      try {
+        const snapshot = await db.collection('billing_items').get();
+        const batch = db.batch();
+        
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const cleanName = (data.name || '').trim();
+          if (presetItemCodes[cleanName]) {
+            batch.update(doc.ref, { code: presetItemCodes[cleanName] });
+          }
+        });
+
+        await batch.commit();
+        alert("✅ 1 മുതൽ 33 വരെയുള്ള ക്രമ നമ്പറുകൾ എല്ലാ ഐറ്റങ്ങൾക്കും വിജയകരമായി സെറ്റ് ചെയ്തു!");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
 
     // Partner PINs
     let partnerPins = {
@@ -1606,30 +1674,12 @@
       });
     }
 
-    // Quick Code Input Functions
-    function handleQuickCodeInput(event) {
-      if (event.key === 'Enter') {
-        addQuickCodeItem();
-      }
-    }
-
-    function addQuickCodeItem() {
-      const input = document.getElementById('quickItemCodeInput');
-      const codeVal = input.value.trim();
-      if (!codeVal) return;
-      const targetItem = menuItems.find(i => String(i.code) === codeVal);
-      if (targetItem) {
-        playTickSound();
-        addToCart(targetItem.id);
-        input.value = '';
-        input.focus();
-      } else {
-        playWarningSound();
-        alert(`❌ #${codeVal} കോഡിൽ ഐറ്റങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല!`);
-      }
-    }
-
     window.onload = function() {
+      // App open ആകുമ്പോൾ അവസാനമായി കണക്റ്റ് ചെയ്ത പ്രിന്റർ ഓട്ടോമാറ്റിക്കായി റീകണക്റ്റ് ചെയ്യാൻ
+      setTimeout(() => {
+        initBluetoothAutoConnect();
+      }, 1000);
+
       db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
         menuItems = [];
         snap.forEach(doc => {
@@ -1647,6 +1697,7 @@
 
         renderMenuItems();
         renderModalItems();
+        updatePosSuggestions();
       }, (error) => {
         console.log("Using offline cache for menu items:", error);
       });
@@ -1661,8 +1712,6 @@
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
-
-      setTimeout(initBluetoothAutoConnect, 1200);
     };
 
     function switchCategory(cat) {
@@ -1706,12 +1755,14 @@
 
       if (!items.length) {
         root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
+        updatePosSuggestions();
         return;
       }
 
       if (currentCategory === 'juices') {
         items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
         root.innerHTML = `<div class="items-container">${items.map(it => renderCardHTML(it)).join('')}</div>`;
+        updatePosSuggestions();
         return;
       }
 
@@ -1741,6 +1792,7 @@
       });
 
       root.innerHTML = fullHTML;
+      updatePosSuggestions();
     }
 
     function renderCardHTML(it) {
@@ -1748,6 +1800,9 @@
       const qty = cartItem ? cartItem.qty : 0;
       const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
       const isSelected = qty > 0 ? 'in-cart' : '';
+
+      // ഐറ്റത്തിന് മുകളിൽ കോഡ് നമ്പർ കാണിക്കാൻ
+      const itemCodeBadge = it.code ? `<div style="font-size:0.7rem; font-weight:900; color:#0284c7; background:#e0f2fe; padding:1px 6px; border-radius:6px; margin-bottom:3px; display:inline-block;">#${it.code}</div>` : '';
 
       const mediaHTML = it.imageUrl 
         ? `<img src="${it.imageUrl}" class="item-img" alt="${it.name}">`
@@ -1757,6 +1812,7 @@
         <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
           ${qtyBadge}
           <div class="item-media-box">${mediaHTML}</div>
+          ${itemCodeBadge}
           <div class="item-name">${it.name}</div>
           <div class="price-chip">₹${it.price}</div>
           
@@ -2359,6 +2415,7 @@
 
     function saveOrUpdateItem() {
       let name = document.getElementById('newItemName').value.trim();
+      const code = document.getElementById('newItemCode').value.trim();
       const price = parseFloat(document.getElementById('newItemPrice').value);
       const category = document.getElementById('newItemCat').value;
       const subCategory = (category === 'avil_milk') ? document.getElementById('newItemSubCat').value : '';
@@ -2374,6 +2431,7 @@
       if (editingItemId) {
         const updateData = {
           name,
+          code,
           price,
           category,
           subCategory,
@@ -2389,6 +2447,7 @@
       } else {
         db.collection('billing_items').add({
           name,
+          code,
           price,
           category,
           subCategory,
@@ -2408,6 +2467,7 @@
 
       editingItemId = it.id;
       document.getElementById('newItemName').value = it.name;
+      document.getElementById('newItemCode').value = it.code || '';
       document.getElementById('newItemPrice').value = it.price;
       document.getElementById('newItemCat').value = it.category;
       document.getElementById('newItemIcon').value = it.icon || '🥤';
@@ -2439,6 +2499,7 @@
     function cancelItemEditing() {
       editingItemId = null;
       document.getElementById('newItemName').value = '';
+      document.getElementById('newItemCode').value = '';
       document.getElementById('newItemPrice').value = '';
       document.getElementById('newItemIcon').value = '🥤';
       pickedItemImageBase64 = '';
@@ -2474,7 +2535,7 @@
           <div style="display:flex; align-items:center; gap:6px;">
             ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">` : `<span>${it.icon || '🥤'}</span>`}
             <strong>${it.name}</strong> 
-            <span style="font-size:0.68rem; color:#64748b;">(${it.subCategory || it.category})</span>
+            <span style="font-size:0.68rem; color:#64748b;">(#${it.code || '-'})</span>
             - <span style="color:var(--emerald); font-weight:800;">₹${it.price}</span>
           </div>
           <div style="display:flex; gap:6px;">
@@ -2483,6 +2544,39 @@
           </div>
         </div>
       `).join('');
+    }
+
+    // Quick Code / Suggestions Functions
+    function updatePosSuggestions() {
+      const dl = document.getElementById('posQuickSuggestions');
+      if (dl) {
+        dl.innerHTML = menuItems.map(i => `<option value="${i.code ? i.code + ' - ' : ''}${i.name}">`).join('');
+      }
+    }
+
+    function handleQuickCodeInput(event) {
+      if (event.key === 'Enter') {
+        addQuickCodeItem();
+      }
+    }
+
+    function addQuickCodeItem() {
+      const input = document.getElementById('quickItemCodeInput');
+      let val = input.value.trim();
+      if (!val) return;
+      if (val.includes(' - ')) {
+        val = val.split(' - ')[0].trim();
+      }
+      const targetItem = menuItems.find(i => String(i.code) === val || i.name.toLowerCase() === val.toLowerCase());
+      if (targetItem) {
+        playTickSound();
+        addToCart(targetItem.id);
+        input.value = '';
+        input.focus();
+      } else {
+        playWarningSound();
+        alert(`❌ '${val}' കോഡിൽ അല്ലെങ്കിൽ പേരിൽ ഐറ്റങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല!`);
+      }
     }
   </script>
 </body>
