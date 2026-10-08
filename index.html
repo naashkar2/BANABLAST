@@ -1062,15 +1062,14 @@
     <div id="tab-stock" class="tab-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="font-size:0.95rem; margin:0; color:#0f172a;">വാങ്ങിയ സാധനങ്ങളുടെ കണക്കുകൾ (Item-wise Stock)</h3>
-        <button type="button" onclick="openAddStockItemModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
-          + Add Item
-        </button>
-      </div>
-
-      <!-- മാസ്റ്റർ സ്റ്റോക്ക് ഐറ്റം വ്യൂ ലിസ്റ്റ് -->
-      <div style="margin-bottom:12px;">
-        <h4 style="font-size:0.85rem; font-weight:800; color:#475569; margin-bottom:6px;">ആഡ് ചെയ്ത സ്റ്റോക്ക് ഐറ്റങ്ങൾ (View List):</h4>
-        <div id="masterStockItemsViewContainer" style="max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px; background:#fff;"></div>
+        <div>
+          <button type="button" onclick="openAddStockItemModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+            + Add Item
+          </button>
+          <button type="button" onclick="openStockViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer; margin-left:4px;">
+            📋 View List
+          </button>
+        </div>
       </div>
 
       <div class="report-filter" style="margin-bottom:10px;">
@@ -1093,15 +1092,14 @@
     <div id="tab-suppliers" class="tab-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="font-size:0.95rem; margin:0; color:#0f172a;">സപ്ലയർമാർ & കുടിശ്ശിക കണക്കുകൾ (Supplier Ledger)</h3>
-        <button type="button" onclick="openAddSupplierModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
-          + Add Supplier
-        </button>
-      </div>
-
-      <!-- മാസ്റ്റർ സപ്ലയർ വ്യൂ ലിസ്റ്റ് -->
-      <div style="margin-bottom:12px;">
-        <h4 style="font-size:0.85rem; font-weight:800; color:#475569; margin-bottom:6px;">സപ്ലയർമാരുടെ ലിസ്റ്റ് (View Suppliers List):</h4>
-        <div id="masterSuppliersViewContainer" style="max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px; background:#fff;"></div>
+        <div>
+          <button type="button" onclick="openAddSupplierModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+            + Add Supplier
+          </button>
+          <button type="button" onclick="openSupplierViewModal()" style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer; margin-left:4px;">
+            📋 View Suppliers
+          </button>
+        </div>
       </div>
 
       <!-- TOTAL OUTSTANDING DUE BANNER (CLICKABLE FILTER) -->
@@ -1895,6 +1893,28 @@
     </div>
   </div>
 
+  <!-- 20. STOCK VIEW MODAL (POPUP FOR STOCK ITEMS LIST) -->
+  <div id="stockViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; width:90%; max-width:400px; border-radius:12px; padding:16px; max-height:80vh; overflow-y:auto; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:1rem; font-weight:900; color:#1e293b;">📦 സ്റ്റോക്ക് ഐറ്റങ്ങൾ ലിസ്റ്റ്</h3>
+        <button type="button" onclick="closeStockViewModal()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      <div id="masterStockItemsModalContainer"></div>
+    </div>
+  </div>
+
+  <!-- 21. SUPPLIER VIEW MODAL (POPUP FOR SUPPLIERS LIST) -->
+  <div id="supplierViewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; width:90%; max-width:400px; border-radius:12px; padding:16px; max-height:80vh; overflow-y:auto; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:1rem; font-weight:900; color:#1e293b;">🏢 സപ്ലയർമാർ ലിസ്റ്റ്</h3>
+        <button type="button" onclick="closeSupplierViewModal()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      <div id="masterSuppliersModalContainer"></div>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     /* =========================================================
@@ -1906,7 +1926,6 @@
 
     let dynamicOcrKey = localStorage.getItem('BANABLAST_OCR_KEY') || localStorage.getItem('BANABLAST_GEMINI_KEY') || "";
 
-    // ഡിഫോൾട്ട് ലോഗിൻ PIN കോഡുകൾ
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
@@ -1927,7 +1946,6 @@
       }
     }
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -1950,12 +1968,10 @@
     let opening = { cash: 0, bank: 0 };
     let currentReportFilter = 'month';
 
-    // മാസ്റ്റർ ലിസ്റ്റുകൾ
     let masterItems = [];
     let masterSuppliers = [];
     let masterStaff = [];
 
-    // തീയതി & ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
     let currentPosFilter = 'today';
     let currentStockFilter = 'all';
     let currentSupplierFilter = 'all';
@@ -1972,10 +1988,85 @@
 
     const today = new Date().toISOString().split('T')[0];
 
+    // Preset Item Codes Map (1 to 33)
+    const presetItemCodes = {
+      "Happy Kid": "1",
+      "Spider Kid": "2",
+      "Micky Mouse": "3",
+      "Dora Kid": "4",
+      "Normal": "5",
+      "Sp Vanila": "6",
+      "Bana Boost": "7",
+      "Strawberry": "8",
+      "Pistachio": "9",
+      "Mango": "10",
+      "Chocolate": "11",
+      "Coffee": "12",
+      "Butterscotch": "13",
+      "Nuts Banana": "14",
+      "Dates": "15",
+      "Chocochip": "16",
+      "Fruit Mix": "17",
+      "Sp Fruit": "18",
+      "Fruit & Nut": "19",
+      "Jack Fruit": "20",
+      "Catamount": "21",
+      "Royal": "22",
+      "Kulfi": "23",
+      "Arabian Khajoor": "24",
+      "Sanish": "25",
+      "Red Velvet": "26",
+      "Passion Fruit": "27",
+      "Caramel Nuts": "28",
+      "Tender Coconut": "29",
+      "Sp Nuts": "30",
+      "Dry Fruit": "31",
+      "Fig Honey": "32",
+      "Belgium Chocolate": "33"
+    };
+
+    async function autoAssignPresetCodesToFirebase() {
+      try {
+        const snapshot = await db.collection('billing_items').get();
+        const batch = db.batch();
+        let updatedCount = 0;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const cleanName = (data.name || '').trim();
+          if (presetItemCodes[cleanName] && data.code !== presetItemCodes[cleanName]) {
+            batch.update(doc.ref, { code: presetItemCodes[cleanName] });
+            updatedCount++;
+          }
+        });
+        if (updatedCount > 0) {
+          await batch.commit();
+          console.log("✅ Menu codes updated successfully!");
+        }
+      } catch (err) {
+        console.error("Auto assign error: ", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(autoAssignPresetCodesToFirebase, 2000);
+    });
+
     /* =============================================================
        1. UNIVERSAL HARDWARE & GESTURE BACK BUTTON INTERCEPTOR
        ============================================================= */
     function closeTopmostModalOrDropdown() {
+      const stockModal = document.getElementById('stockViewModal');
+      if (stockModal && stockModal.style.display === 'flex') {
+        stockModal.style.display = 'none';
+        return true;
+      }
+
+      const suppModal = document.getElementById('supplierViewModal');
+      if (suppModal && suppModal.style.display === 'flex') {
+        suppModal.style.display = 'none';
+        return true;
+      }
+
       const dd = document.getElementById('mainHeaderDropdown');
       if (dd && dd.classList.contains('show')) {
         dd.classList.remove('show');
@@ -2259,7 +2350,6 @@
       db.collection('master_items').onSnapshot(snap => {
         masterItems = [];
         snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
-        renderMasterStockItemsView();
         updateMasterSuggestions();
       });
 
@@ -2267,7 +2357,6 @@
       db.collection('master_suppliers').onSnapshot(snap => {
         masterSuppliers = [];
         snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
-        renderMasterSuppliersView();
         updateMasterSuggestions();
       });
 
@@ -2365,42 +2454,50 @@
     }
 
     /* -------------------------------------------------------------
-       5. MASTER VIEW LISTS & SUGGESTIONS
+       5. MASTER VIEW MODALS & SUGGESTIONS
        ------------------------------------------------------------- */
-    function renderMasterStockItemsView() {
-      const container = document.getElementById('masterStockItemsViewContainer');
-      if (!container) return;
+    function openStockViewModal() {
+      const container = document.getElementById('masterStockItemsModalContainer');
       if (!masterItems || !masterItems.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">സ്റ്റോക്ക് ഐറ്റങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല</p>';
-        return;
-      }
-      container.innerHTML = masterItems.map(it => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
-          <div><strong>📦 ${it.name}</strong> ${it.unit ? '(' + it.unit + ')' : ''}</div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="openAddStockItemModalWithData('${it.id}', '${it.name}', '${it.unit || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
-            <button type="button" onclick="deleteStockItemMaster('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സ്റ്റോക്ക് ഐറ്റങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല</p>';
+      } else {
+        container.innerHTML = masterItems.map(it => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:0.88rem;">
+            <div><strong>📦 ${it.name}</strong> ${it.unit ? '(' + it.unit + ')' : ''}</div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" onclick="closeStockViewModal(); openAddStockItemModal('${it.id}', '${it.name}', '${it.unit || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
+              <button type="button" onclick="deleteStockItemMaster('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
+      document.getElementById('stockViewModal').style.display = 'flex';
     }
 
-    function renderMasterSuppliersView() {
-      const container = document.getElementById('masterSuppliersViewContainer');
-      if (!container) return;
+    function closeStockViewModal() {
+      document.getElementById('stockViewModal').style.display = 'none';
+    }
+
+    function openSupplierViewModal() {
+      const container = document.getElementById('masterSuppliersModalContainer');
       if (!masterSuppliers || !masterSuppliers.length) {
-        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">സപ്ലയർമാർ ആരും ഇല്ല</p>';
-        return;
-      }
-      container.innerHTML = masterSuppliers.map(s => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
-          <div><strong>🏢 ${s.name}</strong> ${s.phone ? '• ' + s.phone : ''}</div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="openAddSupplierModalWithData('${s.id}', '${s.name}', '${s.phone || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
-            <button type="button" onclick="deleteSupplierMaster('${s.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">സപ്ലയർമാർ ആരും ഇല്ല</p>';
+      } else {
+        container.innerHTML = masterSuppliers.map(s => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:0.88rem;">
+            <div><strong>🏢 ${s.name}</strong> ${s.phone ? '• ' + s.phone : ''}</div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" onclick="closeSupplierViewModal(); openAddSupplierModal('${s.id}', '${s.name}', '${s.phone || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
+              <button type="button" onclick="deleteSupplierMaster('${s.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
+      document.getElementById('supplierViewModal').style.display = 'flex';
+    }
+
+    function closeSupplierViewModal() {
+      document.getElementById('supplierViewModal').style.display = 'none';
     }
 
     let editingStockItemId = null;
@@ -2412,7 +2509,6 @@
       document.getElementById('newStockItemUnitInput').value = unit;
       openModalWithHistory('addStockItemModal');
     }
-    function openAddStockItemModalWithData(id, name, unit) { openAddStockItemModal(id, name, unit); }
 
     function saveNewStockItemMaster() {
       const name = document.getElementById('newStockItemNameInput').value.trim();
@@ -2426,6 +2522,7 @@
         db.collection('master_items').doc(editingStockItemId).update(data).then(() => {
           alert("✅ സ്റ്റോക്ക് ഐറ്റം അപ്‌ഡേറ്റ് ചെയ്തു!");
           closeModal('addStockItemModal');
+          if (document.getElementById('stockViewModal').style.display === 'flex') openStockViewModal();
         });
       } else {
         db.collection('master_items').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
@@ -2437,7 +2534,9 @@
 
     function deleteStockItemMaster(id) {
       if (confirm("ഈ സ്റ്റോക്ക് ഐറ്റം ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
-        db.collection('master_items').doc(id).delete();
+        db.collection('master_items').doc(id).delete().then(() => {
+          if (document.getElementById('stockViewModal').style.display === 'flex') openStockViewModal();
+        });
       }
     }
 
@@ -2447,7 +2546,6 @@
       document.getElementById('newSupplierPhoneInput').value = phone;
       openModalWithHistory('addSupplierModal');
     }
-    function openAddSupplierModalWithData(id, name, phone) { openAddSupplierModal(id, name, phone); }
 
     function saveNewSupplierMaster() {
       const name = document.getElementById('newSupplierNameInput').value.trim();
@@ -2461,6 +2559,7 @@
         db.collection('master_suppliers').doc(editingSupplierId).update(data).then(() => {
           alert("✅ സപ്ലയർ അപ്‌ഡേറ്റ് ചെയ്തു!");
           closeModal('addSupplierModal');
+          if (document.getElementById('supplierViewModal').style.display === 'flex') openSupplierViewModal();
         });
       } else {
         db.collection('master_suppliers').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
@@ -2472,7 +2571,9 @@
 
     function deleteSupplierMaster(id) {
       if (confirm("ഈ സപ്ലയറെ ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
-        db.collection('master_suppliers').doc(id).delete();
+        db.collection('master_suppliers').doc(id).delete().then(() => {
+          if (document.getElementById('supplierViewModal').style.display === 'flex') openSupplierViewModal();
+        });
       }
     }
 
@@ -4415,9 +4516,9 @@
       closeModal('openingModal');
     }
 
-    /* -------------------------------------------------------------
+    /* =============================================================
        17. ROBUST A4 PDF PREVIEW, DIRECT DOWNLOAD & NATIVE WHATSAPP SHARE
-       ------------------------------------------------------------- */
+       ============================================================= */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
