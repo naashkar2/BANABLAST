@@ -681,7 +681,7 @@
 
     <!-- 1-TAP UNIFORM COMPACT ACTION BUTTONS -->
     <div class="header-quick-btns">
-      <!-- 1 സ്മാർട്ട് ബട്ടൺ: സ്റ്റാറ്റസും കണക്റ്റും ഒരുമിച്ച് (Zero Overflow) -->
+      <!-- സ്മാർട്ട് കണക്റ്റ് ബട്ടൺ -->
       <button type="button" id="btnSmartBT" class="btn-smart-connect" onclick="connectBluetoothPrinterUniversal()" title="പ്രിന്റർ ബന്ധിപ്പിക്കുക">
         <span id="btDotIcon">🔴</span> <span id="btTextLabel">Connect</span>
       </button>
@@ -827,7 +827,7 @@
     </div>
   </div>
 
-  <!-- 3. BILL RECEIPT DETAILS MODAL (LAYERED WITH Z-INDEX 1200) -->
+  <!-- 3. BILL RECEIPT DETAILS MODAL -->
   <div class="modal" id="billReceiptModal" style="z-index: 1200;">
     <div class="modal-box">
       <div class="modal-header">
@@ -842,7 +842,7 @@
     </div>
   </div>
 
-  <!-- 4. PARTNER PIN PROMPT WITH SELECT DROPDOWN -->
+  <!-- 4. PARTNER PIN PROMPT -->
   <div class="modal" id="partnerPinPromptModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -869,7 +869,7 @@
     </div>
   </div>
 
-  <!-- 5. BLUETOOTH PRINTER DEVICE SELECTOR MODAL (Z-INDEX 1300) -->
+  <!-- 5. BLUETOOTH PRINTER DEVICE SELECTOR MODAL -->
   <div class="modal" id="printerSelectModal" style="z-index: 1300;">
     <div class="modal-box">
       <div class="modal-header">
@@ -962,7 +962,7 @@
     </div>
   </div>
 
-  <!-- 7. RECENT BILLS / REPRINT MODAL (Z-INDEX 1000) -->
+  <!-- 7. RECENT BILLS / REPRINT MODAL -->
   <div class="modal" id="recentBillsModal" style="z-index: 1000;">
     <div class="modal-box">
       <div class="modal-header">
@@ -999,6 +999,25 @@
           <span>വിറ്റഴിഞ്ഞ ഗ്ലാസുകൾ:</span>
           <strong id="sumGlassesCountText">0</strong>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. SPLIT LONG PRESS MODAL -->
+  <div id="splitLongPressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; width: 85%; max-width: 320px; border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <div style="font-size: 0.9rem; font-weight: 900; color: #1e293b; margin-bottom: 8px;">🔀 സ്പ്ലിറ്റ് പെയ്മെന്റ് (Cash + GPay)</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 12px;">മൊത്തം തുക: <span id="splitModalTotal" style="font-weight: 800; color: #0284c7;">₹0</span></div>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 0.75rem; font-weight: 800; color: #16a34a; display: block; margin-bottom: 4px;">കസ്റ്റമർ തന്ന ക്യാഷ് തുക:</label>
+        <input type="number" id="quickCashInput" placeholder="ഉദാ: 120" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; font-weight: 800; outline: none;" oninput="autoCalcGPayAmount()">
+      </div>
+      <div style="font-size: 0.8rem; font-weight: 700; color: #2563eb; margin-bottom: 14px;">
+        GPay (Auto Balance): <span id="quickGpayDisplay" style="font-weight: 900;">₹0</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" onclick="closeSplitLongPressModal()" style="flex: 1; background: #e2e8f0; border: none; padding: 8px; border-radius: 6px; font-weight: 800; cursor: pointer;">ക്യാൻസൽ</button>
+        <button type="button" onclick="saveSplitPaymentData()" style="flex: 1; background: #16a34a; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 800; cursor: pointer;">ശരി (Save)</button>
       </div>
     </div>
   </div>
@@ -1094,11 +1113,10 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Enable Offline Persistence so app works without internet
     db.enablePersistence({ synchronizeTabs: true })
       .catch((err) => {
         if (err.code == 'unimplemented') {
-          console.warn('The current browser does not support all of the features required to enable persistence');
+          console.warn('The current browser does not support persistence');
         }
       });
 
@@ -1107,13 +1125,16 @@
     let cart = [];
     let parcelCharge = 0;
     let isPrintingBill = false;
-    let currentPayMode = null; // MANDATORY: Starts unselected!
+    let currentPayMode = null; 
     let currentCategory = 'avil_milk';
     let editingBill = null;
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
-    // Preset Item Codes Map (1 to 33) - Lowercased for robust matching
+    // Split Payment State
+    let currentBillSplit = null;
+    let pressTimer = null;
+
     const presetItemCodes = {
       "happy kid": "1", "spider kid": "2", "micky mouse": "3", "dora kid": "4", "normal": "5",
       "sp vanila": "6", "bana boost": "7", "strawberry": "8", "pistachio": "9", "mango": "10",
@@ -1141,17 +1162,12 @@
 
         if (updatedCount > 0) {
           await batch.commit();
-          alert("✅ മെനു കോഡുകൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!");
-          location.reload();
-        } else {
-          alert("ℹ️ പുതിയ കോഡുകൾ ഒന്നും അപ്ഡേറ്റ് ചെയ്യാനില്ല.");
         }
       } catch (err) {
         console.error("Auto assign error: ", err);
       }
     }
 
-    // Partner PINs
     let partnerPins = {
       "ASHIF": "1111",
       "SABITH": "2222",
@@ -1159,14 +1175,11 @@
       "Counter / Billing": "0000"
     };
 
-    // Bluetooth Thermal Printer State
     let connectedThermalPrinter = null;
-    let isConnectingBT = false;
-
     const todayDate = new Date().toISOString().split('T')[0];
 
     /* =============================================================
-       WEB AUDIO API SYNTHESIZER (ZERO-DEPENDENCY AUDIO FEEDBACK)
+       AUDIO SYNTHESIZER
        ============================================================= */
     let audioCtx = null;
     function getAudioContext() {
@@ -1236,7 +1249,6 @@
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     }
 
-    // Date & Time Helpers
     function get12HourTimeString(dateObj = new Date()) {
       let h = dateObj.getHours();
       let m = dateObj.getMinutes();
@@ -1271,17 +1283,23 @@
     function matchMenuCardSubCategory(name, price) {
       const nm = (name || '').toLowerCase();
       const p = Number(price) || 0;
-      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy') || nm.includes('doara')) return 'kids';
-      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut') || nm.includes('fruit and nut')) return 'fruit';
-      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dray fruit') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || nm.includes('biscoff') || nm.includes('roasted almond') || p >= 110) return 'premium_nuts';
+      if (nm.includes('kid') || nm.includes('micky') || nm.includes('spider') || nm.includes('happy')) return 'kids';
+      if (nm.includes('fruit mix') || nm.includes('sp fruit') || nm.includes('fruit & nut')) return 'fruit';
+      if (nm.includes('caramel nuts') || nm.includes('sp nuts') || nm.includes('tender coco') || nm.includes('dry fruit') || nm.includes('fig honey') || nm.includes('belgium') || p >= 110) return 'premium_nuts';
       if (nm.includes('kulfi') || nm.includes('jack fruit') || nm.includes('caramount') || nm.includes('royal') || nm.includes('khajoor') || nm.includes('red velvet') || nm.includes('spanish') || nm.includes('passion') || (p >= 90 && p <= 100)) return 'special';
       return 'regular';
     }
 
     /* =============================================================
-       HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION (LIFO & EXIT FIX)
+       NAVIGATION & BACK BUTTON
        ============================================================= */
     function handleBackNavigation() {
+      const splitModal = document.getElementById('splitLongPressModal');
+      if (splitModal && splitModal.style.display === 'flex') {
+        splitModal.style.display = 'none';
+        return true;
+      }
+
       const liveBox = document.getElementById('liveSuggestionsBox');
       if (liveBox && liveBox.style.display === 'block') {
         liveBox.style.display = 'none';
@@ -1304,10 +1322,10 @@
     }
 
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-      window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
+      window.Capacitor.Plugins.App.addListener('backButton', () => {
         const handled = handleBackNavigation();
         if (!handled) {
-          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ? (Exit App?)")) {
+          if (confirm("ആപ്പിൽ നിന്ന് പുറത്തു കടക്കണോ?")) {
             window.Capacitor.Plugins.App.exitApp();
           }
         }
@@ -1315,9 +1333,7 @@
     }
 
     window.addEventListener('popstate', (e) => {
-      if (handleBackNavigation()) {
-        e.preventDefault();
-      }
+      if (handleBackNavigation()) e.preventDefault();
     });
 
     function openModalWithHistory(id) {
@@ -1333,11 +1349,12 @@
     }
 
     /* =============================================================
-       MANDATORY PAYMENT MODE SELECTION
+       PAYMENT MODE & LONG PRESS SPLIT SETUP
        ============================================================= */
     function setPaymentMode(mode) {
       playTickSound();
       currentPayMode = mode;
+      currentBillSplit = null; // Reset split if standard mode clicked
       const bCash = document.getElementById('btnPayCash');
       const bGpay = document.getElementById('btnPayGPay');
       const pBox = document.getElementById('paymentModeContainer');
@@ -1354,14 +1371,117 @@
 
     function resetPaymentModeSelection() {
       currentPayMode = null;
+      currentBillSplit = null;
       document.getElementById('btnPayCash').className = 'btn-pay-sub';
       document.getElementById('btnPayGPay').className = 'btn-pay-sub';
       const pBox = document.getElementById('paymentModeContainer');
       pBox.classList.remove('shake-alert');
     }
 
+    function calculateCartTotal() {
+      const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      return subtotal + parcelCharge;
+    }
+
+    // Long press event listeners for Cash Button
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => initBluetoothAutoConnect(), 1000);
+      setTimeout(autoAssignPresetCodesToFirebase, 1500);
+
+      const cashBtn = document.getElementById('btnPayCash');
+      if (cashBtn) {
+        cashBtn.addEventListener('touchstart', (e) => {
+          pressTimer = setTimeout(() => {
+            e.preventDefault();
+            openSplitLongPressModal();
+          }, 600);
+        }, {passive: false});
+        cashBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
+        cashBtn.addEventListener('touchmove', () => clearTimeout(pressTimer));
+        cashBtn.addEventListener('mousedown', () => {
+          pressTimer = setTimeout(() => {
+            openSplitLongPressModal();
+          }, 600);
+        });
+        cashBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
+      }
+
+      db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
+        menuItems = [];
+        snap.forEach(doc => {
+          const data = doc.data();
+          let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
+          let subCat = data.subCategory;
+          if (!subCat && fixedCat === 'avil_milk') {
+            subCat = matchMenuCardSubCategory(fixedName, data.price);
+          }
+          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat, subCategory: subCat || 'regular' });
+        });
+        renderMenuItems();
+        renderModalItems();
+      });
+
+      db.collection('settings').doc('security').onSnapshot(doc => {
+        if (doc.exists && doc.data().pins) {
+          partnerPins = { ...partnerPins, ...doc.data().pins };
+        }
+      });
+
+      db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
+        todayBills = [];
+        snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
+      });
+    });
+
+    function openSplitLongPressModal() {
+      const totalAmount = calculateCartTotal();
+      if (totalAmount <= 0) {
+        alert('⚠️ ആദ്യം കാർട്ടിലേക്ക് ഐറ്റങ്ങൾ ചേർക്കൂ!');
+        return;
+      }
+      document.getElementById('splitModalTotal').innerText = '₹' + totalAmount;
+      document.getElementById('quickCashInput').value = '';
+      document.getElementById('quickGpayDisplay').innerText = '₹0';
+      document.getElementById('splitLongPressModal').style.display = 'flex';
+    }
+
+    function autoCalcGPayAmount() {
+      const totalAmount = calculateCartTotal();
+      const cashVal = parseFloat(document.getElementById('quickCashInput').value) || 0;
+      let gpayVal = totalAmount - cashVal;
+      if (gpayVal < 0) gpayVal = 0;
+      document.getElementById('quickGpayDisplay').innerText = '₹' + gpayVal;
+    }
+
+    function saveSplitPaymentData() {
+      const totalAmount = calculateCartTotal();
+      const cashVal = parseFloat(document.getElementById('quickCashInput').value) || 0;
+      const gpayVal = totalAmount - cashVal;
+      if (cashVal < 0 || gpayVal < 0) {
+        alert('⚠️ തുക കൃത്യമായി നൽകുക!');
+        return;
+      }
+      currentBillSplit = { cash: cashVal, gpay: gpayVal };
+      currentPayMode = 'Split';
+      document.getElementById('splitLongPressModal').style.display = 'none';
+
+      // Visual indicator on cash button for split mode
+      const bCash = document.getElementById('btnPayCash');
+      const bGpay = document.getElementById('btnPayGPay');
+      bCash.className = 'btn-pay-sub active cash';
+      bGpay.className = 'btn-pay-sub';
+      bCash.innerHTML = `🔀 SPLIT (C:₹${cashVal} G:₹${gpayVal})`;
+
+      printAndSaveBill();
+    }
+
+    function closeSplitLongPressModal() {
+      document.getElementById('splitLongPressModal').style.display = 'none';
+    }
+
     /* =============================================================
-       PARCEL CHARGE LOGIC
+       PARCEL & BILL NUMBER
        ============================================================= */
     function openParcelModal() {
       if (parcelCharge > 0) {
@@ -1390,9 +1510,6 @@
       renderCartUI();
     }
 
-    /* =============================================================
-       CONTINUOUS 4-DIGIT BILL NUMBER (0001 START)
-       ============================================================= */
     function getNextSequentialBillNo() {
       let lastStored = parseInt(localStorage.getItem('BANABLAST_LAST_BILL_NUM') || '0', 10);
       if (lastStored > 3000) lastStored = 0;
@@ -1408,14 +1525,13 @@
           }
         });
       }
-
       const nextNo = lastStored + 1;
       localStorage.setItem('BANABLAST_LAST_BILL_NUM', nextNo.toString());
       return String(nextNo).padStart(4, '0');
     }
 
     /* =============================================================
-       HEADER DROPDOWN & APP UPDATE
+       HEADER & NAVIGATION
        ============================================================= */
     function toggleHeaderMenu(e) {
       e.stopPropagation();
@@ -1429,17 +1545,6 @@
       if (dd) dd.classList.remove('show');
     }
 
-    window.addEventListener('click', (e) => {
-      const dd = document.getElementById('headerDropdown');
-      if (dd && !e.target.closest('.header-quick-btns')) {
-        dd.classList.remove('show');
-      }
-      const liveBox = document.getElementById('liveSuggestionsBox');
-      if (liveBox && !e.target.closest('#quickItemCodeInput') && !e.target.closest('#liveSuggestionsBox')) {
-        liveBox.style.display = 'none';
-      }
-    });
-
     function forceReloadApp() {
       if (confirm("ആപ്പ് ഏറ്റവും പുതിയ വേർഷനിലേക്ക് അപ്‌ഡേറ്റ് ചെയ്യണോ?")) {
         const freshUrl = window.location.href.split('?')[0] + '?update=' + Date.now();
@@ -1447,9 +1552,6 @@
       }
     }
 
-    /* =============================================================
-       BACK TO MAIN APP WITH STRICT PARTNER SELECT & PIN
-       ============================================================= */
     function openPartnerPinPromptModal() {
       document.getElementById('inputBackPartnerPin').value = '';
       openModalWithHistory('partnerPinPromptModal');
@@ -1458,7 +1560,7 @@
     function verifyAndReturnToMainApp() {
       const selectedPartner = document.getElementById('backPartnerSelect').value;
       const enteredPin = document.getElementById('inputBackPartnerPin').value.trim();
-      const requiredPin = partnerPins[selectedPartner] || (selectedPartner === 'ASHKAR ALI' ? '3333' : (selectedPartner === 'SABITH' ? '2222' : '1111'));
+      const requiredPin = partnerPins[selectedPartner] || '3333';
 
       if (enteredPin === requiredPin || enteredPin === '9999') {
         playSuccessSound();
@@ -1466,17 +1568,13 @@
         window.location.href = 'index.html';
       } else {
         playWarningSound();
-        alert(`❌ തെറ്റായ PIN! ${selectedPartner}-ന്റെ ശരിയായ PIN നൽകുക.`);
+        alert(`❌ തെറ്റായ PIN!`);
       }
     }
 
     /* =============================================================
-       UNIVERSAL BLUETOOTH THERMAL PRINTER (WITH PERMISSION HANDLING)
+       BLUETOOTH PRINTER ENGINE
        ============================================================= */
-    document.addEventListener('deviceready', () => {
-      initBluetoothAutoConnect();
-    }, false);
-
     function updateBTStatusUI(status, label) {
       const btn = document.getElementById('btnSmartBT');
       const dot = document.getElementById('btDotIcon');
@@ -1508,7 +1606,7 @@
           const savedMac = localStorage.getItem('BANABLAST_BT_MAC');
           const target = devices.find(d => 
             (savedMac && d.address === savedMac) ||
-            (d.name && (d.name.includes("BlueTooth") || d.name.toLowerCase().includes("printer") || d.name.toLowerCase().includes("pos")))
+            (d.name && (d.name.includes("BlueTooth") || d.name.toLowerCase().includes("printer")))
           ) || devices[0];
 
           if (target) {
@@ -1530,20 +1628,16 @@
     function connectBluetoothPrinterUniversal() {
       playTickSound();
       if (typeof bluetoothSerial === 'undefined') {
-        alert("⚠️ BluetoothSerial plugin ലഭ്യമല്ല (Browser Mode). സാധാരണ പ്രിന്റ് കമാൻഡ് വഴി പ്രിന്റർ തിരഞ്ഞെടുക്കാവുന്നതാണ്.");
-        updateBTStatusUI('offline', 'Connect');
+        alert("⚠️ BluetoothSerial plugin ലഭ്യമല്ല.");
         return;
       }
-
       bluetoothSerial.isEnabled(() => {
         scanAndPopulateBTDevices();
       }, () => {
         bluetoothSerial.enable(() => {
           scanAndPopulateBTDevices();
         }, () => {
-          playWarningSound();
-          alert("ദയവായി ഫോണിലെ ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക!");
-          updateBTStatusUI('offline', 'Connect');
+          alert("ദയവായി ബ്ലൂടൂത്ത് ഓൺ ചെയ്യുക!");
         });
       });
     }
@@ -1554,158 +1648,45 @@
         const container = document.getElementById('btDevicesListContainer');
         if (!devices || devices.length === 0) {
           updateBTStatusUI('offline', 'No Devices');
-          container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px; font-size:0.85rem;">പെയർ ചെയ്ത ഡിവൈസുകൾ കണ്ടെത്തിയില്ല. ഫോൺ സെറ്റിംഗ്സിൽ "BlueTooth Printer" പെയർ ചെയ്യുക.</p>';
+          container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">ഡിവൈസുകൾ കണ്ടെത്തിയില്ല.</p>';
           openModalWithHistory('printerSelectModal');
           return;
         }
 
         container.innerHTML = devices.map(d => `
-          <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="pairSpecificDevice('${d.address}', '${d.name || 'Printer'}')">
+          <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="pairSpecificDevice('${d.address}', '${d.name || 'Printer'}')">
             <div>
-              <div style="font-weight:900; font-size:0.92rem; color:var(--primary-dark);">🖨️ ${d.name || 'Unknown Device'}</div>
+              <div style="font-weight:900; font-size:0.92rem;">🖨️ ${d.name || 'Printer'}</div>
               <div style="font-size:0.72rem; color:#64748b; font-family:monospace;">${d.address}</div>
             </div>
             <button type="button" class="btn-hdr-action" style="height:30px; font-size:0.75rem;">Connect</button>
           </div>
         `).join('');
-
         openModalWithHistory('printerSelectModal');
-      }, (err) => {
+      }, () => {
         updateBTStatusUI('offline', 'Connect');
-        const errStr = String(err || '');
-        if (errStr.includes('BLUETOOTH_CONNECT') || errStr.includes('permission')) {
-          alert("⚠️ ഫോണിൽ ബ്ലൂടൂത്ത് അനുമതി (Nearby Devices Permission) ആവശ്യമാണ്!\n\nദയവായി ഫോൺ Settings ➔ Apps ➔ BANABLAST ➔ Permissions ➔ 'Nearby devices' (സമീപ ഉപകരണങ്ങൾ) എന്നത് Allow (അനുവദിക്കുക) നൽകുക.");
-        } else {
-          alert("ഡിവൈസുകൾ സ്കാൻ ചെയ്യുന്നതിൽ തടസ്സം: " + errStr);
-        }
       });
     }
 
     function pairSpecificDevice(address, name) {
       playTickSound();
-      updateBTStatusUI('connecting', 'Connecting...');
       closeModal('printerSelectModal');
-
       bluetoothSerial.connect(address, () => {
         connectedThermalPrinter = { address, name };
         localStorage.setItem('BANABLAST_BT_MAC', address);
         updateBTStatusUI('online', 'Ready');
         playSuccessSound();
         alert(`✅ പ്രിന്ററുമായി ബന്ധിപ്പിച്ചു: ${name}`);
-      }, (err) => {
+      }, () => {
         connectedThermalPrinter = null;
         updateBTStatusUI('offline', 'Connect');
-        playWarningSound();
-        alert(`❌ പ്രിന്ററുമായി കണക്റ്റ് ചെയ്യാൻ കഴിഞ്ഞില്ല (${name}). പ്രിന്റർ ഓൺ ആണെന്ന് ഉറപ്പാക്കുക.`);
+        alert(`❌ കണക്റ്റ് ചെയ്യാൻ കഴിഞ്ഞില്ല.`);
       });
     }
 
-    function sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge = 0) {
-      const ESC = "\x1B";
-      const GS = "\x1D";
-      const INIT = ESC + "@";
-      const CENTER = ESC + "a\x01";
-      const LEFT = ESC + "a\x00";
-      const BOLD_ON = ESC + "E\x01";
-      const BOLD_OFF = ESC + "E\x00";
-      const DOUBLE_ON = GS + "!\x11";
-      const NORMAL = GS + "!\x00";
-      const FEED = "\n\n\n\n";
-
-      let raw = INIT;
-      raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
-      raw += CENTER + "NELLIPPUZHA, MANNARKKAD\n";
-      raw += CENTER + "Mob:+919037010883\n";
-      raw += CENTER + "--------------------------------\n";
-      
-      // Line 1: Bill No on Left
-      raw += LEFT + BOLD_ON + `BILL NO:${billNo}\n` + BOLD_OFF;
-      
-      // Line 2: Date on Left, Time on Right
-      let datePart = `${date}`;
-      let timePart = `${time}`;
-      let spaceCount = 32 - (datePart.length + timePart.length);
-      if (spaceCount < 1) spaceCount = 1;
-      raw += LEFT + datePart + " ".repeat(spaceCount) + timePart + "\n";
-      
-      raw += CENTER + "--------------------------------\n";
-      raw += LEFT + "NO ITEM           QTY     AMT\n";
-      raw += LEFT + "--------------------------------\n";
-
-      items.forEach((i, index) => {
-        let slNo = String(index + 1).padStart(2, ' ') + " ";
-        let fullName = (i.name || '').trim();
-        let qty = String(i.qty);
-        let amt = String(i.price * i.qty);
-        let name = fullName.length > 15 ? fullName.substring(0, 15) : fullName;
-        
-        // Alignment: SlNo(3) + Item(15) + Qty(4) + Amt(8) = 30 chars
-        raw += slNo + name.padEnd(15, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
-      });
-
-      if (pCharge > 0) {
-        let pSlNo = "   ";
-        let pName = "Parcel Charge".padEnd(15, ' ');
-        let pQty = "".padStart(4, ' ');
-        let pAmt = String(pCharge).padStart(8, ' ');
-        raw += pSlNo + pName + pQty + pAmt + "\n";
-      }
-
-      raw += LEFT + "--------------------------------\n";
-      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
-      raw += LEFT + `PAYMENT: ${(mode || 'cash').toUpperCase()}\n`;
-      raw += LEFT + "--------------------------------\n";
-      raw += CENTER + "*** THANK YOU ***\n";
-      raw += CENTER + "Visit Again!\n";
-      raw += FEED;
-
-      bluetoothSerial.write(raw, () => {
-        console.log("Direct ESC/POS Print Success!");
-      }, () => {
-        window.print();
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        initBluetoothAutoConnect();
-      }, 1000);
-
-      setTimeout(autoAssignPresetCodesToFirebase, 1500);
-
-      db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
-        menuItems = [];
-        snap.forEach(doc => {
-          const data = doc.data();
-          let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
-          
-          let subCat = data.subCategory;
-          if (!subCat && fixedCat === 'avil_milk') {
-            subCat = matchMenuCardSubCategory(fixedName, data.price);
-          }
-
-          menuItems.push({ id: doc.id, ...data, name: fixedName, category: fixedCat, subCategory: subCat || 'regular' });
-        });
-
-        renderMenuItems();
-        renderModalItems();
-      }, (error) => {
-        console.log("Using offline cache for menu items:", error);
-      });
-
-      db.collection('settings').doc('security').onSnapshot(doc => {
-        if (doc.exists && doc.data().pins) {
-          partnerPins = { ...partnerPins, ...doc.data().pins };
-        }
-      });
-
-      db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
-        todayBills = [];
-        snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
-      });
-    });
-
+    /* -------------------------------------------------------------
+       MENU & CART PRIORITY (UNSHIFT)
+       ------------------------------------------------------------- */
     function switchCategory(cat) {
       playTickSound();
       currentCategory = cat;
@@ -1745,7 +1726,6 @@
         return i.category === currentCategory;
       });
 
-      // കോഡ് നമ്പർ അനുസരിച്ച് കൃത്യമായ ക്രമത്തിൽ സോർട്ട് ചെയ്യാൻ
       items.sort((a, b) => {
         let codeA = parseInt(a.code, 10) || 999;
         let codeB = parseInt(b.code, 10) || 999;
@@ -1754,7 +1734,7 @@
       });
 
       if (!items.length) {
-        root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
+        root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല.</p>';
         return;
       }
 
@@ -1772,7 +1752,6 @@
       ];
 
       let fullHTML = '<div id="sec-all"></div>';
-
       subCats.forEach(sc => {
         const catItems = items.filter(i => i.subCategory === sc.filter);
         if (catItems.length) {
@@ -1786,7 +1765,6 @@
           `;
         }
       });
-
       root.innerHTML = fullHTML;
     }
 
@@ -1795,7 +1773,6 @@
       const qty = cartItem ? cartItem.qty : 0;
       const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
       const isSelected = qty > 0 ? 'in-cart' : '';
-
       const itemCodeBadge = it.code ? `<div style="font-size:0.7rem; font-weight:900; color:#0284c7; background:#e0f2fe; padding:1px 6px; border-radius:6px; margin-bottom:3px; display:inline-block;">#${it.code}</div>` : '';
 
       const mediaHTML = it.imageUrl 
@@ -1819,7 +1796,7 @@
       `;
     }
 
-    // കാർട്ടിന്റെ മുകളിലേക്ക് പുതിയ ഐറ്റം കയറാൻ സഹായിക്കുന്ന പ്രയോറിറ്റി ഫങ്ഷൻ
+    // കാർട്ടിന്റെ ഏറ്റവും മുകളിലേക്ക് പുതിയ ഐറ്റം കയറുന്ന പ്രയോറിറ്റി ഫങ്ഷൻ
     function addToCartPriority(itemId) {
       playTickSound();
       const it = menuItems.find(x => x.id === itemId);
@@ -1874,7 +1851,6 @@
       });
 
       const grandTotal = subtotal > 0 ? (subtotal + parcelCharge) : 0;
-
       document.getElementById('cartTotalText').innerText = '₹' + grandTotal;
       document.getElementById('cartCountTag').innerText = `${totalQty} Items`;
 
@@ -1914,7 +1890,6 @@
             </div>
           `;
         }
-
         container.innerHTML = itemsHtml;
       }
     }
@@ -1923,9 +1898,9 @@
       openModalWithHistory('cartDrawerModal');
     }
 
-    /* -------------------------------------------------------------
-       PRINT AND SAVE BILL (MANDATORY PAYMENT CHECK & INSTANT LOCK)
-       ------------------------------------------------------------- */
+    /* =============================================================
+       PRINT AND SAVE BILL (SPLIT & LEDGER LOGIC)
+       ============================================================= */
     async function printAndSaveBill() {
       if (!cart.length) {
         playWarningSound();
@@ -1955,25 +1930,50 @@
       const createdAtMillis = Date.now();
       const billNo = editingBill ? editingBill.billNo : getNextSequentialBillNo();
 
+      let activeModeForRecord = currentPayMode;
+      let splitDetails = null;
+      if (currentPayMode === 'Split' && currentBillSplit) {
+        activeModeForRecord = 'Split';
+        splitDetails = currentBillSplit;
+      }
+
       try {
         if (editingBill) {
           const oldTotal = editingBill.total;
-          const oldMode = editingBill.mode;
+          const oldMode = editingBill.paymentMode || editingBill.mode;
 
-          await db.collection('pos_bills').doc(editingBill.id).update({
+          let updateObj = {
             items: cart,
             parcelCharge: parcelCharge,
             total,
-            mode: currentPayMode,
+            paymentMode: activeModeForRecord,
+            mode: activeModeForRecord === 'Split' ? 'cash' : activeModeForRecord,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          };
+          if (splitDetails) {
+            updateObj.cash = splitDetails.cash;
+            updateObj.gpay = splitDetails.gpay;
+          }
 
-          await syncAggregatedLedger(todayDate, oldMode, -oldTotal);
-          await syncAggregatedLedger(todayDate, currentPayMode, total);
+          await db.collection('pos_bills').doc(editingBill.id).update(updateObj);
+
+          if (oldMode === 'Split' && editingBill.cash && editingBill.gpay) {
+            await syncAggregatedLedger(todayDate, 'cash', -editingBill.cash);
+            await syncAggregatedLedger(todayDate, 'gpay', -editingBill.gpay);
+          } else {
+            await syncAggregatedLedger(todayDate, oldMode, -oldTotal);
+          }
+
+          if (activeModeForRecord === 'Split' && splitDetails) {
+            await syncAggregatedLedger(todayDate, 'cash', splitDetails.cash);
+            await syncAggregatedLedger(todayDate, 'gpay', splitDetails.gpay);
+          } else {
+            await syncAggregatedLedger(todayDate, activeModeForRecord, total);
+          }
 
           alert(`✅ ബില്ല് #${billNo} വിജയകരമായി തിരുത്തി!`);
         } else {
-          await db.collection('pos_bills').add({
+          let newBillObj = {
             billNo,
             date: todayDate,
             dateDisplay: dateFormatted,
@@ -1983,20 +1983,33 @@
             items: cart,
             parcelCharge: parcelCharge,
             total,
-            mode: currentPayMode,
+            paymentMode: activeModeForRecord,
+            mode: activeModeForRecord === 'Split' ? 'cash' : activeModeForRecord,
             addedBy: 'Counter Staff',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          };
+          if (splitDetails) {
+            newBillObj.cash = splitDetails.cash;
+            newBillObj.gpay = splitDetails.gpay;
+          }
 
-          await syncAggregatedLedger(todayDate, currentPayMode, total);
+          await db.collection('pos_bills').add(newBillObj);
+
+          if (activeModeForRecord === 'Split' && splitDetails) {
+            await syncAggregatedLedger(todayDate, 'cash', splitDetails.cash);
+            await syncAggregatedLedger(todayDate, 'gpay', splitDetails.gpay);
+          } else {
+            await syncAggregatedLedger(todayDate, activeModeForRecord, total);
+          }
         }
 
         playSuccessSound();
-        triggerThermalPrint(billNo, dateFormatted, timeStr, total, currentPayMode, cart, parcelCharge);
+        triggerThermalPrint(billNo, dateFormatted, timeStr, total, activeModeForRecord, cart, parcelCharge);
 
         cart = [];
         parcelCharge = 0;
         editingBill = null;
+        currentBillSplit = null;
         resetPaymentModeSelection();
         renderCartUI();
         renderMenuItems();
@@ -2021,7 +2034,7 @@
       document.getElementById('rBillDate').innerText = `${date}  ${time}`;
       document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
       document.getElementById('rTotalAmt').innerText = `₹${total}`;
-      document.getElementById('rPayMode').innerText = (mode === 'cash' ? 'CASH' : 'GPAY');
+      document.getElementById('rPayMode').innerText = (mode === 'Split' ? 'CASH' : mode.toUpperCase());
 
       const pTag = document.getElementById('rParcelTag');
       const pRow = document.getElementById('rParcelRow');
@@ -2045,20 +2058,59 @@
 
       if (typeof bluetoothSerial !== 'undefined' && connectedThermalPrinter) {
         sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge);
-      } else if (typeof bluetoothSerial !== 'undefined') {
-        connectBluetoothPrinterUniversal();
-        setTimeout(() => {
-          if (connectedThermalPrinter) {
-            sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge);
-          } else {
-            window.print();
-          }
-        }, 300);
       } else {
-        setTimeout(() => {
-          window.print();
-        }, 50);
+        setTimeout(() => { window.print(); }, 50);
       }
+    }
+
+    function sendEscPosDirectPrint(billNo, date, time, total, mode, items, pCharge = 0) {
+      const ESC = "\x1B";
+      const GS = "\x1D";
+      const INIT = ESC + "@";
+      const CENTER = ESC + "a\x01";
+      const LEFT = ESC + "a\x00";
+      const BOLD_ON = ESC + "E\x01";
+      const BOLD_OFF = ESC + "E\x00";
+      const DOUBLE_ON = GS + "!\x11";
+      const NORMAL = GS + "!\x00";
+      const FEED = "\n\n\n\n";
+
+      let raw = INIT;
+      raw += CENTER + BOLD_ON + DOUBLE_ON + "BANABLAST\n" + NORMAL + BOLD_OFF;
+      raw += CENTER + "NELLIPPUZHA, MANNARKKAD\n";
+      raw += CENTER + "Mob:+919037010883\n";
+      raw += CENTER + "--------------------------------\n";
+      raw += LEFT + BOLD_ON + `BILL NO:${billNo}\n` + BOLD_OFF;
+      
+      let spaceCount = 32 - (date.length + time.length);
+      if (spaceCount < 1) spaceCount = 1;
+      raw += LEFT + date + " ".repeat(spaceCount) + time + "\n";
+      raw += CENTER + "--------------------------------\n";
+      raw += LEFT + "NO ITEM           QTY     AMT\n";
+      raw += LEFT + "--------------------------------\n";
+
+      items.forEach((i, index) => {
+        let slNo = String(index + 1).padStart(2, ' ') + " ";
+        let fullName = (i.name || '').trim();
+        let qty = String(i.qty);
+        let amt = String(i.price * i.qty);
+        let name = fullName.length > 15 ? fullName.substring(0, 15) : fullName;
+        raw += slNo + name.padEnd(15, ' ') + qty.padStart(4, ' ') + amt.padStart(8, ' ') + "\n";
+      });
+
+      if (pCharge > 0) {
+        raw += "   " + "Parcel Charge".padEnd(15, ' ') + "".padStart(4, ' ') + String(pCharge).padStart(8, ' ') + "\n";
+      }
+
+      raw += LEFT + "--------------------------------\n";
+      raw += LEFT + BOLD_ON + DOUBLE_ON + `TOTAL: Rs.${total}\n` + NORMAL + BOLD_OFF;
+      raw += LEFT + `PAYMENT: ${(mode === 'Split' ? 'CASH' : mode).toUpperCase()}\n`;
+      raw += LEFT + "--------------------------------\n";
+      raw += CENTER + "*** THANK YOU ***\n";
+      raw += CENTER + "Visit Again!\n";
+      raw += FEED;
+
+      bluetoothSerial.write(raw, () => {}, () => { window.print(); });
     }
 
     async function syncAggregatedLedger(dateStr, mode, deltaAmount) {
@@ -2102,24 +2154,20 @@
       await batch.commit();
     }
 
-    /* -------------------------------------------------------------
-       WHATSAPP BILL - NATIVE APP LAUNCH & PDF RENDER
-       ------------------------------------------------------------- */
+    /* =============================================================
+       WHATSAPP BILL - PDF
+       ============================================================= */
     async function sendWhatsAppBillDirect() {
       if (!cart.length) {
         playWarningSound();
         alert("⚠️ സാധനങ്ങൾ തിരഞ്ഞെടുത്ത ശേഷം WhatsApp ബില്ല് നൽകുക.");
         return;
       }
-
       if (!currentPayMode) {
         playWarningSound();
-        const pBox = document.getElementById('paymentModeContainer');
-        pBox.classList.add('shake-alert');
-        alert("⚠️ ദയവായി CASH അല്ലെങ്കിൽ GPAY തിരഞ്ഞെടുക്കുക!");
+        alert("⚠️ ദയവായി CASH അല്ലെങ്കിൽ ക്യാഷ് ബട്ടൺ ലോംഗ് പ്രസ്സ് ചെയ്ത് സ്പ്ലിറ്റ് തിരഞ്ഞെടുക്കുക!");
         return;
       }
-
       const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
       const total = subtotal + parcelCharge;
       const timeStr = get12HourTimeString();
@@ -2133,7 +2181,7 @@
       document.getElementById('pdfDateText').innerText = `${date}  ${time}`;
       document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
       document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
-      document.getElementById('pdfPayModeText').innerText = (mode === 'cash' ? 'CASH' : 'GPAY');
+      document.getElementById('pdfPayModeText').innerText = (mode === 'Split' ? 'SPLIT (CASH + GPAY)' : mode.toUpperCase());
 
       const pRow = document.getElementById('pdfParcelRow');
       const pVal = document.getElementById('pdfParcelVal');
@@ -2168,47 +2216,34 @@
         const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
 
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
         const pdfBlob = pdf.output('blob');
         const fileName = `BANABLAST_Bill_${billNo}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
         if (window.plugins && window.plugins.socialsharing) {
-          window.plugins.socialsharing.share(
-            `🥤 BANABLAST Bill #${billNo} (₹${total})`,
-            `BANABLAST Bill #${billNo}`,
-            pdf.output('datauristring'),
-            null
-          );
+          window.plugins.socialsharing.share(`🥤 BANABLAST Bill #${billNo} (₹${total})`, `BANABLAST Bill #${billNo}`, pdf.output('datauristring'), null);
           return;
         }
 
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           try {
-            await navigator.share({
-              files: [pdfFile],
-              title: `BANABLAST Bill #${billNo}`,
-              text: `🥤 BANABLAST Bill #${billNo} - ₹${total}`
-            });
+            await navigator.share({ files: [pdfFile], title: `BANABLAST Bill #${billNo}`, text: `🥤 Bill #${billNo} - ₹${total}` });
             return;
           } catch(e) {}
         }
-
         pdf.save(fileName);
-        alert(`✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു!`);
+        alert(`✅ PDF ഫയൽ ഫോണിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!`);
       } catch (err) {
-        console.error("PDF Render Error:", err);
         card.style.left = '-9999px';
-        alert("❌ PDF തയ്യാറാക്കുന്നതിൽ തടസ്സം: " + err.message);
+        alert("❌ PDF തടസ്സം: " + err.message);
       }
     }
 
-    /* -------------------------------------------------------------
-       RECENT BILLS - COMPACT CARDS & DETAILED POPUP ON TAP
-       ------------------------------------------------------------- */
+    /* =============================================================
+       RECENT BILLS & EDIT FEATURE
+       ============================================================= */
     function openRecentBillsModal() {
       const container = document.getElementById('recentBillsContainer');
-      
       const sorted = todayBills.slice().sort((a, b) => {
         const tA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : parseToTimeMillis(a.time, a.date));
         const tB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : parseToTimeMillis(b.time, b.date));
@@ -2218,28 +2253,28 @@
       if (!sorted.length) {
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px; font-size:0.9rem;">ഇന്ന് അടിച്ച ബില്ലുകൾ ലഭ്യമല്ല.</p>';
       } else {
-        container.innerHTML = sorted.map(b => {
-          const totalQty = (b.items || []).reduce((sum, it) => sum + (it.qty || 1), 0);
-          const isCash = (b.mode || 'cash').toLowerCase() === 'cash';
+        container.innerHTML = sorted.map(bill => {
+          const isSplit = bill.paymentMode === 'Split';
+          const isCash = (bill.paymentMode || bill.mode || 'cash').toLowerCase() === 'cash';
 
           return `
-            <div class="recent-bill-card" onclick="showBillReceiptDetails('${b.id}')">
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 11px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="showBillReceiptDetails('${bill.id}')">
               <div>
-                <div style="font-weight:900; font-size:0.95rem; color:var(--primary-dark);">
-                  #${b.billNo} • ₹${b.total} 
-                  <span style="font-size:0.68rem; padding:2px 7px; border-radius:6px; font-weight:800; background:${isCash ? '#dcfce7' : '#e0f2fe'}; color:${isCash ? '#059669' : '#0284c7'};">
-                    ${(b.mode || 'cash').toUpperCase()}
+                <div style="font-weight: 900; font-size: 0.95rem; color:var(--primary-dark);">
+                  #${bill.billNo || ''} • ₹${bill.total || 0}
+                  <span style="font-size:0.68rem; padding:2px 7px; border-radius:6px; font-weight:800; background:${isSplit ? '#fef3c7' : (isCash ? '#dcfce7' : '#e0f2fe')}; color:${isSplit ? '#b45309' : (isCash ? '#059669' : '#0284c7')};">
+                    ${isSplit ? 'SPLIT' : (bill.paymentMode || bill.mode || 'CASH').toUpperCase()}
                   </span>
                 </div>
-                <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
-                  🕒 ${b.time || '-'} • ${totalQty} Items ${b.parcelCharge ? '• 🥡' : ''}
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
+                  🕒 ${bill.time || '-'} • ${isSplit ? `Cash: ₹${bill.cash} \vert{} GPay: ₹${bill.gpay}` : ''}
                 </div>
               </div>
               <div style="display:flex; gap:5px;" onclick="event.stopPropagation()">
-                <button type="button" class="btn-rec-act" style="background:#25d366; color:white;" onclick="shareExistingBillPdf('${b.id}')" title="WhatsApp PDF">💬</button>
-                <button type="button" class="btn-rec-act" style="background:var(--blue); color:white;" onclick="reprintBill('${b.id}')" title="റീപ്രിന്റ്">🖨️</button>
-                <button type="button" class="btn-rec-act" style="background:#f59e0b; color:white;" onclick="loadBillToEdit('${b.id}')" title="തിരുത്തുക">✏️</button>
-                <button type="button" class="btn-rec-act" style="background:#fee2e2; color:#dc2626;" onclick="deletePosBill('${b.id}')" title="ഡിലീറ്റ് ചെയ്യുക">🗑</button>
+                <button type="button" class="btn-rec-act" style="background:#25d366; color:white;" onclick="shareExistingBillPdf('${bill.id}')" title="WhatsApp PDF">💬</button>
+                <button type="button" class="btn-rec-act" style="background:var(--blue); color:white;" onclick="reprintBill('${bill.id}')" title="റീപ്രിന്റ്">🖨️</button>
+                <button type="button" class="btn-rec-act" style="background:#f59e0b; color:white;" onclick="loadBillToEdit('${bill.id}')" title="തിരുത്തുക">✏️</button>
+                <button type="button" class="btn-rec-act" style="background:#fee2e2; color:#dc2626;" onclick="deletePosBill('${bill.id}')" title="ഡിലീറ്റ്">🗑</button>
               </div>
             </div>
           `;
@@ -2264,64 +2299,54 @@
         <div style="text-align:center; border-bottom:1px solid #cbd5e1; padding-bottom:8px; margin-bottom:8px;">
           <h3 style="font-size:1.1rem; font-weight:900; margin:0; color:#0f172a;">BANABLAST</h3>
           <div style="font-size:0.75rem; color:#475569;">Nellippuzha, Mannarkkad • +91 9037010883</div>
-          <div style="font-size:0.75rem; color:#64748b; margin-top:4px;"><b>BILL NO:</b> ${b.billNo} | <b>DATE:</b> ${b.dateDisplay || b.date} ${b.time}</div>
-          ${b.parcelCharge > 0 ? '<div style="color:#c2410c; font-weight:800; font-size:0.75rem; margin-top:2px;">*** PARCEL ORDER ***</div>' : ''}
+          <div style="font-size:0.75rem; color:#64748b; margin-top:4px;"><b>BILL NO:</b> #${b.billNo} | <b>DATE:</b> ${b.dateDisplay || b.date} ${b.time}</div>
         </div>
         ${itemsRows}
-        ${b.parcelCharge > 0 ? `
-          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#c2410c; font-weight:700;">
-            <span>Parcel Charge:</span>
-            <span>+₹${b.parcelCharge}</span>
-          </div>
-        ` : ''}
         <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-weight:900; margin-top:8px; padding-top:6px; border-top:1.5px solid #0f172a;">
           <span>TOTAL:</span>
           <span>₹${b.total}</span>
         </div>
         <div style="font-size:0.75rem; color:#64748b; margin-top:4px; text-align:right;">
-          Payment: <b>${(b.mode || 'CASH').toUpperCase()}</b>
+          Payment: <b>${b.paymentMode === 'Split' ? `Split (Cash: ₹${b.cash}, GPay: ₹${b.gpay})` : (b.paymentMode || b.mode || 'CASH').toUpperCase()}</b>
         </div>
       `;
 
-      document.getElementById('btnReceiptModalPrint').onclick = () => {
-        reprintBill(b.id);
-      };
-      document.getElementById('btnReceiptModalWa').onclick = () => {
-        shareExistingBillPdf(b.id);
-      };
-
+      document.getElementById('btnReceiptModalPrint').onclick = () => reprintBill(b.id);
+      document.getElementById('btnReceiptModalWa').onclick = () => shareExistingBillPdf(b.id);
       openModalWithHistory('billReceiptModal');
     }
 
     function shareExistingBillPdf(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
-      generateAndSharePdfBill(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.mode, b.items || [], b.parcelCharge || 0);
+      generateAndSharePdfBill(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.paymentMode || b.mode, b.items || [], b.parcelCharge || 0);
     }
 
     async function deletePosBill(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
 
-      if (!confirm(`⚠ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?\n\nഇത് ഡിലീറ്റ് ചെയ്താൽ പ്രധാന അക്കൗണ്ടിലെ സെയിൽസ് തുകയിൽ നിന്നും ₹${b.total} തനിയെ കുറയുന്നതാണ്.`)) {
-        return;
-      }
+      if (!confirm(`⚠ ബില്ല് #${b.billNo} (₹${b.total}) ഒഴിവാക്കണമെന്ന് ഉറപ്പാണോ?`)) return;
 
       try {
         await db.collection('pos_bills').doc(id).delete();
-        await syncAggregatedLedger(b.date || todayDate, b.mode || 'cash', -b.total);
-        alert(`✅ ബില്ല് #${b.billNo} ഡിലീറ്റ് ചെയ്യുകയും ലെഡ്ജർ തുക വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്യുകയും ചെയ്തു.`);
+        if (b.paymentMode === 'Split' && b.cash && b.gpay) {
+          await syncAggregatedLedger(b.date || todayDate, 'cash', -b.cash);
+          await syncAggregatedLedger(b.date || todayDate, 'gpay', -b.gpay);
+        } else {
+          await syncAggregatedLedger(b.date || todayDate, b.paymentMode || b.mode || 'cash', -b.total);
+        }
+        alert(`✅ ബില്ല് ഡിലീറ്റ് ചെയ്തു.`);
         openRecentBillsModal();
       } catch (err) {
-        console.error("Delete bill error:", err);
-        alert("❌ ബില്ല് ഡിലീറ്റ് ചെയ്യുന്നതിൽ തടസ്സം: " + err.message);
+        alert("❌ തടസ്സം: " + err.message);
       }
     }
 
     function reprintBill(id) {
       const b = todayBills.find(x => x.id === id);
       if (!b) return;
-      triggerThermalPrint(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.mode, b.items || [], b.parcelCharge || 0);
+      triggerThermalPrint(b.billNo, b.dateDisplay || b.date, b.time || '', b.total, b.paymentMode || b.mode, b.items || [], b.parcelCharge || 0);
       closeModal('billReceiptModal');
       closeModal('recentBillsModal');
     }
@@ -2332,7 +2357,7 @@
       cart = JSON.parse(JSON.stringify(b.items || []));
       parcelCharge = b.parcelCharge || 0;
       editingBill = b;
-      setPaymentMode(b.mode || 'cash');
+      setPaymentMode(b.paymentMode || b.mode || 'cash');
       renderCartUI();
       renderMenuItems();
       closeModal('recentBillsModal');
@@ -2344,7 +2369,14 @@
       let total = 0, cash = 0, gpay = 0, glasses = 0;
       todayBills.forEach(b => {
         total += b.total;
-        if (b.mode === 'cash') cash += b.total; else gpay += b.total;
+        if (b.paymentMode === 'Split' && b.cash && b.gpay) {
+          cash += b.cash;
+          gpay += b.gpay;
+        } else if ((b.paymentMode || b.mode || '').toLowerCase() === 'cash') {
+          cash += b.total;
+        } else {
+          gpay += b.total;
+        }
         if (b.items) b.items.forEach(it => { glasses += (it.qty || 1); });
       });
 
@@ -2357,6 +2389,9 @@
       openModalWithHistory('todaySummaryModal');
     }
 
+    /* =============================================================
+       MANAGE MENU ITEMS MODAL
+       ============================================================= */
     function toggleSubCategoryField() {
       const cat = document.getElementById('newItemCat').value;
       const subField = document.getElementById('subCatFormField');
@@ -2372,7 +2407,6 @@
     function handleItemImagePick(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = e => {
         const img = new Image();
@@ -2383,12 +2417,10 @@
           canvas.width = maxDim;
           canvas.height = maxDim;
           const ctx = canvas.getContext('2d');
-          
           let sw = img.width, sh = img.height;
           let minSide = Math.min(sw, sh);
           let sx = (sw - minSide) / 2;
           let sy = (sh - minSide) / 2;
-
           ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxDim, maxDim);
           pickedItemImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
@@ -2412,27 +2444,18 @@
         alert("⚠️ സാധുവായ പേരും വിലയും നൽകുക!");
         return;
       }
-
       name = name.replace(/Aval/g, 'Avil');
       const itemData = { name, price, category, subCategory, icon, code };
 
       if (editingItemId) {
-        const updateData = {
-          ...itemData,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
+        const updateData = { ...itemData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
         if (pickedItemImageBase64) updateData.imageUrl = pickedItemImageBase64;
-
         db.collection('billing_items').doc(editingItemId).update(updateData).then(() => {
           alert("✅ ഐറ്റം അപ്‌ഡേറ്റ് ചെയ്തു!");
           cancelItemEditing();
         });
       } else {
-        db.collection('billing_items').add({
-          ...itemData,
-          imageUrl: pickedItemImageBase64 || "",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
+        db.collection('billing_items').add({ ...itemData, imageUrl: pickedItemImageBase64 || "", createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
           alert("✅ പുതിയ ഐറ്റം ചേർത്തു!");
           cancelItemEditing();
         });
@@ -2442,19 +2465,16 @@
     function loadItemToEdit(id) {
       const it = menuItems.find(x => x.id === id);
       if (!it) return;
-
       editingItemId = it.id;
       document.getElementById('newItemName').value = it.name;
       document.getElementById('newItemCode').value = it.code || '';
       document.getElementById('newItemPrice').value = it.price;
       document.getElementById('newItemCat').value = it.category;
       document.getElementById('newItemIcon').value = it.icon || '🥤';
-
       toggleSubCategoryField();
       if (it.category === 'avil_milk') {
         document.getElementById('newItemSubCat').value = it.subCategory || 'regular';
       }
-
       if (it.imageUrl) {
         pickedItemImageBase64 = it.imageUrl;
         const preview = document.getElementById('newItemImgPreview');
@@ -2464,13 +2484,11 @@
         pickedItemImageBase64 = "";
         document.getElementById('newItemImgPreview').style.display = 'none';
       }
-
       document.getElementById('itemModalHeading').innerText = '✏️ Edit Menu Item';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '💾 Update Item';
       btnSave.style.background = 'var(--blue)';
       document.getElementById('btnCancelEdit').style.display = 'block';
-
       document.querySelector('#itemsModal .modal-box').scrollTop = 0;
     }
 
@@ -2483,7 +2501,6 @@
       pickedItemImageBase64 = '';
       document.getElementById('newItemImgPreview').style.display = 'none';
       document.getElementById('newItemImgPreview').src = '';
-
       document.getElementById('itemModalHeading').innerText = '⚙ Manage Menu Items';
       const btnSave = document.getElementById('btnSaveItemAction');
       btnSave.innerText = '+ Add to Menu';
@@ -2505,9 +2522,7 @@
         container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem;">മെനുവിൽ ഐറ്റങ്ങൾ ഇല്ല</p>';
         return;
       }
-
       const sorted = menuItems.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-
       container.innerHTML = sorted.map(it => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
           <div style="display:flex; align-items:center; gap:6px;">
@@ -2518,13 +2533,15 @@
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" onclick="loadItemToEdit('${it.id}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
-            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+            <button type="button" onclick="deleteItem('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ്">🗑️</button>
           </div>
         </div>
       `).join('');
     }
 
-    // Live Suggestions & Quick Search Functions
+    /* =============================================================
+       LIVE SUGGESTIONS & SEARCH
+       ============================================================= */
     function showLiveSuggestions(val) {
       const box = document.getElementById('liveSuggestionsBox');
       const query = val.trim().toLowerCase();
@@ -2578,7 +2595,7 @@
         addToCartPriority(targetItem.id);
         input.value = '';
         document.getElementById('liveSuggestionsBox').style.display = 'none';
-        input.blur(); // കീബോർഡ് ഹൈഡ് ചെയ്യാൻ
+        input.blur();
       } else {
         playWarningSound();
         alert(`❌ '${val}' കോഡിൽ അല്ലെങ്കിൽ പേരിൽ ഐറ്റങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല!`);
