@@ -1113,41 +1113,15 @@
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
-    // Preset Item Codes Map (Lowercased for robust matching)
+    // Preset Item Codes Map (1 to 33) - Lowercased for robust matching
     const presetItemCodes = {
-      "happy kid": "1",
-      "spider kid": "2",
-      "micky mouse": "3",
-      "dora kid": "4",
-      "normal": "5",
-      "sp vanila": "6",
-      "bana boost": "7",
-      "strawberry": "8",
-      "pistachio": "9",
-      "mango": "10",
-      "chocolate": "11",
-      "coffee": "12",
-      "butterscotch": "13",
-      "nuts banana": "14",
-      "dates": "15",
-      "chocochip": "16",
-      "fruit mix": "17",
-      "sp fruit": "18",
-      "fruit & nut": "19",
-      "jack fruit": "20",
-      "catamount": "21",
-      "royal": "22",
-      "kulfi": "23",
-      "arabian khajoor": "24",
-      "sanish": "25",
-      "red velvet": "26",
-      "passion fruit": "27",
-      "caramel nuts": "28",
-      "tender coconut": "29",
-      "sp nuts": "30",
-      "dry fruit": "31",
-      "fig honey": "32",
-      "belgium chocolate": "33"
+      "happy kid": "1", "spider kid": "2", "micky mouse": "3", "dora kid": "4", "normal": "5",
+      "sp vanila": "6", "bana boost": "7", "strawberry": "8", "pistachio": "9", "mango": "10",
+      "chocolate": "11", "coffee": "12", "butterscotch": "13", "nuts banana": "14", "dates": "15",
+      "chocochip": "16", "fruit mix": "17", "sp fruit": "18", "fruit & nut": "19", "jack fruit": "20",
+      "catamount": "21", "caramount": "21", "royal": "22", "kulfi": "23", "arabian khajoor": "24", 
+      "sanish": "25", "spanish": "25", "red velvet": "26", "passion fruit": "27", "caramel nuts": "28", 
+      "tender coconut": "29", "sp nuts": "30", "dry fruit": "31", "fig honey": "32", "belgium chocolate": "33"
     };
 
     async function autoAssignPresetCodesToFirebase() {
