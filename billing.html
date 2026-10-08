@@ -721,13 +721,15 @@
     </div>
   </div>
 
-  <!-- Item Code / Quick Search Box (Visibility Fixed & No Datalist Hang) -->
-  <div style="padding: 4px 10px 8px; max-width: 1000px; margin: 0 auto;">
+  <!-- Item Code / Quick Search Box with Live Suggestions Box -->
+  <div style="padding: 4px 10px 8px; max-width: 1000px; margin: 0 auto; position: relative;">
     <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
       <span style="font-size: 1.1rem;">⚡</span>
-      <input type="text" id="quickItemCodeInput" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.95rem; font-weight: 800; outline: none; color: #0f172a; background: transparent;" onkeydown="handleQuickCodeInput(event)">
+      <input type="text" id="quickItemCodeInput" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Happy)" style="border: none; padding: 4px; font-size: 0.95rem; font-weight: 800; outline: none; color: #0f172a; background: transparent; width: 100%;" oninput="showLiveSuggestions(this.value)" onkeydown="handleQuickCodeInput(event)">
       <button type="button" onclick="addQuickCodeItem()" style="background: var(--blue); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">Add</button>
     </div>
+    <!-- Live Suggestions Dropdown Box -->
+    <div id="liveSuggestionsBox" style="display: none; position: absolute; top: 100%; left: 10px; right: 10px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; max-height: 180px; overflow-y: auto; margin-top: 4px;"></div>
   </div>
 
   <!-- Sticky Sub-Category Quick-Jump Bar -->
@@ -1111,55 +1113,65 @@
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
-    // Preset Item Codes Map
+    // Preset Item Codes Map (Lowercased for robust matching)
     const presetItemCodes = {
-      "Happy Kid": "1",
-      "Spider Kid": "2",
-      "Micky Mouse": "3",
-      "Dora Kid": "4",
-      "Normal": "5",
-      "Sp Vanila": "6",
-      "Bana Boost": "7",
-      "Strawberry": "8",
-      "Pistachio": "9",
-      "Mango": "10",
-      "Chocolate": "11",
-      "Coffee": "12",
-      "Butterscotch": "13",
-      "Nuts Banana": "14",
-      "Dates": "15",
-      "Chocochip": "16",
-      "Fruit Mix": "17",
-      "Sp Fruit": "18",
-      "Fruit & Nut": "19",
-      "Jack Fruit": "20",
-      "Catamount": "21",
-      "Royal": "22",
-      "Kulfi": "23",
-      "Arabian Khajoor": "24",
-      "Sanish": "25",
-      "Red Velvet": "26",
-      "Passion Fruit": "27",
-      "Caramel Nuts": "28",
-      "Tender Coconut": "29",
-      "Sp Nuts": "30",
-      "Dry Fruit": "31",
-      "Fig Honey": "32",
-      "Belgium Chocolate": "33"
+      "happy kid": "1",
+      "spider kid": "2",
+      "micky mouse": "3",
+      "dora kid": "4",
+      "normal": "5",
+      "sp vanila": "6",
+      "bana boost": "7",
+      "strawberry": "8",
+      "pistachio": "9",
+      "mango": "10",
+      "chocolate": "11",
+      "coffee": "12",
+      "butterscotch": "13",
+      "nuts banana": "14",
+      "dates": "15",
+      "chocochip": "16",
+      "fruit mix": "17",
+      "sp fruit": "18",
+      "fruit & nut": "19",
+      "jack fruit": "20",
+      "catamount": "21",
+      "royal": "22",
+      "kulfi": "23",
+      "arabian khajoor": "24",
+      "sanish": "25",
+      "red velvet": "26",
+      "passion fruit": "27",
+      "caramel nuts": "28",
+      "tender coconut": "29",
+      "sp nuts": "30",
+      "dry fruit": "31",
+      "fig honey": "32",
+      "belgium chocolate": "33"
     };
 
     async function autoAssignPresetCodesToFirebase() {
       try {
         const snapshot = await db.collection('billing_items').get();
         const batch = db.batch();
+        let updatedCount = 0;
+        
         snapshot.forEach(doc => {
           const data = doc.data();
-          const cleanName = (data.name || '').trim();
-          if (presetItemCodes[cleanName] && !data.code) {
+          const cleanName = (data.name || '').trim().toLowerCase();
+          if (presetItemCodes[cleanName] && data.code !== presetItemCodes[cleanName]) {
             batch.update(doc.ref, { code: presetItemCodes[cleanName] });
+            updatedCount++;
           }
         });
-        await batch.commit();
+
+        if (updatedCount > 0) {
+          await batch.commit();
+          alert("✅ മെനു കോഡുകൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!");
+          location.reload();
+        } else {
+          alert("ℹ️ പുതിയ കോഡുകൾ ഒന്നും അപ്ഡേറ്റ് ചെയ്യാനില്ല.");
+        }
       } catch (err) {
         console.error("Auto assign error: ", err);
       }
@@ -1296,6 +1308,12 @@
        HARDWARE BACK BUTTON & MODAL SAFE NAVIGATION (LIFO & EXIT FIX)
        ============================================================= */
     function handleBackNavigation() {
+      const liveBox = document.getElementById('liveSuggestionsBox');
+      if (liveBox && liveBox.style.display === 'block') {
+        liveBox.style.display = 'none';
+        return true;
+      }
+
       const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => {
         return m.style.display === 'flex' || window.getComputedStyle(m).display === 'flex';
       });
@@ -1441,6 +1459,10 @@
       const dd = document.getElementById('headerDropdown');
       if (dd && !e.target.closest('.header-quick-btns')) {
         dd.classList.remove('show');
+      }
+      const liveBox = document.getElementById('liveSuggestionsBox');
+      if (liveBox && !e.target.closest('#quickItemCodeInput') && !e.target.closest('#liveSuggestionsBox')) {
+        liveBox.style.display = 'none';
       }
     });
 
@@ -1671,12 +1693,10 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      // App open ആകുമ്പോൾ അവസാനമായി കണക്റ്റ് ചെയ്ത പ്രിന്റർ ഓട്ടോമാറ്റിക്കായി റീകണക്റ്റ് ചെയ്യാൻ
       setTimeout(() => {
         initBluetoothAutoConnect();
       }, 1000);
 
-      // ഫയർബേസിലെ ഐറ്റങ്ങൾക്ക് 1-33 കോഡുകൾ ഓട്ടോമാറ്റിക്കായി സെറ്റ് ചെയ്യാൻ
       setTimeout(autoAssignPresetCodesToFirebase, 1500);
 
       db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
@@ -1802,7 +1822,6 @@
       const qtyBadge = qty > 0 ? `<div class="item-badge-qty">${qty}</div>` : '';
       const isSelected = qty > 0 ? 'in-cart' : '';
 
-      // ഐറ്റത്തിന് മുകളിൽ കോഡ് നമ്പർ കാണിക്കാൻ
       const itemCodeBadge = it.code ? `<div style="font-size:0.7rem; font-weight:900; color:#0284c7; background:#e0f2fe; padding:1px 6px; border-radius:6px; margin-bottom:3px; display:inline-block;">#${it.code}</div>` : '';
 
       const mediaHTML = it.imageUrl 
@@ -1810,7 +1829,7 @@
         : `<div class="item-emoji">${it.icon || '🥤'}</div>`;
 
       return `
-        <div class="item-card ${isSelected}" onclick="addToCart('${it.id}')">
+        <div class="item-card ${isSelected}" onclick="addToCartPriority('${it.id}')">
           ${qtyBadge}
           <div class="item-media-box">${mediaHTML}</div>
           ${itemCodeBadge}
@@ -1820,25 +1839,32 @@
           <div class="item-stepper-box" onclick="event.stopPropagation()">
             <button type="button" class="btn-step btn-step-minus ${qty === 0 ? 'disabled' : ''}" onclick="changeQty('${it.id}', -1)">−</button>
             <span class="item-qty-center">${qty > 0 ? qty : ''}</span>
-            <button type="button" class="btn-step btn-step-plus" onclick="addToCart('${it.id}')">+</button>
+            <button type="button" class="btn-step btn-step-plus" onclick="addToCartPriority('${it.id}')">+</button>
           </div>
         </div>
       `;
     }
 
-    function addToCart(id) {
+    // കാർട്ടിന്റെ മുകളിലേക്ക് പുതിയ ഐറ്റം കയറാൻ സഹായിക്കുന്ന പ്രയോറിറ്റി ഫങ്ഷൻ
+    function addToCartPriority(itemId) {
       playTickSound();
-      const item = menuItems.find(i => i.id === id);
-      if (!item) return;
+      const it = menuItems.find(x => x.id === itemId);
+      if (!it) return;
 
-      const existing = cart.find(c => c.id === id);
-      if (existing) {
-        existing.qty += 1;
+      const existingIndex = cart.findIndex(c => c.id === itemId);
+      if (existingIndex > -1) {
+        cart[existingIndex].qty += 1;
+        const item = cart.splice(existingIndex, 1)[0];
+        cart.unshift(item);
       } else {
-        cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+        cart.unshift({ id: it.id, name: it.name, price: Number(it.price) || 0, qty: 1, icon: it.icon || '🥤' });
       }
       renderCartUI();
       renderMenuItems();
+    }
+
+    function addToCart(id) {
+      addToCartPriority(id);
     }
 
     function changeQty(id, delta) {
@@ -2203,20 +2229,6 @@
       }
     }
 
-    function sharePdfViaWhatsApp(pdfDataUri, billNo, total) {
-      if (window.plugins && window.plugins.socialsharing) {
-        window.plugins.socialsharing.shareViaWhatsApp(
-          `🥤 BANABLAST Bill #${billNo} (Total: ₹${total})`,
-          pdfDataUri,
-          null,
-          () => {},
-          (err) => { alert("WhatsApp Share Error: " + err); }
-        );
-      } else {
-        alert("WhatsApp direct sharing plugin not available on browser.");
-      }
-    }
-
     /* -------------------------------------------------------------
        RECENT BILLS - COMPACT CARDS & DETAILED POPUP ON TAP
        ------------------------------------------------------------- */
@@ -2538,7 +2550,44 @@
       `).join('');
     }
 
-    // Quick Code / Suggestions Functions
+    // Live Suggestions & Quick Search Functions
+    function showLiveSuggestions(val) {
+      const box = document.getElementById('liveSuggestionsBox');
+      const query = val.trim().toLowerCase();
+      if (!query) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+      }
+      const matches = menuItems.filter(i => 
+        (i.code && String(i.code).toLowerCase().includes(query)) || 
+        (i.name && i.name.toLowerCase().includes(query))
+      );
+      if (matches.length === 0) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+      }
+      box.innerHTML = matches.map(i => `
+        <div onclick="selectSuggestedItem('${i.id}')" style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 700;">
+          <div><span style="color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">#${i.code || '-'}</span> ${i.name}</div>
+          <div style="color: #16a34a;">₹${i.price}</div>
+        </div>
+      `).join('');
+      box.style.display = 'block';
+    }
+
+    function selectSuggestedItem(itemId) {
+      const targetItem = menuItems.find(i => i.id === itemId);
+      if (targetItem) {
+        playTickSound();
+        addToCartPriority(targetItem.id);
+        document.getElementById('quickItemCodeInput').value = '';
+        document.getElementById('liveSuggestionsBox').style.display = 'none';
+        document.getElementById('quickItemCodeInput').blur();
+      }
+    }
+
     function handleQuickCodeInput(event) {
       if (event.key === 'Enter') {
         addQuickCodeItem();
@@ -2552,8 +2601,9 @@
       const targetItem = menuItems.find(i => String(i.code) === val || i.name.toLowerCase() === val.toLowerCase());
       if (targetItem) {
         playTickSound();
-        addToCart(targetItem.id);
+        addToCartPriority(targetItem.id);
         input.value = '';
+        document.getElementById('liveSuggestionsBox').style.display = 'none';
         input.blur(); // കീബോർഡ് ഹൈഡ് ചെയ്യാൻ
       } else {
         playWarningSound();
