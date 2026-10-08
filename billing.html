@@ -725,7 +725,7 @@
   <div style="padding: 4px 10px 8px; max-width: 1000px; margin: 0 auto;">
     <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
       <span style="font-size: 1.1rem;">⚡</span>
-      <input type="text" id="quickItemCodeInput" list="posQuickSuggestions" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.9rem; font-weight: 800; outline: none;" onkeydown="handleQuickCodeInput(event)">
+      <input type="text" id="quickItemCodeInput" list="posQuickSuggestions" class="form-control" placeholder="നമ്പറോ പേരോ ടൈപ്പ് ചെയ്യുക (ഉദാ: 1 അല്ലെങ്കിൽ Micky)" style="border: none; padding: 4px; font-size: 0.95rem; font-weight: 800; outline: none; color: #0f172a; background: transparent;" onkeydown="handleQuickCodeInput(event)">
       <datalist id="posQuickSuggestions"></datalist>
       <button type="button" onclick="addQuickCodeItem()" style="background: var(--blue); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">Add</button>
     </div>
@@ -1163,9 +1163,8 @@
         });
 
         await batch.commit();
-        alert("✅ 1 മുതൽ 33 വരെയുള്ള ക്രമ നമ്പറുകൾ എല്ലാ ഐറ്റങ്ങൾക്കും വിജയകരമായി സെറ്റ് ചെയ്തു!");
       } catch (err) {
-        alert("Error: " + err.message);
+        console.error("Auto assign error: ", err);
       }
     }
 
@@ -1674,11 +1673,14 @@
       });
     }
 
-    window.onload = function() {
+    window.addEventListener('DOMContentLoaded', () => {
       // App open ആകുമ്പോൾ അവസാനമായി കണക്റ്റ് ചെയ്ത പ്രിന്റർ ഓട്ടോമാറ്റിക്കായി റീകണക്റ്റ് ചെയ്യാൻ
       setTimeout(() => {
         initBluetoothAutoConnect();
       }, 1000);
+
+      // ഫയർബേസിലെ ഐറ്റങ്ങൾക്ക് 1-33 കോഡുകൾ ഓട്ടോമാറ്റിക്കായി സെറ്റ് ചെയ്യാൻ
+      setTimeout(autoAssignPresetCodesToFirebase, 2000);
 
       db.collection('billing_items').onSnapshot({ includeMetadataChanges: true }, snap => {
         menuItems = [];
@@ -1712,7 +1714,7 @@
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
-    };
+    });
 
     function switchCategory(cat) {
       playTickSound();
@@ -1753,6 +1755,14 @@
         return i.category === currentCategory;
       });
 
+      // കോഡ് നമ്പർ അനുസരിച്ച് കൃത്യമായ ക്രമത്തിൽ സോർട്ട് ചെയ്യാൻ
+      items.sort((a, b) => {
+        let codeA = parseInt(a.code, 10) || 999;
+        let codeB = parseInt(b.code, 10) || 999;
+        if (codeA !== codeB) return codeA - codeB;
+        return (Number(a.price) || 0) - (Number(b.price) || 0);
+      });
+
       if (!items.length) {
         root.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:30px 0; font-size:0.85rem;">ഈ വിഭാഗത്തിൽ സാധനങ്ങൾ ഇല്ല. "Menu" വഴി ചേർക്കുക.</p>';
         updatePosSuggestions();
@@ -1760,7 +1770,6 @@
       }
 
       if (currentCategory === 'juices') {
-        items.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
         root.innerHTML = `<div class="items-container">${items.map(it => renderCardHTML(it)).join('')}</div>`;
         updatePosSuggestions();
         return;
@@ -1779,7 +1788,6 @@
       subCats.forEach(sc => {
         const catItems = items.filter(i => i.subCategory === sc.filter);
         if (catItems.length) {
-          catItems.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
           fullHTML += `
             <div id="sec-${sc.id}">
               <div class="subcat-section-title">${sc.name} (${catItems.length})</div>
@@ -2020,7 +2028,7 @@
       document.getElementById('rBillDate').innerText = `${date}  ${time}`;
       document.getElementById('rBillNo').innerText = `BILL NO: ${billNo}`;
       document.getElementById('rTotalAmt').innerText = `₹${total}`;
-      document.getElementById('rPayMode').innerText = (mode || 'cash').toUpperCase();
+      document.getElementById('rPayMode').innerText = (mode === 'cash' ? 'CASH' : 'GPAY');
 
       const pTag = document.getElementById('rParcelTag');
       const pRow = document.getElementById('rParcelRow');
@@ -2132,7 +2140,7 @@
       document.getElementById('pdfDateText').innerText = `${date}  ${time}`;
       document.getElementById('pdfBillNoText').innerText = `Bill #${billNo}`;
       document.getElementById('pdfTotalAmtText').innerText = `₹${total}`;
-      document.getElementById('pdfPayModeText').innerText = (mode || 'cash').toUpperCase();
+      document.getElementById('pdfPayModeText').innerText = (mode === 'cash' ? 'CASH' : 'GPAY');
 
       const pRow = document.getElementById('pdfParcelRow');
       const pVal = document.getElementById('pdfParcelVal');
