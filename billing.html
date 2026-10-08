@@ -2435,35 +2435,26 @@
       }
 
       name = name.replace(/Aval/g, 'Avil');
+      const itemData = { name, price, category, subCategory, icon, code };
 
       if (editingItemId) {
         const updateData = {
-          name,
-          code,
-          price,
-          category,
-          subCategory,
-          icon,
+          ...itemData,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         if (pickedItemImageBase64) updateData.imageUrl = pickedItemImageBase64;
 
         db.collection('billing_items').doc(editingItemId).update(updateData).then(() => {
-          alert("✅ ഐറ്റം വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!");
+          alert("✅ ഐറ്റം അപ്‌ഡേറ്റ് ചെയ്തു!");
           cancelItemEditing();
         });
       } else {
         db.collection('billing_items').add({
-          name,
-          code,
-          price,
-          category,
-          subCategory,
-          icon,
+          ...itemData,
           imageUrl: pickedItemImageBase64 || "",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
-          alert("✅ പുതിയ ഐറ്റം മെനുവിൽ ചേർത്തു!");
+          alert("✅ പുതിയ ഐറ്റം ചേർത്തു!");
           cancelItemEditing();
         });
       }
@@ -2580,7 +2571,7 @@
         playTickSound();
         addToCart(targetItem.id);
         input.value = '';
-        input.focus();
+        input.blur(); // കീബോർഡ് ഹൈഡ് ചെയ്യാൻ
       } else {
         playWarningSound();
         alert(`❌ '${val}' കോഡിൽ അല്ലെങ്കിൽ പേരിൽ ഐറ്റങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല!`);
