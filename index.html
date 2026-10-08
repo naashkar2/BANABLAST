@@ -741,6 +741,9 @@
       min-height: 840px;
       box-sizing: border-box;
       position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
     }
     .a4-header {
       background: linear-gradient(135deg, #091e42 0%, #1e3a8a 60%, #2563eb 100%);
@@ -1064,6 +1067,12 @@
         </button>
       </div>
 
+      <!-- മാസ്റ്റർ സ്റ്റോക്ക് ഐറ്റം വ്യൂ ലിസ്റ്റ് -->
+      <div style="margin-bottom:12px;">
+        <h4 style="font-size:0.85rem; font-weight:800; color:#475569; margin-bottom:6px;">ആഡ് ചെയ്ത സ്റ്റോക്ക് ഐറ്റങ്ങൾ (View List):</h4>
+        <div id="masterStockItemsViewContainer" style="max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px; background:#fff;"></div>
+      </div>
+
       <div class="report-filter" style="margin-bottom:10px;">
         <button class="filter-btn active" id="stockFiltAll" onclick="filterStockTab('all')">All Time</button>
         <button class="filter-btn" id="stockFiltToday" onclick="filterStockTab('today')">Today</button>
@@ -1087,6 +1096,12 @@
         <button type="button" onclick="openAddSupplierModal()" style="background:#1e3a8a; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:800; cursor:pointer;">
           + Add Supplier
         </button>
+      </div>
+
+      <!-- മാസ്റ്റർ സപ്ലയർ വ്യൂ ലിസ്റ്റ് -->
+      <div style="margin-bottom:12px;">
+        <h4 style="font-size:0.85rem; font-weight:800; color:#475569; margin-bottom:6px;">സപ്ലയർമാരുടെ ലിസ്റ്റ് (View Suppliers List):</h4>
+        <div id="masterSuppliersViewContainer" style="max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:6px; background:#fff;"></div>
       </div>
 
       <!-- TOTAL OUTSTANDING DUE BANNER (CLICKABLE FILTER) -->
@@ -1879,7 +1894,8 @@
       <button type="button" class="btn-cancel" style="margin-top:12px;" onclick="closeModal('posBillDetailsModal')">Close</button>
     </div>
   </div>
-  <!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     /* =========================================================
        BANABLAST BUSINESS LEDGER & POS MANAGEMENT - COMPLETE PRODUCTION ENGINE
@@ -1911,7 +1927,7 @@
       }
     }
 
-    // Firebase Config (Your Original Active Configuration)
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDnK4HvyYuG_FoXCO_vD-c1V_rN3HGQlmM",
       authDomain: "banablast-64513.firebaseapp.com",
@@ -1935,9 +1951,9 @@
     let currentReportFilter = 'month';
 
     // മാസ്റ്റർ ലിസ്റ്റുകൾ
-    let masterItemsList = [];
-    let masterSuppliersList = [];
-    let masterStaffList = [];
+    let masterItems = [];
+    let masterSuppliers = [];
+    let masterStaff = [];
 
     // തീയതി & ഫിൽട്ടർ സ്റ്റേറ്റുകൾ
     let currentPosFilter = 'today';
@@ -1960,21 +1976,18 @@
        1. UNIVERSAL HARDWARE & GESTURE BACK BUTTON INTERCEPTOR
        ============================================================= */
     function closeTopmostModalOrDropdown() {
-      // 1. ഹെഡർ ഡ്രോപ്പ്ഡൗൺ മെനു തുറന്നിട്ടുണ്ടെങ്കിൽ അടയ്ക്കുക
       const dd = document.getElementById('mainHeaderDropdown');
       if (dd && dd.classList.contains('show')) {
         dd.classList.remove('show');
         return true;
       }
 
-      // 2. A4 പ്രിവ്യൂ മോഡൽ തുറന്നിട്ടുണ്ടെങ്കിൽ അടയ്ക്കുക
       const a4 = document.getElementById('a4PreviewModal');
       if (a4 && a4.style.display === 'flex') {
         a4.style.display = 'none';
         return true;
       }
 
-      // 3. ഏതെങ്കിലും സാധാരണ പോപ്പ്-അപ്പുകൾ തുറന്നിട്ടുണ്ടെങ്കിൽ ഏറ്റവും ഒടുവിലത്തേത് അടയ്ക്കുക
       const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
       if (openModals.length > 0) {
         const topModal = openModals[openModals.length - 1];
@@ -1985,7 +1998,6 @@
       return false;
     }
 
-    // Android Capacitor Native Back Button Listener
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
       window.Capacitor.Plugins.App.addListener('backButton', ({ canGoBack }) => {
         const handled = closeTopmostModalOrDropdown();
@@ -1997,7 +2009,6 @@
       });
     }
 
-    // Android Cordova / Native Webview Listener
     document.addEventListener('backbutton', function(e) {
       if (e) {
         e.preventDefault();
@@ -2015,7 +2026,6 @@
       }
     }, false);
 
-    // Browser Gesture Popstate Listener
     window.addEventListener('popstate', (e) => {
       closeTopmostModalOrDropdown();
     });
@@ -2153,7 +2163,7 @@
       }
 
       if (newPin.length < 4) {
-        alert("⚠️️ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
+        alert("⚠ പുതിയ PIN കുറഞ്ഞത് 4 അക്കങ്ങൾ ഉണ്ടായിരിക്കണം!");
         return;
       }
 
@@ -2245,28 +2255,33 @@
         }
       });
 
+      // Master Items sync
       db.collection('master_items').onSnapshot(snap => {
-        masterItemsList = [];
-        snap.forEach(d => masterItemsList.push(d.data().name));
-        updateDatalists();
+        masterItems = [];
+        snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
+        renderMasterStockItemsView();
+        updateMasterSuggestions();
       });
 
+      // Master Suppliers sync
       db.collection('master_suppliers').onSnapshot(snap => {
-        masterSuppliersList = [];
-        snap.forEach(d => masterSuppliersList.push(d.data().name));
-        updateDatalists();
+        masterSuppliers = [];
+        snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
+        renderMasterSuppliersView();
+        updateMasterSuggestions();
       });
 
+      // Master Staff sync
       db.collection('master_staff').onSnapshot(snap => {
-        masterStaffList = [];
-        snap.forEach(d => masterStaffList.push(d.data().name));
-        updateDatalists();
+        masterStaff = [];
+        snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
+        updateMasterSuggestions();
       });
 
       db.collection('transactions').onSnapshot(snap => {
         transactions = [];
         snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-        updateDatalists();
+        updateMasterSuggestions();
         renderAll();
       }, err => console.error("Trans sync err:", err));
 
@@ -2350,13 +2365,54 @@
     }
 
     /* -------------------------------------------------------------
-       5. MASTER REGISTRATIONS
+       5. MASTER VIEW LISTS & SUGGESTIONS
        ------------------------------------------------------------- */
-    function openAddStockItemModal() {
-      document.getElementById('newStockItemNameInput').value = '';
-      document.getElementById('newStockItemUnitInput').value = '';
+    function renderMasterStockItemsView() {
+      const container = document.getElementById('masterStockItemsViewContainer');
+      if (!container) return;
+      if (!masterItems || !masterItems.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">സ്റ്റോക്ക് ഐറ്റങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല</p>';
+        return;
+      }
+      container.innerHTML = masterItems.map(it => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
+          <div><strong>📦 ${it.name}</strong> ${it.unit ? '(' + it.unit + ')' : ''}</div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="openAddStockItemModalWithData('${it.id}', '${it.name}', '${it.unit || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
+            <button type="button" onclick="deleteStockItemMaster('${it.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderMasterSuppliersView() {
+      const container = document.getElementById('masterSuppliersViewContainer');
+      if (!container) return;
+      if (!masterSuppliers || !masterSuppliers.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:10px;">സപ്ലയർമാർ ആരും ഇല്ല</p>';
+        return;
+      }
+      container.innerHTML = masterSuppliers.map(s => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:0.83rem;">
+          <div><strong>🏢 ${s.name}</strong> ${s.phone ? '• ' + s.phone : ''}</div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="openAddSupplierModalWithData('${s.id}', '${s.name}', '${s.phone || ''}')" style="background:#e0f2fe; border:none; color:#0369a1; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="തിരുത്തുക">✏️</button>
+            <button type="button" onclick="deleteSupplierMaster('${s.id}')" style="background:#fee2e2; border:none; color:#dc2626; border-radius:6px; padding:4px 8px; font-weight:700; cursor:pointer;" title="ഡിലീറ്റ് ചെയ്യുക">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let editingStockItemId = null;
+    let editingSupplierId = null;
+
+    function openAddStockItemModal(id = null, name = '', unit = '') {
+      editingStockItemId = id;
+      document.getElementById('newStockItemNameInput').value = name;
+      document.getElementById('newStockItemUnitInput').value = unit;
       openModalWithHistory('addStockItemModal');
     }
+    function openAddStockItemModalWithData(id, name, unit) { openAddStockItemModal(id, name, unit); }
 
     function saveNewStockItemMaster() {
       const name = document.getElementById('newStockItemNameInput').value.trim();
@@ -2365,21 +2421,33 @@
         alert("⚠️ സാധനത്തിന്റെ പേര് നൽകുക!");
         return;
       }
-      db.collection('master_items').add({
-        name,
-        unit: unit || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`✅ '${name}' സ്റ്റോക്ക് ലിസ്റ്റിൽ ചേർത്തു!`);
-        closeModal('addStockItemModal');
-      });
+      const data = { name, unit: unit || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+      if (editingStockItemId) {
+        db.collection('master_items').doc(editingStockItemId).update(data).then(() => {
+          alert("✅ സ്റ്റോക്ക് ഐറ്റം അപ്‌ഡേറ്റ് ചെയ്തു!");
+          closeModal('addStockItemModal');
+        });
+      } else {
+        db.collection('master_items').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
+          alert(`✅ '${name}' സ്റ്റോക്ക് ലിസ്റ്റിൽ ചേർത്തു!`);
+          closeModal('addStockItemModal');
+        });
+      }
     }
 
-    function openAddSupplierModal() {
-      document.getElementById('newSupplierNameInput').value = '';
-      document.getElementById('newSupplierPhoneInput').value = '';
+    function deleteStockItemMaster(id) {
+      if (confirm("ഈ സ്റ്റോക്ക് ഐറ്റം ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
+        db.collection('master_items').doc(id).delete();
+      }
+    }
+
+    function openAddSupplierModal(id = null, name = '', phone = '') {
+      editingSupplierId = id;
+      document.getElementById('newSupplierNameInput').value = name;
+      document.getElementById('newSupplierPhoneInput').value = phone;
       openModalWithHistory('addSupplierModal');
     }
+    function openAddSupplierModalWithData(id, name, phone) { openAddSupplierModal(id, name, phone); }
 
     function saveNewSupplierMaster() {
       const name = document.getElementById('newSupplierNameInput').value.trim();
@@ -2388,14 +2456,24 @@
         alert("⚠️ സപ്ലയറുടെ പേര് നൽകുക!");
         return;
       }
-      db.collection('master_suppliers').add({
-        name,
-        phone: phone || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`✅ സപ്ലയർ '${name}' രജിസ്റ്റർ ചെയ്തു!`);
-        closeModal('addSupplierModal');
-      });
+      const data = { name, phone: phone || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+      if (editingSupplierId) {
+        db.collection('master_suppliers').doc(editingSupplierId).update(data).then(() => {
+          alert("✅ സപ്ലയർ അപ്‌ഡേറ്റ് ചെയ്തു!");
+          closeModal('addSupplierModal');
+        });
+      } else {
+        db.collection('master_suppliers').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
+          alert(`✅ സപ്ലയർ '${name}' രജിസ്റ്റർ ചെയ്തു!`);
+          closeModal('addSupplierModal');
+        });
+      }
+    }
+
+    function deleteSupplierMaster(id) {
+      if (confirm("ഈ സപ്ലയറെ ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
+        db.collection('master_suppliers').doc(id).delete();
+      }
     }
 
     function openAddStaffModal() {
@@ -2421,33 +2499,22 @@
       });
     }
 
-    function updateDatalists() {
-      const suppliers = new Set(masterSuppliersList);
-      const items = new Set(masterItemsList);
-      const staff = new Set([...masterStaffList, "Asif"]);
-
-      transactions.forEach(t => {
-        if (t.category === 'stock' && t.title) {
-          suppliers.add(t.title.trim());
-        }
-        if (t.category === 'salary' && (t.title || t.extra)) {
-          staff.add((t.title || t.extra).trim());
-        }
-        if (t.items && Array.isArray(t.items)) {
-          t.items.forEach(it => {
-            if (it.name) items.add(it.name.trim());
-          });
-        }
-      });
-
+    function updateMasterSuggestions() {
       const suppDL = document.getElementById('suppliersList');
-      if (suppDL) suppDL.innerHTML = Array.from(suppliers).sort().map(s => `<option value="${s}">`).join('');
+      if (suppDL && masterSuppliers) {
+        suppDL.innerHTML = masterSuppliers.map(s => `<option value="${s.name}">`).join('');
+      }
 
       const itemDL = document.getElementById('itemsList');
-      if (itemDL) itemDL.innerHTML = Array.from(items).sort().map(i => `<option value="${i}">`).join('');
+      if (itemDL && masterItems) {
+        itemDL.innerHTML = masterItems.map(i => `<option value="${i.name}">`).join('');
+      }
 
       const staffDL = document.getElementById('staffList');
-      if (staffDL) staffDL.innerHTML = Array.from(staff).sort().map(st => `<option value="${st}">`).join('');
+      if (staffDL && masterStaff) {
+        const staffNames = new Set([...masterStaff.map(st => st.name), "Asif"]);
+        staffDL.innerHTML = Array.from(staffNames).sort().map(st => `<option value="${st}">`).join('');
+      }
     }
 
     function handleCategoryChange() {
@@ -2760,7 +2827,7 @@
       div.innerHTML = `
         <div style="flex:2; display:flex; flex-direction:column;">
           <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: Cashew)" value="${name}">
-          ${isDoubtful ? `<span style="font-size:0.7rem; color:#dc2626; font-weight:800; margin-top:4px;">⚠️️ ${doubtReason || 'വില വ്യക്തമല്ല - പരിശോധിക്കുക'}</span>` : ''}
+          ${isDoubtful ? `<span style="font-size:0.7rem; color:#dc2626; font-weight:800; margin-top:4px;">⚠ ${doubtReason || 'വില വ്യക്തമല്ല - പരിശോധിക്കുക'}</span>` : ''}
         </div>
         <input type="number" step="any" class="form-control p-price" placeholder="വില ₹" value="${price !== '' ? price : ''}" style="flex:1; ${isDoubtful ? 'border: 2px solid #dc2626; background:#fff;' : ''}" oninput="recalcTotalBillFromItems(); if(this.value > 0) { this.style.borderColor = '#cbd5e1'; const hint = this.parentElement.querySelector('span'); if(hint) hint.remove(); this.parentElement.style.border='none'; this.parentElement.style.background='transparent'; }">
         <button type="button" onclick="this.parentElement.remove(); recalcTotalBillFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
@@ -4348,9 +4415,9 @@
       closeModal('openingModal');
     }
 
-    /* =============================================================
+    /* -------------------------------------------------------------
        17. ROBUST A4 PDF PREVIEW, DIRECT DOWNLOAD & NATIVE WHATSAPP SHARE
-       ============================================================= */
+       ------------------------------------------------------------- */
     function openA4PreviewModal(htmlContent, title) {
       currentA4Title = title || "BANABLAST_Report";
       document.getElementById('a4BarTitle').innerText = title;
@@ -4367,21 +4434,48 @@
       }
     }
 
+    async function downloadAndSharePDF(elementId, filename) {
+      const element = document.getElementById(elementId);
+      const opt = {
+        margin: 5,
+        filename: filename || 'report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).outputPdf('blob').then((pdfBlob) => {
+        const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: 'Business Report',
+            text: 'ഇന്നത്തെ ബിസിനസ്സ് റിപ്പോർട്ട് PDF ആയി അയക്കുന്നു.'
+          }).catch(err => console.log('Share error:', err));
+        } else {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(pdfBlob);
+          link.download = filename;
+          link.click();
+          alert('✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു!');
+        }
+      });
+    }
+
     async function generateCleanPdfArtifact() {
       const element = document.getElementById('a4SheetPaper');
       const canvas = await html2canvas(element, {
-        scale: 1.5,
+        scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const margin = 6;
+      const margin = 5;
       const imgWidth = pdfWidth - (margin * 2);
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -4403,7 +4497,6 @@
       try {
         const { base64, pdfDoc } = await generateCleanPdfArtifact();
 
-        // 1. Android Capacitor Filesystem direct download to Documents folder
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
           const { Filesystem } = window.Capacitor.Plugins;
           await Filesystem.writeFile({
@@ -4438,7 +4531,6 @@
         const { blob, base64 } = await generateCleanPdfArtifact();
         const file = new File([blob], fileName, { type: 'application/pdf', lastModified: Date.now() });
 
-        // Method 1: Capacitor Native Share with File URI (Sends actual PDF Document)
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share && window.Capacitor.Plugins.Filesystem) {
           const { Filesystem, Share } = window.Capacitor.Plugins;
           const cacheFile = await Filesystem.writeFile({
@@ -4454,7 +4546,6 @@
           return;
         }
 
-        // Method 2: Android Web Share API (Pass ONLY files array to prevent WhatsApp text conversion)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file]
@@ -4462,7 +4553,6 @@
           return;
         }
 
-        // Method 3: Direct Download & Alert user
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
