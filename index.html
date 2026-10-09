@@ -1229,6 +1229,7 @@
           <option value="salary">Staff Salary</option>
           <option value="rent">Shop Rent</option>
           <option value="other">Daily Expense / Miscellaneous</option>
+          <option value="others">Others (മറ്റുള്ളവ)</option>
         </select>
       </div>
 
@@ -2487,6 +2488,11 @@
           titleInput.setAttribute('list', 'rentList');
           titleInput.placeholder = 'ഉദാ: Shop Rent';
           if (!editId) titleInput.value = 'Shop Rent';
+        } else if (cat === 'others') {
+          itemNameLabel.innerText = 'വിവരണം (Description)';
+          titleInput.removeAttribute('list');
+          titleInput.placeholder = 'ഉദാ: KSEB Bill / കുറി / സംഭാവന';
+          if (!editId) titleInput.value = '';
         } else {
           itemNameLabel.innerText = 'ചിലവിന്റെ വിവരണം (Miscellaneous)';
           titleInput.setAttribute('list', 'miscList');
@@ -2586,8 +2592,14 @@
 
       filtered.forEach(b => {
         totalSales += (b.total || 0);
-        if (b.mode === 'cash' || b.paymentMode === 'CASH') cashSales += (b.total || 0);
-        else gpaySales += (b.total || 0);
+        if (b.paymentMode === 'Split' && b.cash && b.gpay) {
+          cashSales += b.cash;
+          gpaySales += b.gpay;
+        } else if (b.mode === 'cash' || b.paymentMode === 'CASH') {
+          cashSales += (b.total || 0);
+        } else {
+          gpaySales += (b.total || 0);
+        }
 
         if (b.items && Array.isArray(b.items)) {
           b.items.forEach(it => {
@@ -2659,7 +2671,8 @@
 
           billsContainer.innerHTML = sortedBills.map(b => {
             const displayTime = formatTo12HourTime(b.time);
-            const pMode = (b.paymentMode || b.mode || 'CASH').toUpperCase();
+            const isSplit = b.paymentMode === 'Split';
+            const pMode = isSplit ? 'SPLIT' : (b.paymentMode || b.mode || 'CASH').toUpperCase();
             const totalQty = (b.items || []).reduce((sum, it) => sum + (it.qty || 1), 0);
 
             return `
@@ -2667,7 +2680,7 @@
                 <div>
                   <div style="font-weight:900; font-size:0.92rem; color:var(--primary-dark);">
                     #${b.billNo} • ₹${b.total} 
-                    <span style="font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${pMode === 'CASH' ? '#dcfce7' : '#e0f2fe'}; color:${pMode === 'CASH' ? '#059669' : '#0284c7'};">
+                    <span style="font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:800; background:${isSplit ? '#fef3c7' : (pMode === 'CASH' ? '#dcfce7' : '#e0f2fe')}; color:${isSplit ? '#b45309' : (pMode === 'CASH' ? '#059669' : '#0284c7')};">
                       ${pMode}
                     </span>
                   </div>
@@ -2689,20 +2702,13 @@
     async function deleteBillCompletely(billId) {
       if (!confirm("ഈ ബിൽ ഡിലീറ്റ് ചെയ്യണോ? ഇത് എല്ലാ റിപ്പോർട്ടുകളിൽ നിന്നും ഒഴിവാക്കപ്പെടും.")) return;
       try {
-        // 1. ഡാറ്റാബേസിൽ നിന്ന് ബിൽ പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്യുന്നു
+        const b = posBills.find(x => x.id === billId);
         await db.collection('pos_bills').doc(billId).delete();
-        
-        // 2. ലോക്കൽ അറേയിൽ നിന്ന് ആ ബിൽ ഒഴിവാക്കുന്നു
         posBills = posBills.filter(b => b.id !== billId);
-        
-        // 3. റീസെന്റ് ബിൽ ലിസ്റ്റ് / അനലിറ്റിക്സ് അപ്ഡേറ്റ് ചെയ്യുന്നു
         renderPosAnalyticsTab();
-        
-        // 4. 🔥 ഏറ്റവും പ്രധാനം: സെയിൽസ് റിപ്പോർട്ടും അനലിറ്റിക്സും ഉടൻ തന്നെ റീകാൽക്കുലേറ്റ് ചെയ്യുന്നു
         if (typeof renderDailyAccounts === 'function') {
           renderDailyAccounts();
         }
-        
         alert("✅ ബിൽ വിജയകരമായി ഡിലീറ്റ് ചെയ്തു, കണക്കുകൾ അപ്ഡേറ്റ് ചെയ്തിട്ടുണ്ട്!");
       } catch (error) {
         console.error("Error deleting bill: ", error);
@@ -2743,7 +2749,7 @@
           <span>₹${b.total}</span>
         </div>
         <div style="font-size:0.75rem; color:#64748b; margin-top:4px; text-align:right;">
-          Payment: <b>${(b.paymentMode || b.mode || 'CASH').toUpperCase()}</b>
+          Payment: <b>${b.paymentMode === 'Split' ? `Split (Cash: ₹${b.cash}, GPay: ₹${b.gpay})` : (b.paymentMode || b.mode || 'CASH').toUpperCase()}</b>
         </div>
       `;
 
