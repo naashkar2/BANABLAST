@@ -755,6 +755,11 @@
       <button type="button" class="btn-pay-sub" id="btnPayGPay" onclick="setPaymentMode('gpay')">
         📱 GPAY
       </button>
+      <!-- സ്പ്ലിറ്റ് ആക്ടീവ് ആയിരിക്കുമ്പോൾ കാണിക്കുന്ന ക്ലോസ് മാർക്കോടുകൂടിയ ബട്ടൺ -->
+      <div id="splitActiveBtn" style="display: none; background: #16a34a; color: white; border-radius: 8px; padding: 6px 8px; font-weight: 800; font-size: 0.75rem; align-items: center; justify-content: space-between; gap: 4px; flex: 1;">
+        <span id="splitBtnText" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">SPLIT (C:₹0 | G:₹0)</span>
+        <button type="button" onclick="removeSplitPayment(event)" style="background: rgba(0,0,0,0.2); border: none; color: white; border-radius: 50%; width: 20px; height: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="സ്പ്ലിറ്റ് ഒഴിവാക്കുക">✕</button>
+      </div>
     </div>
 
     <div class="dock-box box-cart-combo">
@@ -889,7 +894,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title" id="itemModalHeading">⚙️ Manage Menu Items</div>
-        <button class="btn-close" onclick="closeModal('itemsModal')">✕</button>
+        <button type="button" class="btn-close" onclick="closeModal('itemsModal')">✕</button>
       </div>
 
       <div class="form-group">
@@ -1354,11 +1359,17 @@
     function setPaymentMode(mode) {
       playTickSound();
       currentPayMode = mode;
-      currentBillSplit = null; // Reset split if standard mode clicked
+      currentBillSplit = null; 
+      
       const bCash = document.getElementById('btnPayCash');
       const bGpay = document.getElementById('btnPayGPay');
+      const splitBtn = document.getElementById('splitActiveBtn');
       const pBox = document.getElementById('paymentModeContainer');
       pBox.classList.remove('shake-alert');
+
+      bCash.style.display = 'flex';
+      bGpay.style.display = 'flex';
+      splitBtn.style.display = 'none';
 
       if (mode === 'cash') {
         bCash.className = 'btn-pay-sub active cash';
@@ -1373,7 +1384,10 @@
       currentPayMode = null;
       currentBillSplit = null;
       document.getElementById('btnPayCash').className = 'btn-pay-sub';
+      document.getElementById('btnPayCash').style.display = 'flex';
       document.getElementById('btnPayGPay').className = 'btn-pay-sub';
+      document.getElementById('btnPayGPay').style.display = 'flex';
+      document.getElementById('splitActiveBtn').style.display = 'none';
       const pBox = document.getElementById('paymentModeContainer');
       pBox.classList.remove('shake-alert');
     }
@@ -1383,7 +1397,6 @@
       return subtotal + parcelCharge;
     }
 
-    // Long press event listeners for Cash Button
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => initBluetoothAutoConnect(), 1000);
       setTimeout(autoAssignPresetCodesToFirebase, 1500);
@@ -1466,12 +1479,28 @@
       currentPayMode = 'Split';
       document.getElementById('splitLongPressModal').style.display = 'none';
 
-      // Cash button-ൽ സ്പ്ലിറ്റ് തുക കാണിക്കാൻ
-      const bCash = document.getElementById('btnPayCash');
-      const bGpay = document.getElementById('btnPayGPay');
-      bCash.className = 'btn-pay-sub active cash';
-      bGpay.className = 'btn-pay-sub';
-      bCash.innerHTML = `🔀 SPLIT (C:₹${cashVal} G:₹${gpayVal})`;
+      // Hide Cash/GPay buttons and show Split Active Button with Close mark
+      document.getElementById('btnPayCash').style.display = 'none';
+      document.getElementById('btnPayGPay').style.display = 'none';
+      
+      const splitBtn = document.getElementById('splitActiveBtn');
+      document.getElementById('splitBtnText').innerText = `SPLIT (C:₹${cashVal} | G:₹${gpayVal})`;
+      splitBtn.style.display = 'flex';
+    }
+
+    // സ്പ്ലിറ്റ് കാൻസൽ ചെയ്ത് നോർമൽ മോഡിലേക്ക് മടരാൻ
+    function removeSplitPayment(event) {
+      if (event) event.stopPropagation(); 
+      currentBillSplit = null;
+      currentPayMode = null;
+      
+      document.getElementById('splitActiveBtn').style.display = 'none';
+      document.getElementById('btnPayCash').style.display = 'flex';
+      document.getElementById('btnPayCash').className = 'btn-pay-sub';
+      document.getElementById('btnPayGPay').style.display = 'flex';
+      document.getElementById('btnPayGPay').className = 'btn-pay-sub';
+      
+      alert("✅ സ്പ്ലിറ്റ് പെയ്മെന്റ് ഒഴിവാക്കി!");
     }
 
     function closeSplitLongPressModal() {
@@ -1598,14 +1627,11 @@
         return;
       }
 
-      // 1. പ്രിന്റർ ഇതിനകം കണക്ടഡ് ആണോ എന്ന് പരിശോധിക്കുന്നു
       bluetoothSerial.isConnected(
         () => {
-          // കണക്ടഡ് ആണെങ്കിൽ സ്റ്റാറ്റസ് 'Ready' എന്ന് കാണിക്കുന്നു
           updateBTStatusUI('online', 'Ready');
         },
         () => {
-          // 2. കണക്ഷൻ നഷ്ടപ്പെട്ടിട്ടുണ്ടെങ്കിൽ, മുമ്പ് സേവ് ചെയ്ത MAC Address വെച്ച് നേരിട്ട് റീകണക്റ്റ് ചെയ്യുന്നു
           const savedMac = localStorage.getItem('BANABLAST_BT_MAC');
           if (savedMac) {
             updateBTStatusUI('connecting', 'Reconnecting...');
@@ -2010,10 +2036,6 @@
         editingBill = null;
         currentBillSplit = null;
         resetPaymentModeSelection();
-        const bCash = document.getElementById('btnPayCash');
-        if (bCash) {
-          bCash.innerHTML = '💵 CASH';
-        }
         renderCartUI();
         renderMenuItems();
         closeModal('cartDrawerModal');
