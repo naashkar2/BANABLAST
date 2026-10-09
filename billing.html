@@ -1411,7 +1411,7 @@
         snap.forEach(doc => {
           const data = doc.data();
           let fixedName = (data.name || '').replace(/Aval/g, 'Avil');
-          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'aval_milk');
+          let fixedCat = data.category === 'aval_milk' ? 'avil_milk' : (data.category || 'avil_milk');
           let subCat = data.subCategory;
           if (!subCat && fixedCat === 'avil_milk') {
             subCat = matchMenuCardSubCategory(fixedName, data.price);
@@ -2542,7 +2542,7 @@
     }
 
     /* =============================================================
-       LIVE SUGGESTIONS & SEARCH
+       LIVE SUGGESTIONS & SEARCH (UPDATED WITH PRIORITY SORTING)
        ============================================================= */
     function showLiveSuggestions(val) {
       const box = document.getElementById('liveSuggestionsBox');
@@ -2552,15 +2552,30 @@
         box.innerHTML = '';
         return;
       }
-      const matches = menuItems.filter(i => 
-        (i.code && String(i.code).toLowerCase().includes(query)) || 
-        (i.name && i.name.toLowerCase().includes(query))
-      );
+
+      const exactMatches = [];
+      const partialMatches = [];
+
+      menuItems.forEach(i => {
+        const codeStr = i.code ? String(i.code).toLowerCase() : '';
+        const nameStr = i.name ? i.name.toLowerCase() : '';
+        if (codeStr === query || nameStr === query) {
+          exactMatches.push(i);
+        } else if (codeStr.includes(query) || nameStr.includes(query)) {
+          partialMatches.push(i);
+        }
+      });
+
+      // നമ്പറുകളുടെ അടിസ്ഥാനത്തിൽ അറേ സോർട്ട് ചെയ്യുന്നു (ഉദാ: 5 ആദ്യം, പിന്നെ 51, 52...)
+      partialMatches.sort((a, b) => Number(a.code || 0) - Number(b.code || 0));
+      const matches = [...exactMatches, ...partialMatches];
+
       if (matches.length === 0) {
         box.style.display = 'none';
         box.innerHTML = '';
         return;
       }
+
       box.innerHTML = matches.map(i => `
         <div onclick="selectSuggestedItem('${i.id}')" style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 700;">
           <div><span style="color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">#${i.code || '-'}</span> ${i.name}</div>
