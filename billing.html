@@ -1571,7 +1571,7 @@
     }
 
     /* =============================================================
-       BLUETOOTH PRINTER ENGINE
+       BLUETOOTH PRINTER ENGINE (SMART AUTO-RECONNECT)
        ============================================================= */
     function updateBTStatusUI(status, label) {
       const btn = document.getElementById('btnSmartBT');
@@ -1598,29 +1598,31 @@
         return;
       }
 
-      bluetoothSerial.isEnabled(() => {
-        bluetoothSerial.list((devices) => {
-          if (!devices || devices.length === 0) return;
+      // 1. പ്രിന്റർ ഇതിനകം കണക്ടഡ് ആണോ എന്ന് പരിശോധിക്കുന്നു
+      bluetoothSerial.isConnected(
+        () => {
+          // കണക്ടഡ് ആണെങ്കിൽ സ്റ്റാറ്റസ് 'Ready' എന്ന് കാണിക്കുന്നു
+          updateBTStatusUI('online', 'Ready');
+        },
+        () => {
+          // 2. കണക്ഷൻ നഷ്ടപ്പെട്ടിട്ടുണ്ടെങ്കിൽ, മുമ്പ് സേവ് ചെയ്ത MAC Address വെച്ച് നേരിട്ട് റീകണക്റ്റ് ചെയ്യുന്നു
           const savedMac = localStorage.getItem('BANABLAST_BT_MAC');
-          const target = devices.find(d => 
-            (savedMac && d.address === savedMac) ||
-            (d.name && (d.name.includes("BlueTooth") || d.name.toLowerCase().includes("printer")))
-          ) || devices[0];
-
-          if (target) {
-            bluetoothSerial.connect(target.address, () => {
-              connectedThermalPrinter = target;
-              localStorage.setItem('BANABLAST_BT_MAC', target.address);
+          if (savedMac) {
+            updateBTStatusUI('connecting', 'Reconnecting...');
+            bluetoothSerial.connect(savedMac, () => {
+              connectedThermalPrinter = { address: savedMac };
               updateBTStatusUI('online', 'Ready');
-            }, () => {
+              console.log("Bluetooth auto-reconnected successfully!");
+            }, (err) => {
               connectedThermalPrinter = null;
               updateBTStatusUI('offline', 'Connect');
+              console.log("Auto-reconnect failed:", err);
             });
+          } else {
+            updateBTStatusUI('offline', 'Connect');
           }
-        });
-      }, () => {
-        updateBTStatusUI('offline', 'Connect');
-      });
+        }
+      );
     }
 
     function connectBluetoothPrinterUniversal() {
@@ -1794,7 +1796,6 @@
       `;
     }
 
-    // കാർട്ടിന്റെ ഏറ്റവും മുകളിലേക്ക് പുതിയ ഐറ്റം കയറുന്ന പ്രയോറിറ്റി ഫങ്ഷൻ
     function addToCartPriority(itemId) {
       playTickSound();
       const it = menuItems.find(x => x.id === itemId);
@@ -2007,8 +2008,8 @@
         cart = [];
         parcelCharge = 0;
         editingBill = null;
-        currentBillSplit = null; // സ്പ്ലിറ്റ് ഡാറ്റ ക്ലിയർ ചെയ്യുന്നു
-        resetPaymentModeSelection(); // ക്യാഷ് ബട്ടൺ ഡിസൈൻ പഴയതുപോലെ ആക്കാൻ
+        currentBillSplit = null;
+        resetPaymentModeSelection();
         const bCash = document.getElementById('btnPayCash');
         if (bCash) {
           bCash.innerHTML = '💵 CASH';
@@ -2566,7 +2567,6 @@
         }
       });
 
-      // നമ്പറുകളുടെ അടിസ്ഥാനത്തിൽ അറേ സോർട്ട് ചെയ്യുന്നു (ഉദാ: 5 ആദ്യം, പിന്നെ 51, 52...)
       partialMatches.sort((a, b) => Number(a.code || 0) - Number(b.code || 0));
       const matches = [...exactMatches, ...partialMatches];
 
