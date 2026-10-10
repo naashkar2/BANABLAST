@@ -1261,11 +1261,11 @@
         <div style="display:flex; gap:8px;">
           <div style="flex:1;">
             <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (ആകെ ബില്ല് ₹)</label>
-            <input type="number" id="suppTotalBill" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
+            <input type="number" id="suppTotalBill" class="form-control" placeholder="0">
           </div>
           <div style="flex:1;">
             <label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (നൽകിയത് ₹)</label>
-            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0" oninput="calcPurchaseDue()">
+            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0">
           </div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
@@ -2161,24 +2161,18 @@
         checkUserLogin();
         initFlatpickrCalendar();
 
-        document.getElementById('invDate').value = today;
-        document.getElementById('withDate').value = today;
-        document.getElementById('sheetFromDate').value = today;
-        document.getElementById('sheetToDate').value = today;
-        document.getElementById('repFromDate').value = today;
-        document.getElementById('repToDate').value = today;
-        if (document.getElementById('posFromDate')) {
-          document.getElementById('posFromDate').value = today;
-          document.getElementById('posToDate').value = today;
-        }
-        if (document.getElementById('stockFromDate')) {
-          document.getElementById('stockFromDate').value = today;
-          document.getElementById('stockToDate').value = today;
-        }
-        if (document.getElementById('suppFromDate')) {
-          document.getElementById('suppFromDate').value = today;
-          document.getElementById('suppToDate').value = today;
-        }
+        if (document.getElementById('invDate')) document.getElementById('invDate').value = today;
+        if (document.getElementById('withDate')) document.getElementById('withDate').value = today;
+        if (document.getElementById('sheetFromDate')) document.getElementById('sheetFromDate').value = today;
+        if (document.getElementById('sheetToDate')) document.getElementById('sheetToDate').value = today;
+        if (document.getElementById('repFromDate')) document.getElementById('repFromDate').value = today;
+        if (document.getElementById('repToDate')) document.getElementById('repToDate').value = today;
+        if (document.getElementById('posFromDate')) document.getElementById('posFromDate').value = today;
+        if (document.getElementById('posToDate')) document.getElementById('posToDate').value = today;
+        if (document.getElementById('stockFromDate')) document.getElementById('stockFromDate').value = today;
+        if (document.getElementById('stockToDate')) document.getElementById('stockToDate').value = today;
+        if (document.getElementById('suppFromDate')) document.getElementById('suppFromDate').value = today;
+        if (document.getElementById('suppToDate')) document.getElementById('suppToDate').value = today;
 
         db.collection('settings').doc('security').onSnapshot(doc => {
           if (doc.exists && doc.data().pins) {
