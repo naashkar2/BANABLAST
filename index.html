@@ -2157,96 +2157,100 @@
     }
 
     window.onload = function() {
-      checkUserLogin();
-      initFlatpickrCalendar();
+      try {
+        checkUserLogin();
+        initFlatpickrCalendar();
 
-      document.getElementById('invDate').value = today;
-      document.getElementById('withDate').value = today;
-      document.getElementById('sheetFromDate').value = today;
-      document.getElementById('sheetToDate').value = today;
-      document.getElementById('repFromDate').value = today;
-      document.getElementById('repToDate').value = today;
-      if (document.getElementById('posFromDate')) {
-        document.getElementById('posFromDate').value = today;
-        document.getElementById('posToDate').value = today;
-      }
-      if (document.getElementById('stockFromDate')) {
-        document.getElementById('stockFromDate').value = today;
-        document.getElementById('stockToDate').value = today;
-      }
-      if (document.getElementById('suppFromDate')) {
-        document.getElementById('suppFromDate').value = today;
-        document.getElementById('suppToDate').value = today;
-      }
-
-      db.collection('settings').doc('security').onSnapshot(doc => {
-        if (doc.exists && doc.data().pins) {
-          partnerPins = { ...partnerPins, ...doc.data().pins };
-        } else {
-          db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
+        document.getElementById('invDate').value = today;
+        document.getElementById('withDate').value = today;
+        document.getElementById('sheetFromDate').value = today;
+        document.getElementById('sheetToDate').value = today;
+        document.getElementById('repFromDate').value = today;
+        document.getElementById('repToDate').value = today;
+        if (document.getElementById('posFromDate')) {
+          document.getElementById('posFromDate').value = today;
+          document.getElementById('posToDate').value = today;
         }
-      });
-
-      db.collection('settings').doc('ocr').onSnapshot(doc => {
-        if (doc.exists && doc.data().key) {
-          dynamicOcrKey = doc.data().key;
-          localStorage.setItem('BANABLAST_OCR_KEY', dynamicOcrKey);
+        if (document.getElementById('stockFromDate')) {
+          document.getElementById('stockFromDate').value = today;
+          document.getElementById('stockToDate').value = today;
         }
-      });
+        if (document.getElementById('suppFromDate')) {
+          document.getElementById('suppFromDate').value = today;
+          document.getElementById('suppToDate').value = today;
+        }
 
-      db.collection('master_items').onSnapshot(snap => {
-        masterItems = [];
-        snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
-        updateMasterSuggestions();
-      });
+        db.collection('settings').doc('security').onSnapshot(doc => {
+          if (doc.exists && doc.data().pins) {
+            partnerPins = { ...partnerPins, ...doc.data().pins };
+          } else {
+            db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
+          }
+        });
 
-      db.collection('master_suppliers').onSnapshot(snap => {
-        masterSuppliers = [];
-        snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
-        updateMasterSuggestions();
-      });
+        db.collection('settings').doc('ocr').onSnapshot(doc => {
+          if (doc.exists && doc.data().key) {
+            dynamicOcrKey = doc.data().key;
+            localStorage.setItem('BANABLAST_OCR_KEY', dynamicOcrKey);
+          }
+        });
 
-      db.collection('master_staff').onSnapshot(snap => {
-        masterStaff = [];
-        snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
-        updateMasterSuggestions();
-      });
+        db.collection('master_items').onSnapshot(snap => {
+          masterItems = [];
+          snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
+          updateMasterSuggestions();
+        });
 
-      db.collection('transactions').onSnapshot(snap => {
-        transactions = [];
-        snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-        updateMasterSuggestions();
-        renderAll();
-      });
+        db.collection('master_suppliers').onSnapshot(snap => {
+          masterSuppliers = [];
+          snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
+          updateMasterSuggestions();
+        });
 
-      db.collection('pos_bills').onSnapshot(snap => {
-        posBills = [];
-        snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
-        renderPosAnalyticsTab();
-      });
+        db.collection('master_staff').onSnapshot(snap => {
+          masterStaff = [];
+          snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
+          updateMasterSuggestions();
+        });
 
-      db.collection('withdrawals').onSnapshot(snap => {
-        withdrawals = [];
-        snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
-        renderAll();
-      });
-
-      db.collection('investments').onSnapshot(snap => {
-        investments = [];
-        snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
-        renderAll();
-      });
-
-      db.collection('settings').doc('general').onSnapshot(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          if (data.opening) opening = data.opening;
-          if (data.holidays) holidays = data.holidays;
-          if (data.monthlyRent) monthlyRentTarget = data.monthlyRent;
-          if (flatpickrCalendar) flatpickrCalendar.redraw();
+        db.collection('transactions').onSnapshot(snap => {
+          transactions = [];
+          snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
+          updateMasterSuggestions();
           renderAll();
-        }
-      });
+        });
+
+        db.collection('pos_bills').onSnapshot(snap => {
+          posBills = [];
+          snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
+          renderPosAnalyticsTab();
+        });
+
+        db.collection('withdrawals').onSnapshot(snap => {
+          withdrawals = [];
+          snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
+          renderAll();
+        });
+
+        db.collection('investments').onSnapshot(snap => {
+          investments = [];
+          snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
+          renderAll();
+        });
+
+        db.collection('settings').doc('general').onSnapshot(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.opening) opening = data.opening;
+            if (data.holidays) holidays = data.holidays;
+            if (data.monthlyRent) monthlyRentTarget = data.monthlyRent;
+            if (flatpickrCalendar) flatpickrCalendar.redraw();
+            renderAll();
+          }
+        });
+      } catch (err) {
+        console.error("Window load safe error:", err);
+      }
     };
 
     function renderAll() {
