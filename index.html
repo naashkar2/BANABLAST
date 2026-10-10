@@ -3508,21 +3508,17 @@
       const refDate = new Date(curDate);
       const fromDate = document.getElementById('suppFromDate') ? document.getElementById('suppFromDate').value : today;
       const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
-
       const grouped = {};
-
       transactions.forEach(t => {
         if (t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due')) {
           const name = (t.title || t.extra || 'Unknown').trim();
           const key = name.toLowerCase();
           const tDate = new Date(t.date);
-          
           let match = false;
           if (currentSupplierFilter === 'all') match = true;
           else if (currentSupplierFilter === 'today') match = (t.date === curDate);
           else if (currentSupplierFilter === 'month') match = (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
           else if (currentSupplierFilter === 'custom') match = (t.date >= fromDate && t.date <= toDate);
-
           if (!grouped[key]) {
             grouped[key] = { name, totalPaid: 0, dueBalance: 0, count: 0, lastDate: t.date, transactions: [] };
           }
@@ -3534,7 +3530,6 @@
           if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
         }
       });
-
       let totalAllDues = 0;
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
@@ -3551,26 +3546,21 @@
         }
         totalAllDues += (item.dueBalance || 0);
       });
-
       const dueDisp = document.getElementById('suppTotalDueDisplay');
       if (dueDisp) dueDisp.innerText = '₹' + (Math.round(totalAllDues * 100) / 100);
-
       let keys = Object.keys(grouped);
       if (supplierDuesOnlyFilter) {
         keys = keys.filter(k => grouped[k].dueBalance > 0);
       }
-
       if (!keys.length) {
         container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:20px;">${supplierDuesOnlyFilter ? 'കുടിശ്ശികയുള്ള സപ്ലയർമാർ ആരും തന്നെയില്ല! 🎉' : 'സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല'}</p>`;
         return;
       }
-
       let html = '';
       keys.forEach(k => {
         const item = grouped[k];
         const totDue = Math.round((item.dueBalance || 0) * 100) / 100;
         const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
-
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
             <div class="stock-header">
@@ -4291,19 +4281,13 @@
       const refDate = new Date(curDate);
       const fromDate = document.getElementById('sheetFromDate').value;
       const toDate = document.getElementById('sheetToDate').value;
-
       let matched = [];
-
       if (forcedCategory === 'item_stock') {
         transactions.forEach(t => {
           if (t.items && t.items.length) {
             const found = t.items.find(it => it.name.trim().toLowerCase() === activeSheetKey);
             if (found) {
-              matched.push({
-                ...t,
-                amount: found.price,
-                note: `Item: ${found.name} (from ${t.title || 'Purchase'})`
-              });
+              matched.push({ ...t, amount: found.price, note: `Item: ${found.name} (from ${t.title || 'Purchase'})` });
             }
           }
         });
@@ -4313,7 +4297,6 @@
           return itemTitle === activeSheetKey;
         });
       }
-
       let filtered = matched.filter(t => {
         if (currentSheetFilter === 'all') return true;
         const tDate = new Date(t.date);
@@ -4329,24 +4312,20 @@
         }
         return true;
       });
-
       filtered.sort((a,b) => {
         const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
         const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
         if (timeA !== timeB) return timeB - timeA;
         return b.date.localeCompare(a.date);
       });
-
       let totalSum = 0;
       let totalDueSum = 0;
       let rowsHTML = '';
-
       filtered.forEach((t, idx) => {
         totalSum += t.amount;
         if (t.dueAmount !== undefined) totalDueSum = t.dueAmount;
         const isSale = t.type === 'sale';
         const rowId = `dropdown-item-${idx}`;
-
         let itemsDropdownHTML = '';
         let hasItems = t.items && t.items.length > 0;
         if (hasItems && forcedCategory !== 'item_stock') {
@@ -4363,14 +4342,11 @@
             </div>
           `;
         }
-
         let dueDisplay = '';
         if (t.dueAmount !== undefined) {
           dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
         }
-
         let addedByDisplay = t.addedBy ? `<div style="font-size:0.7rem; color:#0284c7; font-weight:700; margin-top:3px;">👤 Added by: ${t.addedBy}</div>` : '';
-
         rowsHTML += `
           <tr class="${hasItems && forcedCategory !== 'item_stock' ? 'collapsible-trigger' : ''}" onclick="${hasItems && forcedCategory !== 'item_stock' ? `toggleItemsDropdown('${rowId}')` : ''}">
             <td style="padding:8px; border-bottom:1px solid #e2e8f0;"><strong>${t.date}</strong></td>
@@ -4388,12 +4364,9 @@
           </tr>
         `;
       });
-
       document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
-      
       totalSum = Math.round(totalSum * 100) / 100;
       totalDueSum = Math.round(totalDueSum * 100) / 100;
-
       let totalText = '₹' + totalSum;
       const sortedForDue = filtered.slice().sort((a, b) => {
         const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
