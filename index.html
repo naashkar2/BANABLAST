@@ -1226,6 +1226,7 @@
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
           <option value="tea">Tea / Refreshment</option>
           <option value="stock">Purchase / സപ്ലയർ പർച്ചേസ്</option>
+          <option value="pay_due">Pay Due (പഴയ കുടിശ്ശിക അടയ്ക്കൽ)</option>
           <option value="salary">Staff Salary</option>
           <option value="rent">Shop Rent</option>
           <option value="other">Daily Expense / Miscellaneous</option>
@@ -1254,6 +1255,23 @@
       <div class="form-group">
         <label id="itemNameLabel">Supplier / Item / Description</label>
         <input type="text" id="entryTitle" list="suppliersList" class="form-control" placeholder="പേര് ടൈപ്പ് ചെയ്യുമ്പോൾ സെലക്ട് ചെയ്യാം" required>
+      </div>
+
+      <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (ആകെ ബില്ല് ₹)</label>
+            <input type="number" id="suppTotalBill" class="form-control" placeholder="0">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (നൽകിയത് ₹)</label>
+            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
+          <span style="color:#b91c1c;" id="expenseRemainingDueDisplayLabel">ബാക്കി കുടിശ്ശിക (Due Balance):</span>
+          <span id="suppDueText" style="color:#b91c1c; font-size:0.95rem;">₹0</span>
+        </div>
       </div>
 
       <div class="form-group" id="generalAmountGroup">
@@ -2438,18 +2456,37 @@
       const type = document.getElementById('entryType').value;
       const cat = document.getElementById('entryCategory').value;
       const isStock = (type === 'expense' && cat === 'stock');
+      const isPayDue = (type === 'expense' && cat === 'pay_due');
       const titleInput = document.getElementById('entryTitle');
       const itemNameLabel = document.getElementById('itemNameLabel');
       const editId = document.getElementById('editEntryId').value;
+      
       document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
+      document.getElementById('supplierItemsBox').style.display = (isStock || isPayDue) ? 'none' : 'block';
+      document.getElementById('supplierPaymentRow').style.display = (isStock || isPayDue) ? 'block' : 'none';
+      document.getElementById('generalAmountGroup').style.display = (isStock || isPayDue) ? 'none' : 'block';
+
+      if (isPayDue) {
+        const totalBillInput = document.getElementById('suppTotalBill');
+        if (totalBillInput) {
+          totalBillInput.value = 0;
+          totalBillInput.readOnly = true;
+        }
+      } else {
+        const totalBillInput = document.getElementById('suppTotalBill');
+        if (totalBillInput) {
+          totalBillInput.readOnly = false;
+        }
+      }
+      handleExpenseCategoryOrSupplierChange();
+
       if (type === 'expense') {
         if (cat === 'salary') {
           itemNameLabel.innerText = 'സ്റ്റാഫിന്റെ പേര് (Staff Name)';
           titleInput.setAttribute('list', 'staffList');
           titleInput.placeholder = 'സ്റ്റാഫിന്റെ പേര് ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ തിരഞ്ഞെടുക്കുക';
           if (!editId) titleInput.value = '';
-        } else if (cat === 'stock') {
+        } else if (cat === 'stock' || cat === 'pay_due') {
           itemNameLabel.innerText = 'സപ്ലയർ / കമ്പനിയുടെ പേര് (Supplier)';
           titleInput.setAttribute('list', 'suppliersList');
           titleInput.placeholder = 'സപ്ലയർ അല്ലെങ്കിൽ കമ്പനിയുടെ പേര്';
@@ -2481,6 +2518,118 @@
         titleInput.placeholder = 'Sales';
       }
     }
+
+    function handleExpenseCategoryOrSupplierChange() {
+      const categoryEl = document.getElementById('entryCategory');
+      const supplierTitleEl = document.getElementById('entryTitle');
+      const itemsContainer = document.getElementById('supplierItemsBox');
+      const totalBillInput = document.getElementById('suppTotalBill');
+      const dueDisplay = document.getElementById('suppDueText');
+      const labelElem = document.getElementById('expenseRemainingDueDisplayLabel');
+
+      if (!categoryEl || !supplierTitleEl) return;
+      const category = categoryEl.value;
+      const supplierName = supplierTitleEl.value.trim();
+
+      let currentDue = 0;
+      if (supplierName && typeof transactions !== 'undefined') {
+        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
+        if (matchedTrans.length > 0) {
+          matchedTrans.sort((a,b) => {
+            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+            if (timeA !== timeB) return timeB - timeA;
+            return b.date.localeCompare(a.date);
+          });
+          if (matchedTrans[0].dueAmount !== undefined) {
+            currentDue = matchedTrans[0].dueAmount;
+          }
+        }
+      }
+      if (category === 'pay_due') {
+        if (itemsContainer) itemsContainer.style.display = 'none';
+        if (totalBillInput) {
+          totalBillInput.value = 0;
+          totalBillInput.readOnly = true;
+        }
+        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Remaining Due):';
+        if (dueDisplay) {
+          dueDisplay.innerText = `₹${currentDue.toFixed(2)} (നിലവിലെ കുടിശ്ശിക)`;
+        }
+      } else if (category === 'stock') {
+        if (itemsContainer) itemsContainer.style.display = 'block';
+        if (totalBillInput) {
+          totalBillInput.readOnly = false;
+        }
+        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Due Balance):';
+      }
+    }
+
+    function calculateSupplierDueSafe() {
+      const categoryEl = document.getElementById('entryCategory');
+      const supplierTitleEl = document.getElementById('entryTitle');
+      const totalBillEl = document.getElementById('suppTotalBill');
+      const paidAmountEl = document.getElementById('suppPaidAmount');
+      const dueDisplay = document.getElementById('suppDueText');
+
+      if (!categoryEl || !supplierTitleEl) return;
+
+      const category = categoryEl.value;
+      const supplierName = supplierTitleEl.value.trim();
+      const totalBillInput = totalBillEl ? (parseFloat(totalBillEl.value) || 0) : 0;
+      const paidNowInput = paidAmountEl ? (parseFloat(paidAmountEl.value) || 0) : 0;
+
+      let existingDue = 0;
+      if (supplierName && typeof transactions !== 'undefined') {
+        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
+        if (matchedTrans.length > 0) {
+          matchedTrans.sort((a,b) => {
+            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+            if (timeA !== timeB) return timeB - timeA;
+            return b.date.localeCompare(a.date);
+          });
+          if (matchedTrans[0].dueAmount !== undefined) {
+            existingDue = matchedTrans[0].dueAmount;
+          }
+        }
+      }
+
+      let finalRemainingDue = existingDue;
+      if (category === 'pay_due') {
+        finalRemainingDue = existingDue - paidNowInput;
+      } else if (category === 'stock') {
+        finalRemainingDue = (existingDue + totalBillInput) - paidNowInput;
+      }
+
+      if (dueDisplay) {
+        dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const entryTitleEl = document.getElementById('entryTitle');
+      const suppTotalBillEl = document.getElementById('suppTotalBill');
+      const suppPaidAmountEl = document.getElementById('suppPaidAmount');
+      const entryCategoryEl = document.getElementById('entryCategory');
+
+      if (entryTitleEl) {
+        entryTitleEl.addEventListener('input', () => {
+          handleExpenseCategoryOrSupplierChange();
+          calculateSupplierDueSafe();
+        });
+        entryTitleEl.addEventListener('change', () => {
+          handleExpenseCategoryOrSupplierChange();
+          calculateSupplierDueSafe();
+        });
+      }
+      if (suppTotalBillEl) suppTotalBillEl.addEventListener('input', calculateSupplierDueSafe);
+      if (suppPaidAmountEl) suppPaidAmountEl.addEventListener('input', calculateSupplierDueSafe);
+      if (entryCategoryEl) entryCategoryEl.addEventListener('change', () => {
+        handleCategoryChange();
+        calculateSupplierDueSafe();
+      });
+    });
 
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
@@ -2770,8 +2919,12 @@
         sum += parseFloat(input.value) || 0;
       });
       if (sum > 0) {
-        document.getElementById('entryAmount').value = Math.round(sum * 100) / 100;
+        document.getElementById('suppTotalBill').value = Math.round(sum * 100) / 100;
+        if (!document.getElementById('suppPaidAmount').value) {
+          document.getElementById('suppPaidAmount').value = Math.round(sum * 100) / 100;
+        }
       }
+      calculateSupplierDueSafe();
     }
 
     function getCollectedPurchaseItems() {
@@ -2917,7 +3070,9 @@
         }
 
         if (totalBill > 0) {
-          document.getElementById('entryAmount').value = totalBill;
+          document.getElementById('suppTotalBill').value = totalBill;
+          document.getElementById('suppPaidAmount').value = totalBill;
+          calculateSupplierDueSafe();
         } else {
           recalcTotalFromItems();
         }
@@ -2952,13 +3107,21 @@
           document.getElementById('entryNote').value = item.note || '';
           if (isExp) document.getElementById('entryCategory').value = item.category || 'other';
 
-          if (item.category === 'stock' && item.items && Array.isArray(item.items)) {
-            item.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
+          if (item.category === 'stock' || item.category === 'pay_due') {
+            document.getElementById('suppTotalBill').value = item.billTotal || item.amount;
+            document.getElementById('suppPaidAmount').value = item.paidAmount || item.amount;
+            calculateSupplierDueSafe();
+            if (item.items && Array.isArray(item.items)) {
+              item.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
+            }
           }
         }
       } else {
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
+        document.getElementById('suppTotalBill').value = '';
+        document.getElementById('suppPaidAmount').value = '';
+        document.getElementById('suppDueText').innerText = '₹0';
         if (isExp) {
           document.getElementById('entryCategory').value = 'stock';
           document.getElementById('entryTitle').value = '';
@@ -2975,24 +3138,57 @@
       const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
       const type = document.getElementById('entryType').value;
-      const amount = parseFloat(document.getElementById('entryAmount').value);
       const mode = document.getElementById('entryMode').value;
       let title = document.getElementById('entryTitle').value.trim();
       const note = document.getElementById('entryNote').value.trim();
 
       let category = 'sale';
       let items = [];
-
-      if (!amount || amount <= 0) {
-        alert('സാധുവായ തുക നൽകുക');
-        return;
-      }
+      let billTotal = 0;
+      let paidAmount = 0;
+      let dueAmount = 0;
+      let amount = 0;
 
       if (type === 'expense') {
         category = document.getElementById('entryCategory').value;
-        if (category === 'stock') {
-          items = getCollectedPurchaseItems();
+        if (category === 'stock' || category === 'pay_due') {
+          items = category === 'pay_due' ? [] : getCollectedPurchaseItems();
+          billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
+          paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+          
+          let existingDue = 0;
+          let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === title.toLowerCase());
+          if (matchedTrans.length > 0) {
+            matchedTrans.sort((a,b) => {
+              const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+              const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+              if (timeA !== timeB) return timeB - timeA;
+              return b.date.localeCompare(a.date);
+            });
+            if (matchedTrans[0].dueAmount !== undefined) {
+              existingDue = matchedTrans[0].dueAmount;
+            }
+          }
+
+          let newDueBalance = 0;
+          if (category === 'pay_due') {
+            newDueBalance = existingDue - paidAmount;
+          } else if (category === 'stock') {
+            newDueBalance = (existingDue + billTotal) - paidAmount;
+          }
+
+          dueAmount = newDueBalance > 0 ? newDueBalance : 0;
+          amount = paidAmount;
+        } else {
+          amount = parseFloat(document.getElementById('entryAmount').value) || 0;
         }
+      } else {
+        amount = parseFloat(document.getElementById('entryAmount').value) || 0;
+      }
+
+      if (amount < 0 || (type === 'sale' && amount <= 0)) {
+        alert('സാധുവായ തുക നൽകുക');
+        return;
       }
 
       if (!title) {
@@ -3006,6 +3202,9 @@
         title,
         extra: title,
         amount: Math.round(amount * 100) / 100,
+        billTotal: Math.round((billTotal || amount) * 100) / 100,
+        paidAmount: Math.round((paidAmount || amount) * 100) / 100,
+        dueAmount: dueAmount > 0 ? dueAmount : 0,
         mode,
         note,
         items,
@@ -3070,6 +3269,7 @@
         const isSale = t.type === 'sale';
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
         const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
+        let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
         let addedByTag = t.addedBy ? `<span style="color:#0284c7; font-weight:700;">👤 ${t.addedBy}</span> • ` : '';
 
         const rowHTML = `
@@ -3080,7 +3280,7 @@
                 <span class="mode-badge ${badgeClass}">${t.mode.toUpperCase()}</span>
               </div>
               <div class="entry-sub">
-                ${addedByTag}${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍
+                ${addedByTag}${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
               </div>
             </div>
             <div class="entry-right">
@@ -3282,7 +3482,7 @@
       const grouped = {};
 
       transactions.forEach(t => {
-        if (t.type === 'expense' && t.category === 'stock') {
+        if (t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due')) {
           const name = (t.title || t.extra || 'Unknown').trim();
           const key = name.toLowerCase();
           const tDate = new Date(t.date);
@@ -3300,7 +3500,7 @@
           grouped[key].transactions.push(t);
 
           if (match) {
-            grouped[key].totalPaid += t.amount;
+            grouped[key].totalPaid += (t.paidAmount || t.amount);
             grouped[key].count += 1;
           }
           if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
@@ -3324,7 +3524,11 @@
           item.transactions.forEach(tr => {
             const bill = tr.billTotal !== undefined ? tr.billTotal : tr.amount;
             const paid = tr.paidAmount !== undefined ? tr.paidAmount : tr.amount;
-            runningDue = (runningDue + bill) - paid;
+            if (tr.category === 'pay_due') {
+              runningDue = runningDue - paid;
+            } else {
+              runningDue = (runningDue + bill) - paid;
+            }
             tr.calculatedDue = runningDue > 0 ? runningDue : 0;
           });
 
@@ -3600,7 +3804,7 @@
             rent += t.amount;
           } else if (t.category === 'salary') {
             salary += t.amount;
-          } else if (t.category === 'stock') {
+          } else if (t.category === 'stock' || t.category === 'pay_due') {
             stock += t.amount;
           } else {
             misc += t.amount;
@@ -4138,15 +4342,9 @@
       let finalDueSum = 0;
       let rowsHTML = '';
 
-      if (filtered.length > 0 && filtered[filtered.length - 1].calculatedDue !== undefined) {
-        // റിവേഴ്സ് ചെയ്ത ലിസ്റ്റിൽ ഏറ്റവും ഒടുവിലത്തേത് (പഴയത്) നോക്കിയാൽ ഫൈനൽ ഡ്യൂ കിട്ടും
-        // അല്ലെങ്കിൽ ഏറ്റവും പുതിയ എൻട്രിയുടെ calculatedDue ആണ് മൊത്തം കുടിശ്ശികയായി വരേണ്ടത്
-      }
-
       filtered.forEach((t, idx) => {
         totalSum += t.amount;
         if (idx === 0) {
-          // ഏറ്റവും പുതിയ എൻട്രിയിലാണ് കറന്റ് ഡ്യൂ ഉള്ളത്
           finalDueSum = t.calculatedDue || 0;
         }
 
@@ -4201,7 +4399,7 @@
       finalDueSum = Math.round(finalDueSum * 100) / 100;
 
       let totalText = '₹' + totalSum;
-      if (filtered.length > 0 && !filtered[0].type || filtered[0].type === 'expense') {
+      if (filtered.length > 0 && (!filtered[0].type || filtered[0].type === 'expense')) {
         totalText += ` (ആകെ കുടിശ്ശിക: ₹${finalDueSum})`;
       }
 
