@@ -1226,6 +1226,7 @@
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
           <option value="tea">Tea / Refreshment</option>
           <option value="stock">Purchase / സപ്ലയർ പർച്ചേസ്</option>
+          <option value="pay_due">Pay Due (പഴയ കുടിശ്ശിക അടയ്ക്കൽ)</option>
           <option value="salary">Staff Salary</option>
           <option value="rent">Shop Rent</option>
           <option value="other">Daily Expense / Miscellaneous</option>
@@ -1268,7 +1269,7 @@
           </div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
-          <span style="color:#b91c1c;">ബാക്കി കുടിശ്ശിക (Due Balance):</span>
+          <span style="color:#b91c1c;" id="expenseRemainingDueDisplayLabel">ബാക്കി കുടിശ്ശിക (Due Balance):</span>
           <span id="suppDueText" style="color:#b91c1c; font-size:0.95rem;">₹0</span>
         </div>
       </div>
@@ -1861,6 +1862,7 @@
     let currentStockExpFilter = 'month';
     let monthlyRentTarget = parseFloat(localStorage.getItem('BANABLAST_MONTHLY_RENT')) || 15000;
     let posAnaSortedItems = [];
+    let supplierDatabase = {};
 
     let activeSheetKey = '';
     let currentSheetFilter = 'month';
@@ -1903,6 +1905,10 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(autoAssignPresetCodesToFirebase, 2000);
+      try {
+        const savedSuppliers = localStorage.getItem('BANABLAST_SUPPLIERS');
+        if (savedSuppliers) supplierDatabase = JSON.parse(savedSuppliers);
+      } catch(e) {}
     });
 
     function closeTopmostModalOrDropdown() {
@@ -2458,14 +2464,30 @@
       const type = document.getElementById('entryType').value;
       const cat = document.getElementById('entryCategory').value;
       const isStock = (type === 'expense' && cat === 'stock');
+      const isPayDue = (type === 'expense' && cat === 'pay_due');
       const titleInput = document.getElementById('entryTitle');
       const itemNameLabel = document.getElementById('itemNameLabel');
       const editId = document.getElementById('editEntryId').value;
 
       document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierPaymentRow').style.display = isStock ? 'block' : 'none';
-      document.getElementById('generalAmountGroup').style.display = isStock ? 'none' : 'block';
+      document.getElementById('supplierItemsBox').style.display = (isStock || isPayDue) ? 'none' : 'block';
+      document.getElementById('supplierPaymentRow').style.display = (isStock || isPayDue) ? 'block' : 'none';
+      document.getElementById('generalAmountGroup').style.display = (isStock || isPayDue) ? 'none' : 'block';
+
+      if (isPayDue) {
+        const totalBillInput = document.getElementById('suppTotalBill');
+        if (totalBillInput) {
+          totalBillInput.value = 0;
+          totalBillInput.readOnly = true;
+        }
+      } else {
+        const totalBillInput = document.getElementById('suppTotalBill');
+        if (totalBillInput) {
+          totalBillInput.readOnly = false;
+        }
+      }
+
+      handleExpenseCategoryOrSupplierChange();
 
       if (type === 'expense') {
         if (cat === 'salary') {
@@ -2473,7 +2495,7 @@
           titleInput.setAttribute('list', 'staffList');
           titleInput.placeholder = 'സ്റ്റാഫിന്റെ പേര് ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ തിരഞ്ഞെടുക്കുക';
           if (!editId) titleInput.value = '';
-        } else if (cat === 'stock') {
+        } else if (cat === 'stock' || cat === 'pay_due') {
           itemNameLabel.innerText = 'സപ്ലയർ / കമ്പനിയുടെ പേര് (Supplier)';
           titleInput.setAttribute('list', 'suppliersList');
           titleInput.placeholder = 'സപ്ലയർ അല്ലെങ്കിൽ കമ്പനിയുടെ പേര്';
@@ -2505,6 +2527,86 @@
         titleInput.placeholder = 'Sales';
       }
     }
+
+    function handleExpenseCategoryOrSupplierChange() {
+      const category = document.getElementById('entryCategory').value;
+      const supplierName = document.getElementById('entryTitle').value.trim();
+      const itemsContainer = document.getElementById('supplierItemsBox');
+      const totalBillInput = document.getElementById('suppTotalBill');
+      const dueDisplay = document.getElementById('suppDueText');
+      const labelElem = document.getElementById('expenseRemainingDueDisplayLabel');
+
+      let currentDue = 0;
+      if (typeof supplierDatabase !== 'undefined' && supplierName && supplierDatabase[supplierName]) {
+        currentDue = supplierDatabase[supplierName].dueBalance || 0;
+      }
+
+      if (category === 'pay_due') {
+        if (itemsContainer) itemsContainer.style.display = 'none';
+        if (totalBillInput) {
+          totalBillInput.value = 0;
+          totalBillInput.readOnly = true;
+        }
+        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Remaining Due):';
+        if (dueDisplay) {
+          dueDisplay.innerText = `₹${currentDue.toFixed(2)} (നിലവിലെ കുടിശ്ശിക)`;
+        }
+      } else if (category === 'stock') {
+        if (itemsContainer) itemsContainer.style.display = 'block';
+        if (totalBillInput) {
+          totalBillInput.readOnly = false;
+        }
+        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Due Balance):';
+      }
+    }
+
+    function calculateSupplierDueSafe() {
+      const category = document.getElementById('entryCategory').value;
+      const supplierName = document.getElementById('entryTitle').value.trim();
+      const totalBillInput = parseFloat(document.getElementById('suppTotalBill').value) || 0;
+      const paidNowInput = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+      const dueDisplay = document.getElementById('suppDueText');
+
+      let existingDue = 0;
+      if (typeof supplierDatabase !== 'undefined' && supplierName && supplierDatabase[supplierName]) {
+        existingDue = supplierDatabase[supplierName].dueBalance || 0;
+      }
+
+      let finalRemainingDue = existingDue;
+      if (category === 'pay_due') {
+        finalRemainingDue = existingDue - paidNowInput;
+      } else if (category === 'stock') {
+        finalRemainingDue = (existingDue + totalBillInput) - paidNowInput;
+      }
+
+      if (dueDisplay) {
+        dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const entryTitleEl = document.getElementById('entryTitle');
+      const suppTotalBillEl = document.getElementById('suppTotalBill');
+      const suppPaidAmountEl = document.getElementById('suppPaidAmount');
+      const entryCategoryEl = document.getElementById('entryCategory');
+
+      if (entryTitleEl) {
+        entryTitleEl.addEventListener('input', () => {
+          handleExpenseCategoryOrSupplierChange();
+          calculateSupplierDueSafe();
+        });
+        entryTitleEl.addEventListener('change', () => {
+          handleExpenseCategoryOrSupplierChange();
+          calculateSupplierDueSafe();
+        });
+      }
+      if (suppTotalBillEl) suppTotalBillEl.addEventListener('input', calculateSupplierDueSafe);
+      if (suppPaidAmountEl) suppPaidAmountEl.addEventListener('input', calculateSupplierDueSafe);
+      if (entryCategoryEl) entryCategoryEl.addEventListener('change', () => {
+        handleCategoryChange();
+        calculateSupplierDueSafe();
+      });
+    });
 
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
@@ -2542,21 +2644,6 @@
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
       }
       return clean;
-    }
-
-    function parseToTimeMillis(timeStr, dateStr = today) {
-      if (!timeStr) return 0;
-      let clean = timeStr.trim().toLowerCase();
-      let isPM = clean.includes('pm');
-      let isAM = clean.includes('am');
-      clean = clean.replace(/[^\d:]/g, '');
-      let [h, m] = clean.split(':').map(Number);
-      h = h || 0; m = m || 0;
-      if (isPM && h < 12) h += 12;
-      if (isAM && h === 12) h = 0;
-      const d = new Date(dateStr);
-      d.setHours(h, m, 0, 0);
-      return d.getTime();
     }
 
     function renderPosAnalyticsTab() {
@@ -2702,7 +2789,6 @@
     async function deleteBillCompletely(billId) {
       if (!confirm("ഈ ബിൽ ഡിലീറ്റ് ചെയ്യണോ? ഇത് എല്ലാ റിപ്പോർട്ടുകളിൽ നിന്നും ഒഴിവാക്കപ്പെടും.")) return;
       try {
-        const b = posBills.find(x => x.id === billId);
         await db.collection('pos_bills').doc(billId).delete();
         posBills = posBills.filter(b => b.id !== billId);
         renderPosAnalyticsTab();
@@ -2817,12 +2903,7 @@
     }
 
     function calcPurchaseDue() {
-      const bill = parseFloat(document.getElementById('suppTotalBill').value) || 0;
-      const paid = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
-      let due = Math.round((bill - paid) * 100) / 100;
-
-      document.getElementById('suppDueText').innerText = '₹' + (due > 0 ? due : 0);
-      document.getElementById('entryAmount').value = paid;
+      calculateSupplierDueSafe();
     }
 
     function getCollectedPurchaseItems() {
@@ -3028,7 +3109,7 @@
           document.getElementById('entryNote').value = item.note || '';
           if (isExp) document.getElementById('entryCategory').value = item.category || 'other';
 
-          if (item.category === 'stock') {
+          if (item.category === 'stock' || item.category === 'pay_due') {
             document.getElementById('suppTotalBill').value = item.billTotal || item.amount;
             document.getElementById('suppPaidAmount').value = item.paidAmount || item.amount;
             calcPurchaseDue();
@@ -3072,11 +3153,14 @@
 
       if (type === 'expense') {
         category = document.getElementById('entryCategory').value;
-        if (category === 'stock') {
-          items = getCollectedPurchaseItems();
+        if (category === 'stock' || category === 'pay_due') {
+          saveExpenseRecordSafe();
+          items = category === 'pay_due' ? [] : getCollectedPurchaseItems();
           billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
           paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
-          dueAmount = Math.round((billTotal - paidAmount) * 100) / 100;
+          
+          let existingDue = (supplierDatabase[title] && supplierDatabase[title].dueBalance) || 0;
+          dueAmount = existingDue > 0 ? existingDue : 0;
           amount = paidAmount;
         } else {
           amount = parseFloat(document.getElementById('entryAmount').value) || 0;
@@ -3118,6 +3202,33 @@
       }
 
       closeModal('entryModal');
+      if (category !== 'stock' && category !== 'pay_due') {
+        alert("✅ വിജയകരമായി സേവ് ചെയ്തു!");
+      }
+    }
+
+    function saveExpenseRecordSafe() {
+      const category = document.getElementById('entryCategory').value;
+      const supplierName = document.getElementById('entryTitle').value.trim();
+      const totalBill = parseFloat(document.getElementById('suppTotalBill').value) || 0;
+      const paidNow = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+
+      if (supplierName && typeof supplierDatabase !== 'undefined') {
+        if (!supplierDatabase[supplierName]) {
+          supplierDatabase[supplierName] = { totalPurchased: 0, dueBalance: 0 };
+        }
+        let existingDue = supplierDatabase[supplierName].dueBalance || 0;
+        if (category === 'pay_due') {
+          supplierDatabase[supplierName].dueBalance = existingDue - paidNow;
+        } else if (category === 'stock') {
+          supplierDatabase[supplierName].dueBalance = (existingDue + totalBill) - paidNow;
+          supplierDatabase[supplierName].totalPurchased = (supplierDatabase[supplierName].totalPurchased || 0) + totalBill;
+        }
+        localStorage.setItem('BANABLAST_SUPPLIERS', JSON.stringify(supplierDatabase));
+        if (typeof renderSupplierPurchasesTab === 'function') {
+          renderSupplierPurchasesTab();
+        }
+      }
     }
 
     function deleteEntry(id) {
@@ -3377,7 +3488,7 @@
       const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
 
       const suppTrans = transactions.filter(t => {
-        if (t.type !== 'expense' || t.category !== 'stock') return false;
+        if (t.type !== 'expense' || (t.category !== 'stock' && t.category !== 'pay_due')) return false;
         const tDate = new Date(t.date);
         if (currentSupplierFilter === 'all') return true;
         if (currentSupplierFilter === 'today') return (t.date === curDate);
@@ -3395,9 +3506,19 @@
           grouped[key] = { name, totalPaid: 0, totalDue: 0, count: 0, lastDate: t.date };
         }
         grouped[key].totalPaid += (t.paidAmount || t.amount);
-        grouped[key].totalDue += (t.dueAmount || 0);
+        grouped[key].totalDue = (supplierDatabase[name] && supplierDatabase[name].dueBalance) || 0;
         grouped[key].count += 1;
         if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
+      });
+
+      Object.keys(supplierDatabase).forEach(sName => {
+        const key = sName.toLowerCase();
+        if (!grouped[key]) {
+          const dueVal = supplierDatabase[sName].dueBalance || 0;
+          if (dueVal > 0) {
+            grouped[key] = { name: sName, totalPaid: 0, totalDue: dueVal, count: 0, lastDate: '-' };
+          }
+        }
       });
 
       Object.values(grouped).forEach(g => {
@@ -3428,7 +3549,7 @@
             <div class="stock-header">
               <div>
                 <div class="stock-name">🏢 ${item.name}</div>
-                <div class="stock-meta">പർച്ചേസ്: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
+                <div class="stock-meta">ഇടപാടുകൾ: ${item.count} തവണ | അവസാനം: ${item.lastDate}</div>
               </div>
               <div class="stock-amt-box">
                 <div class="stock-amt">₹${Math.round(item.totalPaid * 100) / 100}</div>
@@ -3671,7 +3792,7 @@
             rent += t.amount;
           } else if (t.category === 'salary') {
             salary += t.amount;
-          } else if (t.category === 'stock') {
+          } else if (t.category === 'stock' || t.category === 'pay_due') {
             stock += t.amount;
           } else {
             misc += t.amount;
