@@ -2468,12 +2468,10 @@
       const titleInput = document.getElementById('entryTitle');
       const itemNameLabel = document.getElementById('itemNameLabel');
       const editId = document.getElementById('editEntryId').value;
-
       document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
       document.getElementById('supplierItemsBox').style.display = (isStock || isPayDue) ? 'none' : 'block';
       document.getElementById('supplierPaymentRow').style.display = (isStock || isPayDue) ? 'block' : 'none';
       document.getElementById('generalAmountGroup').style.display = (isStock || isPayDue) ? 'none' : 'block';
-
       if (isPayDue) {
         const totalBillInput = document.getElementById('suppTotalBill');
         if (totalBillInput) {
@@ -2486,9 +2484,7 @@
           totalBillInput.readOnly = false;
         }
       }
-
       handleExpenseCategoryOrSupplierChange();
-
       if (type === 'expense') {
         if (cat === 'salary') {
           itemNameLabel.innerText = 'സ്റ്റാഫിന്റെ പേര് (Staff Name)';
@@ -2535,12 +2531,21 @@
       const totalBillInput = document.getElementById('suppTotalBill');
       const dueDisplay = document.getElementById('suppDueText');
       const labelElem = document.getElementById('expenseRemainingDueDisplayLabel');
-
       let currentDue = 0;
-      if (typeof supplierDatabase !== 'undefined' && supplierName && supplierDatabase[supplierName]) {
-        currentDue = supplierDatabase[supplierName].dueBalance || 0;
+      if (supplierName) {
+        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
+        if (matchedTrans.length > 0) {
+          matchedTrans.sort((a,b) => {
+            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+            if (timeA !== timeB) return timeB - timeA;
+            return b.date.localeCompare(a.date);
+          });
+          if (matchedTrans[0].dueAmount !== undefined) {
+            currentDue = matchedTrans[0].dueAmount;
+          }
+        }
       }
-
       if (category === 'pay_due') {
         if (itemsContainer) itemsContainer.style.display = 'none';
         if (totalBillInput) {
@@ -2566,19 +2571,27 @@
       const totalBillInput = parseFloat(document.getElementById('suppTotalBill').value) || 0;
       const paidNowInput = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
       const dueDisplay = document.getElementById('suppDueText');
-
       let existingDue = 0;
-      if (typeof supplierDatabase !== 'undefined' && supplierName && supplierDatabase[supplierName]) {
-        existingDue = supplierDatabase[supplierName].dueBalance || 0;
+      if (supplierName) {
+        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
+        if (matchedTrans.length > 0) {
+          matchedTrans.sort((a,b) => {
+            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+            if (timeA !== timeB) return timeB - timeA;
+            return b.date.localeCompare(a.date);
+          });
+          if (matchedTrans[0].dueAmount !== undefined) {
+            existingDue = matchedTrans[0].dueAmount;
+          }
+        }
       }
-
       let finalRemainingDue = existingDue;
       if (category === 'pay_due') {
         finalRemainingDue = existingDue - paidNowInput;
       } else if (category === 'stock') {
         finalRemainingDue = (existingDue + totalBillInput) - paidNowInput;
       }
-
       if (dueDisplay) {
         dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
       }
@@ -3173,32 +3186,29 @@
           billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
           paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
           
-          let existingDue = (supplierDatabase[title] && supplierDatabase[title].dueBalance) || 0;
-          let newDueBalance = 0;
-          let purchasedToAdd = 0;
+          let existingDue = 0;
+          let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === title.toLowerCase());
+          if (matchedTrans.length > 0) {
+            matchedTrans.sort((a,b) => {
+              const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+              const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+              if (timeA !== timeB) return timeB - timeA;
+              return b.date.localeCompare(a.date);
+            });
+            if (matchedTrans[0].dueAmount !== undefined) {
+              existingDue = matchedTrans[0].dueAmount;
+            }
+          }
 
+          let newDueBalance = 0;
           if (category === 'pay_due') {
             newDueBalance = existingDue - paidAmount;
-            purchasedToAdd = 0;
-          } else {
+          } else if (category === 'stock') {
             newDueBalance = (existingDue + billTotal) - paidAmount;
-            purchasedToAdd = billTotal;
           }
 
           dueAmount = newDueBalance > 0 ? newDueBalance : 0;
           amount = paidAmount;
-
-          if (title && typeof supplierDatabase !== 'undefined') {
-            if (!supplierDatabase[title]) {
-              supplierDatabase[title] = { totalPurchased: 0, dueBalance: 0 };
-            }
-            supplierDatabase[title].dueBalance = newDueBalance;
-            supplierDatabase[title].totalPurchased += purchasedToAdd;
-            localStorage.setItem('BANABLAST_SUPPLIERS', JSON.stringify(supplierDatabase));
-            if (typeof renderSupplierPurchasesTab === 'function') {
-              renderSupplierPurchasesTab();
-            }
-          }
         } else {
           amount = parseFloat(document.getElementById('entryAmount').value) || 0;
         }
@@ -3229,6 +3239,7 @@
         note,
         items,
         addedBy: currentLoggedInUser || 'Admin',
+        createdAtMillis: Date.now(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -3499,8 +3510,7 @@
       const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
 
       const grouped = {};
-      
-      // സപ്ലയർമാരുടെ കുടിശ്ശിക വിവരങ്ങൾ transactions-ൽ നിന്ന് ശേഖരിക്കുന്നു
+
       transactions.forEach(t => {
         if (t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due')) {
           const name = (t.title || t.extra || 'Unknown').trim();
@@ -3514,22 +3524,32 @@
           else if (currentSupplierFilter === 'custom') match = (t.date >= fromDate && t.date <= toDate);
 
           if (!grouped[key]) {
-            grouped[key] = { name, totalPaid: 0, dueBalance: 0, count: 0, lastDate: t.date };
+            grouped[key] = { name, totalPaid: 0, dueBalance: 0, count: 0, lastDate: t.date, transactions: [] };
           }
+          grouped[key].transactions.push(t);
           if (match) {
             grouped[key].totalPaid += (t.paidAmount || t.amount);
             grouped[key].count += 1;
-          }
-          if (t.dueAmount !== undefined) {
-            grouped[key].dueBalance = t.dueAmount;
           }
           if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
         }
       });
 
       let totalAllDues = 0;
-      Object.values(grouped).forEach(g => {
-        totalAllDues += (g.dueBalance || 0);
+      Object.keys(grouped).forEach(k => {
+        const item = grouped[k];
+        if (item.transactions && item.transactions.length > 0) {
+          item.transactions.sort((a,b) => {
+            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+            if (timeA !== timeB) return timeB - timeA;
+            return b.date.localeCompare(a.date);
+          });
+          if (item.transactions[0].dueAmount !== undefined) {
+            item.dueBalance = item.transactions[0].dueAmount;
+          }
+        }
+        totalAllDues += (item.dueBalance || 0);
       });
 
       const dueDisp = document.getElementById('suppTotalDueDisplay');
@@ -4310,7 +4330,12 @@
         return true;
       });
 
-      filtered.sort((a,b) => b.date.localeCompare(a.date));
+      filtered.sort((a,b) => {
+        const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+        const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+        if (timeA !== timeB) return timeB - timeA;
+        return b.date.localeCompare(a.date);
+      });
 
       let totalSum = 0;
       let totalDueSum = 0;
@@ -4318,7 +4343,7 @@
 
       filtered.forEach((t, idx) => {
         totalSum += t.amount;
-        if (t.dueAmount) totalDueSum = t.dueAmount; // സപ്ലയറുടെ അവസാനത്തെ dueAmount ആണ് നിലവിലെ മൊത്തം കുടിശ്ശിക
+        if (t.dueAmount !== undefined) totalDueSum = t.dueAmount;
         const isSale = t.type === 'sale';
         const rowId = `dropdown-item-${idx}`;
 
@@ -4370,8 +4395,17 @@
       totalDueSum = Math.round(totalDueSum * 100) / 100;
 
       let totalText = '₹' + totalSum;
-      if (filtered.length > 0 && totalDueSum >= 0) {
-        totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
+      const sortedForDue = filtered.slice().sort((a, b) => {
+        const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+        const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+        if (timeA !== timeB) return timeA - timeB;
+        return a.date.localeCompare(b.date);
+      });
+      if (sortedForDue.length > 0) {
+        const lastEntry = sortedForDue[sortedForDue.length - 1];
+        if (lastEntry.dueAmount !== undefined) {
+          totalText += ` (ആകെ കുടിശ്ശിക: ₹${lastEntry.dueAmount})`;
+        }
       }
       document.getElementById('sheetTotalSum').innerText = totalText;
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
