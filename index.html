@@ -2525,14 +2525,19 @@
     }
 
     function handleExpenseCategoryOrSupplierChange() {
-      const category = document.getElementById('entryCategory').value;
-      const supplierName = document.getElementById('entryTitle').value.trim();
+      const categoryEl = document.getElementById('entryCategory');
+      const supplierTitleEl = document.getElementById('entryTitle');
       const itemsContainer = document.getElementById('supplierItemsBox');
       const totalBillInput = document.getElementById('suppTotalBill');
       const dueDisplay = document.getElementById('suppDueText');
       const labelElem = document.getElementById('expenseRemainingDueDisplayLabel');
+
+      if (!categoryEl || !supplierTitleEl) return;
+      const category = categoryEl.value;
+      const supplierName = supplierTitleEl.value.trim();
+
       let currentDue = 0;
-      if (supplierName) {
+      if (supplierName && typeof transactions !== 'undefined') {
         let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
         if (matchedTrans.length > 0) {
           matchedTrans.sort((a,b) => {
@@ -2566,13 +2571,21 @@
     }
 
     function calculateSupplierDueSafe() {
-      const category = document.getElementById('entryCategory').value;
-      const supplierName = document.getElementById('entryTitle').value.trim();
-      const totalBillInput = parseFloat(document.getElementById('suppTotalBill').value) || 0;
-      const paidNowInput = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
+      const categoryEl = document.getElementById('entryCategory');
+      const supplierTitleEl = document.getElementById('entryTitle');
+      const totalBillEl = document.getElementById('suppTotalBill');
+      const paidAmountEl = document.getElementById('suppPaidAmount');
       const dueDisplay = document.getElementById('suppDueText');
+
+      if (!categoryEl || !supplierTitleEl) return;
+
+      const category = categoryEl.value;
+      const supplierName = supplierTitleEl.value.trim();
+      const totalBillInput = totalBillEl ? (parseFloat(totalBillEl.value) || 0) : 0;
+      const paidNowInput = paidAmountEl ? (parseFloat(paidAmountEl.value) || 0) : 0;
+
       let existingDue = 0;
-      if (supplierName) {
+      if (supplierName && typeof transactions !== 'undefined') {
         let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
         if (matchedTrans.length > 0) {
           matchedTrans.sort((a,b) => {
@@ -2586,18 +2599,26 @@
           }
         }
       }
+
       let finalRemainingDue = existingDue;
       if (category === 'pay_due') {
         finalRemainingDue = existingDue - paidNowInput;
       } else if (category === 'stock') {
         finalRemainingDue = (existingDue + totalBillInput) - paidNowInput;
       }
+
       if (dueDisplay) {
         dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
       }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(autoAssignPresetCodesToFirebase, 2000);
+      try {
+        const savedSuppliers = localStorage.getItem('BANABLAST_SUPPLIERS');
+        if (savedSuppliers) supplierDatabase = JSON.parse(savedSuppliers);
+      } catch(e) {}
+
       const entryTitleEl = document.getElementById('entryTitle');
       const suppTotalBillEl = document.getElementById('suppTotalBill');
       const suppPaidAmountEl = document.getElementById('suppPaidAmount');
