@@ -2646,6 +2646,21 @@
       return clean;
     }
 
+    function parseToTimeMillis(timeStr, dateStr = today) {
+      if (!timeStr) return 0;
+      let clean = timeStr.trim().toLowerCase();
+      let isPM = clean.includes('pm');
+      let isAM = clean.includes('am');
+      clean = clean.replace(/[^\d:]/g, '');
+      let [h, m] = clean.split(':').map(Number);
+      h = h || 0; m = m || 0;
+      if (isPM && h < 12) h += 12;
+      if (isAM && h === 12) h = 0;
+      const d = new Date(dateStr);
+      d.setHours(h, m, 0, 0);
+      return d.getTime();
+    }
+
     function renderPosAnalyticsTab() {
       const curDate = document.getElementById('selectedDate').value || today;
       const refDate = new Date(curDate);
@@ -3154,14 +3169,36 @@
       if (type === 'expense') {
         category = document.getElementById('entryCategory').value;
         if (category === 'stock' || category === 'pay_due') {
-          saveExpenseRecordSafe();
           items = category === 'pay_due' ? [] : getCollectedPurchaseItems();
           billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
           paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
           
           let existingDue = (supplierDatabase[title] && supplierDatabase[title].dueBalance) || 0;
-          dueAmount = existingDue > 0 ? existingDue : 0;
+          let newDueBalance = 0;
+          let purchasedToAdd = 0;
+
+          if (category === 'pay_due') {
+            newDueBalance = existingDue - paidAmount;
+            purchasedToAdd = 0;
+          } else {
+            newDueBalance = (existingDue + billTotal) - paidAmount;
+            purchasedToAdd = billTotal;
+          }
+
+          dueAmount = newDueBalance > 0 ? newDueBalance : 0;
           amount = paidAmount;
+
+          if (title && typeof supplierDatabase !== 'undefined') {
+            if (!supplierDatabase[title]) {
+              supplierDatabase[title] = { totalPurchased: 0, dueBalance: 0 };
+            }
+            supplierDatabase[title].dueBalance = newDueBalance;
+            supplierDatabase[title].totalPurchased += purchasedToAdd;
+            localStorage.setItem('BANABLAST_SUPPLIERS', JSON.stringify(supplierDatabase));
+            if (typeof renderSupplierPurchasesTab === 'function') {
+              renderSupplierPurchasesTab();
+            }
+          }
         } else {
           amount = parseFloat(document.getElementById('entryAmount').value) || 0;
         }
@@ -3202,33 +3239,7 @@
       }
 
       closeModal('entryModal');
-      if (category !== 'stock' && category !== 'pay_due') {
-        alert("✅ വിജയകരമായി സേവ് ചെയ്തു!");
-      }
-    }
-
-    function saveExpenseRecordSafe() {
-      const category = document.getElementById('entryCategory').value;
-      const supplierName = document.getElementById('entryTitle').value.trim();
-      const totalBill = parseFloat(document.getElementById('suppTotalBill').value) || 0;
-      const paidNow = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
-
-      if (supplierName && typeof supplierDatabase !== 'undefined') {
-        if (!supplierDatabase[supplierName]) {
-          supplierDatabase[supplierName] = { totalPurchased: 0, dueBalance: 0 };
-        }
-        let existingDue = supplierDatabase[supplierName].dueBalance || 0;
-        if (category === 'pay_due') {
-          supplierDatabase[supplierName].dueBalance = existingDue - paidNow;
-        } else if (category === 'stock') {
-          supplierDatabase[supplierName].dueBalance = (existingDue + totalBill) - paidNow;
-          supplierDatabase[supplierName].totalPurchased = (supplierDatabase[supplierName].totalPurchased || 0) + totalBill;
-        }
-        localStorage.setItem('BANABLAST_SUPPLIERS', JSON.stringify(supplierDatabase));
-        if (typeof renderSupplierPurchasesTab === 'function') {
-          renderSupplierPurchasesTab();
-        }
-      }
+      alert("✅ വിജയകരമായി സേവ് ചെയ്തു!");
     }
 
     function deleteEntry(id) {
@@ -3487,42 +3498,38 @@
       const fromDate = document.getElementById('suppFromDate') ? document.getElementById('suppFromDate').value : today;
       const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
 
-      const suppTrans = transactions.filter(t => {
-        if (t.type !== 'expense' || (t.category !== 'stock' && t.category !== 'pay_due')) return false;
-        const tDate = new Date(t.date);
-        if (currentSupplierFilter === 'all') return true;
-        if (currentSupplierFilter === 'today') return (t.date === curDate);
-        if (currentSupplierFilter === 'month') return (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
-        if (currentSupplierFilter === 'custom') return (t.date >= fromDate && t.date <= toDate);
-        return true;
+      const grouped = {};
+      
+      // സപ്ലയർമാരുടെ കുടിശ്ശിക വിവരങ്ങൾ transactions-ൽ നിന്ന് ശേഖരിക്കുന്നു
+      transactions.forEach(t => {
+        if (t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due')) {
+          const name = (t.title || t.extra || 'Unknown').trim();
+          const key = name.toLowerCase();
+          const tDate = new Date(t.date);
+          
+          let match = false;
+          if (currentSupplierFilter === 'all') match = true;
+          else if (currentSupplierFilter === 'today') match = (t.date === curDate);
+          else if (currentSupplierFilter === 'month') match = (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
+          else if (currentSupplierFilter === 'custom') match = (t.date >= fromDate && t.date <= toDate);
+
+          if (!grouped[key]) {
+            grouped[key] = { name, totalPaid: 0, dueBalance: 0, count: 0, lastDate: t.date };
+          }
+          if (match) {
+            grouped[key].totalPaid += (t.paidAmount || t.amount);
+            grouped[key].count += 1;
+          }
+          if (t.dueAmount !== undefined) {
+            grouped[key].dueBalance = t.dueAmount;
+          }
+          if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
+        }
       });
 
       let totalAllDues = 0;
-      const grouped = {};
-      suppTrans.forEach(t => {
-        const name = (t.title || t.extra || 'Unknown').trim();
-        const key = name.toLowerCase();
-        if (!grouped[key]) {
-          grouped[key] = { name, totalPaid: 0, totalDue: 0, count: 0, lastDate: t.date };
-        }
-        grouped[key].totalPaid += (t.paidAmount || t.amount);
-        grouped[key].totalDue = (supplierDatabase[name] && supplierDatabase[name].dueBalance) || 0;
-        grouped[key].count += 1;
-        if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
-      });
-
-      Object.keys(supplierDatabase).forEach(sName => {
-        const key = sName.toLowerCase();
-        if (!grouped[key]) {
-          const dueVal = supplierDatabase[sName].dueBalance || 0;
-          if (dueVal > 0) {
-            grouped[key] = { name: sName, totalPaid: 0, totalDue: dueVal, count: 0, lastDate: '-' };
-          }
-        }
-      });
-
       Object.values(grouped).forEach(g => {
-        totalAllDues += g.totalDue;
+        totalAllDues += (g.dueBalance || 0);
       });
 
       const dueDisp = document.getElementById('suppTotalDueDisplay');
@@ -3530,7 +3537,7 @@
 
       let keys = Object.keys(grouped);
       if (supplierDuesOnlyFilter) {
-        keys = keys.filter(k => grouped[k].totalDue > 0);
+        keys = keys.filter(k => grouped[k].dueBalance > 0);
       }
 
       if (!keys.length) {
@@ -3541,7 +3548,7 @@
       let html = '';
       keys.forEach(k => {
         const item = grouped[k];
-        const totDue = Math.round(item.totalDue * 100) / 100;
+        const totDue = Math.round((item.dueBalance || 0) * 100) / 100;
         const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
 
         html += `
@@ -4311,7 +4318,7 @@
 
       filtered.forEach((t, idx) => {
         totalSum += t.amount;
-        if (t.dueAmount) totalDueSum += t.dueAmount;
+        if (t.dueAmount) totalDueSum = t.dueAmount; // സപ്ലയറുടെ അവസാനത്തെ dueAmount ആണ് നിലവിലെ മൊത്തം കുടിശ്ശിക
         const isSale = t.type === 'sale';
         const rowId = `dropdown-item-${idx}`;
 
@@ -4333,7 +4340,7 @@
         }
 
         let dueDisplay = '';
-        if (t.dueAmount && t.dueAmount > 0) {
+        if (t.dueAmount !== undefined) {
           dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
         }
 
@@ -4363,7 +4370,7 @@
       totalDueSum = Math.round(totalDueSum * 100) / 100;
 
       let totalText = '₹' + totalSum;
-      if (totalDueSum > 0) {
+      if (filtered.length > 0 && totalDueSum >= 0) {
         totalText += ` (ആകെ കുടിശ്ശിക: ₹${totalDueSum})`;
       }
       document.getElementById('sheetTotalSum').innerText = totalText;
