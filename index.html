@@ -1226,7 +1226,6 @@
         <select id="entryCategory" class="form-control" onchange="handleCategoryChange()">
           <option value="tea">Tea / Refreshment</option>
           <option value="stock">Purchase / സപ്ലയർ പർച്ചേസ്</option>
-          <option value="pay_due">Pay Due (പഴയ കുടിശ്ശിക അടയ്ക്കൽ)</option>
           <option value="salary">Staff Salary</option>
           <option value="rent">Shop Rent</option>
           <option value="other">Daily Expense / Miscellaneous</option>
@@ -1255,23 +1254,6 @@
       <div class="form-group">
         <label id="itemNameLabel">Supplier / Item / Description</label>
         <input type="text" id="entryTitle" list="suppliersList" class="form-control" placeholder="പേര് ടൈപ്പ് ചെയ്യുമ്പോൾ സെലക്ട് ചെയ്യാം" required>
-      </div>
-
-      <div id="supplierPaymentRow" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:12px;">
-        <div style="display:flex; gap:8px;">
-          <div style="flex:1;">
-            <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Total Bill (ആകെ ബില്ല് ₹)</label>
-            <input type="number" id="suppTotalBill" class="form-control" placeholder="0">
-          </div>
-          <div style="flex:1;">
-            <label style="font-size:0.75rem; font-weight:700; color:#16a34a;">Paid Now (നൽകിയത് ₹)</label>
-            <input type="number" id="suppPaidAmount" class="form-control" placeholder="0">
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.8rem; font-weight:800;">
-          <span style="color:#b91c1c;" id="expenseRemainingDueDisplayLabel">ബാക്കി കുടിശ്ശിക (Due Balance):</span>
-          <span id="suppDueText" style="color:#b91c1c; font-size:0.95rem;">₹0</span>
-        </div>
       </div>
 
       <div class="form-group" id="generalAmountGroup">
@@ -1903,14 +1885,6 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(autoAssignPresetCodesToFirebase, 2000);
-      try {
-        const savedSuppliers = localStorage.getItem('BANABLAST_SUPPLIERS');
-        if (savedSuppliers) supplierDatabase = JSON.parse(savedSuppliers);
-      } catch(e) {}
-    });
-
     function closeTopmostModalOrDropdown() {
       const stockModal = document.getElementById('stockViewModal');
       if (stockModal && stockModal.style.display === 'flex') {
@@ -2157,94 +2131,96 @@
     }
 
     window.onload = function() {
-      try {
-        checkUserLogin();
-        initFlatpickrCalendar();
+      checkUserLogin();
+      initFlatpickrCalendar();
 
-        if (document.getElementById('invDate')) document.getElementById('invDate').value = today;
-        if (document.getElementById('withDate')) document.getElementById('withDate').value = today;
-        if (document.getElementById('sheetFromDate')) document.getElementById('sheetFromDate').value = today;
-        if (document.getElementById('sheetToDate')) document.getElementById('sheetToDate').value = today;
-        if (document.getElementById('repFromDate')) document.getElementById('repFromDate').value = today;
-        if (document.getElementById('repToDate')) document.getElementById('repToDate').value = today;
-        if (document.getElementById('posFromDate')) document.getElementById('posFromDate').value = today;
-        if (document.getElementById('posToDate')) document.getElementById('posToDate').value = today;
-        if (document.getElementById('stockFromDate')) document.getElementById('stockFromDate').value = today;
-        if (document.getElementById('stockToDate')) document.getElementById('stockToDate').value = today;
-        if (document.getElementById('suppFromDate')) document.getElementById('suppFromDate').value = today;
-        if (document.getElementById('suppToDate')) document.getElementById('suppToDate').value = today;
-
-        db.collection('settings').doc('security').onSnapshot(doc => {
-          if (doc.exists && doc.data().pins) {
-            partnerPins = { ...partnerPins, ...doc.data().pins };
-          } else {
-            db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
-          }
-        });
-
-        db.collection('settings').doc('ocr').onSnapshot(doc => {
-          if (doc.exists && doc.data().key) {
-            dynamicOcrKey = doc.data().key;
-            localStorage.setItem('BANABLAST_OCR_KEY', dynamicOcrKey);
-          }
-        });
-
-        db.collection('master_items').onSnapshot(snap => {
-          masterItems = [];
-          snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
-          updateMasterSuggestions();
-        });
-
-        db.collection('master_suppliers').onSnapshot(snap => {
-          masterSuppliers = [];
-          snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
-          updateMasterSuggestions();
-        });
-
-        db.collection('master_staff').onSnapshot(snap => {
-          masterStaff = [];
-          snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
-          updateMasterSuggestions();
-        });
-
-        db.collection('transactions').onSnapshot(snap => {
-          transactions = [];
-          snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-          updateMasterSuggestions();
-          renderAll();
-        });
-
-        db.collection('pos_bills').onSnapshot(snap => {
-          posBills = [];
-          snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
-          renderPosAnalyticsTab();
-        });
-
-        db.collection('withdrawals').onSnapshot(snap => {
-          withdrawals = [];
-          snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
-          renderAll();
-        });
-
-        db.collection('investments').onSnapshot(snap => {
-          investments = [];
-          snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
-          renderAll();
-        });
-
-        db.collection('settings').doc('general').onSnapshot(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data.opening) opening = data.opening;
-            if (data.holidays) holidays = data.holidays;
-            if (data.monthlyRent) monthlyRentTarget = data.monthlyRent;
-            if (flatpickrCalendar) flatpickrCalendar.redraw();
-            renderAll();
-          }
-        });
-      } catch (err) {
-        console.error("Window load safe error:", err);
+      document.getElementById('invDate').value = today;
+      document.getElementById('withDate').value = today;
+      document.getElementById('sheetFromDate').value = today;
+      document.getElementById('sheetToDate').value = today;
+      document.getElementById('repFromDate').value = today;
+      document.getElementById('repToDate').value = today;
+      if (document.getElementById('posFromDate')) {
+        document.getElementById('posFromDate').value = today;
+        document.getElementById('posToDate').value = today;
       }
+      if (document.getElementById('stockFromDate')) {
+        document.getElementById('stockFromDate').value = today;
+        document.getElementById('stockToDate').value = today;
+      }
+      if (document.getElementById('suppFromDate')) {
+        document.getElementById('suppFromDate').value = today;
+        document.getElementById('suppToDate').value = today;
+      }
+
+      db.collection('settings').doc('security').onSnapshot(doc => {
+        if (doc.exists && doc.data().pins) {
+          partnerPins = { ...partnerPins, ...doc.data().pins };
+        } else {
+          db.collection('settings').doc('security').set({ pins: partnerPins }, { merge: true });
+        }
+      });
+
+      db.collection('settings').doc('ocr').onSnapshot(doc => {
+        if (doc.exists && doc.data().key) {
+          dynamicOcrKey = doc.data().key;
+          localStorage.setItem('BANABLAST_OCR_KEY', dynamicOcrKey);
+        }
+      });
+
+      db.collection('master_items').onSnapshot(snap => {
+        masterItems = [];
+        snap.forEach(d => masterItems.push({ id: d.id, ...d.data() }));
+        updateMasterSuggestions();
+      });
+
+      db.collection('master_suppliers').onSnapshot(snap => {
+        masterSuppliers = [];
+        snap.forEach(d => masterSuppliers.push({ id: d.id, ...d.data() }));
+        updateMasterSuggestions();
+      });
+
+      db.collection('master_staff').onSnapshot(snap => {
+        masterStaff = [];
+        snap.forEach(d => masterStaff.push({ id: d.id, ...d.data() }));
+        updateMasterSuggestions();
+      });
+
+      db.collection('transactions').onSnapshot(snap => {
+        transactions = [];
+        snap.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
+        updateMasterSuggestions();
+        renderAll();
+      });
+
+      db.collection('pos_bills').onSnapshot(snap => {
+        posBills = [];
+        snap.forEach(doc => posBills.push({ id: doc.id, ...doc.data() }));
+        renderPosAnalyticsTab();
+      });
+
+      db.collection('withdrawals').onSnapshot(snap => {
+        withdrawals = [];
+        snap.forEach(doc => withdrawals.push({ id: doc.id, ...doc.data() }));
+        renderAll();
+      });
+
+      db.collection('investments').onSnapshot(snap => {
+        investments = [];
+        snap.forEach(doc => investments.push({ id: doc.id, ...doc.data() }));
+        renderAll();
+      });
+
+      db.collection('settings').doc('general').onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.opening) opening = data.opening;
+          if (data.holidays) holidays = data.holidays;
+          if (data.monthlyRent) monthlyRentTarget = data.monthlyRent;
+          if (flatpickrCalendar) flatpickrCalendar.redraw();
+          renderAll();
+        }
+      });
     };
 
     function renderAll() {
@@ -2462,34 +2438,18 @@
       const type = document.getElementById('entryType').value;
       const cat = document.getElementById('entryCategory').value;
       const isStock = (type === 'expense' && cat === 'stock');
-      const isPayDue = (type === 'expense' && cat === 'pay_due');
       const titleInput = document.getElementById('entryTitle');
       const itemNameLabel = document.getElementById('itemNameLabel');
       const editId = document.getElementById('editEntryId').value;
       document.getElementById('aiScanSection').style.display = isStock ? 'block' : 'none';
-      document.getElementById('supplierItemsBox').style.display = (isStock || isPayDue) ? 'none' : 'block';
-      document.getElementById('supplierPaymentRow').style.display = (isStock || isPayDue) ? 'block' : 'none';
-      document.getElementById('generalAmountGroup').style.display = (isStock || isPayDue) ? 'none' : 'block';
-      if (isPayDue) {
-        const totalBillInput = document.getElementById('suppTotalBill');
-        if (totalBillInput) {
-          totalBillInput.value = 0;
-          totalBillInput.readOnly = true;
-        }
-      } else {
-        const totalBillInput = document.getElementById('suppTotalBill');
-        if (totalBillInput) {
-          totalBillInput.readOnly = false;
-        }
-      }
-      handleExpenseCategoryOrSupplierChange();
+      document.getElementById('supplierItemsBox').style.display = isStock ? 'block' : 'none';
       if (type === 'expense') {
         if (cat === 'salary') {
           itemNameLabel.innerText = 'സ്റ്റാഫിന്റെ പേര് (Staff Name)';
           titleInput.setAttribute('list', 'staffList');
           titleInput.placeholder = 'സ്റ്റാഫിന്റെ പേര് ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ തിരഞ്ഞെടുക്കുക';
           if (!editId) titleInput.value = '';
-        } else if (cat === 'stock' || cat === 'pay_due') {
+        } else if (cat === 'stock') {
           itemNameLabel.innerText = 'സപ്ലയർ / കമ്പനിയുടെ പേര് (Supplier)';
           titleInput.setAttribute('list', 'suppliersList');
           titleInput.placeholder = 'സപ്ലയർ അല്ലെങ്കിൽ കമ്പനിയുടെ പേര്';
@@ -2521,124 +2481,6 @@
         titleInput.placeholder = 'Sales';
       }
     }
-
-    function handleExpenseCategoryOrSupplierChange() {
-      const categoryEl = document.getElementById('entryCategory');
-      const supplierTitleEl = document.getElementById('entryTitle');
-      const itemsContainer = document.getElementById('supplierItemsBox');
-      const totalBillInput = document.getElementById('suppTotalBill');
-      const dueDisplay = document.getElementById('suppDueText');
-      const labelElem = document.getElementById('expenseRemainingDueDisplayLabel');
-
-      if (!categoryEl || !supplierTitleEl) return;
-      const category = categoryEl.value;
-      const supplierName = supplierTitleEl.value.trim();
-
-      let currentDue = 0;
-      if (supplierName && typeof transactions !== 'undefined') {
-        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
-        if (matchedTrans.length > 0) {
-          matchedTrans.sort((a,b) => {
-            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
-            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-            if (timeA !== timeB) return timeB - timeA;
-            return b.date.localeCompare(a.date);
-          });
-          if (matchedTrans[0].dueAmount !== undefined) {
-            currentDue = matchedTrans[0].dueAmount;
-          }
-        }
-      }
-      if (category === 'pay_due') {
-        if (itemsContainer) itemsContainer.style.display = 'none';
-        if (totalBillInput) {
-          totalBillInput.value = 0;
-          totalBillInput.readOnly = true;
-        }
-        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Remaining Due):';
-        if (dueDisplay) {
-          dueDisplay.innerText = `₹${currentDue.toFixed(2)} (നിലവിലെ കുടിശ്ശിക)`;
-        }
-      } else if (category === 'stock') {
-        if (itemsContainer) itemsContainer.style.display = 'block';
-        if (totalBillInput) {
-          totalBillInput.readOnly = false;
-        }
-        if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Due Balance):';
-      }
-    }
-
-    function calculateSupplierDueSafe() {
-      const categoryEl = document.getElementById('entryCategory');
-      const supplierTitleEl = document.getElementById('entryTitle');
-      const totalBillEl = document.getElementById('suppTotalBill');
-      const paidAmountEl = document.getElementById('suppPaidAmount');
-      const dueDisplay = document.getElementById('suppDueText');
-
-      if (!categoryEl || !supplierTitleEl) return;
-
-      const category = categoryEl.value;
-      const supplierName = supplierTitleEl.value.trim();
-      const totalBillInput = totalBillEl ? (parseFloat(totalBillEl.value) || 0) : 0;
-      const paidNowInput = paidAmountEl ? (parseFloat(paidAmountEl.value) || 0) : 0;
-
-      let existingDue = 0;
-      if (supplierName && typeof transactions !== 'undefined') {
-        let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === supplierName.toLowerCase());
-        if (matchedTrans.length > 0) {
-          matchedTrans.sort((a,b) => {
-            const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
-            const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-            if (timeA !== timeB) return timeB - timeA;
-            return b.date.localeCompare(a.date);
-          });
-          if (matchedTrans[0].dueAmount !== undefined) {
-            existingDue = matchedTrans[0].dueAmount;
-          }
-        }
-      }
-
-      let finalRemainingDue = existingDue;
-      if (category === 'pay_due') {
-        finalRemainingDue = existingDue - paidNowInput;
-      } else if (category === 'stock') {
-        finalRemainingDue = (existingDue + totalBillInput) - paidNowInput;
-      }
-
-      if (dueDisplay) {
-        dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(autoAssignPresetCodesToFirebase, 2000);
-      try {
-        const savedSuppliers = localStorage.getItem('BANABLAST_SUPPLIERS');
-        if (savedSuppliers) supplierDatabase = JSON.parse(savedSuppliers);
-      } catch(e) {}
-
-      const entryTitleEl = document.getElementById('entryTitle');
-      const suppTotalBillEl = document.getElementById('suppTotalBill');
-      const suppPaidAmountEl = document.getElementById('suppPaidAmount');
-      const entryCategoryEl = document.getElementById('entryCategory');
-
-      if (entryTitleEl) {
-        entryTitleEl.addEventListener('input', () => {
-          handleExpenseCategoryOrSupplierChange();
-          calculateSupplierDueSafe();
-        });
-        entryTitleEl.addEventListener('change', () => {
-          handleExpenseCategoryOrSupplierChange();
-          calculateSupplierDueSafe();
-        });
-      }
-      if (suppTotalBillEl) suppTotalBillEl.addEventListener('input', calculateSupplierDueSafe);
-      if (suppPaidAmountEl) suppPaidAmountEl.addEventListener('input', calculateSupplierDueSafe);
-      if (entryCategoryEl) entryCategoryEl.addEventListener('change', () => {
-        handleCategoryChange();
-        calculateSupplierDueSafe();
-      });
-    });
 
     function filterPosAnalytics(mode) {
       currentPosFilter = mode;
@@ -2910,47 +2752,26 @@
       openModalWithHistory('fullPosReportModal');
     }
 
-    function addNewPurchaseItemRow(name = '', price = '', isDoubtful = false, doubtReason = '') {
+    function addNewPurchaseItemRow(name = '', price = '') {
       const container = document.getElementById('purchaseItemsListContainer');
       const div = document.createElement('div');
       div.className = 'purchase-item-row';
-      
-      if (isDoubtful) {
-        div.style.border = '2px solid #ef4444';
-        div.style.background = '#fef2f2';
-        div.style.padding = '8px';
-        div.style.borderRadius = '8px';
-        div.style.marginBottom = '8px';
-      }
-
       div.innerHTML = `
-        <div style="flex:2; display:flex; flex-direction:column;">
-          <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: Cashew)" value="${name}">
-          ${isDoubtful ? `<span style="font-size:0.7rem; color:#dc2626; font-weight:800; margin-top:4px;">⚠ ${doubtReason || 'വില വ്യക്തമല്ല - പരിശോധിക്കുക'}</span>` : ''}
-        </div>
-        <input type="number" step="any" class="form-control p-price" placeholder="വില ₹" value="${price !== '' ? price : ''}" style="flex:1; ${isDoubtful ? 'border: 2px solid #dc2626; background:#fff;' : ''}" oninput="recalcTotalBillFromItems(); if(this.value > 0) { this.style.borderColor = '#cbd5e1'; const hint = this.parentElement.querySelector('span'); if(hint) hint.remove(); this.parentElement.style.border='none'; this.parentElement.style.background='transparent'; }">
-        <button type="button" onclick="this.parentElement.remove(); recalcTotalBillFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
+        <input type="text" list="itemsList" class="form-control p-name" placeholder="സാധനം (ഉദാ: Cashew)" value="${name}" style="flex:2;">
+        <input type="number" step="any" class="form-control p-price" placeholder="വില ₹" value="${price !== '' ? price : ''}" style="flex:1;" oninput="recalcTotalFromItems()">
+        <button type="button" onclick="this.parentElement.remove(); recalcTotalFromItems();" style="background:#fee2e2; border:none; border-radius:6px; color:#dc2626; font-weight:bold; padding:8px 10px; cursor:pointer;">✕</button>
       `;
       container.appendChild(div);
     }
 
-    function recalcTotalBillFromItems() {
+    function recalcTotalFromItems() {
       let sum = 0;
       document.querySelectorAll('.p-price').forEach(input => {
         sum += parseFloat(input.value) || 0;
       });
       if (sum > 0) {
-        sum = Math.round(sum * 100) / 100;
-        document.getElementById('suppTotalBill').value = sum;
-        if (!document.getElementById('suppPaidAmount').value) {
-          document.getElementById('suppPaidAmount').value = sum;
-        }
+        document.getElementById('entryAmount').value = Math.round(sum * 100) / 100;
       }
-      calcPurchaseDue();
-    }
-
-    function calcPurchaseDue() {
-      calculateSupplierDueSafe();
     }
 
     function getCollectedPurchaseItems() {
@@ -3014,7 +2835,6 @@
 
       const loader = document.getElementById('scanLoadingBox');
       loader.style.display = 'block';
-      loader.innerText = '🔄 OCR വഴി ബില്ല് പരിശോധിക്കുന്നു... ദയവായി കാത്തിരിക്കുക';
 
       try {
         const base64Data = await compressImageFile(file, 1200, 1200, 0.85);
@@ -3079,21 +2899,8 @@
               .replace(/[^a-zA-Z0-9\s()]/g, '')
               .trim();
 
-            if (itemName.length >= 3) {
-              if (lastNum < 1) {
-                items.push({ 
-                  name: itemName, 
-                  price: '', 
-                  isDoubtful: true, 
-                  doubtReason: 'വില വ്യക്തമല്ല (തൂക്കം മാത്രമാണ് ലഭിച്ചത്) - ശരിയായ വില നൽകുക' 
-                });
-              } else if (lastNum >= 1 && lastNum < 100000) {
-                items.push({ 
-                  name: itemName, 
-                  price: lastNum, 
-                  isDoubtful: false 
-                });
-              }
+            if (itemName.length >= 3 && lastNum >= 1 && lastNum < 100000) {
+              items.push({ name: itemName, price: lastNum });
             }
           }
         }
@@ -3103,36 +2910,25 @@
         const container = document.getElementById('purchaseItemsListContainer');
         container.innerHTML = '';
         
-        let hasDoubtfulItems = false;
         if (items.length > 0) {
-          items.forEach(it => {
-            if (it.isDoubtful) hasDoubtfulItems = true;
-            addNewPurchaseItemRow(it.name, it.price, it.isDoubtful, it.doubtReason);
-          });
+          items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
         } else {
           addNewPurchaseItemRow();
         }
 
         if (totalBill > 0) {
-          document.getElementById('suppTotalBill').value = totalBill;
-          document.getElementById('suppPaidAmount').value = totalBill;
-          calcPurchaseDue();
+          document.getElementById('entryAmount').value = totalBill;
         } else {
-          recalcTotalBillFromItems();
+          recalcTotalFromItems();
         }
 
-        if (hasDoubtfulItems) {
-          alert("⚠️ ശ്രദ്ധിക്കുക: ചില സാധനങ്ങളുടെ വില വ്യക്തമല്ല. ആവശ്യമെങ്കിൽ വില ടൈപ്പ് ചെയ്യുക; അല്ലെങ്കിൽ നേരിട്ട് സേവ് ചെയ്യാം.");
-        } else {
-          alert("✅ ബില്ലിലെ വിവരങ്ങൾ കൃത്യമായി എടുത്തു!");
-        }
+        alert("✅ ബില്ലിലെ വിവരങ്ങൾ വിജയകരമായി എടുത്തു!");
 
       } catch (err) {
         console.error("OCR error:", err);
         alert("⚠️ ബില്ല് വായിക്കാൻ സാധിച്ചില്ല!\n\nകാരണം: " + err.message);
       } finally {
         loader.style.display = 'none';
-        loader.innerText = '🔄 OCR വഴി ബില്ല് പരിശോധിക്കുന്നു...';
         event.target.value = '';
       }
     }
@@ -3156,21 +2952,13 @@
           document.getElementById('entryNote').value = item.note || '';
           if (isExp) document.getElementById('entryCategory').value = item.category || 'other';
 
-          if (item.category === 'stock' || item.category === 'pay_due') {
-            document.getElementById('suppTotalBill').value = item.billTotal || item.amount;
-            document.getElementById('suppPaidAmount').value = item.paidAmount || item.amount;
-            calcPurchaseDue();
-            if (item.items && Array.isArray(item.items)) {
-              item.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
-            }
+          if (item.category === 'stock' && item.items && Array.isArray(item.items)) {
+            item.items.forEach(it => addNewPurchaseItemRow(it.name, it.price));
           }
         }
       } else {
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
-        document.getElementById('suppTotalBill').value = '';
-        document.getElementById('suppPaidAmount').value = '';
-        document.getElementById('suppDueText').innerText = '₹0';
         if (isExp) {
           document.getElementById('entryCategory').value = 'stock';
           document.getElementById('entryTitle').value = '';
@@ -3187,57 +2975,24 @@
       const curDate = document.getElementById('selectedDate').value || today;
       const editId = document.getElementById('editEntryId').value;
       const type = document.getElementById('entryType').value;
+      const amount = parseFloat(document.getElementById('entryAmount').value);
       const mode = document.getElementById('entryMode').value;
       let title = document.getElementById('entryTitle').value.trim();
       const note = document.getElementById('entryNote').value.trim();
 
       let category = 'sale';
       let items = [];
-      let billTotal = 0;
-      let paidAmount = 0;
-      let dueAmount = 0;
-      let amount = 0;
+
+      if (!amount || amount <= 0) {
+        alert('സാധുവായ തുക നൽകുക');
+        return;
+      }
 
       if (type === 'expense') {
         category = document.getElementById('entryCategory').value;
-        if (category === 'stock' || category === 'pay_due') {
-          items = category === 'pay_due' ? [] : getCollectedPurchaseItems();
-          billTotal = parseFloat(document.getElementById('suppTotalBill').value) || 0;
-          paidAmount = parseFloat(document.getElementById('suppPaidAmount').value) || 0;
-          
-          let existingDue = 0;
-          let matchedTrans = transactions.filter(t => t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due') && (t.title || t.extra || '').trim().toLowerCase() === title.toLowerCase());
-          if (matchedTrans.length > 0) {
-            matchedTrans.sort((a,b) => {
-              const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
-              const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-              if (timeA !== timeB) return timeB - timeA;
-              return b.date.localeCompare(a.date);
-            });
-            if (matchedTrans[0].dueAmount !== undefined) {
-              existingDue = matchedTrans[0].dueAmount;
-            }
-          }
-
-          let newDueBalance = 0;
-          if (category === 'pay_due') {
-            newDueBalance = existingDue - paidAmount;
-          } else if (category === 'stock') {
-            newDueBalance = (existingDue + billTotal) - paidAmount;
-          }
-
-          dueAmount = newDueBalance > 0 ? newDueBalance : 0;
-          amount = paidAmount;
-        } else {
-          amount = parseFloat(document.getElementById('entryAmount').value) || 0;
+        if (category === 'stock') {
+          items = getCollectedPurchaseItems();
         }
-      } else {
-        amount = parseFloat(document.getElementById('entryAmount').value) || 0;
-      }
-
-      if (amount < 0 || (type === 'sale' && amount <= 0)) {
-        alert('സാധുവായ തുക നൽകുക');
-        return;
       }
 
       if (!title) {
@@ -3251,9 +3006,6 @@
         title,
         extra: title,
         amount: Math.round(amount * 100) / 100,
-        billTotal: Math.round((billTotal || amount) * 100) / 100,
-        paidAmount: Math.round((paidAmount || amount) * 100) / 100,
-        dueAmount: dueAmount > 0 ? dueAmount : 0,
         mode,
         note,
         items,
@@ -3318,7 +3070,6 @@
         const isSale = t.type === 'sale';
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
         const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
-        let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
         let addedByTag = t.addedBy ? `<span style="color:#0284c7; font-weight:700;">👤 ${t.addedBy}</span> • ` : '';
 
         const rowHTML = `
@@ -3329,7 +3080,7 @@
                 <span class="mode-badge ${badgeClass}">${t.mode.toUpperCase()}</span>
               </div>
               <div class="entry-sub">
-                ${addedByTag}${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍 ${dueBadge}
+                ${addedByTag}${t.note ? t.note + ' • ' : ''}തൊട്ടാൽ വിവരങ്ങൾ കാണാം 🔍
               </div>
             </div>
             <div class="entry-right">
@@ -3527,59 +3278,80 @@
       const refDate = new Date(curDate);
       const fromDate = document.getElementById('suppFromDate') ? document.getElementById('suppFromDate').value : today;
       const toDate = document.getElementById('suppToDate') ? document.getElementById('suppToDate').value : today;
+      
       const grouped = {};
+
       transactions.forEach(t => {
-        if (t.type === 'expense' && (t.category === 'stock' || t.category === 'pay_due')) {
+        if (t.type === 'expense' && t.category === 'stock') {
           const name = (t.title || t.extra || 'Unknown').trim();
           const key = name.toLowerCase();
           const tDate = new Date(t.date);
           let match = false;
+
           if (currentSupplierFilter === 'all') match = true;
           else if (currentSupplierFilter === 'today') match = (t.date === curDate);
           else if (currentSupplierFilter === 'month') match = (tDate.getMonth() === refDate.getMonth() && tDate.getFullYear() === refDate.getFullYear());
           else if (currentSupplierFilter === 'custom') match = (t.date >= fromDate && t.date <= toDate);
+
           if (!grouped[key]) {
             grouped[key] = { name, totalPaid: 0, dueBalance: 0, count: 0, lastDate: t.date, transactions: [] };
           }
+
           grouped[key].transactions.push(t);
+
           if (match) {
-            grouped[key].totalPaid += (t.paidAmount || t.amount);
+            grouped[key].totalPaid += t.amount;
             grouped[key].count += 1;
           }
           if (t.date > grouped[key].lastDate) grouped[key].lastDate = t.date;
         }
       });
+
       let totalAllDues = 0;
+
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
         if (item.transactions && item.transactions.length > 0) {
-          item.transactions.sort((a,b) => {
+          // പഴയ തീയതി മുതൽ പുതിയതിലേക്ക് സോർട്ട് ചെയ്ത് കുടിശ്ശിക സ്റ്റെപ്പ്-ബൈ-സ്റ്റെപ്പ് കാൽക്കുലേറ്റ് ചെയ്യുന്നു
+          item.transactions.sort((a, b) => {
             const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
             const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-            if (timeA !== timeB) return timeB - timeA;
-            return b.date.localeCompare(a.date);
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            return timeA - timeB;
           });
-          if (item.transactions[0].dueAmount !== undefined) {
-            item.dueBalance = item.transactions[0].dueAmount;
-          }
+
+          let runningDue = 0;
+          item.transactions.forEach(tr => {
+            const bill = tr.billTotal !== undefined ? tr.billTotal : tr.amount;
+            const paid = tr.paidAmount !== undefined ? tr.paidAmount : tr.amount;
+            runningDue = (runningDue + bill) - paid;
+            tr.calculatedDue = runningDue > 0 ? runningDue : 0;
+          });
+
+          item.dueBalance = item.transactions[item.transactions.length - 1].calculatedDue;
         }
         totalAllDues += (item.dueBalance || 0);
       });
+
       const dueDisp = document.getElementById('suppTotalDueDisplay');
       if (dueDisp) dueDisp.innerText = '₹' + (Math.round(totalAllDues * 100) / 100);
+
       let keys = Object.keys(grouped);
       if (supplierDuesOnlyFilter) {
         keys = keys.filter(k => grouped[k].dueBalance > 0);
       }
+
       if (!keys.length) {
         container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:20px;">${supplierDuesOnlyFilter ? 'കുടിശ്ശികയുള്ള സപ്ലയർമാർ ആരും തന്നെയില്ല! 🎉' : 'സപ്ലയർ പർച്ചേസുകൾ ഒന്നും ലഭ്യമല്ല'}</p>`;
         return;
       }
+
       let html = '';
       keys.forEach(k => {
         const item = grouped[k];
         const totDue = Math.round((item.dueBalance || 0) * 100) / 100;
         const dueText = totDue > 0 ? `<div class="stock-due-tag">⚠️ കൊടുക്കാനുള്ള കുടിശ്ശിക: ₹${totDue}</div>` : `<div style="font-size:0.7rem; color:#16a34a; font-weight:700;">✓ കുടിശ്ശിക ഇല്ല</div>`;
+
         html += `
           <div class="stock-card" onclick="openItemHistorySheet('${item.name}', 'stock')">
             <div class="stock-header">
@@ -3828,7 +3600,7 @@
             rent += t.amount;
           } else if (t.category === 'salary') {
             salary += t.amount;
-          } else if (t.category === 'stock' || t.category === 'pay_due') {
+          } else if (t.category === 'stock') {
             stock += t.amount;
           } else {
             misc += t.amount;
@@ -4301,6 +4073,7 @@
       const fromDate = document.getElementById('sheetFromDate').value;
       const toDate = document.getElementById('sheetToDate').value;
       let matched = [];
+
       if (forcedCategory === 'item_stock') {
         transactions.forEach(t => {
           if (t.items && t.items.length) {
@@ -4316,6 +4089,7 @@
           return itemTitle === activeSheetKey;
         });
       }
+
       let filtered = matched.filter(t => {
         if (currentSheetFilter === 'all') return true;
         const tDate = new Date(t.date);
@@ -4331,22 +4105,56 @@
         }
         return true;
       });
-      filtered.sort((a,b) => {
+
+      // 1. ആദ്യം പഴയതിൽ നിന്ന് പുതിയതിലേക്ക് (Oldest to Newest) സോർട്ട് ചെയ്ത് കുടിശ്ശിക കൃത്യമായി കാൽക്കുലേറ്റ് ചെയ്യുക
+      filtered.sort((a, b) => {
         const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
         const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-        if (timeA !== timeB) return timeB - timeA;
-        return b.date.localeCompare(a.date);
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return timeA - timeB;
       });
+
+      let runningDue = 0;
+      filtered.forEach(t => {
+        const bill = t.billTotal !== undefined ? t.billTotal : t.amount;
+        const paid = t.paidAmount !== undefined ? t.paidAmount : t.amount;
+        if (t.category === 'pay_due') {
+          runningDue = runningDue - paid;
+        } else {
+          runningDue = (runningDue + bill) - paid;
+        }
+        t.calculatedDue = runningDue > 0 ? runningDue : 0;
+      });
+
+      // 2. ഡിസൈൻ പ്രകാരം ഏറ്റവും പുതിയത് മുകളിലേക്ക് (Newest First) റിവേഴ്സ് ചെയ്യുക
+      filtered.sort((a, b) => {
+        const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
+        const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
+        if (a.date !== b.date) return b.date.localeCompare(a.date);
+        return timeB - timeA;
+      });
+
       let totalSum = 0;
-      let totalDueSum = 0;
+      let finalDueSum = 0;
       let rowsHTML = '';
+
+      if (filtered.length > 0 && filtered[filtered.length - 1].calculatedDue !== undefined) {
+        // റിവേഴ്സ് ചെയ്ത ലിസ്റ്റിൽ ഏറ്റവും ഒടുവിലത്തേത് (പഴയത്) നോക്കിയാൽ ഫൈനൽ ഡ്യൂ കിട്ടും
+        // അല്ലെങ്കിൽ ഏറ്റവും പുതിയ എൻട്രിയുടെ calculatedDue ആണ് മൊത്തം കുടിശ്ശികയായി വരേണ്ടത്
+      }
+
       filtered.forEach((t, idx) => {
         totalSum += t.amount;
-        if (t.dueAmount !== undefined) totalDueSum = t.dueAmount;
+        if (idx === 0) {
+          // ഏറ്റവും പുതിയ എൻട്രിയിലാണ് കറന്റ് ഡ്യൂ ഉള്ളത്
+          finalDueSum = t.calculatedDue || 0;
+        }
+
         const isSale = t.type === 'sale';
         const rowId = `dropdown-item-${idx}`;
         let itemsDropdownHTML = '';
         let hasItems = t.items && t.items.length > 0;
+
         if (hasItems && forcedCategory !== 'item_stock') {
           itemsDropdownHTML = `
             <div id="${rowId}" class="dropdown-items-panel">
@@ -4361,11 +4169,14 @@
             </div>
           `;
         }
+
         let dueDisplay = '';
-        if (t.dueAmount !== undefined) {
-          dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.dueAmount}</div>`;
+        if (!isSale && t.calculatedDue !== undefined) {
+          dueDisplay = `<div style="font-size:0.7rem; color:#b91c1c; font-weight:bold;">കുടിശ്ശിക: ₹${t.calculatedDue}</div>`;
         }
+
         let addedByDisplay = t.addedBy ? `<div style="font-size:0.7rem; color:#0284c7; font-weight:700; margin-top:3px;">👤 Added by: ${t.addedBy}</div>` : '';
+
         rowsHTML += `
           <tr class="${hasItems && forcedCategory !== 'item_stock' ? 'collapsible-trigger' : ''}" onclick="${hasItems && forcedCategory !== 'item_stock' ? `toggleItemsDropdown('${rowId}')` : ''}">
             <td style="padding:8px; border-bottom:1px solid #e2e8f0;"><strong>${t.date}</strong></td>
@@ -4383,22 +4194,17 @@
           </tr>
         `;
       });
+
       document.getElementById('sheetTableBody').innerHTML = rowsHTML || '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:15px;">എൻട്രികൾ ലഭ്യമല്ല</td></tr>';
+      
       totalSum = Math.round(totalSum * 100) / 100;
-      totalDueSum = Math.round(totalDueSum * 100) / 100;
+      finalDueSum = Math.round(finalDueSum * 100) / 100;
+
       let totalText = '₹' + totalSum;
-      const sortedForDue = filtered.slice().sort((a, b) => {
-        const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
-        const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-        if (timeA !== timeB) return timeA - timeB;
-        return a.date.localeCompare(b.date);
-      });
-      if (sortedForDue.length > 0) {
-        const lastEntry = sortedForDue[sortedForDue.length - 1];
-        if (lastEntry.dueAmount !== undefined) {
-          totalText += ` (ആകെ കുടിശ്ശിക: ₹${lastEntry.dueAmount})`;
-        }
+      if (filtered.length > 0 && !filtered[0].type || filtered[0].type === 'expense') {
+        totalText += ` (ആകെ കുടിശ്ശിക: ₹${finalDueSum})`;
       }
+
       document.getElementById('sheetTotalSum').innerText = totalText;
       document.getElementById('sheetTotalSum').className = (filtered[0] && filtered[0].type === 'sale') ? 'color-green' : 'color-red';
     }
