@@ -787,7 +787,7 @@
       🖨️ PRINT
     </button>
 
-    <!-- WhatsApp Bill ബട്ടണ് പകരം നൽകിയ Orders / KOT ബട്ടൺ -->
+    <!-- Orders / KOT ബട്ടൺ -->
     <button type="button" class="dock-box box-order" onclick="openOrdersModal()">
       📋 Orders / KOT
     </button>
@@ -979,7 +979,7 @@
     </div>
   </div>
 
-  <!-- 8. ORDERS / KOT MODAL (കസ്റ്റമർ ഓർഡർ സ്ലിപ്പ് & സേവ് ചെയ്ത ഓർഡറുകൾ) -->
+  <!-- 8. ORDERS / KOT MODAL (ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്ത ലൈവ് ഓർഡറുകൾ) -->
   <div class="modal" id="ordersModal" style="z-index: 1050;">
     <div class="modal-box">
       <div class="modal-header">
@@ -1144,7 +1144,7 @@
 
     let menuItems = [];
     let todayBills = [];
-    let activeOrders = []; // പെൻഡിങ് ഓർഡറുകൾ സേവ് ചെയ്തുവെക്കാൻ
+    let activeOrders = []; // ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്യുന്ന ലൈവ് ഓർഡറുകൾ
     let cart = [];
     let parcelCharge = 0;
     let isPrintingBill = false;
@@ -1462,6 +1462,12 @@
       db.collection('pos_bills').where('date', '==', todayDate).onSnapshot(snap => {
         todayBills = [];
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
+      });
+
+      // ഫയർസ്റ്റോറിൽ നിന്ന് ലൈവ് ഓർഡറുകൾ (active_orders) റിയൽ-ടൈം ആയി സിങ്ക് ചെയ്യുന്നു
+      db.collection('active_orders').onSnapshot(snap => {
+        activeOrders = [];
+        snap.forEach(doc => activeOrders.push({ id: doc.id, ...doc.data() }));
       });
     });
 
@@ -2196,14 +2202,14 @@
     }
 
     /* =============================================================
-       ORDERS / KOT MANAGEMENT (ഓർഡർ സേവ് ചെയ്യാനും പ്രിന്റ് ചെയ്യാനും)
+       ORDERS / KOT MANAGEMENT (ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്യുന്ന ലൈവ് ഓർഡറുകൾ)
        ============================================================= */
     function openOrdersModal() {
       renderActiveOrdersUI();
       openModalWithHistory('ordersModal');
     }
 
-    function saveCurrentCartAsOrder() {
+    async function saveCurrentCartAsOrder() {
       if (!cart.length) {
         playWarningSound();
         alert("⚠️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നുമില്ല!");
@@ -2211,20 +2217,25 @@
       }
       playSuccessSound();
       const orderObj = {
-        id: 'ord_' + Date.now(),
         time: get12HourTimeString(),
         items: JSON.parse(JSON.stringify(cart)),
         parcelCharge: parcelCharge,
-        total: calculateCartTotal()
+        total: calculateCartTotal(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      activeOrders.unshift(orderObj);
-      cart = [];
-      parcelCharge = 0;
-      renderCartUI();
-      renderMenuItems();
-      closeModal('cartDrawerModal');
-      renderActiveOrdersUI();
-      alert("✅ ഓർഡർ വിജയകരമായി സേവ് ചെയ്തു!");
+
+      try {
+        await db.collection('active_orders').add(orderObj);
+        cart = [];
+        parcelCharge = 0;
+        renderCartUI();
+        renderMenuItems();
+        closeModal('cartDrawerModal');
+        alert("✅ ഓർഡർ ഫയർസ്റ്റോറിൽ വിജയകരമായി സേവ് ചെയ്തു!");
+      } catch (err) {
+        console.error("Error saving active order: ", err);
+        alert("❌ ഓർഡർ സേവ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
+      }
     }
 
     function renderActiveOrdersUI() {
@@ -2235,7 +2246,7 @@
       }
 
       container.innerHTML = activeOrders.map((ord, idx) => {
-        const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+        const itemsSummary = (ord.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
         return `
           <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -2257,29 +2268,36 @@
       const ord = activeOrders.find(o => o.id === ordId);
       if (!ord) return;
       playTickSound();
-      // സെയിൽസിൽ കയറാതെ കിച്ചണിലേക്കോ കസ്റ്റമർക്കോ ഉള്ള KOT സ്ലിപ്പ് പ്രിന്റ് ചെയ്യുന്നു
       triggerThermalPrint('KOT', formatDateDDMMYYYY(), ord.time, ord.total, 'KOT', ord.items, ord.parcelCharge);
     }
 
-    function recallOrderToCart(ordId) {
-      const idx = activeOrders.findIndex(o => o.id === ordId);
-      if (idx === -1) return;
+    async function recallOrderToCart(ordId) {
+      const ord = activeOrders.find(o => o.id === ordId);
+      if (!ord) return;
       playTickSound();
-      const ord = activeOrders[idx];
       cart = JSON.parse(JSON.stringify(ord.items));
       parcelCharge = ord.parcelCharge || 0;
-      activeOrders.splice(idx, 1);
-      renderCartUI();
-      renderMenuItems();
-      closeModal('ordersModal');
-      alert("✅ ഓർഡർ കാർട്ടിലേക്ക് തിരികെ എടുത്തു!");
+      
+      try {
+        await db.collection('active_orders').doc(ordId).delete();
+        renderCartUI();
+        renderMenuItems();
+        closeModal('ordersModal');
+        alert("✅ ഓർഡർ കാർട്ടിലേക്ക് തിരികെ എടുത്തു!");
+      } catch (err) {
+        console.error("Error recalling order: ", err);
+        alert("❌ തടസ്സം നേരിട്ടു.");
+      }
     }
 
-    function deleteActiveOrder(ordId) {
+    async function deleteActiveOrder(ordId) {
       if (confirm("ഈ ഓർഡർ ഒഴിവാക്കണോ?")) {
         playTickSound();
-        activeOrders = activeOrders.filter(o => o.id !== ordId);
-        renderActiveOrdersUI();
+        try {
+          await db.collection('active_orders').doc(ordId).delete();
+        } catch (err) {
+          console.error("Error deleting order: ", err);
+        }
       }
     }
 
