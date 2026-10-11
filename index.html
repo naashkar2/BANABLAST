@@ -4536,12 +4536,11 @@
     }
 
     /* -------------------------------------------------------------
-       FIXED PDF ARTIFACT GENERATOR (FULL HEIGHT & MULTI-PAGE SUPPORT)
+       FIXED PDF ARTIFACT GENERATOR (AUTO-OPEN & FULL VIEW FIX)
        ------------------------------------------------------------- */
     async function generateCleanPdfArtifact() {
       const element = document.getElementById('a4SheetPaper');
       
-      // Full height rendering fix for html2canvas
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -4588,27 +4587,49 @@
       const fileName = `${currentA4Title}_${today}.pdf`;
 
       try {
-        const { base64, pdfDoc } = await generateCleanPdfArtifact();
+        const { base64, pdfDoc, dataUri } = await generateCleanPdfArtifact();
 
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
           const { Filesystem } = window.Capacitor.Plugins;
-          await Filesystem.writeFile({
-            path: `Download/${fileName}`,
+          const { FileOpener } = window.Capacitor.Plugins; // Capacitor FileOpener if available
+
+          const savedFile = await Filesystem.writeFile({
+            path: fileName,
             data: base64,
-            directory: 'DOCUMENTS',
+            directory: 'CACHE',
             recursive: true
           });
-          alert(`✅ PDF ഫയൽ ഫോണിലേക്ക് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു!\nFile: ${fileName}`);
+
+          if (FileOpener && FileOpener.open) {
+            await FileOpener.open({
+              filePath: savedFile.uri,
+              contentType: 'application/pdf',
+              openWithDefault: true
+            });
+          } else if (window.Capacitor.Plugins.Share) {
+            await window.Capacitor.Plugins.Share.share({
+              title: currentA4Title,
+              url: savedFile.uri,
+              dialogTitle: 'Open / View PDF'
+            });
+          } else {
+            pdfDoc.save(fileName);
+          }
         } else {
-          pdfDoc.save(fileName);
+          // Web fallback: auto trigger view/download
+          const blobUrl = URL.createObjectURL(pdfDoc.output('blob'));
+          const newWindow = window.open(blobUrl, '_blank');
+          if (!newWindow) {
+            pdfDoc.save(fileName);
+          }
         }
 
         if (btn) {
-          btn.innerText = '✅ Saved!';
+          btn.innerText = '✅ Opened!';
           setTimeout(() => { btn.innerText = '💾 Download PDF'; }, 2000);
         }
       } catch (err) {
-        console.error("PDF download fallback:", err);
+        console.error("PDF download/open error:", err);
         window.print();
         if (btn) btn.innerText = '💾 Download PDF';
       }
