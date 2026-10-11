@@ -922,7 +922,7 @@
           <button class="btn-link" onclick="openOpeningModal()">EDIT OPENING</button>
         </div>
 
-        <div class="clickable-row" onclick="openRunningBreakdown('bank')">
+        <div class="clickable-row" onclick="openRunningBreakdown('gpay')">
           <span style="font-weight:600; color:#334155;">Bank Account (GPay/UPI) 🔍</span>
           <strong id="runBankBal" style="font-weight:800; color:#0369a1;">₹0</strong>
         </div>
@@ -1328,7 +1328,7 @@
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:0.8rem;">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Counter Cash Balance:</span>
+            <span>Counter Cash Box Balance:</span>
             <strong id="modalRepCashBal">₹0</strong>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
@@ -4413,7 +4413,7 @@
       const tableContainer = document.getElementById('breakdownTableContainer');
       const curDate = document.getElementById('selectedDate').value || today;
 
-      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'bank' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
+      let modeTitle = mode === 'cash' ? 'Counter Cash Box' : (mode === 'gpay' ? 'Bank Account (GPay/UPI)' : 'TOTAL BALANCE');
       titleElem.innerText = `${modeTitle} - Date-wise Breakdown`;
 
       let relevantDates = new Set();
@@ -4424,7 +4424,7 @@
 
       let currentBal = 0;
       if (mode === 'cash') currentBal = opening.cash || 0;
-      else if (mode === 'bank') currentBal = opening.bank || 0;
+      else if (mode === 'gpay') currentBal = opening.bank || 0;
       else currentBal = (opening.cash || 0) + (opening.bank || 0);
 
       let tableHTML = `
