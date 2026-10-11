@@ -3246,9 +3246,9 @@
               todayTrans.push(counterCashEntry);
             }
             counterCashEntry.amount = Math.round((counterCashEntry.amount + t.amount) * 100) / 100;
-          } else if (t.mode === 'gpay' || t.mode === 'bank') {
+          } else if (t.mode === 'gpay') {
             if (!counterGpayEntry) {
-              counterGpayEntry = { ...t, title: 'Counter Sales (GPay)', extra: 'Counter Sales (GPay)', amount: 0, mode: 'gpay' };
+              counterGpayEntry = { ...t, title: 'Counter Sales (GPay)', extra: 'Counter Sales (GPay)', amount: 0 };
               todayTrans.push(counterGpayEntry);
             }
             counterGpayEntry.amount = Math.round((counterGpayEntry.amount + t.amount) * 100) / 100;
@@ -3268,7 +3268,7 @@
       todayTrans.forEach(t => {
         const isSale = t.type === 'sale';
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
-        const badgeClass = (t.mode === 'cash') ? 'badge-cash' : 'badge-gpay';
+        const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
         let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
         let addedByTag = t.addedBy ? `<span style="color:#0284c7; font-weight:700;">👤 ${t.addedBy}</span> • ` : '';
 
@@ -3518,7 +3518,6 @@
       Object.keys(grouped).forEach(k => {
         const item = grouped[k];
         if (item.transactions && item.transactions.length > 0) {
-          // പഴയ തീയതി മുതൽ പുതിയതിലേക്ക് സോർട്ട് ചെയ്ത് കുടിശ്ശിക സ്റ്റെപ്പ്-ബൈ-സ്റ്റെപ്പ് കാൽക്കുലേറ്റ് ചെയ്യുന്നു
           item.transactions.sort((a, b) => {
             const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
             const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
@@ -4316,7 +4315,6 @@
         return true;
       });
 
-      // 1. ആദ്യം പഴയതിൽ നിന്ന് പുതിയതിലേക്ക് (Oldest to Newest) സോർട്ട് ചെയ്ത് കുടിശ്ശിക കൃത്യമായി കാൽക്കുലേറ്റ് ചെയ്യുക
       filtered.sort((a, b) => {
         const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
         const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
@@ -4336,7 +4334,6 @@
         t.calculatedDue = runningDue > 0 ? runningDue : 0;
       });
 
-      // 2. ഡിസൈൻ പ്രകാരം ഏറ്റവും പുതിയത് മുകളിലേക്ക് (Newest First) റിവേഴ്സ് ചെയ്യുക
       filtered.sort((a, b) => {
         const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
         const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
@@ -4538,24 +4535,44 @@
       }
     }
 
+    /* -------------------------------------------------------------
+       FIXED PDF ARTIFACT GENERATOR (FULL HEIGHT & MULTI-PAGE SUPPORT)
+       ------------------------------------------------------------- */
     async function generateCleanPdfArtifact() {
       const element = document.getElementById('a4SheetPaper');
+      
+      // Full height rendering fix for html2canvas
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        logging: false
+        logging: false,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 0.98);
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
+      
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const margin = 5;
-      const imgWidth = pdfWidth - (margin * 2);
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
 
-      pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
 
       const blob = pdf.output('blob');
       const dataUri = pdf.output('datauristring');
