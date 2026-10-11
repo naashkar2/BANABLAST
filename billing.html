@@ -538,14 +538,14 @@
       gap: 6px;
     }
 
-    .box-whatsapp {
-      background: #25d366;
-      color: #064e3b;
+    .box-order {
+      background: #f97316;
+      color: #ffffff;
       border: none;
       font-size: 0.85rem;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
       gap: 6px;
     }
 
@@ -787,8 +787,9 @@
       🖨️ PRINT
     </button>
 
-    <button type="button" class="dock-box box-whatsapp" onclick="sendWhatsAppBillDirect()">
-      💬 WhatsApp Bill
+    <!-- WhatsApp Bill ബട്ടണ് പകരം നൽകിയ Orders / KOT ബട്ടൺ -->
+    <button type="button" class="dock-box box-order" onclick="openOrdersModal()">
+      📋 Orders / KOT
     </button>
 
     <button type="button" class="dock-box box-recent" onclick="openRecentBillsModal()">
@@ -978,7 +979,23 @@
     </div>
   </div>
 
-  <!-- 8. TODAY'S SUMMARY MODAL -->
+  <!-- 8. ORDERS / KOT MODAL (കസ്റ്റമർ ഓർഡർ സ്ലിപ്പ് & സേവ് ചെയ്ത ഓർഡറുകൾ) -->
+  <div class="modal" id="ordersModal" style="z-index: 1050;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">📋 Live Orders / KOT Slips</div>
+        <button class="btn-close" onclick="closeModal('ordersModal')">✕</button>
+      </div>
+      <div style="margin-bottom:12px; display:flex; gap:8px;">
+        <button type="button" class="btn-hdr-action" style="flex:1; background:var(--orange, #f97316); justify-content:center; height:38px;" onclick="saveCurrentCartAsOrder()">
+          📥 Save Current Cart as Order
+        </button>
+      </div>
+      <div id="activeOrdersContainer" style="max-height:320px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- 9. TODAY'S SUMMARY MODAL -->
   <div class="modal" id="todaySummaryModal">
     <div class="modal-box" style="text-align:center;">
       <div class="modal-header">
@@ -1008,7 +1025,7 @@
     </div>
   </div>
 
-  <!-- 9. SPLIT LONG PRESS MODAL -->
+  <!-- 10. SPLIT LONG PRESS MODAL -->
   <div id="splitLongPressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
     <div style="background: white; width: 85%; max-width: 320px; border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
       <div style="font-size: 0.9rem; font-weight: 900; color: #1e293b; margin-bottom: 8px;">🔀 സ്പ്ലിറ്റ് പെയ്മെന്റ് (Cash + GPay)</div>
@@ -1127,6 +1144,7 @@
 
     let menuItems = [];
     let todayBills = [];
+    let activeOrders = []; // പെൻഡിങ് ഓർഡറുകൾ സേവ് ചെയ്തുവെക്കാൻ
     let cart = [];
     let parcelCharge = 0;
     let isPrintingBill = false;
@@ -1479,7 +1497,6 @@
       currentPayMode = 'Split';
       document.getElementById('splitLongPressModal').style.display = 'none';
 
-      // Hide Cash/GPay buttons and show Split Active Button with Close mark
       document.getElementById('btnPayCash').style.display = 'none';
       document.getElementById('btnPayGPay').style.display = 'none';
       
@@ -1488,7 +1505,6 @@
       splitBtn.style.display = 'flex';
     }
 
-    // സ്പ്ലിറ്റ് കാൻസൽ ചെയ്ത് നോർമൽ മോഡിലേക്ക് മടരാൻ
     function removeSplitPayment(event) {
       if (event) event.stopPropagation(); 
       currentBillSplit = null;
@@ -2111,7 +2127,7 @@
       if (spaceCount < 1) spaceCount = 1;
       raw += LEFT + date + " ".repeat(spaceCount) + time + "\n";
       raw += CENTER + "--------------------------------\n";
-      raw += LEFT + "NO ITEM           QTY     AMT\n";
+      raw += LEFT + "NO ITEM     QTY     AMT\n";
       raw += LEFT + "--------------------------------\n";
 
       items.forEach((i, index) => {
@@ -2177,6 +2193,94 @@
       }, { merge: true });
 
       await batch.commit();
+    }
+
+    /* =============================================================
+       ORDERS / KOT MANAGEMENT (ഓർഡർ സേവ് ചെയ്യാനും പ്രിന്റ് ചെയ്യാനും)
+       ============================================================= */
+    function openOrdersModal() {
+      renderActiveOrdersUI();
+      openModalWithHistory('ordersModal');
+    }
+
+    function saveCurrentCartAsOrder() {
+      if (!cart.length) {
+        playWarningSound();
+        alert("⚠️ കാർട്ടിൽ സാധനങ്ങൾ ഒന്നുമില്ല!");
+        return;
+      }
+      playSuccessSound();
+      const orderObj = {
+        id: 'ord_' + Date.now(),
+        time: get12HourTimeString(),
+        items: JSON.parse(JSON.stringify(cart)),
+        parcelCharge: parcelCharge,
+        total: calculateCartTotal()
+      };
+      activeOrders.unshift(orderObj);
+      cart = [];
+      parcelCharge = 0;
+      renderCartUI();
+      renderMenuItems();
+      closeModal('cartDrawerModal');
+      renderActiveOrdersUI();
+      alert("✅ ഓർഡർ വിജയകരമായി സേവ് ചെയ്തു!");
+    }
+
+    function renderActiveOrdersUI() {
+      const container = document.getElementById('activeOrdersContainer');
+      if (!activeOrders.length) {
+        container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:25px; font-size:0.85rem;">പെൻഡിങ് ഓർഡറുകൾ ഒന്നും ഇല്ല.</p>';
+        return;
+      }
+
+      container.innerHTML = activeOrders.map((ord, idx) => {
+        const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+        return `
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <strong style="color:var(--primary-dark); font-size:0.9rem;">Order #${idx + 1} • ₹${ord.total}</strong>
+              <span style="font-size:0.72rem; color:#64748b;">🕒 ${ord.time}</span>
+            </div>
+            <div style="font-size:0.78rem; color:#475569; margin-bottom:8px; line-height:1.2;">${itemsSummary}</div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-rec-act" style="background:var(--emerald); color:white; flex:1;" onclick="printKOTSlip('${ord.id}')">🖨️ Print KOT Slip</button>
+              <button type="button" class="btn-rec-act" style="background:var(--blue); color:white; flex:1;" onclick="recallOrderToCart('${ord.id}')">📥 Recall to Cart</button>
+              <button type="button" class="btn-rec-act" style="background:#fee2e2; color:#dc2626;" onclick="deleteActiveOrder('${ord.id}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function printKOTSlip(ordId) {
+      const ord = activeOrders.find(o => o.id === ordId);
+      if (!ord) return;
+      playTickSound();
+      // സെയിൽസിൽ കയറാതെ കിച്ചണിലേക്കോ കസ്റ്റമർക്കോ ഉള്ള KOT സ്ലിപ്പ് പ്രിന്റ് ചെയ്യുന്നു
+      triggerThermalPrint('KOT', formatDateDDMMYYYY(), ord.time, ord.total, 'KOT', ord.items, ord.parcelCharge);
+    }
+
+    function recallOrderToCart(ordId) {
+      const idx = activeOrders.findIndex(o => o.id === ordId);
+      if (idx === -1) return;
+      playTickSound();
+      const ord = activeOrders[idx];
+      cart = JSON.parse(JSON.stringify(ord.items));
+      parcelCharge = ord.parcelCharge || 0;
+      activeOrders.splice(idx, 1);
+      renderCartUI();
+      renderMenuItems();
+      closeModal('ordersModal');
+      alert("✅ ഓർഡർ കാർട്ടിലേക്ക് തിരികെ എടുത്തു!");
+    }
+
+    function deleteActiveOrder(ordId) {
+      if (confirm("ഈ ഓർഡർ ഒഴിവാക്കണോ?")) {
+        playTickSound();
+        activeOrders = activeOrders.filter(o => o.id !== ordId);
+        renderActiveOrdersUI();
+      }
     }
 
     /* =============================================================
@@ -2292,7 +2396,7 @@
                   </span>
                 </div>
                 <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
-                  🕒 ${bill.time || '-'} • ${isSplit ? `Cash: ₹${bill.cash} \vert{} GPay: ₹${bill.gpay}` : ''}
+                  🕒 ${bill.time || '-'} • ${isSplit ? `Cash: ₹${bill.cash} ｜ GPay: ₹${bill.gpay}` : ''}
                 </div>
               </div>
               <div style="display:flex; gap:5px;" onclick="event.stopPropagation()">
