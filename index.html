@@ -3246,9 +3246,9 @@
               todayTrans.push(counterCashEntry);
             }
             counterCashEntry.amount = Math.round((counterCashEntry.amount + t.amount) * 100) / 100;
-          } else if (t.mode === 'gpay') {
+          } else if (t.mode === 'gpay' || t.mode === 'bank') {
             if (!counterGpayEntry) {
-              counterGpayEntry = { ...t, title: 'Counter Sales (GPay)', extra: 'Counter Sales (GPay)', amount: 0 };
+              counterGpayEntry = { ...t, title: 'Counter Sales (GPay)', extra: 'Counter Sales (GPay)', amount: 0, mode: 'gpay' };
               todayTrans.push(counterGpayEntry);
             }
             counterGpayEntry.amount = Math.round((counterGpayEntry.amount + t.amount) * 100) / 100;
@@ -3268,7 +3268,7 @@
       todayTrans.forEach(t => {
         const isSale = t.type === 'sale';
         const displayTitle = t.title || t.extra || (isSale ? 'Sales' : 'Expense');
-        const badgeClass = t.mode === 'cash' ? 'badge-cash' : 'badge-gpay';
+        const badgeClass = (t.mode === 'cash') ? 'badge-cash' : 'badge-gpay';
         let dueBadge = (t.dueAmount && t.dueAmount > 0) ? `<span style="color:#b91c1c; font-weight:800; font-size:0.7rem;"> (ബാക്കി: ₹${t.dueAmount})</span>` : '';
         let addedByTag = t.addedBy ? `<span style="color:#0284c7; font-weight:700;">👤 ${t.addedBy}</span> • ` : '';
 
@@ -3326,14 +3326,20 @@
 
       transactions.forEach(t => {
         if (t.date <= curDate) {
-          if (t.mode === 'cash') cumCash += (t.type === 'sale' ? t.amount : -t.amount);
-          else cumBank += (t.type === 'sale' ? t.amount : -t.amount);
+          const tMode = (t.mode || '').toLowerCase();
+          if (tMode === 'cash') {
+            cumCash += (t.type === 'sale' ? t.amount : -t.amount);
+          } else if (tMode === 'gpay' || tMode === 'bank') {
+            cumBank += (t.type === 'sale' ? t.amount : -t.amount);
+          }
         }
       });
 
       withdrawals.forEach(w => {
         if (w.status === 'verified' && w.date <= curDate) {
-          if (w.mode === 'cash') cumCash -= w.amount; else cumBank -= w.amount;
+          const wMode = (w.mode || '').toLowerCase();
+          if (wMode === 'cash') cumCash -= w.amount;
+          else if (wMode === 'gpay' || wMode === 'bank') cumBank -= w.amount;
         }
       });
 
@@ -4450,7 +4456,11 @@
         let dayOut = 0;
 
         transactions.filter(t => t.date === d).forEach(t => {
-          const matchMode = (mode === 'total') || (t.mode === mode);
+          const tMode = (t.mode || '').toLowerCase();
+          const matchMode = (mode === 'total') || 
+                            (mode === tMode) || 
+                            (mode === 'cash' && tMode === 'cash') || 
+                            (mode === 'gpay' && (tMode === 'gpay' || tMode === 'bank'));
           if (matchMode) {
             if (t.type === 'sale') dayIn += t.amount;
             else dayOut += t.amount;
@@ -4458,7 +4468,11 @@
         });
 
         withdrawals.filter(w => w.status === 'verified' && w.date === d).forEach(w => {
-          const matchMode = (mode === 'total') || (w.mode === mode);
+          const wMode = (w.mode || '').toLowerCase();
+          const matchMode = (mode === 'total') || 
+                            (mode === wMode) || 
+                            (mode === 'cash' && wMode === 'cash') || 
+                            (mode === 'gpay' && (wMode === 'gpay' || wMode === 'bank'));
           if (matchMode) {
             dayOut += w.amount;
           }
