@@ -2538,12 +2538,20 @@
           matchedTrans.sort((a,b) => {
             const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
             const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-            if (timeA !== timeB) return timeB - timeA;
-            return b.date.localeCompare(a.date);
+            if (timeA !== timeB) return timeA - timeB;
+            return a.date.localeCompare(b.date);
           });
-          if (matchedTrans[0].dueAmount !== undefined) {
-            currentDue = matchedTrans[0].dueAmount;
-          }
+          let runningDue = 0;
+          matchedTrans.forEach(tr => {
+            const bill = tr.billTotal !== undefined ? tr.billTotal : tr.amount;
+            const paid = tr.paidAmount !== undefined ? tr.paidAmount : tr.amount;
+            if (tr.category === 'pay_due') {
+              runningDue = runningDue - paid;
+            } else {
+              runningDue = (runningDue + bill) - paid;
+            }
+          });
+          currentDue = runningDue > 0 ? runningDue : 0;
         }
       }
       if (category === 'pay_due') {
@@ -2554,7 +2562,7 @@
         }
         if (labelElem) labelElem.innerText = 'ബാക്കി കുടിശ്ശിക (Remaining Due):';
         if (dueDisplay) {
-          dueDisplay.innerText = `₹${currentDue.toFixed(2)} (നിലവിലെ കുടിശ്ശിക)`;
+          dueDisplay.innerText = `₹${currentDue.toFixed(2)} (മൊത്തം കുടിശ്ശിക)`;
         }
       } else if (category === 'stock') {
         if (itemsContainer) itemsContainer.style.display = 'block';
@@ -2586,12 +2594,20 @@
           matchedTrans.sort((a,b) => {
             const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
             const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-            if (timeA !== timeB) return timeB - timeA;
-            return b.date.localeCompare(a.date);
+            if (timeA !== timeB) return timeA - timeB;
+            return a.date.localeCompare(b.date);
           });
-          if (matchedTrans[0].dueAmount !== undefined) {
-            existingDue = matchedTrans[0].dueAmount;
-          }
+          let runningDue = 0;
+          matchedTrans.forEach(tr => {
+            const bill = tr.billTotal !== undefined ? tr.billTotal : tr.amount;
+            const paid = tr.paidAmount !== undefined ? tr.paidAmount : tr.amount;
+            if (tr.category === 'pay_due') {
+              runningDue = runningDue - paid;
+            } else {
+              runningDue = (runningDue + bill) - paid;
+            }
+          });
+          existingDue = runningDue > 0 ? runningDue : 0;
         }
       }
 
@@ -2603,7 +2619,7 @@
       }
 
       if (dueDisplay) {
-        dueDisplay.innerText = `₹${finalRemainingDue.toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
+        dueDisplay.innerText = `₹${(finalRemainingDue > 0 ? finalRemainingDue : 0).toFixed(2)}${category === 'pay_due' ? ' (ബാക്കി കുടിശ്ശിക)' : ''}`;
       }
     }
 
@@ -3162,12 +3178,20 @@
             matchedTrans.sort((a,b) => {
               const timeA = a.createdAtMillis || (a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0);
               const timeB = b.createdAtMillis || (b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0);
-              if (timeA !== timeB) return timeB - timeA;
-              return b.date.localeCompare(a.date);
+              if (timeA !== timeB) return timeA - timeB;
+              return a.date.localeCompare(b.date);
             });
-            if (matchedTrans[0].dueAmount !== undefined) {
-              existingDue = matchedTrans[0].dueAmount;
-            }
+            let runningDue = 0;
+            matchedTrans.forEach(tr => {
+              const bill = tr.billTotal !== undefined ? tr.billTotal : tr.amount;
+              const paid = tr.paidAmount !== undefined ? tr.paidAmount : tr.amount;
+              if (tr.category === 'pay_due') {
+                runningDue = runningDue - paid;
+              } else {
+                runningDue = (runningDue + bill) - paid;
+              }
+            });
+            existingDue = runningDue > 0 ? runningDue : 0;
           }
 
           let newDueBalance = 0;
@@ -4535,9 +4559,6 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       FIXED PDF ARTIFACT GENERATOR (AUTO-OPEN & FULL VIEW FIX)
-       ------------------------------------------------------------- */
     async function generateCleanPdfArtifact() {
       const element = document.getElementById('a4SheetPaper');
       
@@ -4591,7 +4612,7 @@
 
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
           const { Filesystem } = window.Capacitor.Plugins;
-          const { FileOpener } = window.Capacitor.Plugins; // Capacitor FileOpener if available
+          const { FileOpener } = window.Capacitor.Plugins;
 
           const savedFile = await Filesystem.writeFile({
             path: fileName,
@@ -4616,7 +4637,6 @@
             pdfDoc.save(fileName);
           }
         } else {
-          // Web fallback: auto trigger view/download
           const blobUrl = URL.createObjectURL(pdfDoc.output('blob'));
           const newWindow = window.open(blobUrl, '_blank');
           if (!newWindow) {
