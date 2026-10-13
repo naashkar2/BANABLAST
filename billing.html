@@ -979,7 +979,7 @@
     </div>
   </div>
 
-  <!-- 8. ORDERS / KOT MODAL (ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്ത ലൈവ് ഓർഡറുകൾ) -->
+  <!-- 8. ORDERS / KOT MODAL (മാനുവൽ ആയി ഡിലീറ്റ് ചെയ്യുന്നത് വരെ നിലനിൽക്കും) -->
   <div class="modal" id="ordersModal" style="z-index: 1050;">
     <div class="modal-box">
       <div class="modal-header">
@@ -1144,7 +1144,7 @@
 
     let menuItems = [];
     let todayBills = [];
-    let activeOrders = []; // ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്യുന്ന ലൈവ് ഓർഡറുകൾ
+    let activeOrders = []; 
     let cart = [];
     let parcelCharge = 0;
     let isPrintingBill = false;
@@ -1154,7 +1154,6 @@
     let editingItemId = null;
     let pickedItemImageBase64 = "";
 
-    // Split Payment State
     let currentBillSplit = null;
     let pressTimer = null;
 
@@ -1464,7 +1463,7 @@
         snap.forEach(doc => todayBills.push({ id: doc.id, ...doc.data() }));
       });
 
-      // ഫയർസ്റ്റോറിൽ നിന്ന് ലൈവ് ഓർഡറുകൾ (active_orders) റിയൽ-ടൈം ആയി സിങ്ക് ചെയ്യുന്നു
+      // മാനുവൽ ആയി ഡിലീറ്റ് ചെയ്യുന്നത് വരെമാത്രം ലിസ്റ്റിൽ നിലനിൽക്കുന്ന ലൈവ് ഓർഡറുകൾ (active_orders)
       db.collection('active_orders').onSnapshot(snap => {
         activeOrders = [];
         snap.forEach(doc => activeOrders.push({ id: doc.id, ...doc.data() }));
@@ -2202,7 +2201,7 @@
     }
 
     /* =============================================================
-       ORDERS / KOT MANAGEMENT (ഫയർസ്റ്റോറുമായി സിങ്ക് ചെയ്യുന്ന ലൈവ് ഓർഡറുകൾ)
+       ORDERS / KOT MANAGEMENT (മാനുവൽ ആയി ഡിലീറ്റ് ചെയ്യുന്നത് വരെ നിലനിൽക്കും)
        ============================================================= */
     function openOrdersModal() {
       renderActiveOrdersUI();
